@@ -142,6 +142,30 @@ the target you select.
 
 This section is for other options that are in-common with all builds.
 
+=== nREPL [[nREPL]]
+
+When an active dev build is running there will be an nREPL. If you look at the startup message you'll see
+the port of nREPL, and the port will also be stored in `target/shadow-cljs/nrepl.port`:
+
+```bash
+$ shadow-cljs watch dev
+shadow-cljs - HTTP server for ":app" available at http://localhost:8020
+shadow-cljs - server running at http://0.0.0.0:9630
+shadow-cljs - nrepl running at /0.0.0.0:9462
+shadow-cljs - watching build :app
+[:app] Configuring build.
+[:app] Compiling ...
+```
+
+You can configure the port and additional middleware with `shadow-cljs.edn`:
+
+```
+{...
+ :nrepl {:port 9000
+         :middleware []} ; list of namespace-qualified symbols
+}
+```
+
 = Targeting the Browser
 
 There are a few targets that target web browsers in various ways, and since the targets are pluggable
@@ -174,10 +198,10 @@ these assets with some kind of server, and the Javascript loading code needs to 
 path to these assets. The options you need to specify are:
 
 [Horizontal]
-`:output-dir`:: The directory to use for all output. Your entry point javascript file will appear here.
-`:asset-path`:: The relative path from *web server's root* to the resources in `:output-dir`. For
-example if your web server will serve `resources/public` and your `output-dir` is `resources/public/js`
-then your asset-path should be `/js`.
+`:output-dir`:: The directory to use for all js output.
+`:asset-path`:: The relative path from *web server's root* to the resources in `:output-dir`.
+
+Your entry point javascript file and all related js files will appear in `:output-dir`.
 
 WARNING: Each build requires its own :output-dir, you may not put multiple builds into the same directory.
 This directory should also be exclusively owned by the build. There should be no other files in there.
@@ -185,7 +209,50 @@ While `shadow-cljs` won't delete anything it is safer to leave it alone. Compila
 creates many more files than just the main entry point javascript file during development:
 source maps, original sources, and generated sources.
 
-You are not required to use an absolute asset path, but an absolute path is highly recommended.
+The `asset-path` is a prefix that gets added to the paths of module loading code inside of the
+generated javascript. It allows you to output your javascript module to a particular subdirectory
+of your web server's root. The dynamic loading during development (hot code reload) and production
+(code splitting) need this to correctly locate files.
+
+Locating your generated files in a directory and asset path like this make it so that other assets
+(images, css, etc.) can easily co-exist on the same server without accidental collisions.
+
+For example: if your web server will serve the folder `public/x` when asked for the URI `/x`,
+and your `output-dir` for a module is `public/assets/app/js` then your asset-path should be `/assets/app/js`.
+You are not required to use an absolute asset path, but it is highly recommended.
+
+== Modules
+
+All projects will have one or more modules. If you're doing code splitting, then you will have more than one. If you're
+not <<CodeSpliting,code splitting>>, then you'll have one. The available options in a module are:
+
+The `modules` section of the config is always a map keyed by module ID. The module ID is also used
+to generate the Javascript filename. This is so the module loading code can easily find the correct file
+without additional configuration.
+
+[horizontal]
+`:entries`:: The namespaces that serve as the root nodes of the dependency graph for the output code of this module.
+`:depends-on`:: The names of other modules that must be loaded in order for this one to have everything it needs.
+`:prepend`:: String content that will be prepended to the js output. Useful for comments, copyright notice, etc.
+`:append`:: String content that will be appended to the js output. Useful for comments, copyright notice, etc.
+`:prepend-js`:: A string to prepend to the module output containing valid javascript that will be run through Closure optimizer.
+`:append-js`:: A string to append to the module output containing valid javascript that will be run through Closure optimizer.
+
+
+
+For now, know that a module definition need the following minimum things: A name (as a keyword) and one or more
+namespaces of the entry point(s) for code execution:
+
+```
+{...
+ :builds {
+   :app  {...
+          :modules {:main {:entries [my.app.main]}}}}}
+```
+
+shadow-cljs will follow the dependency graph from this root set of code entry points to find everything needed
+to actually run.
+
 
 == Cljsjs and NPM Modules
 
@@ -211,24 +278,6 @@ Alternatively you could simply try to build the project and respond to missing d
 with additions to your `package.json` file and an `npm install`.
 
 Read more about using arbitrary npm modules in you Clojurescript in a <<UsingNPMModules,later chapter>>.
-
-== Modules
-
-All projects will have one or more modules. If you're doing code splitting, then you will have more than one. If you're
-not code splitting, then you'll have one. See the <<Modules, the modules chapter>> for more information on code splitting.
-
-For now, know that a module definition need the following minimum things: A name (as a keyword) and one or more
-namespaces of the entry point(s) for code execution:
-
-```
-{...
- :builds {
-   :app  {...
-          :modules {:main {:entries [my.app.main]}}}}}
-```
-
-shadow-cljs will follow the dependency graph from this root set of code entry points to find everything needed
-to actually run.
 
 == Preloads
 
@@ -329,30 +378,6 @@ shadow-cljs cljs-repl app
 shadow-cljs node-repl
 ```
 
-=== nREPL
-
-When an active dev build is running there will be an nREPL. If you look at the startup message you'll see
-the port of nREPL, and the port will also be stored in `target/shadow-cljs/nrepl.port`:
-
-```bash
-$ shadow-cljs watch dev
-shadow-cljs - HTTP server for ":app" available at http://localhost:8020
-shadow-cljs - server running at http://0.0.0.0:9630
-shadow-cljs - nrepl running at /0.0.0.0:9462
-shadow-cljs - watching build :app
-[:app] Configuring build.
-[:app] Compiling ...
-```
-
-You can configure the port and additional middleware with `shadow-cljs.edn`:
-
-```
-{...
- :nrepl {:port 9000
-         :middleware []} ; list of namespace-qualified symbols
-}
-```
-
 === Cursive
 
 If you're a Cursive user then you currently need at least a dummy `project.clj` file. You may also wish to
@@ -374,7 +399,7 @@ If you want the full Cursive experience including proper code navigation then yo
 
 ==== Cursive REPL Integration
 
-An nREPL is created by `shadow-cljs` when it is in development mode. You can connect to it to get
+An <<nREPL>> is created by `shadow-cljs` when it is in development mode. You can connect to it to get
 REPL integration using a Clojure Remote REPL run configuration.
 
 By default the network port number is random, but that will be a major pain. You have
@@ -535,7 +560,43 @@ Here are some of the central functions that seem useful:
 
 // Thomas: care to opine?
 
-== Release Mode
+== Code Splitting [[CodeSplitting]]
+
+You've already seen how to configure your main module. Adding additional modules requires a little
+bit of care, but the technical details are simple:
+
+. Ensure you don't require things you don't use in any namespace.
+. Put the top-level namespace(s) for each module into a module config.
+. Choose you dynamic loading API
+
+=== Using shadow-cljs's built-in Loader Support
+
+=== Using the Standard Clojurescript API
+
+The generated code is capable of using the standard Clojurescript `cljs.loader` API. See the
+https://clojurescript.org/news/2017-07-10-code-splitting[documentation] on the Clojurescript website for instructions.
+
+== Using NPM Modules [[UsingNPMModules]]
+
+
+
+
+== Hacking
+
+=== Patching Libraries
+
+The shadow-cljs compiler ensure that things on your source paths are
+compiled last. Things from JAR files go first. This means that
+you can copy a source file from a library, patch it, and include it
+in your own source directory. This is a convenient way to test out
+fixes (even to `shadow-cljs` itself!) without having to clone
+that project and understand its setup, build, etc.
+
+= Targeting Node
+
+= Other Targets
+
+= Generating Production Code -- Release Mode
 
 Development mode always outputs individual files for each namespace so that they can be hot loaded
 in isolation. When you're ready to deploy code to a real server you want to run the Closure Compiler
@@ -583,51 +644,4 @@ can override settings by including a `:dev` and/or `:release` section in the bui
    :release {:compiler-options {:optimizations :whitespace}}}}}
 ```
 
-== Modules and Code Splitting [[Modules]]
-
-You've already seen how to configure your main module. Adding additional modules requires a little
-bit of care, but the technical details are simple:
-
-. Ensure you don't require things you don't use in any namespace.
-. Put the top-level namespace(s) for each module into a module config.
-. Choose you dynamic loading API
-
-[horizontal]
-`:entries`:: The namespaces that serve as the root nodes of the dependency graph for the output code of this module.
-`:depends-on`:: The names of other modules that must be loaded in order for this one to have everything it needs.
-`:prepend`:: String content that will be prepended to the js output. Useful for comments, copyright notice, etc.
-`:append`:: String content that will be appended to the js output. Useful for comments, copyright notice, etc.
-`:prepend-js`:: A string to prepend to the module output containing valid javascript that will be run through Closure optimizer.
-`:append-js`:: A string to append to the module output containing valid javascript that will be run through Closure optimizer.
-
-The `modules` section of the config is always a map keyed by module ID. The module ID is also used
-to generate the Javascript filename. This is so the module loading code can easily find the correct file
-without additional configuration.
-
-=== Using shadow-cljs's built-in Loader Support
-
-=== Using the Standard Clojurescript API
-
-The generated code is capable of using the standard Clojurescript `cljs.loader` API. See the
-https://clojurescript.org/news/2017-07-10-code-splitting[documentation] on the Clojurescript website for instructions.
-
-== Using NPM Modules [[UsingNPMModules]]
-
-
-
-
-== Hacking
-
-=== Patching Libraries
-
-The shadow-cljs compiler ensure that things on your source paths are
-compiled last. Things from JAR files go first. This means that
-you can copy a source file from a library, patch it, and include it
-in your own source directory. This is a convenient way to test out
-fixes (even to `shadow-cljs` itself!) without having to clone
-that project and understand its setup, build, etc.
-
-= Targeting Node
-
-= Other Targets
 
