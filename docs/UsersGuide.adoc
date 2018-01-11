@@ -34,6 +34,52 @@ endif::[]
 This is a work in progress. It has not been proofread and may contain errors. If you find an error, please
 submit a PR to fix it, or an issue with details of the problem.
 
+== Conventions Used in this Book
+
+There are many examples in this book. Most things used in these should be obvious from their context,
+but to prevent misunderstanding it is important to know the author's intentions.
+
+When command-line examples are given we may include BASH comments (starting with `#`), and will
+usually include the standard user UNIX prompt of `$` to indicate separation of the command
+from its output.
+
+```bash
+# A comment. This command lists files:
+$ ls -l
+shadow-cljs.edn
+project.clj
+...
+```
+
+Many of the examples are of the configuration file for the compiler. This file contains an EDN map.
+Where we have already discussed required options we will often elide them for clarity. In this
+case we'll usually include an elipsis to indicate "content that is required but isn't in our
+current focus":
+
+.Example 1. Specify dependencies
+```
+{:dependencies [[lib "1.0"]]}
+```
+
+.Example 2. Add source paths
+```
+{...
+ :source-paths ["src"]
+ ...}
+```
+
+This allows us to concisely include enough context to understand the nesting of the configuration of
+interest:
+
+.Example 3. Nested option
+```
+{...
+ :builds {:build-id {...
+                     :output-dir "resources/public/js"}}}
+```
+
+Code examples may are similarly shortened.
+
 == Why shadow-cljs?
 
 The shadow-cljs compiler provides everything you need to compile your
@@ -53,7 +99,9 @@ features and enhancements:
 * Smart integration with CLJS testing for the browser and CI
 * The built-in development server aggressively fixes browser caching issues
 
-== Installing the Tools
+== Quick Start
+
+=== Installing the Tools
 
 You will need:
 
@@ -73,7 +121,94 @@ $ yarn add --dev shadow-cljs
 $ yarn global add shadow-cljs
 ```
 
-== Basic Configuration
+=== Configuration
+
+`shadow-cljs` is configured by a `shadow-cljs.edn` file in your project root directory. You can
+create a default one by running `shadow-cljs init`. It should contain a map with some global
+configuration and a `:builds` entry for all your builds.
+
+```
+{:source-paths ["src"]
+ :dependencies []
+ :builds {}}
+```
+
+[horizontal]
+`:dependencies`:: manage your CLJS dependencies in the same format as `leiningen` or `boot`.
+`:source-paths`:: define where the compiler will look for `.cljs` and `.cljc` files.
+`:builds`:: is a map of build-id (a keyword) to the build config.
+
+An example config could look like this:
+
+```clojure
+{:dependencies
+ [[reagent "0.8.0-alpha2"]]
+
+ :source-paths
+ ["src"]
+
+ :builds
+ {:app {:target :browser
+        :output-dir "public/js"
+        :asset-path "/js"
+        :modules {:main {:entries [my.app]}}}}}
+```
+
+The file structure for this example should look like this:
+```
+.
+├── package.json
+├── shadow-cljs.edn
+└── src
+    └── my
+        └── app.cljs
+```
+
+=== Build Targets
+
+Each build in `shadow-cljs` must define a `:target` which defines where you intend
+your code to be executed. There are default built-ins for the <<BrowserTarget,browser>> and <<NodeTarget,`node.js`>>.
+They all share the basic concept of having `:dev` and `:release` modes.
+`:dev` mode provides all the usual development goodies like fast compilation, live code
+reloading and a REPL. `:release` mode will produce optimized output intended for production.
+
+Targets are covered in separate chapters.
+
+=== Compilation
+
+`shadow-cljs` has 2 compilation modes: `:dev` and `:release`. `:dev` will inject a few
+development helpers for dealing with things like a CLJS REPL and live code reloading.
+In `:release` mode those things will not be included and the code will be optimized by the Closure Compiler.
+
+.Sample Development Mode Commands
+```bash
+# compile a build once in :dev mode
+$ shadow-cljs compile app
+
+# compile and watch
+$ shadow-cljs watch app
+
+# connect to REPL for the build (available while watch is running)
+$ shadow-cljs cljs-repl app
+
+# (if you are targeting node) connect to node-repl
+$ shadow-cljs node-repl
+```
+
+.Running a release build optimized for production use.
+```
+$ shadow-cljs release app
+```
+
+Sometimes you may run into some release issues due to `:advanced` compilation. These
+commands can help track down the causes.
+
+.Release debugging commands.
+```
+$ shadow-cljs check app
+$ shadow-cljs release app --debug
+```
+== Common Configuration
 
 === Core Options
 
@@ -94,8 +229,7 @@ build.
 
 === Builds
 
-You will also need a `:builds` section. Builds can be a vector of builds that *have* IDs, or a
-map of builds *keyed* by build ID:
+You will also need a `:builds` section. Builds should be a map of builds *keyed* by build ID:
 
 .A configuration file with a build map.
 ```
@@ -106,19 +240,6 @@ map of builds *keyed* by build ID:
                ... target-specific options ...}
      :tests   {:target :karma
                ... target-specific options ...}}}
-```
-
-.A configuration with a vector of builds
-```
-{:dependencies [[some-library "1.2.1"] ...]
- :source-paths ["src"]
-
- :builds [{:id :app
-           :target     :browser
-           ... target-specific options ...}
-          {:id :tests
-           :target :karma
-           ... target-specific options ...}]}
 ```
 
 Each build describes artifacts that the compiler will build. The build target is an
@@ -166,12 +287,12 @@ You can configure the port and additional middleware with `shadow-cljs.edn`:
 }
 ```
 
-= Targeting the Browser
+= Targeting the Browser [[BrowserTarget]]
 
 There are a few targets that target web browsers in various ways, and since the targets are pluggable
 it is easy to imagine additional targets for specific scenarios. This chapter concentrates on the
-most commonly-user `:browser` target, but many of the configuration options may apply to browser-related
-targets.
+most commonly-used `:browser` target, but many of the configuration options may apply to other
+browser-related targets.
 
 A basic browser configuration looks like this:
 
@@ -181,15 +302,10 @@ A basic browser configuration looks like this:
 
  :builds [{:id :app
            :target :browser
-
            :output-dir "public/assets/app/js"
            :asset-path "/assets/app/js"
-
            :modules {:main {:entries [my.app]}}}]}
 ```
-
-We've already covered the basic settings in the <<Introduction, introduction>>. Now, we'll concentrate
-on the browser-specific settings.
 
 == Output Settings
 
@@ -223,12 +339,18 @@ You are not required to use an absolute asset path, but it is highly recommended
 
 == Modules
 
-All projects will have one or more modules. If you're doing code splitting, then you will have more than one. If you're
-not <<CodeSpliting,code splitting>>, then you'll have one. The available options in a module are:
-
 The `modules` section of the config is always a map keyed by module ID. The module ID is also used
 to generate the Javascript filename. This is so the module loading code can easily find the correct file
 without additional configuration.
+
+All projects will have one or more modules. If you're doing code splitting, then you will have more than one.
+If you're not <<CodeSpliting,code splitting>> then you'll typically have just have one.
+
+NOTE: It's perfectly
+fine for a module's `:entries` to contain as many "entry points", "mini apps", or global functions as you care
+to put in it, so you do *not* need separate modules to do that.
+
+The available options in a module are:
 
 [horizontal]
 `:entries`:: The namespaces that serve as the root nodes of the dependency graph for the output code of this module.
@@ -238,10 +360,7 @@ without additional configuration.
 `:prepend-js`:: A string to prepend to the module output containing valid javascript that will be run through Closure optimizer.
 `:append-js`:: A string to append to the module output containing valid javascript that will be run through Closure optimizer.
 
-
-
-For now, know that a module definition need the following minimum things: A name (as a keyword) and one or more
-namespaces of the entry point(s) for code execution:
+The following example shows a minimum module configuration:
 
 ```
 {...
@@ -250,9 +369,8 @@ namespaces of the entry point(s) for code execution:
           :modules {:main {:entries [my.app.main]}}}}}
 ```
 
-shadow-cljs will follow the dependency graph from this root set of code entry points to find everything needed
-to actually run.
-
+shadow-cljs will follow the dependency graph from the root set of code entry points in the `:entries`
+to find everything needed to actually run.
 
 == Cljsjs and NPM Modules
 
@@ -578,6 +696,8 @@ https://clojurescript.org/news/2017-07-10-code-splitting[documentation] on the C
 
 == Using NPM Modules [[UsingNPMModules]]
 
+Integrate https://code.thheller.com/blog/shadow-cljs/2017/11/10/js-dependencies-in-practice.html[]
+
 
 
 
@@ -593,6 +713,18 @@ fixes (even to `shadow-cljs` itself!) without having to clone
 that project and understand its setup, build, etc.
 
 = Targeting Node
+
+== Node Scripts (`:target :node-script`)
+
+// TODO:
+
+https://github.com/thheller/shadow-cljs/wiki/ClojureScript-for-node.js-scripts[Compiling node.js scripts].
+
+== Node Libraries (`:target :node-library`)
+
+// TODO:
+
+https://github.com/thheller/shadow-cljs/wiki/ClojureScript-for-node.js-libraries[Compiling node.js libraries].
 
 = Other Targets
 
