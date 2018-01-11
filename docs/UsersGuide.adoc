@@ -129,13 +129,14 @@ configuration and a `:builds` entry for all your builds.
 
 ```
 {:source-paths ["src"]
- :dependencies []
+ :dependencies [] ; These are JVM dependencies, NOT node. Use package.json for npm.
  :builds {}}
 ```
 
 [horizontal]
-`:dependencies`:: manage your CLJS dependencies in the same format as `leiningen` or `boot`.
-`:source-paths`:: define where the compiler will look for `.cljs` and `.cljc` files.
+`:dependencies`:: manage your CLJS dependencies in the same format as `leiningen` or `boot`. These are for JVM dependencies
+in all target modes. External js dependencies use the standard `package.json`.
+`:source-paths`:: define where the compiler will look for `.cljs` and `.cljc` source files.
 `:builds`:: is a map of build-id (a keyword) to the build config.
 
 An example config could look like this:
@@ -723,6 +724,53 @@ NOTE: The optimizations in node at the time of this writing default to `:simple`
 don't work well with `:advanced`. You can use the normal configuration options to set
 the <<Optimization, optimization level>>.
 
+== Common Node Considerations
+
+=== Requirements for Development Mode
+
+Development mode requires two dependencies for the REPL and live-reloading to work. You must
+install these via `package.json` in the directory of `:output-to` (e.g. `out/demo-script`):
+
+.Development Mode `package.json` (in `:output-to` directory)
+```json
+{
+  "devDependencies": {
+    "source-map-support": "^0.4.14",
+    "ws": "^2.2.3"
+  }
+}
+```
+
+NOTE: These are *not* needed in release mode. A completely stand-alone js file is generated for
+releases.
+
+=== Using NPM Dependencies
+
+Node targets use the normal `npm` mechanism. Simply make your `package.json` file and install. Then use
+them from your Clojurescript.
+
+Something like this:
+
+```js
+import { createElement } as react from "react";
+import { render } as rdom from "react-dom";
+// or
+const react = require("react");
+```
+
+is just:
+
+```
+(ns your.app
+  (:require [clojure.string :as str]
+            ["react" :as react :refer (createElement)]
+            ["react-dom" :as rdom :refer (render)]))
+```
+
+Symbols are supported in requires of npm libraries but it is *highly* recommended that you use strings for
+external native libraries. It not only makes it visually obvious which things are native it also ensures
+you can use things like "@scoped/packages".
+
 == Node Scripts (`:target :node-script`)
 
 Node scripts are simply that: single-file stand-alone output that can be run using `node.js`.
@@ -763,25 +811,7 @@ via `node script.js <command line args>`. When run it will call `(demo.script/ma
 function on startup. This only ever produces the file specified in `:output-to`. Any other support files
 (e.g. for development mode) are written to a temporary support directory.
 
-=== Development and Release Modes
-
-Development mode requires two dependencies for the REPL and live-reloading to work. You must
-install these via `package.json` in the directory of `:output-to` (e.g. `out/demo-script`):
-
-.Development Mode `package.json` (in `:output-to` directory)
-```json
-{
-  "devDependencies": {
-    "source-map-support": "^0.4.14",
-    "ws": "^2.2.3"
-  }
-}
-```
-
-NOTE: These are *not* needed in release mode. A completely stand-alone js file is generated for
-releases.
-
-==== Hot Code Reload
+=== Hot Code Reload [[NodeHotCodeReload]]
 
 You will often write scripts that run as servers or some other long-running process. Hot code reload can
 be quite useful when working with these, and it is simple to set up:
@@ -856,15 +886,206 @@ is nothing the compiler can do to improve this since it has no idea what those l
 Hot code reload will only work well in situations where you can cleanly "stop" and "restart" the
 artifacts used.
 
-== Node Libraries (`:target :node-library`)
+== Node Libraries (`:target :node-library`) [[NodeLibrary]]
 
-// TODO:
+This mode emits code that can be used (via `require`) as a standard node library, and is
+useful for publishing your code for re-use as a compiled Javascript artifact.
 
-https://github.com/thheller/shadow-cljs/wiki/ClojureScript-for-node.js-libraries[Compiling node.js libraries].
+As with other modes the <<CommonConfig, common configuration options>> apply and must be set.
+The target-specific options are:
+
+[horizontal]
+`:target`:: Use :node-library
+`:output-to`:: (required). The path and filename for the generated library.
+`:exports`:: (required) Either a single namespace-qualified symbol or a map from keywords to namespace-qualified symbols.
+`:output-dir`:: (optional). The path for supporting files in development mode. Defaults to a cache directory.
+
+The hot code reload story is similar to <<NodeHotCodeReload, the script target>>, but may not work as well
+since it cannot as easily control all of the code that is loaded.
+
+=== Exports
+
+The `:exports` option deserves some specific examples. There are two possible ways to specify what should be exported:
+
+. Export a single artifact
+. Export any number of artifacts
+
+In the first case, you can use a single symbol:
+
+.Build configuration with a single export
+```
+{...
+ :builds {:lib {:exports demo-ns/f
+                ...}}}
+```
+
+and the resulting `require` in Node will give you *that* artifact:
+
+```bash
+$ node
+> var f = require('./lib.js');
+f(); // the object I get is exactly what I exported
+```
+
+In the second case you supply a map from keyword names to artifacts:
+
+.Build configuration with multiple exports
+```
+{...
+ :builds {:lib {:exports {:g       demo-ns/f
+                          :h       other-ns/thing
+                          :ns/ok?  another-ns/ok?}
+                ...}}}
+```
+
+The keyword is used as the name of the entry in the exported object. *No munging is done* to this keyword name
+(but namespaces are dropped). So, the above example maps cljs `f` to `g`, etc.:
+
+```bash
+$ node
+> var lib = require('./lib.js');
+lib.g(); // call demo-ns/f
+lib["ok?"](); // call another-ns/ok?
+```
+
+NOTE: The exports config automatically tracks exported symbols and passes them on to the optimization
+stage. This means that anything listed in `:exports` will not be renamed by Google Closure optimizations.
+
+=== Full Example
+
+The example below creates a `lib.js` file intended to be consumed via the normal Node `require` mechanism.
+
+```
+(ns demo.lib)
+
+(defn hello []
+  (prn "hello")
+  "hello")
+```
+
+The build configuration would be:
+
+```
+{...
+ :builds {:library {:target    :node-library
+                    :output-to "out/demo-library/lib.js"
+                    :exports   {:hello demo.lib/hello}}}}
+```
+
+and the runtime use is as you would expect:
+
+```
+$ cd out/demo-library
+$ node
+> var x = require('./lib');
+undefined
+> x.hello()
+hello
+'hello'
+```
+
+As :node-script this will only create the file specified in :output-to. The :exports map maps CLJS vars
+to the name they should be exported to.
+
+NOTE: Development mode has the <<NodeModes,same setup>> as for node scripts (extra dependencies).
+
+=== Distributing on NPM
+
+// TODO: Thomas: I think it would be useful to show a package.json and a little bit of an example
+// on how you could set up to deploy this on NPM.
 
 = Other Targets
 
-= Generating Production Code -- Release Mode
+= Embedding in the JS Ecosystem -- The `:node-module` Target
+
+There is an additional target that is intended to help you use `shadow-cljs` as *part* of
+a project and provide seamless integration with existing JS tools (eg. webpack, browserify, babel,
+create-react-app, ...) with as little configuration as possible.
+
+It can be configured like other targets, but since it is meant to work in the JS ecosystem it
+comes with a convenience mode that makes such integration easier.
+
+== Convenience Mode
+
+This target is meant to be as easy to access as possible, and does not actually require a specific
+build in the config. You still need a non-empty config file, but the default one from
+`shadow-cljs init` will do.
+
+ClojureScript organizes files into namespaces which means that a `demo.foo` namespace should be inside a
+`src/demo/foo.cljs` file. Where `src` is the default source path the shadow-cljs tool (see <<CommonConfig, common configuration>>).
+
+If you have this file in `src/demo`:
+
+.Sample source for `foo.cljs`
+```
+(ns demo.foo)
+
+(defn hello [who]
+  (str "Hello, " who "!"))
+```
+
+you can compile it (and any others) via:
+
+```bash
+$ shadow-cljs compile npm
+[:npm] Build completed. (16 files, 5 compiled, 0 warnings, 7.91s)
+```
+
+The generated exports will be named `shadow-cljs/` with the CLJS namespace.
+
+```js
+$ node
+> var x = require("shadow-cljs/demo.foo");
+undefined
+> x.hello("JS")
+'Hello, JS!'
+```
+
+Watching with incremental compile is as simple as running `shadow-cljs watch npm`.
+
+== Explicit Configuration
+
+You can also treat `:npm-module` on the same footing with your other builds: give it explicit
+configuration. This allows you to also customize the code generation options. Of course
+you will configure the <<CommonConfig, common configuration>> as in all targets. The target-specific
+options are:
+
+[horizontal]
+`:target`:: Use :node-module
+`:entries`:: (optinal) A vector of namespaces to include. Everything from these will be included.
+Defaults to everything it can find.
+`:output-dir`:: (optional). The path for supporting files in development mode. Defaults to
+`node_modules/shadow-cljs`.
+
+The `:entries` setting can be used to limit what things get included, and the `:output-dir` is
+particularly useful for naming the directory in `node_modules` so that you can
+customize what name you use with `require`.
+
+Each entry will still result in a file with that namespace name in the specified output directory.
+
+Of course all of this is generated with standard Node conventions.
+
+If you plan to distribute code on NPM, then you may want to use the
+<<NodeLibrary, `:node-library` target>> instead since it allows for a finer level of control
+over exports and optimization.
+
+== Working with Optimizations
+
+Unlike the `:node-library` target, the module target does not know what you want to call the
+symbols you're exporting, so it just exports them as-is. If you use advanced compilation, then everything
+will get a minified munged name!
+
+This is easy to remedy, simply add `:export` metadata on any symbols that you want to preserve:
+
+```
+(def ^:export my-constant 5.662)
+(defn ^:export my-function [] ...)
+```
+
+This is a standard annotation that is understood by Clojurescript and prevents Google Closure from
+renaming an artifact.
+
+= Generating Production Code -- All Targets
 
 Development mode always outputs individual files for each namespace so that they can be hot loaded
 in isolation. When you're ready to deploy code to a real server you want to run the Closure Compiler
@@ -874,8 +1095,7 @@ on it to generate a single minified result for each <<Modules, module>>.
 ```
 $ shadow-cljs release build-id
 ```
-
-=== Optimizations [[Optimization]]
+== Optimizations [[Optimization]]
 
 You can choose the optimization level using the `:compiler-options` section of the configuration:
 
@@ -890,7 +1110,7 @@ You can choose the optimization level using the `:compiler-options` section of t
 See the https://developers.google.com/closure/compiler/docs/compilation_levels[the Closure compiler's documentation]
 for more information on available optimization levels.
 
-=== Release-Specific vs. Development Configuration
+== Release-Specific vs. Development Configuration
 
 If you wish to have separate configuration values in a build when running a release build then you
 can override settings by including a `:dev` and/or `:release` section in the build section:
