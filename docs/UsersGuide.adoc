@@ -207,6 +207,10 @@ preloads option is simply a list of namespaces in the `:devtools`/`:preloads` se
                                  ... }}}}
 ```
 
+=== Chrome Devtools Preloads
+
+See <<Chrome Devtools>> if you'd like to include preloads for Chrome Devtools.
+
 == Hot Code Reload
 
 The React and Clojurescript ecosystems combine to make this kind of thing super useful. The `shadow-cljs`
@@ -477,8 +481,14 @@ When this mode is active the
 == Chrome Devtools
 
 The shadow-cljs tool system comes with some basic data formatters that
-aid in debugging when using Chrome. Additional development tools like
-`binaryage.devtools` can be easily added:
+aid in debugging when using Chrome. You don't have to do anything to get these.
+
+If you'd like to use the popular https://github.com/binaryage/cljs-devtools[binaryage/cljs-devtools],
+shadow-cljs makes this easy by automatically including the preload for you whenever
+`binaryage.devtools.preloads` exists on your classpath.
+
+Additional development tools, such as `fulcro.inspect`, can easily be added by
+manually specifying the preload:
 
 ```
 {...

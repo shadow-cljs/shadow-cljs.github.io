@@ -546,7 +546,11 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 <li><a href="#_development">4. Development</a>
 <ul class="sectlevel2">
-<li><a href="#_preloads">4.1. Preloads</a></li>
+<li><a href="#_preloads">4.1. Preloads</a>
+<ul class="sectlevel3">
+<li><a href="#_chrome_devtools_preloads">4.1.1. Chrome Devtools Preloads</a></li>
+</ul>
+</li>
 <li><a href="#_hot_code_reload">4.2. Hot Code Reload</a></li>
 <li><a href="#_http_server">4.3. HTTP Server</a>
 <ul class="sectlevel3">
@@ -894,6 +898,12 @@ preloads option is simply a list of namespaces in the <code>:devtools</code>/<co
                     <span class="symbol">:modules</span>    { <span class="keyword">..</span><span class="keyword">.</span> }
                     <span class="symbol">:devtools</span>   {<span class="symbol">:preloads</span>   [fulcro.inspect.preload]
                                  <span class="keyword">..</span><span class="keyword">.</span> }}}}</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_chrome_devtools_preloads"><a class="anchor" href="#_chrome_devtools_preloads"></a><a class="link" href="#_chrome_devtools_preloads">4.1.1. Chrome Devtools Preloads</a></h4>
+<div class="paragraph">
+<p>See <a href="#_chrome_devtools">Chrome Devtools</a> if you&#8217;d like to include preloads for Chrome Devtools.</p>
 </div>
 </div>
 </div>
@@ -1302,8 +1312,16 @@ When this mode is active the
 <h3 id="_chrome_devtools"><a class="anchor" href="#_chrome_devtools"></a><a class="link" href="#_chrome_devtools">4.9. Chrome Devtools</a></h3>
 <div class="paragraph">
 <p>The shadow-cljs tool system comes with some basic data formatters that
-aid in debugging when using Chrome. Additional development tools like
-<code>binaryage.devtools</code> can be easily added:</p>
+aid in debugging when using Chrome. You don&#8217;t have to do anything to get these.</p>
+</div>
+<div class="paragraph">
+<p>If you&#8217;d like to use the popular <a href="https://github.com/binaryage/cljs-devtools">binaryage/cljs-devtools</a>,
+shadow-cljs makes this easy by automatically including the preload for you whenever
+<code>binaryage.devtools.preloads</code> exists on your classpath.</p>
+</div>
+<div class="paragraph">
+<p>Additional development tools, such as <code>fulcro.inspect</code>, can easily be added by
+manually specifying the preload:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1437,7 +1455,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-01-11 11:20:10 CET
+Last updated 2018-01-11 11:05:57 EST
 </div>
 </div>
 </body>
