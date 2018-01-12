@@ -47,7 +47,7 @@ submit a PR to fix it, or an issue with details of the problem.
 
 The shadow-cljs compiler provides everything you need to compile your
 ClojureScript code with a focus on simplicity and ease of use. It augments
-the official Clojurescript compiler with a number of additional
+the official ClojureScript compiler with a number of additional
 features and enhancements:
 
 * More reliable NPM integration
@@ -484,7 +484,7 @@ NOTE: Since version 2.0.130 shadow-cljs automatically adds "binaryage/cljs-devto
 
 === Hot Code Reload
 
-The React and Clojurescript ecosystems combine to make this kind of thing super useful. The `shadow-cljs`
+The React and ClojureScript ecosystems combine to make this kind of thing super useful. The `shadow-cljs`
 system includes everything you need to do your hot code reload, without needing to resort to external tools.
 
 In order to use it you simply run:
@@ -518,7 +518,7 @@ can do async processing, but *must* call `(done)` to indicate it is complete.
 
 = Using JavaScript Dependencies [[UsingNPMModules]]
 
-The standard Clojurescript compiler has https://code.thheller.com/blog/shadow-cljs/2017/09/15/js-dependencies-the-problem.html[some issues]
+The standard ClojureScript compiler has https://code.thheller.com/blog/shadow-cljs/2017/09/15/js-dependencies-the-problem.html[some issues]
 when dealing with Javascript dependencies.
 
 The summary of these is
@@ -829,7 +829,7 @@ to find everything needed to actually run.
 
 == HTTP Server
 
-The `:devtools` section of the configuration supports
+The `:devtools` section of the configuration for `:browser` supports a few additional
 options for configuring an optional dev-time HTTP server for a build. The server supports the following
 options:
 
@@ -972,8 +972,8 @@ you are already using, and what level of optimization you use for your release b
 
 === Using the Standard ClojureScript API
 
-The generated code is capable of using the standard Clojurescript `cljs.loader` API. See the
-https://clojurescript.org/news/2017-07-10-code-splitting[documentation] on the Clojurescript
+The generated code is capable of using the standard ClojureScript `cljs.loader` API. See the
+https://clojurescript.org/news/2017-07-10-code-splitting[documentation] on the ClojureScript
 website for instructions.
 
 The advantage of using the standard API is that your code will play well with others. This
@@ -1010,11 +1010,6 @@ know when a new build completed.
 I use this file in production to know when a new CLJS release build should be loaded.
 
 
-
-
-
-
-
 = Targeting Node
 
 There is built-in support for generating code that is intended to be use as a stand-alone
@@ -1022,61 +1017,13 @@ script, and also for code that is intended to be used as a library. See the
 section on <<CommonConfig,common configuration>> for the base settings needed in
 a configuration file.
 
-NOTE: The optimizations in node at the time of this writing default to `:simple`. Many NPM libraries
-don't work well with `:advanced`. You can use the normal configuration options to set
-the <<Optimization, optimization level>>.
+NOTE: The optimizations in node at the time of this writing default to `:simple`.
+You can use the normal configuration options to set the <<Optimization, optimization level>>.
 
-== Common Node Considerations
+== Node Scripts
 
-=== Requirements for Development Mode
-
-Development mode requires two dependencies for the REPL and live-reloading to work. You must
-install these via `package.json` in the directory of `:output-to` (e.g. `out/demo-script`):
-
-.Development Mode `package.json` (in `:output-to` directory)
-```json
-{
-  "devDependencies": {
-    "source-map-support": "^0.4.14",
-    "ws": "^2.2.3"
-  }
-}
-```
-
-NOTE: These are *not* needed in release mode. A completely stand-alone js file is generated for
-releases.
-
-=== Using NPM Dependencies
-
-Node targets use the normal `npm` mechanism. Simply make your `package.json` file and install. Then use
-them from your Clojurescript.
-
-Something like this:
-
-```js
-import { createElement } as react from "react";
-import { render } as rdom from "react-dom";
-// or
-const react = require("react");
-```
-
-is just:
-
-```
-(ns your.app
-  (:require [clojure.string :as str]
-            ["react" :as react :refer (createElement)]
-            ["react-dom" :as rdom :refer (render)]))
-```
-
-Symbols are supported in requires of npm libraries but it is *highly* recommended that you use strings for
-external native libraries. It not only makes it visually obvious which things are native it also ensures
-you can use things like "@scoped/packages".
-
-== Node Scripts (`:target :node-script`)
-
-Node scripts are simply that: single-file stand-alone output that can be run using `node.js`.
-The code is just Clojurescript, and an entry point is easy to define:
+The `:target :node-script` produces single-file stand-alone output that can be run using `node.js`.
+The code is just ClojureScript, and an entry point is easy to define:
 
 ```
 (ns demo.script)
@@ -1180,17 +1127,14 @@ The associated configuration is (`shadow-cljs.edn`):
                          :after-load demo.script/start}}}}
 ```
 
-When run in development mode the nREPL is available, files are watched for changes,
-and incremental compile should make it all fast.
-
 WARNING: Many libraries hide state or do actions that prevent hot code reloading from working well. There
 is nothing the compiler can do to improve this since it has no idea what those libraries are doing.
 Hot code reload will only work well in situations where you can cleanly "stop" and "restart" the
 artifacts used.
 
-== Node Libraries (`:target :node-library`) [[NodeLibrary]]
+== Node Libraries [[NodeLibrary]]
 
-This mode emits code that can be used (via `require`) as a standard node library, and is
+The `:target :node-library` emits code that can be used (via `require`) as a standard node library, and is
 useful for publishing your code for re-use as a compiled Javascript artifact.
 
 As with other modes the <<CommonConfig, main configuration options>> apply and must be set.
@@ -1217,7 +1161,7 @@ In the first case, you can use a single symbol:
 .Build configuration with a single export
 ```
 {...
- :builds {:lib {:exports demo-ns/f
+ :builds {:lib {:exports demo.ns/f
                 ...}}}
 ```
 
@@ -1234,9 +1178,9 @@ In the second case you supply a map from keyword names to artifacts:
 .Build configuration with multiple exports
 ```
 {...
- :builds {:lib {:exports {:g       demo-ns/f
-                          :h       other-ns/thing
-                          :ns/ok?  another-ns/ok?}
+ :builds {:lib {:exports {:g       demo.ns/f
+                          :h       other.ns/thing
+                          :ns/ok?  another.ns/ok?}
                 ...}}}
 ```
 
@@ -1529,7 +1473,7 @@ This is easy to remedy, simply add `:export` metadata on any symbols that you wa
 (defn ^:export my-function [] ...)
 ```
 
-This is a standard annotation that is understood by Clojurescript and prevents Google Closure from
+This is a standard annotation that is understood by ClojureScript and prevents Google Closure from
 renaming an artifact.
 
 = Generating Production Code -- All Targets
