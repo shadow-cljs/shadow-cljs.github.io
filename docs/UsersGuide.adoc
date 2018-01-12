@@ -30,6 +30,7 @@ toc::[]
 endif::[]
 
 // TODO: Missing content
+// - HUD
 // - Undocumented global options
 //    - http
 //    - ssl
