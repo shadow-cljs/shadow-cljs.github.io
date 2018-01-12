@@ -513,7 +513,7 @@ options:
 no disk files are served.
 `:http-port`:: The port to serve from.
 `:http-host`:: The hostname to listen on. Defaults to localhost).
-`:http-resource-root`:: A sequence of paths relative to classpath from which resources can be scanned.
+`:http-resource-root`:: A path relative to classpath from which resources can be served.
 If not supplied, no resources are served.
 `:http-handler`:: A namespace (as a symbol). A `(fn [req] resp)` that is used
 if a resource is not found for the given request. Defaults to a not-found handler.
