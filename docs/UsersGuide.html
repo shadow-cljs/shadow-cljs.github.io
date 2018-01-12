@@ -984,22 +984,22 @@ file.
 <p>The <code>shadow-cljs</code> command-line utility can also use <code>lein</code> to run your commands. You can enable this
 by adding a :lein entry to your shadow-cljs.edn config.</p>
 </div>
-<div class="paragraph">
-<p>{:lein {:profile "+cljs"}
- :builds {&#8230;&#8203;}}</p>
-</div>
-<div class="paragraph">
-<p>This will execute all shadow-cljs commands via lein instead of launching its own JVM.</p>
-</div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">lein with-profile +cljs run -m shadow.cljs.devtools.cli <span class="keyword">..</span><span class="keyword">.</span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:lein</span> {<span class="symbol">:profile</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">+cljs</span><span class="delimiter">&quot;</span></span>}
+ <span class="symbol">:builds</span> {<span class="keyword">..</span><span class="keyword">.</span>}}</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The <code>:profile</code> is optional, <code>:lein true</code> or <code>:lein {}</code> is enough to enable lein support.
-When this mode is active the
-`:source-paths and :dependencies inside shadow-cljs.edn will be ignored.</p>
+<p>This will execute all <code>shadow-cljs</code> commands via <code>lein</code> instead of launching its own JVM. The <code>:profile</code> is optional,
+<code>:lein true</code> or <code>:lein {}</code> is enough to enable lein support. When this mode is active the <code>:source-paths</code> and
+<code>:dependencies</code> inside <code>shadow-cljs.edn</code> will be ignored.</p>
+</div>
+<div class="listingblock">
+<div class="title">The <code>lein</code> command used by <code>shadow-cljs</code> as configured above</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">lein with-profile +cljs run -m shadow.cljs.devtools.cli ...</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -3245,7 +3245,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-01-12 14:01:16 CET
+Last updated 2018-01-12 14:04:57 CET
 </div>
 </div>
 </body>

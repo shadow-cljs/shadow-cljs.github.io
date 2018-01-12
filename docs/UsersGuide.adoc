@@ -240,18 +240,19 @@ lein run -m shadow.cljs.devtools.cli release build-id
 The `shadow-cljs` command-line utility can also use `lein` to run your commands. You can enable this
 by adding a :lein entry to your shadow-cljs.edn config.
 
+```
 {:lein {:profile "+cljs"}
  :builds {...}}
-
-This will execute all shadow-cljs commands via lein instead of launching its own JVM.
-
 ```
+
+This will execute all `shadow-cljs` commands via `lein` instead of launching its own JVM. The `:profile` is optional,
+`:lein true` or `:lein {}` is enough to enable lein support. When this mode is active the `:source-paths` and
+`:dependencies` inside `shadow-cljs.edn` will be ignored.
+
+.The `lein` command used by `shadow-cljs` as configured above
+```bash
 lein with-profile +cljs run -m shadow.cljs.devtools.cli ...
 ```
-
-The `:profile` is optional, `:lein true` or `:lein {}` is enough to enable lein support.
-When this mode is active the
-`:source-paths and :dependencies inside shadow-cljs.edn will be ignored.
 
 === Boot
 
