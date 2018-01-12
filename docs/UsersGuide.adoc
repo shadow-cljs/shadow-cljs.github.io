@@ -29,6 +29,14 @@ ifdef::env-github[]
 toc::[]
 endif::[]
 
+// TODO: Missing content
+// - Undocumented global options
+//    - http
+//    - ssl
+//    - cache-root
+//    - open-file-command
+//    - others???
+
 = Introduction
 
 This is a work in progress. It has not been proofread and may contain errors. If you find an error, please
