@@ -43,6 +43,25 @@ endif::[]
 This is a work in progress. It has not been proofread and may contain errors. If you find an error, please
 submit a PR to fix it, or an issue with details of the problem.
 
+== Why shadow-cljs?
+
+The shadow-cljs compiler provides everything you need to compile your
+ClojureScript code with a focus on simplicity and ease of use. It augments
+the official Clojurescript compiler with a number of additional
+features and enhancements:
+
+* More reliable NPM integration
+** More likely your favorite js library will work
+* Less configuration
+* Deterministic build order
+* No need for build-specific source directories
+* Better externs checker
+* Better warning tracker
+* Easier use with js projects
+* Includes hot code reload
+* Smart integration with CLJS testing for the browser and CI
+* The built-in development server aggressively fixes browser caching issues
+
 == Conventions Used in this Book
 
 There are many examples in this book. Most things used in these should be obvious from their context,
@@ -89,28 +108,10 @@ interest:
 
 Code examples may are similarly shortened.
 
-== Why shadow-cljs?
 
-The shadow-cljs compiler provides everything you need to compile your
-ClojureScript code with a focus on simplicity and ease of use. It augments
-the official Clojurescript compiler with a number of additional
-features and enhancements:
+= Quick Start
 
-* More reliable NPM integration
-** More likely your favorite js library will work
-* Less configuration
-* Deterministic build order
-* No need for build-specific source directories
-* Better externs checker
-* Better warning tracker
-* Easier use with js projects
-* Includes hot code reload
-* Smart integration with CLJS testing for the browser and CI
-* The built-in development server aggressively fixes browser caching issues
-
-== Quick Start
-
-=== Installing the Tools
+== Installing the Tools
 
 You will need:
 
@@ -130,561 +131,54 @@ $ yarn add --dev shadow-cljs
 $ yarn global add shadow-cljs
 ```
 
-=== Configuration
+== Running `shadow-cljs`
 
-`shadow-cljs` is configured by a `shadow-cljs.edn` file in your project root directory. You can
-create a default one by running `shadow-cljs init`. It should contain a map with some global
-configuration and a `:builds` entry for all your builds.
-
-```
-{:source-paths ["src"]
- :dependencies [] ; These are JVM dependencies, NOT node. Use package.json for npm.
- :builds {}}
-```
-
-[horizontal]
-`:dependencies`:: manage your CLJS dependencies in the same format as `leiningen` or `boot`. These are for JVM dependencies
-in all target modes. External js dependencies use the standard `package.json`.
-`:source-paths`:: define where the compiler will look for `.cljs` and `.cljc` source files.
-`:builds`:: is a map of build-id (a keyword) to the build config.
-
-An example config could look like this:
-
-```clojure
-{:dependencies
- [[reagent "0.8.0-alpha2"]]
-
- :source-paths
- ["src"]
-
- :builds
- {:app {:target :browser
-        :output-dir "public/js"
-        :asset-path "/js"
-        :modules {:main {:entries [my.app]}}}}}
-```
-
-The file structure for this example should look like this:
-```
-.
-├── package.json
-├── shadow-cljs.edn
-└── src
-    └── my
-        └── app.cljs
-```
-
-=== Build Targets
-
-Each build in `shadow-cljs` must define a `:target` which defines where you intend
-your code to be executed. There are default built-ins for the <<BrowserTarget,browser>> and <<NodeTarget,`node.js`>>.
-They all share the basic concept of having `:dev` and `:release` modes.
-`:dev` mode provides all the usual development goodies like fast compilation, live code
-reloading and a REPL. `:release` mode will produce optimized output intended for production.
-
-Targets are covered in separate chapters.
-
-=== Compilation
-
-`shadow-cljs` has 2 compilation modes: `:dev` and `:release`. `:dev` will inject a few
-development helpers for dealing with things like a CLJS REPL and live code reloading.
-In `:release` mode those things will not be included and the code will be optimized by the Closure Compiler.
-
-.Sample Development Mode Commands
-```bash
-# compile a build once in :dev mode
-$ shadow-cljs compile app
-
-# compile and watch
-$ shadow-cljs watch app
-
-# connect to REPL for the build (available while watch is running)
-$ shadow-cljs cljs-repl app
-
-# (if you are targeting node) connect to node-repl
-$ shadow-cljs node-repl
-```
-
-.Running a release build optimized for production use.
-```
-$ shadow-cljs release app
-```
-
-Sometimes you may run into some release issues due to `:advanced` compilation. These
-commands can help track down the causes.
-
-.Release debugging commands.
-```
-$ shadow-cljs check app
-$ shadow-cljs release app --debug
-```
-== Common Configuration [[CommonConfig]]
-
-=== Core Options
-
-The first options you need to set are the location of your source folder(s) and your dependencies.
-All settings go in `shadow-cljs.edn` in the top-level directory of your project. In this book
-any abiguous reference to "configuration file" should be assumed to mean this file:
-
-.The main configuration file: `shadow-cljs.edn`
-```
-{:dependencies [[some-library "1.2.1"] ...]
- :source-paths ["src"]
- ...
-```
-
-Notice that the source path is *only* specified once in the entire configuration. The system will
-use namespace dependency graphs to determine what code is needed in the final output of any given
-build.
-
-=== Builds
-
-You will also need a `:builds` section. Builds should be a map of builds *keyed* by build ID:
-
-.A configuration file with a build map.
-```
-{:dependencies [[some-library "1.2.1"] ...]
- :source-paths ["src"]
- :builds
-   {:app      {:target     :browser
-               ... target-specific options ...}
-     :tests   {:target :karma
-               ... target-specific options ...}}}
-```
-
-Each build describes artifacts that the compiler will build. The build target is an
-extensible feature of `shadow-cljs`, and the compiler comes with quite a few of them already.
-
-Here are some of them:
-
-[Horizontal]
-`:browser`:: Output code suitable for running in a web browser.
-`:bootstrap`:: Output code suitable for running in bootstrapped cljs environment.
-`:browser-test`:: Scan for tests to determine required files, and output tests suitable for running in the browser.
-`:karma`:: Scan for tests to determine required files, and output karma-runner compatible tests. See http://karma-runner.github.io/2.0/index.html[Karma].
-`:node-library`:: Output code suitable for use as a node library.
-`:node-script`:: Output code suitable for use as a node script.
-`:npm-module`:: Output code suitable for use as an NPM module.
-
-Each target is covered in more detail in its own chapter since the remaining build options vary on
-the target you select.
-
-=== More Common Options
-
-This section is for other options that are in-common with all builds.
-
-=== nREPL [[nREPL]]
-
-When an active dev build is running there will be an nREPL. If you look at the startup message you'll see
-the port of nREPL, and the port will also be stored in `target/shadow-cljs/nrepl.port`:
+If installed globally you can just invoke it directly
 
 ```bash
-$ shadow-cljs watch dev
-shadow-cljs - HTTP server for ":app" available at http://localhost:8020
-shadow-cljs - server running at http://0.0.0.0:9630
-shadow-cljs - nrepl running at /0.0.0.0:9462
-shadow-cljs - watching build :app
-[:app] Configuring build.
-[:app] Compiling ...
+$ shadow-cljs help
 ```
 
-You can configure the port and additional middleware with `shadow-cljs.edn`:
-
-```
-{...
- :nrepl {:port 9000
-         :middleware []} ; list of namespace-qualified symbols
-}
-```
-
-= Targeting the Browser [[BrowserTarget]]
-
-There are a few targets that target web browsers in various ways, and since the targets are pluggable
-it is easy to imagine additional targets for specific scenarios. This chapter concentrates on the
-most commonly-used `:browser` target, but many of the configuration options may apply to other
-browser-related targets.
-
-A basic browser configuration looks like this:
-
-```
-{:dependencies [...]
- :source-paths [...]
-
- :builds [{:id :app
-           :target :browser
-           :output-dir "public/assets/app/js"
-           :asset-path "/assets/app/js"
-           :modules {:main {:entries [my.app]}}}]}
-```
-
-== Output Settings
-
-The browser target outputs a lot of files, and a directory is needed for them all. You'll need to serve
-these assets with some kind of server, and the Javascript loading code needs to know the server-centric
-path to these assets. The options you need to specify are:
-
-[Horizontal]
-`:output-dir`:: The directory to use for all js output.
-`:asset-path`:: The relative path from *web server's root* to the resources in `:output-dir`.
-
-Your entry point javascript file and all related js files will appear in `:output-dir`.
-
-WARNING: Each build requires its own :output-dir, you may not put multiple builds into the same directory.
-This directory should also be exclusively owned by the build. There should be no other files in there.
-While `shadow-cljs` won't delete anything it is safer to leave it alone. Compilation
-creates many more files than just the main entry point javascript file during development:
-source maps, original sources, and generated sources.
-
-The `asset-path` is a prefix that gets added to the paths of module loading code inside of the
-generated javascript. It allows you to output your javascript module to a particular subdirectory
-of your web server's root. The dynamic loading during development (hot code reload) and production
-(code splitting) need this to correctly locate files.
-
-Locating your generated files in a directory and asset path like this make it so that other assets
-(images, css, etc.) can easily co-exist on the same server without accidental collisions.
-
-For example: if your web server will serve the folder `public/x` when asked for the URI `/x`,
-and your `output-dir` for a module is `public/assets/app/js` then your asset-path should be `/assets/app/js`.
-You are not required to use an absolute asset path, but it is highly recommended.
-
-== Modules
-
-The `modules` section of the config is always a map keyed by module ID. The module ID is also used
-to generate the Javascript filename. This is so the module loading code can easily find the correct file
-without additional configuration.
-
-All projects will have one or more modules. If you're doing code splitting, then you will have more than one.
-If you're not <<CodeSpliting,code splitting>> then you'll typically have just have one.
-
-NOTE: It's perfectly
-fine for a module's `:entries` to contain as many "entry points", "mini apps", or global functions as you care
-to put in it, so you do *not* need separate modules to do that.
-
-The available options in a module are:
-
-[horizontal]
-`:entries`:: The namespaces that serve as the root nodes of the dependency graph for the output code of this module.
-`:depends-on`:: The names of other modules that must be loaded in order for this one to have everything it needs.
-`:prepend`:: String content that will be prepended to the js output. Useful for comments, copyright notice, etc.
-`:append`:: String content that will be appended to the js output. Useful for comments, copyright notice, etc.
-`:prepend-js`:: A string to prepend to the module output containing valid javascript that will be run through Closure optimizer.
-`:append-js`:: A string to append to the module output containing valid javascript that will be run through Closure optimizer.
-
-The following example shows a minimum module configuration:
-
-```
-{...
- :builds {
-   :app  {...
-          :modules {:main {:entries [my.app.main]}}}}}
-```
-
-shadow-cljs will follow the dependency graph from the root set of code entry points in the `:entries`
-to find everything needed to actually run.
-
-== Cljsjs and NPM Modules
-
-It is likely that you're using libraries (directly or transitively) that in turn use low-level Javascript code. For
-example `cljsjs.react`. It is fine to have these in your dependencies, but you must ensure that the real underlying
-NPM version of those is installed.
-
-This is relatively easy to manage. If you're using Leiningen or Cursive you can easily look at the deps tree
-and find the cljsjs package, and make sure they're also in your `package.json` file as NPM dev deps.
+If you prefer to only use the local install you can invoke it via `npx` or `yarn`.
 
 ```bash
-$ lein deps :tree
+# npm
+$ npx shadow-cljs help
+
+# yarn
+$ yarn shadow-cljs help
+
+# manually
+$ ./node_modules/.bin/shadow-cljs help
 ```
 
-If you're using `shadow-cljs` alone, then you can generate a POM for Maven and get the same effect:
+=== Server Mode
+
+Starting a `shadow-cljs` command can be fairly slow to start. To improve this `shadow-cljs` can run in "server mode" which
+means that a dedicated process is started which all other commands can use to execute a lot faster since they won't have
+to start a new JVM/Clojure instance.
+
+Commands that do long running things implicitly start a server instance (eg. `watch`) but it is often advisable to have
+a dedicated server process running.
+
+You can either run the process in the foreground in a dedicated terminal. Use `CTRL+C` to terminate the server.
 
 ```bash
-$ shadow-cljs pom
-$ mvn dependency:tree
+$ shadow-cljs server
+
+# or (if you'd like REPL to control the server process)
+$ shadow-cljs clj-repl
 ```
 
-Alternatively you could simply try to build the project and respond to missing dependency errors
-with additions to your `package.json` file and an `npm install`.
+You can also run the server in the background controlled via the common `start|stop|restart` functions.
 
-Read more about using arbitrary npm modules in you Clojurescript in a <<UsingNPMModules,later chapter>>.
-
-== Web Workers
-
-The `:modules` configuration may also be used to generate files intended to be used as a Web Workers.
-You may declare any module (except the default) as a Web Worker by setting `:web-worker true`. The
-generated file will contain some additional bootstrap code which will load its dependencies
-automatically. The way `:modules` work also ensures that code used only by the worker will also only
-be in the final file for the worker. Each worker should have a dedicated CLJS namespace.
-
-.An example of generating a web worker script
-```
-{...
- :builds
-   {:app
-    {:target :browser
-     ...
-     :modules {:main   {:entries [my.app]}
-               :extra  {:entries [my.app.extra]
-                        :depends-on #{:main}}
-               :worker {:entries [my.app.worker]
-                        :depends-on #{:main}
-                        :web-worker true}}}}}
+```bash
+$ shadow-cljs start
+$ shadow-cljs stop
+$ shadow-cljs restart
 ```
 
-The above configuration will generate `worker.js` which you can use to start the Web Worker.
-It will have all code from the `:main` module available (but not `:extra`). The code in the
-`my.app.worker` namespace will only ever execute in the worker. Worker generation happens in
-both development and release modes.
-
-NOTE: Hot code reload does not support reloading code in the worker while it is running.
-I suggest shutting down all workers using the `:devtools :before-load` function and restarting it
-in the `:after-load`.
-
-== Hashed Module Names [[NameHashing]]
-
-You can add `:module-hash-names true` to your build config to automatically create a MD5
-signature for each generated output module file. That means that a `:main` module will generate
-a `main.<md5hash>.js` instead of just the default `main.js`.
-
-Such files can be cached forever since a file with different contents will have a different name.
-
-However, this means that including these files in your HTML gets a bit more complicated.
-
-=== Hashed File Manifest
-
-When using hashed filenames `shadow-cljs` generates a `manifest.json` file in the configured `:output-dir`.
-This file contains a JSON description of the module config together with an
-extra "js-name" property which maps the original module name to the hashed name.
-
-.Sample output of manifest.json when using hashed filenames.
-```
-[{"name":"main", "js-name":"main.md5hash.js", "depends-on":[], ...}
- {"name":"extra", "js-name":"extra.md5hash.js", "depends-on":["main"], ...}]
-```
-
-You can use this file in your server to figure out which files to include.
-Development builds also produce this file and you may check if for modifications to
-know when a new build completed.
-
-I use this file in production to know when a new CLJS release build should be loaded.
-
-== Preloads
-
-As a developer most of your time is spent in development mode. You're probably familiar with tools like `figwheel`,
-`boot-reload`, and `devtools`. It's almost certain that you want one or more of these in your builds.
-
-Preloads are used to force certain namespaces into the front of your generated Javascript. This is
-generally used to inject tools and instrumutation before the application actually loads and runs. The
-preloads option is simply a list of namespaces in the `:devtools`/`:preloads` section of
-`shadow-cljs-edn`:
-
-```
-{:dependencies [...]
- :builds
-        {:app      {:target     :browser
-                    :output-dir "resources/public/js"
-                    :asset-path "/js"
-                    :modules    { ... }
-                    :devtools   {:preloads   [fulcro.inspect.preload]
-                                 ... }}}}
-```
-
-NOTE: Since version 2.0.130 shadow-cljs automatically adds "binaryage/devtools" to the preloads in
-`watch` and `compile` if they are on the classpath. All you need to do is make sure it is in your
-`dependencies` list.
-
-== Hot Code Reload
-
-The React and Clojurescript ecosystems combine to make this kind of thing super useful. The `shadow-cljs`
-system includes everything you need to do your hot code reload, without needing to resort to external tools.
-
-In order to use it you simply run:
-
-```
-shadow-cljs watch build-id
-```
-
-However, you probably need a few more options in order for it to work
-well in your project. In particular you probably need one or more
-of the following:
-
-* A way to serve files/resources
-* Hooks to initialize and start your application
-* Possibly a hook to stop you application before a reload
-
-== HTTP Server
-
-The `:devtools` section of the configuration supports
-options for configuring an optional dev-time HTTP server for a build. The server supports the following
-options:
-
-[Horizontal]
-`:http-root`:: The disk path from which to serve root filesystem requests. If not supplied,
-no disk files are served.
-`:http-port`:: The port to serve from.
-`:http-host`:: The hostname to listen on. Defaults to localhost).
-`:http-resource-root`:: A path relative to classpath from which resources can be served.
-If not supplied, no resources are served.
-`:http-handler`:: A namespace (as a symbol). A `(fn [req] resp)` that is used
-if a resource is not found for the given request. Defaults to a not-found handler.
-
-=== Development HTTP and URI-based Routing (Push state)
-
-If your browser application uses browser push state then you will typically want
-the server to respond with `index.html` instead of "Not Found" on URIs that have no
-real resource (so you can just hit browser reload on your SPA even on odd URIs).
-
-There is a built-in handler that you can add for this:
-
-```
-{...
-    {:builds
-      {:app { ...
-              :devtools { :http-handler shadow.http.push-state/handle }}}}
-```
-
-It supports two additional options (in the `devtools` section):
-
-[horizontal]
-`:push-state/headers`:: (optional) A map of HTTP headers to respond with. Defaults to `text/html` standard headers.
-`:push-state/index`:: (optional) The file to serve. Defaults to `index.html`.
-
-== Lifecycle Hooks
-
-The build configuration supports hooks that allow you to run functions just before hot code reload
-brings in updated code, and just after. These are useful for stopping/starting things that would otherwise
-close over old code. The options go in the `:devtools` section of the config and are:
-
-[Horizontal]
-`:before-load`:: A symbol (with namespace) of a function to run just before refreshing
-files that have been recompiled.  This function *must* by synchronous in nature.
-`:before-load-async`:: A symbol (with namespace) of a function `(fn [done] )` to run just before refreshing. This function
-can do async processing, but *must* call `(done)` to indicate it is complete.
-`:after-load`:: A symbol (with namespace) of a function to run after hot code reload is complete.
-
-.A sample of lifecycle hooks.
-```
-{...
- :builds {
-   :app  {...
-          :devtools        {:after-load   app.ui/start-workers!
-                            :before-load  app.workers/stop-workers!
-                             ...}}}}
-```
-
-== Editor/IDE/REPL Setup
-
-=== REPL
-
-You can use the command-line utility to connect to a REPL simply by using a running build ID:
-
-.Browser REPL
-```
-shadow-cljs cljs-repl app
-```
-
-.Node REPL
-```
-shadow-cljs node-repl
-```
-
-=== Cursive
-
-If you're a Cursive user then you currently need at least a dummy `project.clj` file. You may also wish to
-read the
-
-```
-(defproject your/project "0.0.0"
-  :dependencies
-  [[thheller/shadow-cljs "1.0.20170629"]]
-
-  :source-paths
-  ["src"])
-```
-
-This will allow Cursive to detect the proper source paths for the project.
-
-If you want the full Cursive experience including proper code navigation then you want to use full
-<<Leiningen, Leiningen integration>>.
-
-==== Cursive REPL Integration
-
-An <<nREPL>> is created by `shadow-cljs` when it is in development mode. You can connect to it to get
-REPL integration using a Clojure Remote REPL run configuration.
-
-By default the network port number is random, but that will be a major pain. You have
-two choices:
-
-. Configure the nREPL port
-. Use a symlink to get the port into the standard location.
-
-Option 1 is nice because it doesn't require any filesystem interactions:
-
-.NREPL in shadow-cljs.edn
-```
-{:nrepl {:port 9000}}
-```
-
-Option 2 is simple, but involves using the standard nREPL port file, which you may need for other
-network REPLs like your server. The port for the `shadow-cljs` REPL is written out to
-`target/shadow-cljs/nrepl.port`, so simply symbolically link this file to the standard
-`~/.nrepl-port`:
-
-.Using a symbolic link for REPL port
-```
-ln -sv target/shadow-cljs/nrepl.port .nrepl-port
-```
-
-Once you've chosen your option for tracking the port, you can add a run configuration via
-`Run -> Edit Configurations...`:
-
-.Clicking on the `+` icon will add a new run configuration.
-image::cursive-repl-1.png[]
-
-.Choose a Clojure Remote REPL
-image::cursive-repl-2.png[]
-
-In the last step either type in the port you've set in your config, or choose to use the
-standard nrepl port:
-
-.If you're using `.nrepl-port`, then configure as shown. If you configured the port number in `shadow-cljs.edn` then use `localhost` and the configured port number.
-image::cursive-repl-3.png[]
-
-=== CIDER
-
-CIDER support requires the simple combination of having the `cider-nrepl` dependency on your
-classpath and configuring nREPL. The entries to `shadow-cljs.edn` are simply:
-
-```
-{:dependencies [[cider/cider-nrepl "0.16.0-SNAPSHOT"]]
- :nrepl {:port 8202}
-
- ...
-}
-```
-
-then invoke the `cider-connect` function from emacs.
-
-When you connect to the nREPL it will start out in CLJ mode. If you select a running build it should
-switch the nREPL session to CLJS.
-
-Internally, it does this either by calling a fake piggieback function or the "official" API:
-
-```
-(cemerick.piggieback/cljs-repl :id-of-build)
-;; or
-(shadow.cljs.devtools.api/nrepl-select :id-of-build)
-```
-
-Once connected you should be able to eval code using `C-c C-c` (eval a block), `C-x C-e` (eval sexp),
-or `C-c C-k` (eval buffer).
-
-If you see an error like "`cider-load-buffer' needs a ClojureScript REPL", you need to hit
-enter once in the repl buffer. Emacs should then recognize that you have a cljs repl buffer and
-evals should start working.
-
-NOTE: `shadow-cljs` will automatically add the required `cider-nrepl` middleware when it finds `cider.nrepl`
-on your classpath, i.e. in your dependencies.
-
+Once any server is running every other command will use that and run much faster.
 
 == Build Tool Integration
 
@@ -765,96 +259,264 @@ The authors have little Boot experience, so this chapter is in need of contribut
 that Boot allows you to build your tool chain out of functions. Since `shadow-cljs` is a normal
 JVM library with functions that you can call to invoke tasks.
 
-Here are some of the central functions that seem useful:
+Some boot tasks are available here:
+https://github.com/jgdavey/boot-shadow-cljs
 
-// Thomas: care to opine?
+== Embedding
 
-== Code Splitting [[CodeSplitting]]
+It is possible to run `shadow-cljs` inside your JVM.
 
-You've already seen how to configure your main module. Adding additional modules requires a little
-bit of care, but the technical details are simple:
+.TODO
+```
+(require 'shadow.cljs.devtools.server)
+(shadow.cljs.devtools.server/start!)
+(shadow.cljs.devtools.server/stop!)
+```
 
-. Ensure you don't require things you don't use in any namespace.
-. Put the top-level namespace(s) for each module into a module config.
-. Choose you dynamic loading API
 
-=== Using shadow-cljs's built-in Loader Support
+= Configuration
 
-The compiler supports generating the required data for `goog.module.ModuleManager` to work.
-It exposes a simple interface to let you load modules on-demand at runtime.
+`shadow-cljs` is configured by a `shadow-cljs.edn` file in your project root directory. You can
+create a default one by running `shadow-cljs init`. It should contain a map with some global
+configuration and a `:builds` entry for all your builds.
 
-You only need to add `:module-loader true` to your build config. The loader will
-always be injected into the default module (the one everything else depends on).
+```
+{:source-paths ["src"]
+ :dependencies [] ; These are CLJS dependencies, NOT node. Use package.json for npm.
+ :builds {}}
+```
 
-At runtime you may use the `shadow.loader` namespace to load modules. You may also load a
-module eagerly by just using a `<script>` tag in your page.
+[horizontal]
+`:dependencies`:: manage your CLJS dependencies in the same format as `leiningen` or `boot`. These are for JVM dependencies
+in all target modes. External JS dependencies use the standard `package.json`, installed via `npm` or `yarn`.
+`:source-paths`:: define where the compiler will look for `.cljs` and `.cljc` source files.
+`:builds`:: is a map of build-id (a keyword) to the build config.
+
+An example config could look like this:
+
+```clojure
+{:dependencies
+ [[reagent "0.8.0-alpha2"]]
+
+ :source-paths
+ ["src"]
+
+ :builds
+ {:app {:target :browser
+        :output-dir "public/js"
+        :asset-path "/js"
+        :modules {:main {:entries [my.app]}}}}}
+```
+
+The file structure for this example should look like this:
+```
+.
+├── package.json
+├── shadow-cljs.edn
+└── src
+    └── my
+        └── app.cljs
+```
+
+== Build Targets
+
+Each build in `shadow-cljs` must define a `:target` which defines where you intend
+your code to be executed. There are default built-ins for the <<BrowserTarget,browser>> and <<NodeTarget,`node.js`>>.
+They all share the basic concept of having `:dev` and `:release` modes.
+`:dev` mode provides all the usual development goodies like fast compilation, live code
+reloading and a REPL. `:release` mode will produce optimized output intended for production.
+
+Targets are covered in separate chapters.
+
+== Compilation
+
+`shadow-cljs` has 2 compilation modes: `:dev` and `:release`. `:dev` will inject a few
+development helpers for dealing with things like a CLJS REPL and live code reloading.
+In `:release` mode those things will not be included and the code will be optimized by the Closure Compiler.
+
+.Sample Development Mode Commands
+```bash
+# compile a build once in :dev mode
+$ shadow-cljs compile app
+
+# compile and watch
+$ shadow-cljs watch app
+
+# connect to REPL for the build (available while watch is running)
+$ shadow-cljs cljs-repl app
+
+# (if you are targeting node) connect to node-repl
+$ shadow-cljs node-repl
+```
+
+.Running a release build optimized for production use.
+```
+$ shadow-cljs release app
+```
+
+Sometimes you may run into some release issues due to `:advanced` compilation. These
+commands can help track down the causes.
+
+.Release debugging commands.
+```
+$ shadow-cljs check app
+$ shadow-cljs release app --debug
+```
+
+// FIXME: this is basically a repetition of the "Configuration" intro
+
+== Main Configuration [[CommonConfig]]
+
+The first options you need to set are the location of your source folder(s) and your dependencies.
+All settings go in `shadow-cljs.edn` in the top-level directory of your project. In this book
+any ambiguous reference to "configuration file" should be assumed to mean this file.
+
+.The main configuration file: `shadow-cljs.edn`
+```
+{:dependencies [[some-library "1.2.1"] ...]
+ :source-paths ["src"]
+ ...
+```
+
+=== `:source-paths`
+
+Notice that the source path is *only* specified once in the entire configuration. The system will
+use namespace dependency graphs to determine what code is needed in the final output of any given
+build.
+
+=== `:builds`
+
+You will also need a `:builds` section. Builds should be a map of builds *keyed* by build ID:
+
+.A configuration file with a build map.
+```
+{:dependencies [[some-library "1.2.1"] ...]
+ :source-paths ["src"]
+ :builds
+ {:app  {:target     :browser
+         ... target-specific options ...}
+ :tests {:target :karma
+         ... target-specific options ...}}}
+```
+
+Each build describes artifacts that the compiler will build. The build target is an
+extensible feature of `shadow-cljs`, and the compiler comes with quite a few of them already.
+
+Here are some of them:
+
+[Horizontal]
+`:browser`:: Output code suitable for running in a web browser.
+`:bootstrap`:: Output code suitable for running in bootstrapped cljs environment.
+`:browser-test`:: Scan for tests to determine required files, and output tests suitable for running in the browser.
+`:karma`:: Scan for tests to determine required files, and output karma-runner compatible tests. See http://karma-runner.github.io/2.0/index.html[Karma].
+`:node-library`:: Output code suitable for use as a node library.
+`:node-script`:: Output code suitable for use as a node script.
+`:npm-module`:: Output code suitable for use as an NPM module.
+
+Each target is covered in more detail in its own chapter since the remaining build options vary on
+the target you select.
+
+== Server Options
+
+This section is for other options that configure the `shadow-cljs` server instance.
+
+=== nREPL [[nREPL]]
+
+The `shadow-cljs` server provides a nREPL server via TCP. If you look at the startup message you'll see
+the port of nREPL, and the port will also be stored in `target/shadow-cljs/nrepl.port`:
+
+```bash
+$ shadow-cljs watch dev
+shadow-cljs - HTTP server for ":app" available at http://localhost:8020
+shadow-cljs - server running at http://0.0.0.0:9630
+shadow-cljs - nrepl running at /0.0.0.0:9462
+shadow-cljs - watching build :app
+[:app] Configuring build.
+[:app] Compiling ...
+```
+
+You can configure the port and additional middleware with `shadow-cljs.edn`:
 
 ```
 {...
+ :nrepl {:port 9000
+         :middleware []} ; list of namespace-qualified symbols
+}
+```
+
+=== HTTP
+
+// TODO
+
+=== SSL
+
+// TODO
+
+
+== Generic Build Options
+
+Each `:target` typically provides some development support.
+
+=== Preloads
+
+As a developer most of your time is spent in development mode. You're probably familiar with tools like `figwheel`,
+`boot-reload`, and `devtools`. It's almost certain that you want one or more of these in your builds.
+
+Preloads are used to force certain namespaces into the front of your generated Javascript. This is
+generally used to inject tools and instrumutation before the application actually loads and runs. The
+preloads option is simply a list of namespaces in the `:devtools`/`:preloads` section of
+`shadow-cljs-edn`:
+
+```
+{:dependencies [...]
  :builds
-   {:app
-     {:target :browser
-      ...
-      :module-loader true
-      :modules {:main  {:entries [my.app]}
-                :extra {:entries [my.app.extra]
-                        :depends-on #{:main}}}}}}
+        {:app      {:target     :browser
+                    :output-dir "resources/public/js"
+                    :asset-path "/js"
+                    :modules    { ... }
+                    :devtools   {:preloads   [fulcro.inspect.preload]
+                                 ... }}}}
 ```
 
-If you had the following for your main entry point:
+NOTE: Since version 2.0.130 shadow-cljs automatically adds "binaryage/cljs-devtools" to the preloads in
+`watch` and `compile` if they are on the classpath. All you need to do is make sure it is in your
+`dependencies` list.
+
+=== Hot Code Reload
+
+The React and Clojurescript ecosystems combine to make this kind of thing super useful. The `shadow-cljs`
+system includes everything you need to do your hot code reload, without needing to resort to external tools.
+
+In order to use it you simply run:
 
 ```
-(ns my.app
-  (:require [shadow.loader :as loader]))
-
-(defn fn-to-call-on-load []
-  (js/console.log "extra loaded"))
-
-(defn fn-to-call-on-error []
-  (js/console.log "extra load failed"))
+shadow-cljs watch build-id
 ```
 
-Then the following expressions can be used for loading code:
+=== Lifecycle Hooks
 
-.Loading a module
+The build configuration supports hooks that allow you to run functions just before hot code reload
+brings in updated code, and just after. These are useful for stopping/starting things that would otherwise
+close over old code. The options go in the `:devtools` section of the build config and are:
+
+[Horizontal]
+`:before-load`:: A symbol (with namespace) of a function to run just before refreshing
+files that have been recompiled.  This function *must* by synchronous in nature.
+`:before-load-async`:: A symbol (with namespace) of a function `(fn [done] )` to run just before refreshing. This function
+can do async processing, but *must* call `(done)` to indicate it is complete.
+`:after-load`:: A symbol (with namespace) of a function to run after hot code reload is complete.
+
+.A sample of lifecycle hooks.
 ```
-;; load returns a goog.async.Deferred, and can be used like a promise
-(-> (loader/load "extra")
-    (.then fn-to-call-on-load fn-to-call-on-error))
+{...
+ :builds
+ {:app {...
+        :devtools {:after-load   app.ui/start-workers!
+                   :before-load  app.workers/stop-workers!
+                   ...}}}}
 ```
 
-.Loading many modules
-```
-;; must be a JS array, also returns goog.async.Deferred
-(loader/load-many #js ["foo" "bar"])
-```
-
-.Including a callback
-```
-(loader/with-module "extra" fn-to-call-on-load)
-```
-
-You can check if a module is loaded using `(loaded? "module-name")`.
-
-==== Loader Costs
-
-Using the loader is very lightweight. It has a few dependencies which you may not be otherwise using.
-In practice using `:module-loader true` adds about 8KB gzip'd
-to the default module. This will vary depending on how much of `goog.net` and `goog.events`
-you are already using, and what level of optimization you use for your release builds.
-
-=== Using the Standard Clojurescript API
-
-The generated code is capable of using the standard Clojurescript `cljs.loader` API. See the
-https://clojurescript.org/news/2017-07-10-code-splitting[documentation] on the Clojurescript
-website for instructions.
-
-The advantage of using the standard API is that your code will play well with others. This
-may be of particular importance to library authors. The disadvantage is that the dynamic module
-loading API in the standard distribution is currently somewhat less easy-to-use than the
-support in `shadow-cljs`.
-
-== Using Javascript Dependencies [[UsingNPMModules]]
+= Using JavaScript Dependencies [[UsingNPMModules]]
 
 The standard Clojurescript compiler has https://code.thheller.com/blog/shadow-cljs/2017/09/15/js-dependencies-the-problem.html[some issues]
 when dealing with Javascript dependencies.
@@ -869,7 +531,7 @@ To address these issues `shadow-cljs` implements a custom JS bundler and removes
 The intention is to make the vast majority of the JS ecosystem easily accessible from
 Javascript.
 
-=== Installing JS Dependencies
+== Installing JS Dependencies
 
 Almost every package on npm will explain how to install it. Those instructions now apply to shadow-cljs
 as well. So if a library tells you to run:
@@ -886,7 +548,7 @@ be added to the `package.json` file and this will be used to manage them. If you
 You can use this https://github.com/shadow-cljs/quickstart-browser[Quick-Start template]
 to try everything described in this section.
 
-=== Using JS Dependencies
+== Using JS Dependencies
 
 Most npm packages will also include some instructions on how to use the actual code. The
 “old” CommonJS style just has require calls which translates directly:
@@ -984,14 +646,14 @@ With our improved support we we can easily translate this to:
             ["react-virtualized/dist/commonjs/List" :default virtual-list]))
 ```
 
-=== Resolving JS Dependencies
+== Resolving JS Dependencies
 
 By default `shadow-cljs` will resolve all `(:require ["thing" :as x])` requires following the npm convention.
 This means it will look at `<project>/node_modules/thing/...` and follow the code from there. To
 customize how this works `shadow-cljs` exposes a `:resolve` config option that lets you override how
 things are resolved.
 
-==== Using a CDN
+=== Using a CDN
 
 Say you already have React included in your page via a CDN. You could just start using `js/React` again
 but we stopped doing that for a good reason. Instead you can continue to use `(:require ["react" :as react])`
@@ -1017,7 +679,7 @@ Here is a sample `shadow-cljs.edn` config for such a build:
 The `:app` build will now use the global `React` instance while the `:server` build continues using
 the "react" npm package! No need to fiddle with the code to make this work.
 
-==== Redirecting “require”
+=== Redirecting “require”
 
 Some packages provide multiple “dist” files and sometimes the default one described doesn’t quite work
 in `shadow-cljs`. One good example for this is "d3". Their default "main" points to "build/d3.node.js" but
@@ -1037,7 +699,7 @@ so we can’t use that. Instead we just redirect the require to some other file:
 
 You can also just `(:require ["d3/build/d3.js" :as d3])` as well if you only care about the Browser.
 
-==== Using local Files
+=== Using local Files
 
 You may also use :resolve to directly map to files in your project.
 
@@ -1051,7 +713,7 @@ You may also use :resolve to directly map to files in your project.
 The `:file` is always relative to the project directory. The included file may use require or
 `import/export` and those will be followed and included properly as well.
 
-==== Migrating cljsjs.*
+== Migrating cljsjs.*
 
 Many CLJS libraries are still using CLJSJS packages and they would break with `shadow-cljs` since it
 no longer supports `:foreign-libs`. I have a clear migration path for this and it just
@@ -1078,25 +740,280 @@ them and contributions are very welcome as well.
 NOTE: The `shadow-cljsjs` library only provides the shim files. You’ll still need to
 `npm install` the actual packages yourself.
 
-==== What to do when things don’t work?
 
-Since the JS world is still evolving rapidly and not everyone is using the same way to write and
-distribute code there are some things `shadow-cljs` cannot work around automatically. These
-can usually be solved with custom `:resolve` configs, but there may also be bugs or oversights.
 
-If you cannot resolve such an issue with the instructions in this chapter, then try asking on the
-https://clojurians.slack.com/messages/C6N245JGG[`#shadow-cljs` Slack channel].
+= Targeting the Browser [[BrowserTarget]]
 
-== Hacking
+There are a few targets that target web browsers in various ways, and since the targets are pluggable
+it is easy to imagine additional targets for specific scenarios. This chapter concentrates on the
+most commonly-used `:browser` target, but many of the configuration options may apply to other
+browser-related targets.
 
-=== Patching Libraries
+A basic browser configuration looks like this:
 
-The shadow-cljs compiler ensure that things on your source paths are
-compiled last. Things from JAR files go first. This means that
-you can copy a source file from a library, patch it, and include it
-in your own source directory. This is a convenient way to test out
-fixes (even to `shadow-cljs` itself!) without having to clone
-that project and understand its setup, build, etc.
+```
+{:dependencies [...]
+ :source-paths [...]
+
+ :builds
+ {:app {:target :browser
+        :output-dir "public/assets/app/js"
+        :asset-path "/assets/app/js"
+        :modules {:main {:entries [my.app]}}}]}
+```
+
+== Output Settings
+
+The browser target outputs a lot of files, and a directory is needed for them all. You'll need to serve
+these assets with some kind of server, and the Javascript loading code needs to know the server-centric
+path to these assets. The options you need to specify are:
+
+[Horizontal]
+`:output-dir`:: The directory to use for all js output.
+`:asset-path`:: The relative path from *web server's root* to the resources in `:output-dir`.
+
+Your entry point javascript file and all related js files will appear in `:output-dir`.
+
+WARNING: Each build requires its own :output-dir, you may not put multiple builds into the same directory.
+This directory should also be exclusively owned by the build. There should be no other files in there.
+While `shadow-cljs` won't delete anything it is safer to leave it alone. Compilation
+creates many more files than just the main entry point javascript file during development:
+source maps, original sources, and generated sources.
+
+The `:asset-path` is a prefix that gets added to the paths of module loading code inside of the
+generated javascript. It allows you to output your javascript module to a particular subdirectory
+of your web server's root. The dynamic loading during development (hot code reload) and production
+(code splitting) need this to correctly locate files.
+
+Locating your generated files in a directory and asset path like this make it so that other assets
+(images, css, etc.) can easily co-exist on the same server without accidental collisions.
+
+For example: if your web server will serve the folder `public/x` when asked for the URI `/x`,
+and your `output-dir` for a module is `public/assets/app/js` then your asset-path should be `/assets/app/js`.
+You are not required to use an absolute asset path, but it is highly recommended.
+
+== Modules
+
+The `modules` section of the config is always a map keyed by module ID. The module ID is also used
+to generate the Javascript filename. This is so the module loading code can easily find the correct file
+without additional configuration.
+
+All projects will have one or more modules. If you're doing code splitting, then you will have more than one.
+If you're not <<CodeSpliting,code splitting>> then you'll typically have just have one.
+
+NOTE: It's perfectly
+fine for a module's `:entries` to contain as many "entry points", "mini apps", or global functions as you care
+to put in it, so you do *not* need separate modules to do that.
+
+The available options in a module are:
+
+[horizontal]
+`:entries`:: The namespaces that serve as the root nodes of the dependency graph for the output code of this module.
+`:depends-on`:: The names of other modules that must be loaded in order for this one to have everything it needs.
+`:prepend`:: String content that will be prepended to the js output. Useful for comments, copyright notice, etc.
+`:append`:: String content that will be appended to the js output. Useful for comments, copyright notice, etc.
+`:prepend-js`:: A string to prepend to the module output containing valid javascript that will be run through Closure optimizer.
+`:append-js`:: A string to append to the module output containing valid javascript that will be run through Closure optimizer.
+
+The following example shows a minimum module configuration:
+
+```
+{...
+ :builds
+ {:app {...
+        :modules {:main {:entries [my.app.main]}}}}}
+```
+
+`shadow-cljs` will follow the dependency graph from the root set of code entry points in the `:entries`
+to find everything needed to actually run.
+
+== HTTP Server
+
+The `:devtools` section of the configuration supports
+options for configuring an optional dev-time HTTP server for a build. The server supports the following
+options:
+
+[Horizontal]
+`:http-root`:: The disk path from which to serve root filesystem requests. If not supplied,
+no disk files are served.
+`:http-port`:: The port to serve from.
+`:http-host`:: The hostname to listen on. Defaults to localhost).
+`:http-resource-root`:: A path relative to classpath from which resources can be served.
+If not supplied, no resources are served.
+`:http-handler`:: A namespace (as a symbol). A `(fn [req] resp)` that is used
+if a resource is not found for the given request. Defaults to a not-found handler.
+
+=== Development HTTP and URI-based Routing (Push state)
+
+If your browser application uses browser push state then you will typically want
+the server to respond with `index.html` instead of "Not Found" on URIs that have no
+real resource (so you can just hit browser reload on your SPA even on odd URIs).
+
+There is a built-in handler that you can add for this:
+
+```
+{...
+    {:builds
+      {:app { ...
+              :devtools { :http-handler shadow.http.push-state/handle }}}}
+```
+
+It supports two additional options (in the `devtools` section):
+
+[horizontal]
+`:push-state/headers`:: (optional) A map of HTTP headers to respond with. Defaults to `text/html` standard headers.
+`:push-state/index`:: (optional) The file to serve. Defaults to `index.html`.
+
+== Web Workers
+
+The `:modules` configuration may also be used to generate files intended to be used as a Web Workers.
+You may declare any module (except the default) as a Web Worker by setting `:web-worker true`. The
+generated file will contain some additional bootstrap code which will load its dependencies
+automatically. The way `:modules` work also ensures that code used only by the worker will also only
+be in the final file for the worker. Each worker should have a dedicated CLJS namespace.
+
+.An example of generating a web worker script
+```
+{...
+ :builds
+   {:app
+    {:target :browser
+     ...
+     :modules {:main   {:entries [my.app]}
+               :extra  {:entries [my.app.extra]
+                        :depends-on #{:main}}
+               :worker {:entries [my.app.worker]
+                        :depends-on #{:main}
+                        :web-worker true}}}}}
+```
+
+The above configuration will generate `worker.js` which you can use to start the Web Worker.
+It will have all code from the `:main` module available (but not `:extra`). The code in the
+`my.app.worker` namespace will only ever execute in the worker. Worker generation happens in
+both development and release modes.
+
+NOTE: Hot code reload does not support reloading code in the worker while it is running.
+I suggest shutting down all workers using the `:devtools :before-load` function and restarting it
+in the `:after-load`.
+
+== Code Splitting [[CodeSplitting]]
+
+You've already seen how to configure your main module. Adding additional modules requires a little
+bit of care, but the technical details are simple:
+
+. Ensure you don't require things you don't use in any namespace.
+. Put the top-level namespace(s) for each module into a module config.
+. Choose you dynamic loading API
+
+=== Using shadow-cljs's built-in Loader Support
+
+The compiler supports generating the required data for `goog.module.ModuleManager` to work.
+It exposes a simple interface to let you load modules on-demand at runtime.
+
+You only need to add `:module-loader true` to your build config. The loader will
+always be injected into the default module (the one everything else depends on).
+
+At runtime you may use the `shadow.loader` namespace to load modules. You may also load a
+module eagerly by just using a `<script>` tag in your page.
+
+```
+{...
+ :builds
+   {:app
+     {:target :browser
+      ...
+      :module-loader true
+      :modules {:main  {:entries [my.app]}
+                :extra {:entries [my.app.extra]
+                        :depends-on #{:main}}}}}}
+```
+
+If you had the following for your main entry point:
+
+```
+(ns my.app
+  (:require [shadow.loader :as loader]))
+
+(defn fn-to-call-on-load []
+  (js/console.log "extra loaded"))
+
+(defn fn-to-call-on-error []
+  (js/console.log "extra load failed"))
+```
+
+Then the following expressions can be used for loading code:
+
+.Loading a module
+```
+;; load returns a goog.async.Deferred, and can be used like a promise
+(-> (loader/load "extra")
+    (.then fn-to-call-on-load fn-to-call-on-error))
+```
+
+.Loading many modules
+```
+;; must be a JS array, also returns goog.async.Deferred
+(loader/load-many #js ["foo" "bar"])
+```
+
+.Including a callback
+```
+(loader/with-module "extra" fn-to-call-on-load)
+```
+
+You can check if a module is loaded using `(loaded? "module-name")`.
+
+==== Loader Costs
+
+Using the loader is very lightweight. It has a few dependencies which you may not be otherwise using.
+In practice using `:module-loader true` adds about 8KB gzip'd
+to the default module. This will vary depending on how much of `goog.net` and `goog.events`
+you are already using, and what level of optimization you use for your release builds.
+
+=== Using the Standard ClojureScript API
+
+The generated code is capable of using the standard Clojurescript `cljs.loader` API. See the
+https://clojurescript.org/news/2017-07-10-code-splitting[documentation] on the Clojurescript
+website for instructions.
+
+The advantage of using the standard API is that your code will play well with others. This
+may be of particular importance to library authors. The disadvantage is that the dynamic module
+loading API in the standard distribution is currently somewhat less easy-to-use than the
+support in `shadow-cljs`.
+
+== Hashed Module Names [[NameHashing]]
+
+You can add `:module-hash-names true` to your build config to automatically create a MD5
+signature for each generated output module file. That means that a `:main` module will generate
+a `main.<md5hash>.js` instead of just the default `main.js`.
+
+Such files can be cached forever since a file with different contents will have a different name.
+
+However, this means that including these files in your HTML gets a bit more complicated.
+
+=== Hashed File Manifest
+
+When using hashed filenames `shadow-cljs` generates a `manifest.json` file in the configured `:output-dir`.
+This file contains a JSON description of the module config together with an
+extra "js-name" property which maps the original module name to the hashed name.
+
+.Sample output of manifest.json when using hashed filenames.
+```
+[{"name":"main", "js-name":"main.md5hash.js", "depends-on":[], ...}
+ {"name":"extra", "js-name":"extra.md5hash.js", "depends-on":["main"], ...}]
+```
+
+You can use this file in your server to figure out which files to include.
+Development builds also produce this file and you may check if for modifications to
+know when a new build completed.
+
+I use this file in production to know when a new CLJS release build should be loaded.
+
+
+
+
+
+
 
 = Targeting Node
 
@@ -1170,7 +1087,7 @@ The code is just Clojurescript, and an entry point is easy to define:
 
 === Build Options
 
-You will need the same basic <<CommonConfig,common configuration>> as in other targets (like
+You will need the same basic <<CommonConfig,main configuration>> as in other targets (like
 `:source-paths`), but you'll need some node-specific build target options:
 
 [horizontal]
@@ -1276,7 +1193,7 @@ artifacts used.
 This mode emits code that can be used (via `require`) as a standard node library, and is
 useful for publishing your code for re-use as a compiled Javascript artifact.
 
-As with other modes the <<CommonConfig, common configuration options>> apply and must be set.
+As with other modes the <<CommonConfig, main configuration options>> apply and must be set.
 The target-specific options are:
 
 [horizontal]
@@ -1374,12 +1291,14 @@ to the name they should be exported to.
 
 NOTE: Development mode has the <<NodeModes,same setup>> as for node scripts (extra dependencies).
 
-=== Distributing on NPM
+== Distributing on NPM
 
 // TODO: Thomas: I think it would be useful to show a package.json and a little bit of an example
 // on how you could set up to deploy this on NPM.
 
-= Other Targets
+= Testing
+
+`shadow-cljs` provides a few ultility targets to make building tests a little easier.
 
 == Browser Test
 
@@ -1523,66 +1442,6 @@ LOG: 'Testing boo.sample-spec'
 HeadlessChrome 0.0.0 (Mac OS X 10.12.6): Executed 1 of 1 SUCCESS (0.007 secs / 0.002 secs)
 ```
 
-= Custom Targets
-
-// TODO: edit this and expand/clean up
-
-You might have guess that with so many targets the ecosystem probably allows easy extension.
-Creating custom targets just requires one function. This function receives one argument (the compiler
-state) and must return it after doing its work. This function is called once for each stage of the compilation.
-
-The compiler provides three special keys from the `shadow.cljs.devtools.compiler` namespace:
-
-[horizontal]
-`shadow.build/config`:: The build config map from your `shadow-cljs.edn` file.
-`shadow.build/mode`:: Either `:dev` or `:release`
-`shadow.build/stage`:: A keyword. See below.
-
-To use it, you simply specify the fully qualified name of the function as the :target for your build.
-In this case :target `build/custom`. The namespace is up to you.
-
-== Example
-
-If your `:source-path` is `["src"]` then create a `src/build.clj`:
-
-```
-(ns build
-  (:require [shadow.build :as build]
-            [shadow.build.targets.browser :as browser]))
-
-(defn custom [{::build/keys [stage mode config] :as state}]
-  (let [state (browser/process state]
-    (when (and (= :flush stage) (= :dev mode))
-      (call-rsync)
-    state))
-```
-
-This would call a call-rsync (undefined here, can do pretty much everything you want here) after every successful
-dev build.
-
-The state is a clojure map representing the full `shadow-build` compiler state.
-
-// TODO: describe the basics at least...
-
-== Compilation Stages
-
-The stages are:
-
-`:init`
-`:compile-prepare`
-`:compile-finish`
-`:optimize-prepare` (`:release` only)
-`:optimize-finish` (`:release` only)
-`:flush`
-
-When mode is `:dev` the `:init` is only called once. Any of the others may be called
-again (in order) when autobuild is active and files are re-compiled on change.
-
-== Built-in Targets
-
-You can read the implementations for the built-in targets in the `shadow-cljs` source code. The
-correct directory for them in the source code is
-https://github.com/thheller/shadow-cljs/tree/master/src/main/shadow/build/targets[src/main/shadow/build/targets].
 
 = Embedding in the JS Ecosystem -- The `:node-module` Target
 
@@ -1600,7 +1459,7 @@ build in the config. You still need a non-empty config file, but the default one
 `shadow-cljs init` will do.
 
 ClojureScript organizes files into namespaces which means that a `demo.foo` namespace should be inside a
-`src/demo/foo.cljs` file. Where `src` is the default source path the shadow-cljs tool (see <<CommonConfig, common configuration>>).
+`src/demo/foo.cljs` file. Where `src` is the default source path the shadow-cljs tool (see <<CommonConfig, main configuration>>).
 
 If you have this file in `src/demo`:
 
@@ -1635,7 +1494,7 @@ Watching with incremental compile is as simple as running `shadow-cljs watch npm
 
 You can also treat `:npm-module` on the same footing with your other builds: give it explicit
 configuration. This allows you to also customize the code generation options. Of course
-you will configure the <<CommonConfig, common configuration>> as in all targets. The target-specific
+you will configure the <<CommonConfig, main configuration>> as in all targets. The target-specific
 options are:
 
 [horizontal]
@@ -1724,4 +1583,196 @@ can override settings by including a `:dev` and/or `:release` section in the bui
    :release {:compiler-options {:optimizations :whitespace}}}}}
 ```
 
+= Custom Targets
 
+// TODO: edit this and expand/clean up
+
+You might have guess that with so many targets the ecosystem probably allows easy extension.
+Creating custom targets just requires one function. This function receives one argument (the compiler
+state) and must return it after doing its work. This function is called once for each stage of the compilation.
+
+The compiler provides three special keys from the `shadow.cljs.devtools.compiler` namespace:
+
+[horizontal]
+`shadow.build/config`:: The build config map from your `shadow-cljs.edn` file.
+`shadow.build/mode`:: Either `:dev` or `:release`
+`shadow.build/stage`:: A keyword. See below.
+
+To use it, you simply specify the fully qualified name of the function as the :target for your build.
+In this case :target `build/custom`. The namespace is up to you.
+
+== Example
+
+If your `:source-path` is `["src"]` then create a `src/build.clj`:
+
+```
+(ns build
+  (:require [shadow.build :as build]
+            [shadow.build.targets.browser :as browser]))
+
+(defn custom [{::build/keys [stage mode config] :as state}]
+  (let [state (browser/process state]
+    (when (and (= :flush stage) (= :dev mode))
+      (call-rsync)
+    state))
+```
+
+This would call a call-rsync (undefined here, can do pretty much everything you want here) after every successful
+dev build.
+
+The state is a clojure map representing the full `shadow-build` compiler state.
+
+// TODO: describe the basics at least...
+
+== Compilation Stages
+
+The stages are:
+
+`:init`
+`:compile-prepare`
+`:compile-finish`
+`:optimize-prepare` (`:release` only)
+`:optimize-finish` (`:release` only)
+`:flush`
+
+When mode is `:dev` the `:init` is only called once. Any of the others may be called
+again (in order) when autobuild is active and files are re-compiled on change.
+
+
+
+= Editor/IDE/REPL Setup
+
+== REPL
+
+You can use the command-line utility to connect to a REPL simply by using a running build ID:
+
+.Browser REPL
+```
+shadow-cljs cljs-repl app
+```
+
+.Node REPL
+```
+shadow-cljs node-repl
+```
+
+== Cursive
+
+If you're a Cursive user then you currently need at least a dummy `project.clj` file. You may also wish to
+read the
+
+```
+(defproject your/project "0.0.0"
+  :dependencies
+  [[thheller/shadow-cljs "1.0.20170629"]]
+
+  :source-paths
+  ["src"])
+```
+
+This will allow Cursive to detect the proper source paths for the project.
+
+If you want the full Cursive experience including proper code navigation then you want to use full
+<<Leiningen, Leiningen integration>>.
+
+=== Cursive REPL Integration
+
+An <<nREPL>> is created by `shadow-cljs` when it is in development mode. You can connect to it to get
+REPL integration using a Clojure Remote REPL run configuration.
+
+By default the network port number is random, but that will be a major pain. You have
+two choices:
+
+. Configure the nREPL port
+. Use a symlink to get the port into the standard location.
+
+Option 1 is nice because it doesn't require any filesystem interactions:
+
+.NREPL in shadow-cljs.edn
+```
+{:nrepl {:port 9000}}
+```
+
+Option 2 is simple, but involves using the standard nREPL port file, which you may need for other
+network REPLs like your server. The port for the `shadow-cljs` REPL is written out to
+`target/shadow-cljs/nrepl.port`, so simply symbolically link this file to the standard
+`~/.nrepl-port`:
+
+.Using a symbolic link for REPL port
+```
+ln -sv target/shadow-cljs/nrepl.port .nrepl-port
+```
+
+Once you've chosen your option for tracking the port, you can add a run configuration via
+`Run -> Edit Configurations...`:
+
+.Clicking on the `+` icon will add a new run configuration.
+image::cursive-repl-1.png[]
+
+.Choose a Clojure Remote REPL
+image::cursive-repl-2.png[]
+
+In the last step either type in the port you've set in your config, or choose to use the
+standard nrepl port:
+
+.If you're using `.nrepl-port`, then configure as shown. If you configured the port number in `shadow-cljs.edn` then use `localhost` and the configured port number.
+image::cursive-repl-3.png[]
+
+== CIDER
+
+CIDER support requires the simple combination of having the `cider-nrepl` dependency on your
+classpath and configuring nREPL. The entries to `shadow-cljs.edn` are simply:
+
+```
+{:dependencies [[cider/cider-nrepl "0.16.0"]]
+ :nrepl {:port 8202}
+
+ ...
+}
+```
+
+then invoke the `cider-connect` function from emacs.
+
+When you connect to the nREPL it will start out in CLJ mode. If you select a running build it should
+switch the nREPL session to CLJS.
+
+Internally, it does this either by calling a fake piggieback function or the "official" API:
+
+```
+(cemerick.piggieback/cljs-repl :id-of-build)
+;; or
+(shadow.cljs.devtools.api/nrepl-select :id-of-build)
+```
+
+Once connected you should be able to eval code using `C-c C-c` (eval a block), `C-x C-e` (eval sexp),
+or `C-c C-k` (eval buffer).
+
+If you see an error like "`cider-load-buffer' needs a ClojureScript REPL", you need to hit
+enter once in the repl buffer. Emacs should then recognize that you have a cljs repl buffer and
+evals should start working.
+
+NOTE: `shadow-cljs` will automatically add the required `cider-nrepl` middleware when it finds `cider.nrepl`
+on your classpath, i.e. in your dependencies.
+
+
+
+
+= What to do when things don’t work?
+
+Since the JS world is still evolving rapidly and not everyone is using the same way to write and
+distribute code there are some things `shadow-cljs` cannot work around automatically. These
+can usually be solved with custom `:resolve` configs, but there may also be bugs or oversights.
+
+If you cannot resolve such an issue with the instructions in this chapter, then try asking on the
+https://clojurians.slack.com/messages/C6N245JGG[`#shadow-cljs` Slack channel].
+
+= Hacking
+
+== Patching Libraries
+
+The shadow-cljs compiler ensure that things on your source paths are
+compiled last. Things from JAR files go first. This means that
+you can copy a source file from a library, patch it, and include it
+in your own source directory. This is a convenient way to test out
+fixes (even to `shadow-cljs` itself!) without having to clone
+that project and understand its setup, build, etc.
