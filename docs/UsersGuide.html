@@ -595,21 +595,22 @@ table.CodeRay td.code>pre{padding:0}
 <ul class="sectlevel2">
 <li><a href="#_output_settings">5.1. Output Settings</a></li>
 <li><a href="#_modules">5.2. Modules</a></li>
-<li><a href="#_http_server">5.3. HTTP Server</a>
+<li><a href="#_web_workers">5.3. Web Workers</a></li>
+<li><a href="#CodeSplitting">5.4. Code Splitting</a>
 <ul class="sectlevel3">
-<li><a href="#_development_http_and_uri_based_routing_push_state">5.3.1. Development HTTP and URI-based Routing (Push state)</a></li>
+<li><a href="#_using_shadow_cljs_s_built_in_loader_support">5.4.1. Using shadow-cljs&#8217;s built-in Loader Support</a></li>
+<li><a href="#_using_the_standard_clojurescript_api">5.4.2. Using the Standard ClojureScript API</a></li>
 </ul>
 </li>
-<li><a href="#_web_workers">5.4. Web Workers</a></li>
-<li><a href="#CodeSplitting">5.5. Code Splitting</a>
+<li><a href="#NameHashing">5.5. Cacheable Output</a>
 <ul class="sectlevel3">
-<li><a href="#_using_shadow_cljs_s_built_in_loader_support">5.5.1. Using shadow-cljs&#8217;s built-in Loader Support</a></li>
-<li><a href="#_using_the_standard_clojurescript_api">5.5.2. Using the Standard ClojureScript API</a></li>
+<li><a href="#BrowserManifest">5.5.1. Output Manifest</a></li>
 </ul>
 </li>
-<li><a href="#NameHashing">5.6. Cacheable Output</a>
+<li><a href="#_development_support">5.6. Development Support</a>
 <ul class="sectlevel3">
-<li><a href="#BrowserManifest">5.6.1. Output Manifest</a></li>
+<li><a href="#_http_server">5.6.1. HTTP Server</a></li>
+<li><a href="#_css_reloading">5.6.2. CSS Reloading</a></li>
 </ul>
 </li>
 </ul>
@@ -1868,84 +1869,7 @@ to find everything needed to actually run.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_http_server"><a class="anchor" href="#_http_server"></a><a class="link" href="#_http_server">5.3. HTTP Server</a></h3>
-<div class="paragraph">
-<p>The <code>:devtools</code> section of the configuration for <code>:browser</code> supports a few additional
-options for configuring an optional dev-time HTTP server for a build. The server supports the following
-options:</p>
-</div>
-<div class="dlist Horizontal">
-<dl>
-<dt><code>:http-root</code></dt>
-<dd>
-<p>The disk path from which to serve root filesystem requests. If not supplied,
-no disk files are served.</p>
-</dd>
-<dt><code>:http-port</code></dt>
-<dd>
-<p>The port to serve from.</p>
-</dd>
-<dt><code>:http-host</code></dt>
-<dd>
-<p>The hostname to listen on. Defaults to localhost).</p>
-</dd>
-<dt><code>:http-resource-root</code></dt>
-<dd>
-<p>A path relative to classpath from which resources can be served.
-If not supplied, no resources are served.</p>
-</dd>
-<dt><code>:http-handler</code></dt>
-<dd>
-<p>A namespace (as a symbol). A <code>(fn [req] resp)</code> that is used
-if a resource is not found for the given request. Defaults to a not-found handler.</p>
-</dd>
-</dl>
-</div>
-<div class="sect3">
-<h4 id="_development_http_and_uri_based_routing_push_state"><a class="anchor" href="#_development_http_and_uri_based_routing_push_state"></a><a class="link" href="#_development_http_and_uri_based_routing_push_state">5.3.1. Development HTTP and URI-based Routing (Push state)</a></h4>
-<div class="paragraph">
-<p>If your browser application uses browser push state then you will typically want
-the server to respond with <code>index.html</code> instead of "Not Found" on URIs that have no
-real resource (so you can just hit browser reload on your SPA even on odd URIs).</p>
-</div>
-<div class="paragraph">
-<p>There is a built-in handler that you can add for this:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
-    {<span class="symbol">:builds</span>
-      {<span class="symbol">:app</span> { <span class="keyword">..</span><span class="keyword">.</span>
-              <span class="symbol">:devtools</span> { <span class="symbol">:http-handler</span> shadow.http.push-state/handle }}}}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>It supports two additional options (in the <code>devtools</code> section):</p>
-</div>
-<div class="hdlist">
-<table>
-<tr>
-<td class="hdlist1">
-<code>:push-state/headers</code>
-</td>
-<td class="hdlist2">
-<p>(optional) A map of HTTP headers to respond with. Defaults to <code>text/html</code> standard headers.</p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
-<code>:push-state/index</code>
-</td>
-<td class="hdlist2">
-<p>(optional) The file to serve. Defaults to <code>index.html</code>.</p>
-</td>
-</tr>
-</table>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_web_workers"><a class="anchor" href="#_web_workers"></a><a class="link" href="#_web_workers">5.4. Web Workers</a></h3>
+<h3 id="_web_workers"><a class="anchor" href="#_web_workers"></a><a class="link" href="#_web_workers">5.3. Web Workers</a></h3>
 <div class="paragraph">
 <p>The <code>:modules</code> configuration may also be used to generate files intended to be used as a Web Workers.
 You may declare any module (except the default) as a Web Worker by setting <code>:web-worker true</code>. The
@@ -1991,7 +1915,7 @@ in the <code>:after-load</code>.
 </div>
 </div>
 <div class="sect2">
-<h3 id="CodeSplitting"><a class="anchor" href="#CodeSplitting"></a><a class="link" href="#CodeSplitting">5.5. Code Splitting</a></h3>
+<h3 id="CodeSplitting"><a class="anchor" href="#CodeSplitting"></a><a class="link" href="#CodeSplitting">5.4. Code Splitting</a></h3>
 <div class="paragraph">
 <p>You&#8217;ve already seen how to configure your main module. Adding additional modules requires a little
 bit of care, but the technical details are simple:</p>
@@ -2010,7 +1934,7 @@ bit of care, but the technical details are simple:</p>
 </ol>
 </div>
 <div class="sect3">
-<h4 id="_using_shadow_cljs_s_built_in_loader_support"><a class="anchor" href="#_using_shadow_cljs_s_built_in_loader_support"></a><a class="link" href="#_using_shadow_cljs_s_built_in_loader_support">5.5.1. Using shadow-cljs&#8217;s built-in Loader Support</a></h4>
+<h4 id="_using_shadow_cljs_s_built_in_loader_support"><a class="anchor" href="#_using_shadow_cljs_s_built_in_loader_support"></a><a class="link" href="#_using_shadow_cljs_s_built_in_loader_support">5.4.1. Using shadow-cljs&#8217;s built-in Loader Support</a></h4>
 <div class="paragraph">
 <p>The compiler supports generating the required data for <code>goog.module.ModuleManager</code> to work.
 It exposes a simple interface to let you load modules on-demand at runtime.</p>
@@ -2089,7 +2013,7 @@ you are already using, and what level of optimization you use for your release b
 </div>
 </div>
 <div class="sect3">
-<h4 id="_using_the_standard_clojurescript_api"><a class="anchor" href="#_using_the_standard_clojurescript_api"></a><a class="link" href="#_using_the_standard_clojurescript_api">5.5.2. Using the Standard ClojureScript API</a></h4>
+<h4 id="_using_the_standard_clojurescript_api"><a class="anchor" href="#_using_the_standard_clojurescript_api"></a><a class="link" href="#_using_the_standard_clojurescript_api">5.4.2. Using the Standard ClojureScript API</a></h4>
 <div class="paragraph">
 <p>The generated code is capable of using the standard ClojureScript <code>cljs.loader</code> API. See the
 <a href="https://clojurescript.org/news/2017-07-10-code-splitting">documentation</a> on the ClojureScript
@@ -2104,7 +2028,7 @@ support in <code>shadow-cljs</code>.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="NameHashing"><a class="anchor" href="#NameHashing"></a><a class="link" href="#NameHashing">5.6. Cacheable Output</a></h3>
+<h3 id="NameHashing"><a class="anchor" href="#NameHashing"></a><a class="link" href="#NameHashing">5.5. Cacheable Output</a></h3>
 <div class="paragraph">
 <p>In a web setting it is desirable to cache <code>.js</code> files for a very long time to avoid extra request. It is common
 practice the generate a unique name for the <code>.js</code> file for every released version. This changes the URL used to
@@ -2144,7 +2068,7 @@ of generating conflicts. I recommend using the full hash.</p>
 in your HTML. The <a href="#BrowserManifest">Output Manifest</a> can help with that.</p>
 </div>
 <div class="sect3">
-<h4 id="BrowserManifest"><a class="anchor" href="#BrowserManifest"></a><a class="link" href="#BrowserManifest">5.6.1. Output Manifest</a></h4>
+<h4 id="BrowserManifest"><a class="anchor" href="#BrowserManifest"></a><a class="link" href="#BrowserManifest">5.5.1. Output Manifest</a></h4>
 <div class="paragraph">
 <p><code>shadow-cljs</code> generates a <code>manifest.edn</code> file in the configured <code>:output-dir</code>.
 This file contains a description of the module config together with an extra <code>:output-name</code> property which
@@ -2194,6 +2118,131 @@ be relative to the configured <code>:output-dir</code>.</p>
       <span class="symbol">:modules</span> {<span class="symbol">:main</span>  {<span class="symbol">:entries</span> [my.app]}
                 <span class="symbol">:extra</span> {<span class="symbol">:entries</span> [my.app.extra]
                         <span class="symbol">:depends-on</span> #{<span class="symbol">:main</span>}}}}}}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_development_support"><a class="anchor" href="#_development_support"></a><a class="link" href="#_development_support">5.6. Development Support</a></h3>
+<div class="paragraph">
+<p>The <code>:devtools</code> section of the configuration for <code>:browser</code> supports a few additional
+options for configuring an optional dev-time HTTP server for a build and CSS reloading.</p>
+</div>
+<div class="sect3">
+<h4 id="_http_server"><a class="anchor" href="#_http_server"></a><a class="link" href="#_http_server">5.6.1. HTTP Server</a></h4>
+<div class="paragraph">
+<p>The server supports the following options:</p>
+</div>
+<div class="dlist Horizontal">
+<dl>
+<dt><code>:http-root</code></dt>
+<dd>
+<p>The disk path from which to serve root filesystem requests. If not supplied,
+no disk files are served.</p>
+</dd>
+<dt><code>:http-port</code></dt>
+<dd>
+<p>The port to serve from.</p>
+</dd>
+<dt><code>:http-host</code></dt>
+<dd>
+<p>The hostname to listen on. Defaults to localhost).</p>
+</dd>
+<dt><code>:http-resource-root</code></dt>
+<dd>
+<p>A path relative to classpath from which resources can be served.
+If not supplied, no resources are served.</p>
+</dd>
+<dt><code>:http-handler</code></dt>
+<dd>
+<p>A namespace (as a symbol). A <code>(fn [req] resp)</code> that is used
+if a resource is not found for the given request. Defaults to a not-found handler.</p>
+</dd>
+</dl>
+</div>
+<div class="sect4">
+<h5 id="_http_and_uri_based_routing_push_state"><a class="anchor" href="#_http_and_uri_based_routing_push_state"></a><a class="link" href="#_http_and_uri_based_routing_push_state">HTTP and URI-based Routing (Push state)</a></h5>
+<div class="paragraph">
+<p>If your browser application uses browser push state then you will typically want
+the server to respond with <code>index.html</code> instead of "Not Found" on URIs that have no
+real resource (so you can just hit browser reload on your SPA even on odd URIs).</p>
+</div>
+<div class="paragraph">
+<p>There is a built-in handler that you can add for this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+    {<span class="symbol">:builds</span>
+      {<span class="symbol">:app</span> { <span class="keyword">..</span><span class="keyword">.</span>
+              <span class="symbol">:devtools</span> { <span class="symbol">:http-handler</span> shadow.http.push-state/handle }}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It supports two additional options (in the <code>devtools</code> section):</p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+<code>:push-state/headers</code>
+</td>
+<td class="hdlist2">
+<p>(optional) A map of HTTP headers to respond with. Defaults to <code>text/html</code> standard headers.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>:push-state/index</code>
+</td>
+<td class="hdlist2">
+<p>(optional) The file to serve. Defaults to <code>index.html</code>.</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_css_reloading"><a class="anchor" href="#_css_reloading"></a><a class="link" href="#_css_reloading">5.6.2. CSS Reloading</a></h4>
+<div class="paragraph">
+<p>The Browser devtools can also reload CSS for you. This is enabled by default and in most cases requires no additional
+configuration when you are using the built-in HTTP dev server.</p>
+</div>
+<div class="paragraph">
+<p>The server will watch the configured <code>:http-root</code> and notify the client about file updates. If a <code>.css</code> file is linked
+with an absolute path it will be reloaded on change. Relative paths are currently not supported.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example HTML snippet</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="html"><span class="tag">&lt;link</span> <span class="attribute-name">rel</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">stylesheet</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">href</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">/css/main.css</span><span class="delimiter">&quot;</span></span><span class="tag">/&gt;</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Example Hiccup since we aren&#8217;t savages</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">[<span class="symbol">:link</span> {<span class="symbol">:rel</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">stylesheet</span><span class="delimiter">&quot;</span></span> <span class="symbol">:href</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">/css/main.css</span><span class="delimiter">&quot;</span></span>}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will cause an update if the file <code>&lt;:http-root&gt;/css/main.css</code> is changed.</p>
+</div>
+<div class="paragraph">
+<p><code>shadow-cljs</code> currently provides no support for directly compiling CSS but the usual tools will work and should
+be run separately. Just make sure the output is generated into the correct places.</p>
+</div>
+<div class="paragraph">
+<p>When you are not using the built-in HTTP Server you can specify <code>:watch-dir</code> instead which should be a path to the
+document root used to serve your content.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example :watch-dir config</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+    {<span class="symbol">:builds</span>
+      {<span class="symbol">:app</span> {<span class="keyword">..</span><span class="keyword">.</span>
+             <span class="symbol">:devtools</span> {<span class="symbol">:watch-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public</span><span class="delimiter">&quot;</span></span>}}}}</code></pre>
 </div>
 </div>
 </div>
@@ -3303,7 +3352,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-01-12 21:04:17 CET
+Last updated 2018-01-12 21:17:19 CET
 </div>
 </div>
 </body>

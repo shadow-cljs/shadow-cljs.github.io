@@ -825,42 +825,6 @@ The following example shows a minimum module configuration:
 `shadow-cljs` will follow the dependency graph from the root set of code entry points in the `:entries`
 to find everything needed to actually run.
 
-== HTTP Server
-
-The `:devtools` section of the configuration for `:browser` supports a few additional
-options for configuring an optional dev-time HTTP server for a build. The server supports the following
-options:
-
-[Horizontal]
-`:http-root`:: The disk path from which to serve root filesystem requests. If not supplied,
-no disk files are served.
-`:http-port`:: The port to serve from.
-`:http-host`:: The hostname to listen on. Defaults to localhost).
-`:http-resource-root`:: A path relative to classpath from which resources can be served.
-If not supplied, no resources are served.
-`:http-handler`:: A namespace (as a symbol). A `(fn [req] resp)` that is used
-if a resource is not found for the given request. Defaults to a not-found handler.
-
-=== Development HTTP and URI-based Routing (Push state)
-
-If your browser application uses browser push state then you will typically want
-the server to respond with `index.html` instead of "Not Found" on URIs that have no
-real resource (so you can just hit browser reload on your SPA even on odd URIs).
-
-There is a built-in handler that you can add for this:
-
-```
-{...
-    {:builds
-      {:app { ...
-              :devtools { :http-handler shadow.http.push-state/handle }}}}
-```
-
-It supports two additional options (in the `devtools` section):
-
-[horizontal]
-`:push-state/headers`:: (optional) A map of HTTP headers to respond with. Defaults to `text/html` standard headers.
-`:push-state/index`:: (optional) The file to serve. Defaults to `index.html`.
 
 == Web Workers
 
@@ -1059,6 +1023,82 @@ be relative to the configured `:output-dir`.
                 :extra {:entries [my.app.extra]
                         :depends-on #{:main}}}}}}
 ```
+
+== Development Support
+
+The `:devtools` section of the configuration for `:browser` supports a few additional
+options for configuring an optional dev-time HTTP server for a build and CSS reloading.
+
+=== HTTP Server
+
+The server supports the following options:
+
+[Horizontal]
+`:http-root`:: The disk path from which to serve root filesystem requests. If not supplied,
+no disk files are served.
+`:http-port`:: The port to serve from.
+`:http-host`:: The hostname to listen on. Defaults to localhost).
+`:http-resource-root`:: A path relative to classpath from which resources can be served.
+If not supplied, no resources are served.
+`:http-handler`:: A namespace (as a symbol). A `(fn [req] resp)` that is used
+if a resource is not found for the given request. Defaults to a not-found handler.
+
+
+==== HTTP and URI-based Routing (Push state)
+
+If your browser application uses browser push state then you will typically want
+the server to respond with `index.html` instead of "Not Found" on URIs that have no
+real resource (so you can just hit browser reload on your SPA even on odd URIs).
+
+There is a built-in handler that you can add for this:
+
+```
+{...
+    {:builds
+      {:app { ...
+              :devtools { :http-handler shadow.http.push-state/handle }}}}
+```
+
+It supports two additional options (in the `devtools` section):
+
+[horizontal]
+`:push-state/headers`:: (optional) A map of HTTP headers to respond with. Defaults to `text/html` standard headers.
+`:push-state/index`:: (optional) The file to serve. Defaults to `index.html`.
+
+=== CSS Reloading
+
+The Browser devtools can also reload CSS for you. This is enabled by default and in most cases requires no additional
+configuration when you are using the built-in HTTP dev server.
+
+The server will watch the configured `:http-root` and notify the client about file updates. If a `.css` file is linked
+with an absolute path it will be reloaded on change. Relative paths are currently not supported.
+
+.Example HTML snippet
+```html
+<link rel="stylesheet" href="/css/main.css"/>
+```
+
+.Example Hiccup since we aren't savages
+```
+[:link {:rel "stylesheet" :href "/css/main.css"}]
+```
+
+This will cause an update if the file `<:http-root>/css/main.css` is changed.
+
+`shadow-cljs` currently provides no support for directly compiling CSS but the usual tools will work and should
+be run separately. Just make sure the output is generated into the correct places.
+
+When you are not using the built-in HTTP Server you can specify `:watch-dir` instead which should be a path to the
+document root used to serve your content.
+
+.Example :watch-dir config
+```
+{...
+    {:builds
+      {:app {...
+             :devtools {:watch-dir "public"}}}}
+```
+
 
 
 = Targeting Node
