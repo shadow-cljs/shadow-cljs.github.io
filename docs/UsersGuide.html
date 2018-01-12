@@ -632,6 +632,12 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_generated_output_in_code_test_dir_code">4.1.1. Generated output in <code>:test-dir</code></a></li>
 </ul>
 </li>
+<li><a href="#_targeting_tests_to_karma_for_continuous_integration">4.2. Targeting Tests to Karma for Continuous Integration</a>
+<ul class="sectlevel3">
+<li><a href="#_installing_karma">4.2.1. Installing Karma</a></li>
+<li><a href="#_the_build">4.2.2. The Build</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#_embedding_in_the_js_ecosystem_the_code_node_module_code_target">5. Embedding in the JS Ecosystem&#8201;&#8212;&#8201;The <code>:node-module</code> Target</a>
@@ -2788,6 +2794,128 @@ auto-generated.</p>
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_targeting_tests_to_karma_for_continuous_integration"><a class="anchor" href="#_targeting_tests_to_karma_for_continuous_integration"></a><a class="link" href="#_targeting_tests_to_karma_for_continuous_integration">4.2. Targeting Tests to Karma for Continuous Integration</a></h3>
+<div class="paragraph">
+<p>When you want to run your CLJS tests against a browser on some kind of CI server you&#8217;ll need to
+be able to run the tests from a command line and get back a status code. Karma is a well-known
+and supported test runner that can do this for you, and <code>shadow-cljs</code> includes a target that
+can add the appropriate wrappers around your tests so the will work in it.</p>
+</div>
+<div class="sect3">
+<h4 id="_installing_karma"><a class="anchor" href="#_installing_karma"></a><a class="link" href="#_installing_karma">4.2.1. Installing Karma</a></h4>
+<div class="paragraph">
+<p>See their <a href="http://karma-runner.github.io">website</a> for full instructions. You&#8217;ll typically need
+something like this is your <code>package.json</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">CITests</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">version</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">1.0.0</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">description</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Testing</span><span class="delimiter">&quot;</span></span>,
+  <span class="error">.</span><span class="error">.</span><span class="error">.</span>
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">devDependencies</span><span class="delimiter">&quot;</span></span>: {
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">karma</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">^2.0.0</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">karma-chrome-launcher</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">^2.2.0</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">karma-cljs-test</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">^0.1.0</span><span class="delimiter">&quot;</span></span>,
+    <span class="error">.</span><span class="error">.</span><span class="error">.</span>
+  },
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">author</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">license</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">MIT</span><span class="delimiter">&quot;</span></span>
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So, you need Karma, a browser launcher, and the cljs-test integration.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_the_build"><a class="anchor" href="#_the_build"></a><a class="link" href="#_the_build">4.2.2. The Build</a></h4>
+<div class="paragraph">
+<p>The build options are:</p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+<code>:target</code>
+</td>
+<td class="hdlist2">
+<p><code>:karma</code></p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>:output-to</code>
+</td>
+<td class="hdlist2">
+<p>A path/filename for the js file.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>:ns-regexp</code>
+</td>
+<td class="hdlist2">
+<p>(optional) A regex to match the test namespaces.</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>So you might have something like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span> { <span class="symbol">:ci-tests</span> {<span class="symbol">:target</span>     <span class="symbol">:karma</span>
+                      <span class="symbol">:js-options</span> {<span class="symbol">:js-provider</span> <span class="symbol">:shadow</span>} <span class="comment">; needed in older versions of shadow-cljs</span>
+                      <span class="symbol">:output-to</span>  <span class="string"><span class="delimiter">&quot;</span><span class="content">target/ci.js</span><span class="delimiter">&quot;</span></span>
+                      <span class="symbol">:ns-regexp</span>  <span class="string"><span class="delimiter">&quot;</span><span class="content">-spec$</span><span class="delimiter">&quot;</span></span>}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You also need a <code>karma.conf.js</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json"><span class="error">m</span><span class="error">o</span><span class="error">d</span><span class="error">u</span><span class="error">l</span><span class="error">e</span><span class="error">.</span><span class="error">e</span><span class="error">x</span><span class="error">p</span><span class="error">o</span><span class="error">r</span><span class="error">t</span><span class="error">s</span> <span class="error">=</span> <span class="error">f</span><span class="error">u</span><span class="error">n</span><span class="error">c</span><span class="error">t</span><span class="error">i</span><span class="error">o</span><span class="error">n</span> <span class="error">(</span><span class="error">c</span><span class="error">o</span><span class="error">n</span><span class="error">f</span><span class="error">i</span><span class="error">g</span><span class="error">)</span> {
+    <span class="error">c</span><span class="error">o</span><span class="error">n</span><span class="error">f</span><span class="error">i</span><span class="error">g</span><span class="error">.</span><span class="error">s</span><span class="error">e</span><span class="error">t</span><span class="error">(</span>{
+        <span class="error">b</span><span class="error">r</span><span class="error">o</span><span class="error">w</span><span class="error">s</span><span class="error">e</span><span class="error">r</span><span class="error">s</span>: [<span class="error">'</span><span class="error">C</span><span class="error">h</span><span class="error">r</span><span class="error">o</span><span class="error">m</span><span class="error">e</span><span class="error">H</span><span class="error">e</span><span class="error">a</span><span class="error">d</span><span class="error">l</span><span class="error">e</span><span class="error">s</span><span class="error">s</span><span class="error">'</span>],
+        <span class="error">/</span><span class="error">/</span> <span class="error">T</span><span class="error">h</span><span class="error">e</span> <span class="error">d</span><span class="error">i</span><span class="error">r</span><span class="error">e</span><span class="error">c</span><span class="error">t</span><span class="error">o</span><span class="error">r</span><span class="error">y</span> <span class="error">w</span><span class="error">h</span><span class="error">e</span><span class="error">r</span><span class="error">e</span> <span class="error">t</span><span class="error">h</span><span class="error">e</span> <span class="error">o</span><span class="error">u</span><span class="error">t</span><span class="error">p</span><span class="error">u</span><span class="error">t</span> <span class="error">f</span><span class="error">i</span><span class="error">l</span><span class="error">e</span> <span class="error">l</span><span class="error">i</span><span class="error">v</span><span class="error">e</span><span class="error">s</span>
+        <span class="error">b</span><span class="error">a</span><span class="error">s</span><span class="error">e</span><span class="error">P</span><span class="error">a</span><span class="error">t</span><span class="error">h</span>: <span class="error">'</span><span class="error">t</span><span class="error">a</span><span class="error">r</span><span class="error">g</span><span class="error">e</span><span class="error">t</span><span class="error">'</span>,
+        <span class="error">/</span><span class="error">/</span> <span class="error">T</span><span class="error">h</span><span class="error">e</span> <span class="error">f</span><span class="error">i</span><span class="error">l</span><span class="error">e</span> <span class="error">i</span><span class="error">t</span><span class="error">s</span><span class="error">e</span><span class="error">l</span><span class="error">f</span>
+        <span class="error">f</span><span class="error">i</span><span class="error">l</span><span class="error">e</span><span class="error">s</span>: [<span class="error">'</span><span class="error">c</span><span class="error">i</span><span class="error">.</span><span class="error">j</span><span class="error">s</span><span class="error">'</span>],
+        <span class="error">f</span><span class="error">r</span><span class="error">a</span><span class="error">m</span><span class="error">e</span><span class="error">w</span><span class="error">o</span><span class="error">r</span><span class="error">k</span><span class="error">s</span>: [<span class="error">'</span><span class="error">c</span><span class="error">l</span><span class="error">j</span><span class="error">s</span><span class="error">-</span><span class="error">t</span><span class="error">e</span><span class="error">s</span><span class="error">t</span><span class="error">'</span>],
+        <span class="error">p</span><span class="error">l</span><span class="error">u</span><span class="error">g</span><span class="error">i</span><span class="error">n</span><span class="error">s</span>: [<span class="error">'</span><span class="error">k</span><span class="error">a</span><span class="error">r</span><span class="error">m</span><span class="error">a</span><span class="error">-</span><span class="error">c</span><span class="error">l</span><span class="error">j</span><span class="error">s</span><span class="error">-</span><span class="error">t</span><span class="error">e</span><span class="error">s</span><span class="error">t</span><span class="error">'</span>, <span class="error">'</span><span class="error">k</span><span class="error">a</span><span class="error">r</span><span class="error">m</span><span class="error">a</span><span class="error">-</span><span class="error">c</span><span class="error">h</span><span class="error">r</span><span class="error">o</span><span class="error">m</span><span class="error">e</span><span class="error">-</span><span class="error">l</span><span class="error">a</span><span class="error">u</span><span class="error">n</span><span class="error">c</span><span class="error">h</span><span class="error">e</span><span class="error">r</span><span class="error">'</span>],
+        <span class="error">c</span><span class="error">o</span><span class="error">l</span><span class="error">o</span><span class="error">r</span><span class="error">s</span>: <span class="value">true</span>,
+        <span class="error">l</span><span class="error">o</span><span class="error">g</span><span class="error">L</span><span class="error">e</span><span class="error">v</span><span class="error">e</span><span class="error">l</span>: <span class="error">c</span><span class="error">o</span><span class="error">n</span><span class="error">f</span><span class="error">i</span><span class="error">g</span><span class="error">.</span><span class="error">L</span><span class="error">O</span><span class="error">G</span><span class="error">_</span><span class="error">I</span><span class="error">N</span><span class="error">F</span><span class="error">O</span>,
+        <span class="error">c</span><span class="error">l</span><span class="error">i</span><span class="error">e</span><span class="error">n</span><span class="error">t</span>: {
+            <span class="error">a</span><span class="error">r</span><span class="error">g</span><span class="error">s</span>: [<span class="string"><span class="delimiter">&quot;</span><span class="content">shadow.test.karma.init</span><span class="delimiter">&quot;</span></span>],
+            <span class="error">s</span><span class="error">i</span><span class="error">n</span><span class="error">g</span><span class="error">l</span><span class="error">e</span><span class="error">R</span><span class="error">u</span><span class="error">n</span>: <span class="value">true</span>
+        }
+    }<span class="error">)</span>
+}<span class="error">;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>then you can run the tests as follows (assuming you&#8217;ve installed global executables of the tools):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">$ shadow-cljs <span class="keyword">compile</span> ci
+$ karma start --single-run
+<span class="integer">12</span> <span class="integer">01</span> <span class="integer">2018</span> <span class="integer">01</span><span class="error">:</span><span class="integer">19</span><span class="error">:</span><span class="float">24.222</span><span class="symbol">:INFO</span> [karma]<span class="error">:</span> Karma v2.<span class="float">0.0</span> server started at http<span class="symbol">://0.</span><span class="float">0.0</span><span class="keyword">.</span><span class="integer">0</span><span class="error">:</span><span class="integer">9876</span><span class="keyword">/</span>
+<span class="integer">12</span> <span class="integer">01</span> <span class="integer">2018</span> <span class="integer">01</span><span class="error">:</span><span class="integer">19</span><span class="error">:</span><span class="float">24.224</span><span class="symbol">:INFO</span> [launcher]<span class="error">:</span> Launching browser ChromeHeadless with unlimited concurrency
+<span class="integer">12</span> <span class="integer">01</span> <span class="integer">2018</span> <span class="integer">01</span><span class="error">:</span><span class="integer">19</span><span class="error">:</span><span class="float">24.231</span><span class="symbol">:INFO</span> [launcher]<span class="error">:</span> Starting browser ChromeHeadless
+<span class="integer">12</span> <span class="integer">01</span> <span class="integer">2018</span> <span class="integer">01</span><span class="error">:</span><span class="integer">19</span><span class="error">:</span><span class="float">24.478</span><span class="symbol">:INFO</span> [HeadlessChrome <span class="float">0.0</span><span class="keyword">.</span><span class="integer">0</span> (Mac OS X <span class="float">10.12</span><span class="keyword">.</span><span class="integer">6</span>)]<span class="error">:</span> Connected on socket TcfrjxVKmx7xN6enAAAA with id <span class="integer">85554456</span>
+LOG<span class="error">:</span> 'Testing boo.sample-spec'
+HeadlessChrome <span class="float">0.0</span><span class="keyword">.</span><span class="integer">0</span> (Mac OS X <span class="float">10.12</span><span class="keyword">.</span><span class="integer">6</span>)<span class="error">:</span> Executed <span class="integer">1</span> of <span class="integer">1</span> SUCCESS (<span class="float">0.007</span> secs <span class="keyword">/</span> <span class="float">0.002</span> secs)</code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -2997,7 +3125,7 @@ can override settings by including a <code>:dev</code> and/or <code>:release</co
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-01-12 01:06:04 PST
+Last updated 2018-01-12 01:22:17 PST
 </div>
 </div>
 </body>
