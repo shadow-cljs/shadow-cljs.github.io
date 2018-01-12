@@ -625,7 +625,15 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 </ul>
 </li>
-<li><a href="#_other_targets">4. Other Targets</a></li>
+<li><a href="#_other_targets">4. Other Targets</a>
+<ul class="sectlevel2">
+<li><a href="#_browser_test">4.1. Browser Test</a>
+<ul class="sectlevel3">
+<li><a href="#_generated_output_in_code_test_dir_code">4.1.1. Generated output in <code>:test-dir</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a href="#_embedding_in_the_js_ecosystem_the_code_node_module_code_target">5. Embedding in the JS Ecosystem&#8201;&#8212;&#8201;The <code>:node-module</code> Target</a>
 <ul class="sectlevel2">
 <li><a href="#_convenience_mode">5.1. Convenience Mode</a></li>
@@ -1429,7 +1437,7 @@ no disk files are served.</p>
 </dd>
 <dt><code>:http-resource-root</code></dt>
 <dd>
-<p>A sequence of paths relative to classpath from which resources can be scanned.
+<p>A path relative to classpath from which resources can be served.
 If not supplied, no resources are served.</p>
 </dd>
 <dt><code>:http-handler</code></dt>
@@ -2676,7 +2684,110 @@ Development mode has the <a href="#NodeModes">same setup</a> as for node scripts
 <div class="sect1">
 <h2 id="_other_targets"><a class="anchor" href="#_other_targets"></a><a class="link" href="#_other_targets">4. Other Targets</a></h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_browser_test"><a class="anchor" href="#_browser_test"></a><a class="link" href="#_browser_test">4.1. Browser Test</a></h3>
+<div class="paragraph">
+<p>This target is meant for gathering up namespaces that contain tests (based on a filename pattern match),
+and triggering a test runner. It contains a built-in runner that will automatically scan for <code>cljs.test</code>
+tests and run them.</p>
+</div>
+<div class="paragraph">
+<p>The relevant configuration options are:</p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+<code>:target</code>
+</td>
+<td class="hdlist2">
+<p><code>:browser-test</code></p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>:test-dir</code>
+</td>
+<td class="hdlist2">
+<p>A folder in which to output files. See below.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>:ns-regexp</code>
+</td>
+<td class="hdlist2">
+<p>(optional) A regular expression matching namespaces against project files. This only scans files, and
+will not scan jars. Defaults to "-test$".</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>:runner-ns</code>
+</td>
+<td class="hdlist2">
+<p>(optional) A namespace that can contain a start, stop, and init function. Defaults to
+<code>shadow.test.browser</code>.</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The normal <code>:devtools</code> options are supported, so you will usually create an http server to serve the files.
+In general you will need a config that looks like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span> {<span class="symbol">:test</span>     {<span class="symbol">:target</span>    <span class="symbol">:browser-test</span>
+                     <span class="symbol">:test-dir</span>  <span class="string"><span class="delimiter">&quot;</span><span class="content">resources/public/js/test</span><span class="delimiter">&quot;</span></span>
+                     <span class="symbol">:ns-regexp</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">-spec$</span><span class="delimiter">&quot;</span></span>
+                     <span class="symbol">:runner-ns</span> tests.client-test-main
+                     <span class="symbol">:devtools</span>  {<span class="symbol">:http-port</span>          <span class="integer">8021</span>
+                                 <span class="symbol">:http-root</span>          <span class="string"><span class="delimiter">&quot;</span><span class="content">resources/public/js/test</span><span class="delimiter">&quot;</span></span>}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Remember that the test directory will have the index.html, and a js folder.</p>
+</div>
+<div class="paragraph">
+<p>If you choose to supply a test main, it might look like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">tests.client-test-main</span>)
 
+(<span class="keyword">defn</span> <span class="function">start</span> []
+  <span class="keyword">..</span><span class="keyword">.</span> run the tests.<span class="keyword">..</span>)
+
+(<span class="keyword">defn</span> <span class="function">stop</span> [done]
+  <span class="comment">; tests can be async. You must call done so that the runner knows you actually finished</span>
+  (done))
+
+(<span class="keyword">defn</span> ^<span class="symbol">:export</span> init []
+  (start))</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_generated_output_in_code_test_dir_code"><a class="anchor" href="#_generated_output_in_code_test_dir_code"></a><a class="link" href="#_generated_output_in_code_test_dir_code">4.1.1. Generated output in <code>:test-dir</code></a></h4>
+<div class="paragraph">
+<p>The output includes two primary artifacts in your <code>test-dir</code> folder:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>index.html</code> - If and only if there was not already an <code>index.html</code> file present. By default the generated
+file loads the tests and runs <code>init</code> in the <code>:runner-ns</code>. You may edit or add a custom version that will
+not be overwritten.</p>
+</li>
+<li>
+<p><code>js/test.js</code> - The Javascript tests. The tests will always have this name. The entries for the module are
+auto-generated.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -2886,7 +2997,7 @@ can override settings by including a <code>:dev</code> and/or <code>:release</co
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-01-11 17:11:43 PST
+Last updated 2018-01-12 01:06:04 PST
 </div>
 </div>
 </body>
