@@ -568,7 +568,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_ssl">3.4.3. SSL</a></li>
 </ul>
 </li>
-<li><a href="#_generic_build_options">3.5. Generic Build Options</a>
+<li><a href="#_development_options">3.5. Development Options</a>
 <ul class="sectlevel3">
 <li><a href="#_preloads">3.5.1. Preloads</a></li>
 <li><a href="#_hot_code_reload">3.5.2. Hot Code Reload</a></li>
@@ -1290,9 +1290,9 @@ shadow-cljs - watching build :app
 </div>
 </div>
 <div class="sect2">
-<h3 id="_generic_build_options"><a class="anchor" href="#_generic_build_options"></a><a class="link" href="#_generic_build_options">3.5. Generic Build Options</a></h3>
+<h3 id="_development_options"><a class="anchor" href="#_development_options"></a><a class="link" href="#_development_options">3.5. Development Options</a></h3>
 <div class="paragraph">
-<p>Each <code>:target</code> typically provides some development support.</p>
+<p>Each build <code>:target</code> typically provides some development support. They are grouped under the <code>:devtools</code> key for each <code>:build</code>.</p>
 </div>
 <div class="sect3">
 <h4 id="_preloads"><a class="anchor" href="#_preloads"></a><a class="link" href="#_preloads">3.5.1. Preloads</a></h4>
@@ -1302,20 +1302,17 @@ shadow-cljs - watching build :app
 </div>
 <div class="paragraph">
 <p>Preloads are used to force certain namespaces into the front of your generated Javascript. This is
-generally used to inject tools and instrumutation before the application actually loads and runs. The
+generally used to inject tools and instrumentation before the application actually loads and runs. The
 preloads option is simply a list of namespaces in the <code>:devtools</code>/<code>:preloads</code> section of
 <code>shadow-cljs-edn</code>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:dependencies</span> [<span class="keyword">..</span><span class="keyword">.</span>]
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
  <span class="symbol">:builds</span>
-        {<span class="symbol">:app</span>      {<span class="symbol">:target</span>     <span class="symbol">:browser</span>
-                    <span class="symbol">:output-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">resources/public/js</span><span class="delimiter">&quot;</span></span>
-                    <span class="symbol">:asset-path</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">/js</span><span class="delimiter">&quot;</span></span>
-                    <span class="symbol">:modules</span>    { <span class="keyword">..</span><span class="keyword">.</span> }
-                    <span class="symbol">:devtools</span>   {<span class="symbol">:preloads</span>   [fulcro.inspect.preload]
-                                 <span class="keyword">..</span><span class="keyword">.</span> }}}}</code></pre>
+ {<span class="symbol">:app</span> {<span class="keyword">..</span><span class="keyword">.</span>
+        <span class="symbol">:devtools</span> {<span class="symbol">:preloads</span> [fulcro.inspect.preload]
+                   <span class="keyword">..</span><span class="keyword">.</span>}}}}</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -1379,8 +1376,8 @@ can do async processing, but <strong>must</strong> call <code>(done)</code> to i
 <pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
  <span class="symbol">:builds</span>
  {<span class="symbol">:app</span> {<span class="keyword">..</span><span class="keyword">.</span>
-        <span class="symbol">:devtools</span> {<span class="symbol">:after-load</span>   app.ui/start-workers!
-                   <span class="symbol">:before-load</span>  app.workers/stop-workers!
+        <span class="symbol">:devtools</span> {<span class="symbol">:before-load</span>  my.app/stop
+                   <span class="symbol">:after-load</span>   my.app/start
                    <span class="keyword">..</span><span class="keyword">.</span>}}}}</code></pre>
 </div>
 </div>
@@ -3248,7 +3245,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-01-12 13:53:26 CET
+Last updated 2018-01-12 14:01:16 CET
 </div>
 </div>
 </body>
