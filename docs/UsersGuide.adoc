@@ -533,6 +533,12 @@ There is a built-in handler that you can add for this:
               :devtools { :http-handler shadow.http.push-state/handle }}}}
 ```
 
+It supports two additional options (in the `devtools` section):
+
+[horizontal]
+`:push-state/headers`:: (optional) A map of HTTP headers to respond with. Defaults to `text/html` standard headers.
+`:push-state/index`:: (optional) The file to serve. Defaults to `index.html`.
+
 == Lifecycle Hooks
 
 The build configuration supports hooks that allow you to run functions just before hot code reload
@@ -1507,6 +1513,67 @@ $ karma start --single-run
 LOG: 'Testing boo.sample-spec'
 HeadlessChrome 0.0.0 (Mac OS X 10.12.6): Executed 1 of 1 SUCCESS (0.007 secs / 0.002 secs)
 ```
+
+= Custom Targets
+
+// TODO: edit this and expand/clean up
+
+You might have guess that with so many targets the ecosystem probably allows easy extension.
+Creating custom targets just requires one function. This function receives one argument (the compiler
+state) and must return it after doing its work. This function is called once for each stage of the compilation.
+
+The compiler provides three special keys from the `shadow.cljs.devtools.compiler` namespace:
+
+[horizontal]
+`shadow.build/config`:: The build config map from your `shadow-cljs.edn` file.
+`shadow.build/mode`:: Either `:dev` or `:release`
+`shadow.build/stage`:: A keyword. See below.
+
+To use it, you simply specify the fully qualified name of the function as the :target for your build.
+In this case :target `build/custom`. The namespace is up to you.
+
+== Example
+
+If your `:source-path` is `["src"]` then create a `src/build.clj`:
+
+```
+(ns build
+  (:require [shadow.build :as build]
+            [shadow.build.targets.browser :as browser]))
+
+(defn custom [{::build/keys [stage mode config] :as state}]
+  (let [state (browser/process state]
+    (when (and (= :flush stage) (= :dev mode))
+      (call-rsync)
+    state))
+```
+
+This would call a call-rsync (undefined here, can do pretty much everything you want here) after every successful
+dev build.
+
+The state is a clojure map representing the full `shadow-build` compiler state.
+
+// TODO: describe the basics at least...
+
+== Compilation Stages
+
+The stages are:
+
+`:init`
+`:compile-prepare`
+`:compile-finish`
+`:optimize-prepare` (`:release` only)
+`:optimize-finish` (`:release` only)
+`:flush`
+
+When mode is `:dev` the `:init` is only called once. Any of the others may be called
+again (in order) when autobuild is active and files are re-compiled on change.
+
+== Built-in Targets
+
+You can read the implementations for the built-in targets in the `shadow-cljs` source code. The
+correct directory for them in the source code is
+https://github.com/thheller/shadow-cljs/tree/master/src/main/shadow/build/targets[src/main/shadow/build/targets].
 
 = Embedding in the JS Ecosystem -- The `:node-module` Target
 

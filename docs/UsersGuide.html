@@ -640,17 +640,24 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 </ul>
 </li>
-<li><a href="#_embedding_in_the_js_ecosystem_the_code_node_module_code_target">5. Embedding in the JS Ecosystem&#8201;&#8212;&#8201;The <code>:node-module</code> Target</a>
+<li><a href="#_custom_targets">5. Custom Targets</a>
 <ul class="sectlevel2">
-<li><a href="#_convenience_mode">5.1. Convenience Mode</a></li>
-<li><a href="#_explicit_configuration">5.2. Explicit Configuration</a></li>
-<li><a href="#_working_with_optimizations">5.3. Working with Optimizations</a></li>
+<li><a href="#_example">5.1. Example</a></li>
+<li><a href="#_compilation_stages">5.2. Compilation Stages</a></li>
+<li><a href="#_built_in_targets">5.3. Built-in Targets</a></li>
 </ul>
 </li>
-<li><a href="#_generating_production_code_all_targets">6. Generating Production Code&#8201;&#8212;&#8201;All Targets</a>
+<li><a href="#_embedding_in_the_js_ecosystem_the_code_node_module_code_target">6. Embedding in the JS Ecosystem&#8201;&#8212;&#8201;The <code>:node-module</code> Target</a>
 <ul class="sectlevel2">
-<li><a href="#Optimization">6.1. Optimizations</a></li>
-<li><a href="#_release_specific_vs_development_configuration">6.2. Release-Specific vs. Development Configuration</a></li>
+<li><a href="#_convenience_mode">6.1. Convenience Mode</a></li>
+<li><a href="#_explicit_configuration">6.2. Explicit Configuration</a></li>
+<li><a href="#_working_with_optimizations">6.3. Working with Optimizations</a></li>
+</ul>
+</li>
+<li><a href="#_generating_production_code_all_targets">7. Generating Production Code&#8201;&#8212;&#8201;All Targets</a>
+<ul class="sectlevel2">
+<li><a href="#Optimization">7.1. Optimizations</a></li>
+<li><a href="#_release_specific_vs_development_configuration">7.2. Release-Specific vs. Development Configuration</a></li>
 </ul>
 </li>
 </ul>
@@ -1470,6 +1477,29 @@ real resource (so you can just hit browser reload on your SPA even on odd URIs).
       {<span class="symbol">:app</span> { <span class="keyword">..</span><span class="keyword">.</span>
               <span class="symbol">:devtools</span> { <span class="symbol">:http-handler</span> shadow.http.push-state/handle }}}}</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>It supports two additional options (in the <code>devtools</code> section):</p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+<code>:push-state/headers</code>
+</td>
+<td class="hdlist2">
+<p>(optional) A map of HTTP headers to respond with. Defaults to <code>text/html</code> standard headers.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>:push-state/index</code>
+</td>
+<td class="hdlist2">
+<p>(optional) The file to serve. Defaults to <code>index.html</code>.</p>
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -2919,7 +2949,104 @@ HeadlessChrome <span class="float">0.0</span><span class="keyword">.</span><span
 </div>
 </div>
 <div class="sect1">
-<h2 id="_embedding_in_the_js_ecosystem_the_code_node_module_code_target"><a class="anchor" href="#_embedding_in_the_js_ecosystem_the_code_node_module_code_target"></a><a class="link" href="#_embedding_in_the_js_ecosystem_the_code_node_module_code_target">5. Embedding in the JS Ecosystem&#8201;&#8212;&#8201;The <code>:node-module</code> Target</a></h2>
+<h2 id="_custom_targets"><a class="anchor" href="#_custom_targets"></a><a class="link" href="#_custom_targets">5. Custom Targets</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You might have guess that with so many targets the ecosystem probably allows easy extension.
+Creating custom targets just requires one function. This function receives one argument (the compiler
+state) and must return it after doing its work. This function is called once for each stage of the compilation.</p>
+</div>
+<div class="paragraph">
+<p>The compiler provides three special keys from the <code>shadow.cljs.devtools.compiler</code> namespace:</p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+<code>shadow.build/config</code>
+</td>
+<td class="hdlist2">
+<p>The build config map from your <code>shadow-cljs.edn</code> file.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>shadow.build/mode</code>
+</td>
+<td class="hdlist2">
+<p>Either <code>:dev</code> or <code>:release</code></p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>shadow.build/stage</code>
+</td>
+<td class="hdlist2">
+<p>A keyword. See below.</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To use it, you simply specify the fully qualified name of the function as the :target for your build.
+In this case :target <code>build/custom</code>. The namespace is up to you.</p>
+</div>
+<div class="sect2">
+<h3 id="_example"><a class="anchor" href="#_example"></a><a class="link" href="#_example">5.1. Example</a></h3>
+<div class="paragraph">
+<p>If your <code>:source-path</code> is <code>["src"]</code> then create a <code>src/build.clj</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">build</span>
+  (<span class="symbol">:require</span> [shadow.build <span class="symbol">:as</span> build]
+            [shadow.build.targets.browser <span class="symbol">:as</span> browser]))
+
+(<span class="keyword">defn</span> <span class="function">custom</span> [{<span class="symbol">::build/keys</span> [stage mode config] <span class="symbol">:as</span> state}]
+  (<span class="keyword">let</span> [state (browser/process state]
+    (<span class="keyword">when</span> (<span class="keyword">and</span> (<span class="keyword">=</span> <span class="symbol">:flush</span> stage) (<span class="keyword">=</span> <span class="symbol">:dev</span> mode))
+      (call-rsync)
+    state))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This would call a call-rsync (undefined here, can do pretty much everything you want here) after every successful
+dev build.</p>
+</div>
+<div class="paragraph">
+<p>The state is a clojure map representing the full <code>shadow-build</code> compiler state.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_compilation_stages"><a class="anchor" href="#_compilation_stages"></a><a class="link" href="#_compilation_stages">5.2. Compilation Stages</a></h3>
+<div class="paragraph">
+<p>The stages are:</p>
+</div>
+<div class="paragraph">
+<p><code>:init</code>
+<code>:compile-prepare</code>
+<code>:compile-finish</code>
+<code>:optimize-prepare</code> (<code>:release</code> only)
+<code>:optimize-finish</code> (<code>:release</code> only)
+<code>:flush</code></p>
+</div>
+<div class="paragraph">
+<p>When mode is <code>:dev</code> the <code>:init</code> is only called once. Any of the others may be called
+again (in order) when autobuild is active and files are re-compiled on change.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_built_in_targets"><a class="anchor" href="#_built_in_targets"></a><a class="link" href="#_built_in_targets">5.3. Built-in Targets</a></h3>
+<div class="paragraph">
+<p>You can read the implementations for the built-in targets in the <code>shadow-cljs</code> source code. The
+correct directory for them in the source code is
+<a href="https://github.com/thheller/shadow-cljs/tree/master/src/main/shadow/build/targets">src/main/shadow/build/targets</a>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_embedding_in_the_js_ecosystem_the_code_node_module_code_target"><a class="anchor" href="#_embedding_in_the_js_ecosystem_the_code_node_module_code_target"></a><a class="link" href="#_embedding_in_the_js_ecosystem_the_code_node_module_code_target">6. Embedding in the JS Ecosystem&#8201;&#8212;&#8201;The <code>:node-module</code> Target</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>There is an additional target that is intended to help you use <code>shadow-cljs</code> as <strong>part</strong> of
@@ -2931,7 +3058,7 @@ create-react-app, &#8230;&#8203;) with as little configuration as possible.</p>
 comes with a convenience mode that makes such integration easier.</p>
 </div>
 <div class="sect2">
-<h3 id="_convenience_mode"><a class="anchor" href="#_convenience_mode"></a><a class="link" href="#_convenience_mode">5.1. Convenience Mode</a></h3>
+<h3 id="_convenience_mode"><a class="anchor" href="#_convenience_mode"></a><a class="link" href="#_convenience_mode">6.1. Convenience Mode</a></h3>
 <div class="paragraph">
 <p>This target is meant to be as easy to access as possible, and does not actually require a specific
 build in the config. You still need a non-empty config file, but the default one from
@@ -2979,7 +3106,7 @@ build in the config. You still need a non-empty config file, but the default one
 </div>
 </div>
 <div class="sect2">
-<h3 id="_explicit_configuration"><a class="anchor" href="#_explicit_configuration"></a><a class="link" href="#_explicit_configuration">5.2. Explicit Configuration</a></h3>
+<h3 id="_explicit_configuration"><a class="anchor" href="#_explicit_configuration"></a><a class="link" href="#_explicit_configuration">6.2. Explicit Configuration</a></h3>
 <div class="paragraph">
 <p>You can also treat <code>:npm-module</code> on the same footing with your other builds: give it explicit
 configuration. This allows you to also customize the code generation options. Of course
@@ -3034,7 +3161,7 @@ over exports and optimization.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_working_with_optimizations"><a class="anchor" href="#_working_with_optimizations"></a><a class="link" href="#_working_with_optimizations">5.3. Working with Optimizations</a></h3>
+<h3 id="_working_with_optimizations"><a class="anchor" href="#_working_with_optimizations"></a><a class="link" href="#_working_with_optimizations">6.3. Working with Optimizations</a></h3>
 <div class="paragraph">
 <p>Unlike the <code>:node-library</code> target, the module target does not know what you want to call the
 symbols you&#8217;re exporting, so it just exports them as-is. If you use advanced compilation, then everything
@@ -3057,7 +3184,7 @@ renaming an artifact.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_generating_production_code_all_targets"><a class="anchor" href="#_generating_production_code_all_targets"></a><a class="link" href="#_generating_production_code_all_targets">6. Generating Production Code&#8201;&#8212;&#8201;All Targets</a></h2>
+<h2 id="_generating_production_code_all_targets"><a class="anchor" href="#_generating_production_code_all_targets"></a><a class="link" href="#_generating_production_code_all_targets">7. Generating Production Code&#8201;&#8212;&#8201;All Targets</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Development mode always outputs individual files for each namespace so that they can be hot loaded
@@ -3076,7 +3203,7 @@ may use <a href="#NameHashing">filename hashing</a> to improve caching character
 </div>
 </div>
 <div class="sect2">
-<h3 id="Optimization"><a class="anchor" href="#Optimization"></a><a class="link" href="#Optimization">6.1. Optimizations</a></h3>
+<h3 id="Optimization"><a class="anchor" href="#Optimization"></a><a class="link" href="#Optimization">7.1. Optimizations</a></h3>
 <div class="paragraph">
 <p>You can choose the optimization level using the <code>:compiler-options</code> section of the configuration:</p>
 </div>
@@ -3095,7 +3222,7 @@ for more information on available optimization levels.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_release_specific_vs_development_configuration"><a class="anchor" href="#_release_specific_vs_development_configuration"></a><a class="link" href="#_release_specific_vs_development_configuration">6.2. Release-Specific vs. Development Configuration</a></h3>
+<h3 id="_release_specific_vs_development_configuration"><a class="anchor" href="#_release_specific_vs_development_configuration"></a><a class="link" href="#_release_specific_vs_development_configuration">7.2. Release-Specific vs. Development Configuration</a></h3>
 <div class="paragraph">
 <p>If you wish to have separate configuration values in a build when running a release build then you
 can override settings by including a <code>:dev</code> and/or <code>:release</code> section in the build section:</p>
@@ -3125,7 +3252,7 @@ can override settings by including a <code>:dev</code> and/or <code>:release</co
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-01-12 01:22:17 PST
+Last updated 2018-01-12 01:40:36 PST
 </div>
 </div>
 </body>
