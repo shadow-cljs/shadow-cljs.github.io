@@ -398,6 +398,66 @@ with additions to your `package.json` file and an `npm install`.
 
 Read more about using arbitrary npm modules in you Clojurescript in a <<UsingNPMModules,later chapter>>.
 
+== Web Workers
+
+The `:modules` configuration may also be used to generate files intended to be used as a Web Workers.
+You may declare any module (except the default) as a Web Worker by setting `:web-worker true`. The
+generated file will contain some additional bootstrap code which will load its dependencies
+automatically. The way `:modules` work also ensures that code used only by the worker will also only
+be in the final file for the worker. Each worker should have a dedicated CLJS namespace.
+
+.An example of generating a web worker script
+```
+{...
+ :builds
+   {:app
+    {:target :browser
+     ...
+     :modules {:main   {:entries [my.app]}
+               :extra  {:entries [my.app.extra]
+                        :depends-on #{:main}}
+               :worker {:entries [my.app.worker]
+                        :depends-on #{:main}
+                        :web-worker true}}}}}
+```
+
+The above configuration will generate `worker.js` which you can use to start the Web Worker.
+It will have all code from the `:main` module available (but not `:extra`). The code in the
+`my.app.worker` namespace will only ever execute in the worker. Worker generation happens in
+both development and release modes.
+
+NOTE: Hot code reload does not support reloading code in the worker while it is running.
+I suggest shutting down all workers using the `:devtools :before-load` function and restarting it
+in the `:after-load`.
+
+== Hashed Module Names [[NameHashing]]
+
+You can add `:module-hash-names true` to your build config to automatically create a MD5
+signature for each generated output module file. That means that a `:main` module will generate
+a `main.<md5hash>.js` instead of just the default `main.js`.
+
+Such files can be cached forever since a file with different contents will have a different name.
+
+However, this means that including these files in your HTML gets a bit more complicated.
+
+=== Hashed File Manifest
+
+When using hashed filenames `shadow-cljs` generates a `manifest.json` file in the configured `:output-dir`.
+This file contains a JSON description of the module config together with an
+extra "js-name" property which maps the original module name to the hashed name.
+
+.Sample output of manifest.json when using hashed filenames.
+```
+[{"name":"main", "js-name":"main.md5hash.js", "depends-on":[], ...}
+ {"name":"extra", "js-name":"extra.md5hash.js", "depends-on":["main"], ...}]
+```
+
+You can use this file in your server to figure out which files to include.
+Development builds also produce this file and you may check if for modifications to
+know when a new build completed.
+
+I use this file in production to know when a new CLJS release build should be loaded.
+
 == Preloads
 
 As a developer most of your time is spent in development mode. You're probably familiar with tools like `figwheel`,
@@ -457,6 +517,21 @@ no disk files are served.
 If not supplied, no resources are served.
 `:http-handler`:: A namespace (as a symbol). A `(fn [req] resp)` that is used
 if a resource is not found for the given request. Defaults to a not-found handler.
+
+=== Development HTTP and URI-based Routing (Push state)
+
+If your browser application uses browser push state then you will typically want
+the server to respond with `index.html` instead of "Not Found" on URIs that have no
+real resource (so you can just hit browser reload on your SPA even on odd URIs).
+
+There is a built-in handler that you can add for this:
+
+```
+{...
+    {:builds
+      {:app { ...
+              :devtools { :http-handler shadow.http.push-state/handle }}}}
+```
 
 == Lifecycle Hooks
 
@@ -690,17 +765,312 @@ bit of care, but the technical details are simple:
 
 === Using shadow-cljs's built-in Loader Support
 
+The compiler supports generating the required data for `goog.module.ModuleManager` to work.
+It exposes a simple interface to let you load modules on-demand at runtime.
+
+You only need to add `:module-loader true` to your build config. The loader will
+always be injected into the default module (the one everything else depends on).
+
+At runtime you may use the `shadow.loader` namespace to load modules. You may also load a
+module eagerly by just using a `<script>` tag in your page.
+
+```
+{...
+ :builds
+   {:app
+     {:target :browser
+      ...
+      :module-loader true
+      :modules {:main  {:entries [my.app]}
+                :extra {:entries [my.app.extra]
+                        :depends-on #{:main}}}}}}
+```
+
+If you had the following for your main entry point:
+
+```
+(ns my.app
+  (:require [shadow.loader :as loader]))
+
+(defn fn-to-call-on-load []
+  (js/console.log "extra loaded"))
+
+(defn fn-to-call-on-error []
+  (js/console.log "extra load failed"))
+```
+
+Then the following expressions can be used for loading code:
+
+.Loading a module
+```
+;; load returns a goog.async.Deferred, and can be used like a promise
+(-> (loader/load "extra")
+    (.then fn-to-call-on-load fn-to-call-on-error))
+```
+
+.Loading many modules
+```
+;; must be a JS array, also returns goog.async.Deferred
+(loader/load-many #js ["foo" "bar"])
+```
+
+.Including a callback
+```
+(loader/with-module "extra" fn-to-call-on-load)
+```
+
+You can check if a module is loaded using `(loaded? "module-name")`.
+
+==== Loader Costs
+
+Using the loader is very lightweight. It has a few dependencies which you may not be otherwise using.
+In practice using `:module-loader true` adds about 8KB gzip'd
+to the default module. This will vary depending on how much of `goog.net` and `goog.events`
+you are already using, and what level of optimization you use for your release builds.
+
 === Using the Standard Clojurescript API
 
 The generated code is capable of using the standard Clojurescript `cljs.loader` API. See the
-https://clojurescript.org/news/2017-07-10-code-splitting[documentation] on the Clojurescript website for instructions.
+https://clojurescript.org/news/2017-07-10-code-splitting[documentation] on the Clojurescript
+website for instructions.
 
-== Using NPM Modules [[UsingNPMModules]]
+The advantage of using the standard API is that your code will play well with others. This
+may be of particular importance to library authors. The disadvantage is that the dynamic module
+loading API in the standard distribution is currently somewhat less easy-to-use than the
+support in `shadow-cljs`.
 
-Integrate https://code.thheller.com/blog/shadow-cljs/2017/11/10/js-dependencies-in-practice.html[]
+== Using Javascript Dependencies [[UsingNPMModules]]
+
+The standard Clojurescript compiler has https://code.thheller.com/blog/shadow-cljs/2017/09/15/js-dependencies-the-problem.html[some issues]
+when dealing with Javascript dependencies.
+
+The summary of these is
+
+* CLJSJS/:foreign-libs do not scale
+* Custom bundles are tedious to work with
+* Closure Compiler can’t yet reliably process a large portion of npm packages
+
+To address these issues `shadow-cljs` implements a custom JS bundler and removes :foreign-libs support.
+The intention is to make the vast majority of the JS ecosystem easily accessible from
+Javascript.
+
+=== Installing JS Dependencies
+
+Almost every package on npm will explain how to install it. Those instructions now apply to shadow-cljs
+as well. So if a library tells you to run:
+
+```bash
+$ npm install the-thing
+```
+
+then that is exactly what to do. Nothing more is required. You may use yarn if prefer. Dependencies will
+be added to the `package.json` file and this will be used to manage them. If you don’t have a
+`package.json` yet run `npm init` from a command line.
 
 
+You can use this https://github.com/shadow-cljs/quickstart-browser[Quick-Start template]
+to try everything described in this section.
 
+=== Using JS Dependencies
+
+Most npm packages will also include some instructions on how to use the actual code. The
+“old” CommonJS style just has require calls which translates directly:
+
+```js
+var react = require("react");
+```
+
+```
+(ns my.app
+  (:require ["react" :as react]))
+```
+
+Whatever "string" parameter is used when calling require we transfer to the `:require` as-is.
+The `:as` alias is up to you. Once we have that we can use the code like any other CLJS namespace!
+
+```
+(react/createElement "div" nil "hello world")
+```
+
+In `shadow-cljs`: *always use the `ns` form and whatever `:as` alias you provided.*
+You may also use `:refer` and `:rename`. This is different than what `:foreign-libs`/CLJSJS does
+where you include the thing in the namespace but then used a global `js/Thing` in your code.
+
+Some packages just export a single function which you can call directly by
+using `(:require ["thing" :as thing])` and then `(thing)`.
+
+More recently some packages started using ES6 `import` statements in their examples. Those also
+translate pretty much 1:1 with one slight difference related to default exports.
+The following table can be used for translation:
+
+.ES6 Import to CLJS Require
+|===
+|ES6 Import|CLJS Require
+
+|`import defaultExport from "module-name";`
+|`(:require ["module-name" :default defaultExport])`
+
+|`import * as name from "module-name";`
+|`(:require ["module-name" :as name])`
+
+|`import { export } from "module-name";`
+|`(:require ["module-name" :refer (export)])`
+
+|`import { export as alias } from "module-name";`
+|`(:require ["module-name" :rename {export alias}])`
+
+|`import { export1 , export2 } from "module-name";`
+|`(:require ["module-name" :refer (export1 export2)])`
+
+|`import { export1 , export2 as alias2 , [...] } from "module-name";`
+|`(:require ["module-name" :refer (export1) :rename {export2 alias2}])`
+
+|`import defaultExport, { export [ , [...] ] } from "module-name";`
+|`(:require ["module-name" :refer (export) :default defaultExport])`
+
+|`import defaultExport, * as name from "module-name";`
+|`(:require ["module-name" :as name :default defaultExport])`
+
+|`import "module-name";`
+|`(:require ["module-name"])`
+|===
+
+The `:default` option is currently only available in `shadow-cljs`, you can
+https://dev.clojure.org/jira/browse/CLJS-2376[vote here] to hopefully make it standard.
+You can always use `:as alias` and then call `alias/default` if you prefer to stay compatible
+with standard CLJS in the meantime.
+
+Notice that previously we were stuck using bundled code which included a lot of code we
+didn’t actually need. Now we're in a better situation:
+Some libraries are also packaged in ways  ways that allow you to include only the parts you need,
+leading to much less code in your final build.
+
+`react-virtualized` is a great example:
+
+```js
+// You can import any component you want as a named export from 'react-virtualized', eg
+import { Column, Table } from 'react-virtualized'
+
+// But if you only use a few react-virtualized components,
+// And you're concerned about increasing your application's bundle size,
+// You can directly import only the components you need, like so:
+import AutoSizer from 'react-virtualized/dist/commonjs/AutoSizer'
+import List from 'react-virtualized/dist/commonjs/List'
+```
+
+With our improved support we we can easily translate this to:
+
+```
+(ns my-ns
+  ;; all
+  (:require ["react-virtualized" :refer (Column Table)])
+  ;; OR one by one
+  (:require ["react-virtualized/dist/commonjs/AutoSizer" :default virtual-auto-sizer]
+            ["react-virtualized/dist/commonjs/List" :default virtual-list]))
+```
+
+=== Resolving JS Dependencies
+
+By default `shadow-cljs` will resolve all `(:require ["thing" :as x])` requires following the npm convention.
+This means it will look at `<project>/node_modules/thing/...` and follow the code from there. To
+customize how this works `shadow-cljs` exposes a `:resolve` config option that lets you override how
+things are resolved.
+
+==== Using a CDN
+
+Say you already have React included in your page via a CDN. You could just start using `js/React` again
+but we stopped doing that for a good reason. Instead you can continue to use `(:require ["react" :as react])`
+but configure how "react" resolves!
+
+Here is a sample `shadow-cljs.edn` config for such a build:
+
+```
+{...
+ :builds
+ {:app
+  {:target :browser
+   ...
+   :js-options
+   {:resolve {"react" {:target :global
+                       :global "React"}}}}
+
+  :server
+  {:target :node-script
+   ...}}}
+```
+
+The `:app` build will now use the global `React` instance while the `:server` build continues using
+the "react" npm package! No need to fiddle with the code to make this work.
+
+==== Redirecting “require”
+
+Some packages provide multiple “dist” files and sometimes the default one described doesn’t quite work
+in `shadow-cljs`. One good example for this is "d3". Their default "main" points to "build/d3.node.js" but
+that is not what we want when working with the browser. Their ES6 code runs into a bug in the Closure Compiler,
+so we can’t use that. Instead we just redirect the require to some other file:
+
+```
+{...
+ :builds
+ {:app
+  {:target :browser
+   ...
+   :js-options
+   {:resolve {"d3" {:target :npm
+                    :require "d3/build/d3.js"}}}
+```
+
+You can also just `(:require ["d3/build/d3.js" :as d3])` as well if you only care about the Browser.
+
+==== Using local Files
+
+You may also use :resolve to directly map to files in your project.
+
+```
+...
+    {:resolve {"my-thing" {:target :file
+                           :file "path/to/file.js"}}}
+...
+```
+
+The `:file` is always relative to the project directory. The included file may use require or
+`import/export` and those will be followed and included properly as well.
+
+==== Migrating cljsjs.*
+
+Many CLJS libraries are still using CLJSJS packages and they would break with `shadow-cljs` since it
+no longer supports `:foreign-libs`. I have a clear migration path for this and it just
+requires one shim file that maps the `cljsjs.thing` back to its original npm package and
+exposes the expected global variable.
+
+For React this requires a file like `src/cljsjs/react.cljs`:
+
+```
+(ns cljsjs.react
+  (:require ["react" :as react]
+            ["create-react-class" :as crc]))
+```
+
+```
+(js/goog.object.set react "createClass" crc)
+(js/goog.exportSymbol "React" react)
+```
+
+Since this would be tedious for everyone to do manually I created the https://github.com/thheller/shadow-cljsjs[`shadow-cljsjs`]
+library which provides just that. It does not include every package but I’ll keep adding
+them and contributions are very welcome as well.
+
+NOTE: The `shadow-cljsjs` library only provides the shim files. You’ll still need to
+`npm install` the actual packages yourself.
+
+==== What to do when things don’t work?
+
+Since the JS world is still evolving rapidly and not everyone is using the same way to write and
+distribute code there are some things `shadow-cljs` cannot work around automatically. These
+can usually be solved with custom `:resolve` configs, but there may also be bugs or oversights.
+
+If you cannot resolve such an issue with the instructions in this chapter, then try asking on the
+https://clojurians.slack.com/messages/C6N245JGG[`#shadow-cljs` Slack channel].
 
 == Hacking
 
@@ -1090,6 +1460,10 @@ renaming an artifact.
 Development mode always outputs individual files for each namespace so that they can be hot loaded
 in isolation. When you're ready to deploy code to a real server you want to run the Closure Compiler
 on it to generate a single minified result for each <<Modules, module>>.
+
+By default the release mode output file should just be a drop-in replacements for the
+development mode file: there is no difference in the way you include them in your HTML. You
+may use <<NameHashing, filename hashing>> to improve caching characteristics on browser targets.
 
 .Generating Minified Output
 ```
