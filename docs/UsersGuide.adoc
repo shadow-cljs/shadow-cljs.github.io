@@ -979,33 +979,86 @@ may be of particular importance to library authors. The disadvantage is that the
 loading API in the standard distribution is currently somewhat less easy-to-use than the
 support in `shadow-cljs`.
 
-== Hashed Module Names [[NameHashing]]
+== Cacheable Output [[NameHashing]]
+
+In a web setting it is desirable to cache `.js` files for a very long time to avoid extra request. It is common
+practice the generate a unique name for the `.js` file for every released version. This changes the URL used to
+access it and thereby is safe to cache forever.
 
 You can add `:module-hash-names true` to your build config to automatically create a MD5
 signature for each generated output module file. That means that a `:main` module will generate
 a `main.<md5hash>.js` instead of just the default `main.js`.
 
-Such files can be cached forever since a file with different contents will have a different name.
+`:module-hash-names true` will include the full 32-length md5 hash, if you prefer a shorter version you can specify a
+number between 1-32 instead (eg. `:module-hash-names 8`). Be aware that shortening the hash may increase the chances
+of generating conflicts. I recommend using the full hash.
 
-However, this means that including these files in your HTML gets a bit more complicated.
-
-=== Hashed File Manifest
-
-When using hashed filenames `shadow-cljs` generates a `manifest.json` file in the configured `:output-dir`.
-This file contains a JSON description of the module config together with an
-extra "js-name" property which maps the original module name to the hashed name.
-
-.Sample output of manifest.json when using hashed filenames.
+.Example :module-hash-names config
 ```
-[{"name":"main", "js-name":"main.md5hash.js", "depends-on":[], ...}
- {"name":"extra", "js-name":"extra.md5hash.js", "depends-on":["main"], ...}]
+{...
+ :builds
+   {:app
+     {:target :browser
+      ...
+      :output-dir "public/js"
+      :asset-path "/js"
+      :module-hash-names true
+      :modules {:main  {:entries [my.app]}
+                :extra {:entries [my.app.extra]
+                        :depends-on #{:main}}}}}}
 ```
 
-You can use this file in your server to figure out which files to include.
+Instead of generating `main.js` it will now generate `main.<hash>.js` in the `:output-dir`.
+
+Since the filename can change with every release it gets a little bit more complicated to include them
+in your HTML. The <<BrowserManifest, Output Manifest>> can help with that.
+
+=== Output Manifest [[BrowserManifest]]
+
+`shadow-cljs` generates a `manifest.edn` file in the configured `:output-dir`.
+This file contains a description of the module config together with an extra `:output-name` property which
+maps the original module name to the hashed name.
+
+.Sample output of manifest.edn when using hashed filenames.
+```
+[{:module-id :common,
+  :name :common,
+  :output-name "common.15D142F7841E2838B46283EA558634EE.js",
+  :entries [...],
+  :depends-on #{},
+  :sources [...]}
+ {:module-id :page-a,
+  :name :page-a,
+  :output-name "page-a.D8844E305644135CBD5CBCF7E359168A.js",
+  :entries [...],
+  :depends-on #{:common},
+  :sources [...]}
+ ...]
+```
+
+The manifest contains all `:modules` sorted in dependency order. You can use it to map the `:module-id` back to the
+actual generated filename.
+
 Development builds also produce this file and you may check if for modifications to
-know when a new build completed.
+know when a new build completed. `:module-hash-names` does not apply during development so you'll get the usual
+filenames.
 
-I use this file in production to know when a new CLJS release build should be loaded.
+You can configure the name of the generated manifest file via the `:build-options :manifest-name` entry. It defaults to
+`manifest.edn`. If you configure a filename with `.json` ending the output will be JSON instead of EDN. The file will
+be relative to the configured `:output-dir`.
+
+.Example manifest.json config
+```
+{...
+ :builds
+   {:app
+     {:target :browser
+      ...
+      :build-options {:manifest-name "manifest.json"}
+      :modules {:main  {:entries [my.app]}
+                :extra {:entries [my.app.extra]
+                        :depends-on #{:main}}}}}}
+```
 
 
 = Targeting Node

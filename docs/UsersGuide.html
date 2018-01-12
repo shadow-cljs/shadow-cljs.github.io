@@ -607,9 +607,9 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_using_the_standard_clojurescript_api">5.5.2. Using the Standard ClojureScript API</a></li>
 </ul>
 </li>
-<li><a href="#NameHashing">5.6. Hashed Module Names</a>
+<li><a href="#NameHashing">5.6. Cacheable Output</a>
 <ul class="sectlevel3">
-<li><a href="#_hashed_file_manifest">5.6.1. Hashed File Manifest</a></li>
+<li><a href="#BrowserManifest">5.6.1. Output Manifest</a></li>
 </ul>
 </li>
 </ul>
@@ -2104,39 +2104,97 @@ support in <code>shadow-cljs</code>.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="NameHashing"><a class="anchor" href="#NameHashing"></a><a class="link" href="#NameHashing">5.6. Hashed Module Names</a></h3>
+<h3 id="NameHashing"><a class="anchor" href="#NameHashing"></a><a class="link" href="#NameHashing">5.6. Cacheable Output</a></h3>
+<div class="paragraph">
+<p>In a web setting it is desirable to cache <code>.js</code> files for a very long time to avoid extra request. It is common
+practice the generate a unique name for the <code>.js</code> file for every released version. This changes the URL used to
+access it and thereby is safe to cache forever.</p>
+</div>
 <div class="paragraph">
 <p>You can add <code>:module-hash-names true</code> to your build config to automatically create a MD5
 signature for each generated output module file. That means that a <code>:main</code> module will generate
 a <code>main.&lt;md5hash&gt;.js</code> instead of just the default <code>main.js</code>.</p>
 </div>
 <div class="paragraph">
-<p>Such files can be cached forever since a file with different contents will have a different name.</p>
-</div>
-<div class="paragraph">
-<p>However, this means that including these files in your HTML gets a bit more complicated.</p>
-</div>
-<div class="sect3">
-<h4 id="_hashed_file_manifest"><a class="anchor" href="#_hashed_file_manifest"></a><a class="link" href="#_hashed_file_manifest">5.6.1. Hashed File Manifest</a></h4>
-<div class="paragraph">
-<p>When using hashed filenames <code>shadow-cljs</code> generates a <code>manifest.json</code> file in the configured <code>:output-dir</code>.
-This file contains a JSON description of the module config together with an
-extra "js-name" property which maps the original module name to the hashed name.</p>
+<p><code>:module-hash-names true</code> will include the full 32-length md5 hash, if you prefer a shorter version you can specify a
+number between 1-32 instead (eg. <code>:module-hash-names 8</code>). Be aware that shortening the hash may increase the chances
+of generating conflicts. I recommend using the full hash.</p>
 </div>
 <div class="listingblock">
-<div class="title">Sample output of manifest.json when using hashed filenames.</div>
+<div class="title">Example :module-hash-names config</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">[{<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span><span class="error">:</span><span class="string"><span class="delimiter">&quot;</span><span class="content">main</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">js-name</span><span class="delimiter">&quot;</span></span><span class="error">:</span><span class="string"><span class="delimiter">&quot;</span><span class="content">main.md5hash.js</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">depends-on</span><span class="delimiter">&quot;</span></span><span class="error">:</span>[], <span class="keyword">..</span><span class="keyword">.</span>}
- {<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span><span class="error">:</span><span class="string"><span class="delimiter">&quot;</span><span class="content">extra</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">js-name</span><span class="delimiter">&quot;</span></span><span class="error">:</span><span class="string"><span class="delimiter">&quot;</span><span class="content">extra.md5hash.js</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">depends-on</span><span class="delimiter">&quot;</span></span><span class="error">:</span>[<span class="string"><span class="delimiter">&quot;</span><span class="content">main</span><span class="delimiter">&quot;</span></span>], <span class="keyword">..</span><span class="keyword">.</span>}]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+   {<span class="symbol">:app</span>
+     {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+      <span class="keyword">..</span><span class="keyword">.</span>
+      <span class="symbol">:output-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public/js</span><span class="delimiter">&quot;</span></span>
+      <span class="symbol">:asset-path</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">/js</span><span class="delimiter">&quot;</span></span>
+      <span class="symbol">:module-hash-names</span> <span class="predefined-constant">true</span>
+      <span class="symbol">:modules</span> {<span class="symbol">:main</span>  {<span class="symbol">:entries</span> [my.app]}
+                <span class="symbol">:extra</span> {<span class="symbol">:entries</span> [my.app.extra]
+                        <span class="symbol">:depends-on</span> #{<span class="symbol">:main</span>}}}}}}</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>You can use this file in your server to figure out which files to include.
-Development builds also produce this file and you may check if for modifications to
-know when a new build completed.</p>
+<p>Instead of generating <code>main.js</code> it will now generate <code>main.&lt;hash&gt;.js</code> in the <code>:output-dir</code>.</p>
 </div>
 <div class="paragraph">
-<p>I use this file in production to know when a new CLJS release build should be loaded.</p>
+<p>Since the filename can change with every release it gets a little bit more complicated to include them
+in your HTML. The <a href="#BrowserManifest">Output Manifest</a> can help with that.</p>
+</div>
+<div class="sect3">
+<h4 id="BrowserManifest"><a class="anchor" href="#BrowserManifest"></a><a class="link" href="#BrowserManifest">5.6.1. Output Manifest</a></h4>
+<div class="paragraph">
+<p><code>shadow-cljs</code> generates a <code>manifest.edn</code> file in the configured <code>:output-dir</code>.
+This file contains a description of the module config together with an extra <code>:output-name</code> property which
+maps the original module name to the hashed name.</p>
+</div>
+<div class="listingblock">
+<div class="title">Sample output of manifest.edn when using hashed filenames.</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">[{<span class="symbol">:module-id</span> <span class="symbol">:common</span>,
+  <span class="symbol">:name</span> <span class="symbol">:common</span>,
+  <span class="symbol">:output-name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">common.15D142F7841E2838B46283EA558634EE.js</span><span class="delimiter">&quot;</span></span>,
+  <span class="symbol">:entries</span> [<span class="keyword">..</span><span class="keyword">.</span>],
+  <span class="symbol">:depends-on</span> #{},
+  <span class="symbol">:sources</span> [<span class="keyword">..</span><span class="keyword">.</span>]}
+ {<span class="symbol">:module-id</span> <span class="symbol">:page-a</span>,
+  <span class="symbol">:name</span> <span class="symbol">:page-a</span>,
+  <span class="symbol">:output-name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">page-a.D8844E305644135CBD5CBCF7E359168A.js</span><span class="delimiter">&quot;</span></span>,
+  <span class="symbol">:entries</span> [<span class="keyword">..</span><span class="keyword">.</span>],
+  <span class="symbol">:depends-on</span> #{<span class="symbol">:common</span>},
+  <span class="symbol">:sources</span> [<span class="keyword">..</span><span class="keyword">.</span>]}
+ <span class="keyword">..</span><span class="keyword">.</span>]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The manifest contains all <code>:modules</code> sorted in dependency order. You can use it to map the <code>:module-id</code> back to the
+actual generated filename.</p>
+</div>
+<div class="paragraph">
+<p>Development builds also produce this file and you may check if for modifications to
+know when a new build completed. <code>:module-hash-names</code> does not apply during development so you&#8217;ll get the usual
+filenames.</p>
+</div>
+<div class="paragraph">
+<p>You can configure the name of the generated manifest file via the <code>:build-options :manifest-name</code> entry. It defaults to
+<code>manifest.edn</code>. If you configure a filename with <code>.json</code> ending the output will be JSON instead of EDN. The file will
+be relative to the configured <code>:output-dir</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example manifest.json config</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+   {<span class="symbol">:app</span>
+     {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+      <span class="keyword">..</span><span class="keyword">.</span>
+      <span class="symbol">:build-options</span> {<span class="symbol">:manifest-name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">manifest.json</span><span class="delimiter">&quot;</span></span>}
+      <span class="symbol">:modules</span> {<span class="symbol">:main</span>  {<span class="symbol">:entries</span> [my.app]}
+                <span class="symbol">:extra</span> {<span class="symbol">:entries</span> [my.app.extra]
+                        <span class="symbol">:depends-on</span> #{<span class="symbol">:main</span>}}}}}}</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -3245,7 +3303,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-01-12 14:04:57 CET
+Last updated 2018-01-12 21:04:17 CET
 </div>
 </div>
 </body>
