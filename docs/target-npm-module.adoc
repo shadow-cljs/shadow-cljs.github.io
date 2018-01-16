@@ -1,0 +1,86 @@
+There is an additional target that is intended to help you use `shadow-cljs` as *part* of
+a project and provide seamless integration with existing JS tools (eg. webpack, browserify, babel,
+create-react-app, ...) with as little configuration as possible.
+
+It can be configured like other targets, but since it is meant to work in the JS ecosystem it
+comes with a convenience mode that makes such integration easier.
+
+== Convenience Mode
+
+This target is meant to be as easy to access as possible, and does not actually require a specific
+build in the config. You still need a non-empty config file, but the default one from
+`shadow-cljs init` will do.
+
+ClojureScript organizes files into namespaces which means that a `demo.foo` namespace should be inside a
+`src/demo/foo.cljs` file. Where `src` is the default source path the shadow-cljs tool (see <<CommonConfig, main configuration>>).
+
+If you have this file in `src/demo`:
+
+.Sample source for `foo.cljs`
+```
+(ns demo.foo)
+
+(defn hello [who]
+  (str "Hello, " who "!"))
+```
+
+you can compile it (and any others) via:
+
+```bash
+$ shadow-cljs compile npm
+[:npm] Build completed. (16 files, 5 compiled, 0 warnings, 7.91s)
+```
+
+The generated exports will be named `shadow-cljs/` with the CLJS namespace.
+
+```js
+$ node
+> var x = require("shadow-cljs/demo.foo");
+undefined
+> x.hello("JS")
+'Hello, JS!'
+```
+
+Watching with incremental compile is as simple as running `shadow-cljs watch npm`.
+
+== Explicit Configuration
+
+You can also treat `:npm-module` on the same footing with your other builds: give it explicit
+configuration. This allows you to also customize the code generation options. Of course
+you will configure the <<CommonConfig, main configuration>> as in all targets. The target-specific
+options are:
+
+[horizontal]
+`:target`:: Use :npm-module
+`:entries`:: (optinal) A vector of namespaces to include. Everything from these will be included.
+Defaults to everything it can find.
+`:output-dir`:: (optional). The path for supporting files in development mode. Defaults to
+`node_modules/shadow-cljs`.
+
+The `:entries` setting can be used to limit what things get included, and the `:output-dir` is
+particularly useful for naming the directory in `node_modules` so that you can
+customize what name you use with `require`.
+
+Each entry will still result in a file with that namespace name in the specified output directory.
+
+Of course all of this is generated with standard Node conventions.
+
+If you plan to distribute code on NPM, then you may want to use the
+<<NodeLibrary, `:node-library` target>> instead since it allows for a finer level of control
+over exports and optimization.
+
+== Working with Optimizations
+
+Unlike the `:node-library` target, the module target does not know what you want to call the
+symbols you're exporting, so it just exports them as-is. If you use advanced compilation, then everything
+will get a minified munged name!
+
+This is easy to remedy, simply add `:export` metadata on any symbols that you want to preserve:
+
+```
+(def ^:export my-constant 5.662)
+(defn ^:export my-function [] ...)
+```
+
+This is a standard annotation that is understood by ClojureScript and prevents Google Closure from
+renaming an artifact.

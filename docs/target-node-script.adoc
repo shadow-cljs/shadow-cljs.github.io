@@ -1,0 +1,109 @@
+The `:target :node-script` produces single-file stand-alone output that can be run using `node.js`.
+The code is just ClojureScript, and an entry point is easy to define:
+
+```
+(ns demo.script)
+
+(defn main [& cli-args]
+  (prn "hello world"))
+```
+
+=== Build Options
+
+You will need the same basic <<CommonConfig,main configuration>> as in other targets (like
+`:source-paths`), but you'll need some node-specific build target options:
+
+[horizontal]
+`:main`:: (required). The namespace-qualified symbol of your script's entry point function.
+`:output-to`:: (required). The path and filename for the generated script.
+`:output-dir`:: (optional). The path for supporting files in development mode. Defaults to a cache directory.
+
+// TODO: Thomas mentioned that node can be picky and sometimes output-dir is useful...an example would be nice.
+
+.Sample node script build
+```
+{:source-paths [...]
+ ...
+ :builds {:script
+            {:id        :script
+             :target    :node-script
+             :main      demo.script/main
+             :output-to "out/demo-script/script.js"}}}
+```
+
+When compiled this results in a standalone `out/demo-script/script.js` file intended to be called
+via `node script.js <command line args>`. When run it will call `(demo.script/main <command line args>)`
+function on startup. This only ever produces the file specified in `:output-to`. Any other support files
+(e.g. for development mode) are written to a temporary support directory.
+
+=== Hot Code Reload [[NodeHotCodeReload]]
+
+You will often write scripts that run as servers or some other long-running process. Hot code reload can
+be quite useful when working with these, and it is simple to set up:
+
+. Add start/top hook functions.
+. Configure the build use those hooks.
+
+Here is an example http server in node:
+
+.Sample node script with start/stop hooks for hot code reload.
+```
+(ns demo.script
+  (:require ["http" :as http]))
+
+(defn request-handler [req res]
+  (.end res "foo"))
+
+; a place to hang onto the server so we can stop/start it
+(defonce server-ref
+  (volatile! nil))
+
+(defn main [& args]
+  (js/console.log "starting server")
+  (let [server (http/createServer #(request-handler %1 %2))]
+
+    (.listen server 3000
+      (fn [err]
+        (if err
+          (js/console.error "server start failed")
+          (js/console.info "http server running"))
+        ))
+
+    (vreset! server-ref server)))
+
+(defn start
+  "Hook to start. Also used as a hook for hot code reload."
+  []
+  (js/console.warn "start called")
+  (main))
+
+(defn stop
+  "Hot code reload hook to shut down resources so hot code reload can work"
+  [done]
+  (js/console.warn "stop called")
+  (when-some [srv @server-ref]
+    (.close srv
+      (fn [err]
+        (js/console.log "stop completed" err)
+        (done)))))
+
+(js/console.log "__filename" js/__filename)
+```
+
+The associated configuration is (`shadow-cljs.edn`):
+
+.Adding hooks for hot core reload.
+```
+{...
+ :builds
+   { :script {... as before
+
+              ; add in reload hooks
+              :devtools {:before-load-async demo.script/stop
+                         :after-load demo.script/start}}}}
+```
+
+WARNING: Many libraries hide state or do actions that prevent hot code reloading from working well. There
+is nothing the compiler can do to improve this since it has no idea what those libraries are doing.
+Hot code reload will only work well in situations where you can cleanly "stop" and "restart" the
+artifacts used.

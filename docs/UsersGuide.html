@@ -536,7 +536,7 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 <li><a href="#_quick_start">2. Quick Start</a>
 <ul class="sectlevel2">
-<li><a href="#_installing_the_tools">2.1. Installing the Tools</a></li>
+<li><a href="#_installing_via_code_npm_code">2.1. Installing via <code>npm</code></a></li>
 <li><a href="#_running_code_shadow_cljs_code">2.2. Running <code>shadow-cljs</code></a>
 <ul class="sectlevel3">
 <li><a href="#_server_mode">2.2.1. Server Mode</a></li>
@@ -553,134 +553,143 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 <li><a href="#_configuration">3. Configuration</a>
 <ul class="sectlevel2">
-<li><a href="#_build_targets">3.1. Build Targets</a></li>
-<li><a href="#_compilation">3.2. Compilation</a></li>
-<li><a href="#CommonConfig">3.3. Main Configuration</a>
+<li><a href="#_dependencies">3.1. Dependencies</a></li>
+<li><a href="#_source_paths">3.2. Source Paths</a>
 <ul class="sectlevel3">
-<li><a href="#_code_source_paths_code">3.3.1. <code>:source-paths</code></a></li>
-<li><a href="#_code_builds_code">3.3.2. <code>:builds</code></a></li>
+<li><a href="#_clojure_script">3.2.1. Clojure(Script)</a></li>
+<li><a href="#_javascript_via_code_npm_code">3.2.2. JavaScript (via <code>npm</code>)</a></li>
 </ul>
 </li>
-<li><a href="#_server_options">3.4. Server Options</a>
+<li><a href="#_server_options">3.3. Server Options</a>
 <ul class="sectlevel3">
-<li><a href="#nREPL">3.4.1. nREPL</a></li>
-<li><a href="#_http">3.4.2. HTTP</a></li>
-<li><a href="#_ssl">3.4.3. SSL</a></li>
-</ul>
-</li>
-<li><a href="#_development_options">3.5. Development Options</a>
-<ul class="sectlevel3">
-<li><a href="#_preloads">3.5.1. Preloads</a></li>
-<li><a href="#_hot_code_reload">3.5.2. Hot Code Reload</a></li>
-<li><a href="#_lifecycle_hooks">3.5.3. Lifecycle Hooks</a></li>
+<li><a href="#nREPL">3.3.1. nREPL</a></li>
+<li><a href="#_http">3.3.2. HTTP</a></li>
+<li><a href="#_ssl">3.3.3. SSL</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#UsingNPMModules">4. Using JavaScript Dependencies</a>
+<li><a href="#_build_configuration">4. Build Configuration</a>
 <ul class="sectlevel2">
-<li><a href="#_installing_js_dependencies">4.1. Installing JS Dependencies</a></li>
-<li><a href="#_using_js_dependencies">4.2. Using JS Dependencies</a></li>
-<li><a href="#_resolving_js_dependencies">4.3. Resolving JS Dependencies</a>
+<li><a href="#_build_target">4.1. Build Target</a></li>
+<li><a href="#_development_options">4.2. Development Options</a>
 <ul class="sectlevel3">
-<li><a href="#_using_a_cdn">4.3.1. Using a CDN</a></li>
-<li><a href="#_redirecting_require">4.3.2. Redirecting “require”</a></li>
-<li><a href="#_using_local_files">4.3.3. Using local Files</a></li>
+<li><a href="#_preloads">4.2.1. Preloads</a></li>
+<li><a href="#_hot_code_reload">4.2.2. Hot Code Reload</a></li>
+<li><a href="#_lifecycle_hooks">4.2.3. Lifecycle Hooks</a></li>
 </ul>
 </li>
-<li><a href="#_migrating_cljsjs">4.4. Migrating cljsjs.*</a></li>
 </ul>
 </li>
-<li><a href="#BrowserTarget">5. Targeting the Browser</a>
+<li><a href="#_using_code_shadow_cljs_code">5. Using <code>shadow-cljs</code></a>
 <ul class="sectlevel2">
-<li><a href="#_output_settings">5.1. Output Settings</a></li>
-<li><a href="#_modules">5.2. Modules</a></li>
-<li><a href="#_web_workers">5.3. Web Workers</a></li>
-<li><a href="#CodeSplitting">5.4. Code Splitting</a>
-<ul class="sectlevel3">
-<li><a href="#_using_shadow_cljs_s_built_in_loader_support">5.4.1. Using shadow-cljs&#8217;s built-in Loader Support</a></li>
-<li><a href="#_using_the_standard_clojurescript_api">5.4.2. Using the Standard ClojureScript API</a></li>
+<li><a href="#_compilation">5.1. Compilation</a></li>
 </ul>
 </li>
-<li><a href="#NameHashing">5.5. Cacheable Output</a>
-<ul class="sectlevel3">
-<li><a href="#BrowserManifest">5.5.1. Output Manifest</a></li>
-</ul>
-</li>
-<li><a href="#_development_support">5.6. Development Support</a>
-<ul class="sectlevel3">
-<li><a href="#_http_server">5.6.1. HTTP Server</a></li>
-<li><a href="#_css_reloading">5.6.2. CSS Reloading</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#_targeting_node">6. Targeting Node</a>
+<li><a href="#js-deps">6. JavaScript Dependencies</a>
 <ul class="sectlevel2">
-<li><a href="#_node_scripts">6.1. Node Scripts</a>
+<li><a href="#_installing_via_code_npm_code_2">6.1. Installing via <code>npm</code></a></li>
+<li><a href="#_using_js_dependencies">6.2. Using JS Dependencies</a></li>
+<li><a href="#_resolving_js_dependencies">6.3. Resolving JS Dependencies</a>
 <ul class="sectlevel3">
-<li><a href="#_build_options">6.1.1. Build Options</a></li>
-<li><a href="#NodeHotCodeReload">6.1.2. Hot Code Reload</a></li>
+<li><a href="#_using_a_cdn">6.3.1. Using a CDN</a></li>
+<li><a href="#_redirecting_require">6.3.2. Redirecting “require”</a></li>
+<li><a href="#_using_local_files">6.3.3. Using local Files</a></li>
 </ul>
 </li>
-<li><a href="#NodeLibrary">6.2. Node Libraries</a>
+<li><a href="#_migrating_cljsjs">6.4. Migrating cljsjs.*</a></li>
+</ul>
+</li>
+<li><a href="#target-browser">7. Targeting the Browser</a>
+<ul class="sectlevel2">
+<li><a href="#_output_settings">7.1. Output Settings</a></li>
+<li><a href="#_modules">7.2. Modules</a></li>
+<li><a href="#_web_workers">7.3. Web Workers</a></li>
+<li><a href="#CodeSplitting">7.4. Code Splitting</a>
 <ul class="sectlevel3">
-<li><a href="#_exports">6.2.1. Exports</a></li>
-<li><a href="#_full_example">6.2.2. Full Example</a></li>
+<li><a href="#_using_shadow_cljs_s_built_in_loader_support">7.4.1. Using shadow-cljs&#8217;s built-in Loader Support</a></li>
+<li><a href="#_using_the_standard_clojurescript_api">7.4.2. Using the Standard ClojureScript API</a></li>
 </ul>
 </li>
-<li><a href="#_distributing_on_npm">6.3. Distributing on NPM</a></li>
-</ul>
-</li>
-<li><a href="#_testing">7. Testing</a>
-<ul class="sectlevel2">
-<li><a href="#_browser_test">7.1. Browser Test</a>
+<li><a href="#NameHashing">7.5. Cacheable Output</a>
 <ul class="sectlevel3">
-<li><a href="#_generated_output_in_code_test_dir_code">7.1.1. Generated output in <code>:test-dir</code></a></li>
+<li><a href="#BrowserManifest">7.5.1. Output Manifest</a></li>
 </ul>
 </li>
-<li><a href="#_targeting_tests_to_karma_for_continuous_integration">7.2. Targeting Tests to Karma for Continuous Integration</a>
+<li><a href="#_development_support">7.6. Development Support</a>
 <ul class="sectlevel3">
-<li><a href="#_installing_karma">7.2.1. Installing Karma</a></li>
-<li><a href="#_the_build">7.2.2. The Build</a></li>
+<li><a href="#_http_server">7.6.1. HTTP Server</a></li>
+<li><a href="#_css_reloading">7.6.2. CSS Reloading</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#_embedding_in_the_js_ecosystem_the_code_node_module_code_target">8. Embedding in the JS Ecosystem&#8201;&#8212;&#8201;The <code>:node-module</code> Target</a>
+<li><a href="#_targeting_node_js">8. Targeting node.js</a>
 <ul class="sectlevel2">
-<li><a href="#_convenience_mode">8.1. Convenience Mode</a></li>
-<li><a href="#_explicit_configuration">8.2. Explicit Configuration</a></li>
-<li><a href="#_working_with_optimizations">8.3. Working with Optimizations</a></li>
-</ul>
-</li>
-<li><a href="#_generating_production_code_all_targets">9. Generating Production Code&#8201;&#8212;&#8201;All Targets</a>
-<ul class="sectlevel2">
-<li><a href="#Optimization">9.1. Optimizations</a></li>
-<li><a href="#_release_specific_vs_development_configuration">9.2. Release-Specific vs. Development Configuration</a></li>
-</ul>
-</li>
-<li><a href="#_custom_targets">10. Custom Targets</a>
-<ul class="sectlevel2">
-<li><a href="#_example">10.1. Example</a></li>
-<li><a href="#_compilation_stages">10.2. Compilation Stages</a></li>
-</ul>
-</li>
-<li><a href="#_editor_ide_repl_setup">11. Editor/IDE/REPL Setup</a>
-<ul class="sectlevel2">
-<li><a href="#_repl">11.1. REPL</a></li>
-<li><a href="#_cursive">11.2. Cursive</a>
+<li><a href="#target-node-script">8.1. node.js Scripts</a>
 <ul class="sectlevel3">
-<li><a href="#_cursive_repl_integration">11.2.1. Cursive REPL Integration</a></li>
+<li><a href="#_build_options">8.1.1. Build Options</a></li>
+<li><a href="#NodeHotCodeReload">8.1.2. Hot Code Reload</a></li>
 </ul>
 </li>
-<li><a href="#_cider">11.3. CIDER</a></li>
+<li><a href="#target-node-library">8.2. node.js Libraries</a>
+<ul class="sectlevel3">
+<li><a href="#_exports">8.2.1. Exports</a></li>
+<li><a href="#_full_example">8.2.2. Full Example</a></li>
 </ul>
 </li>
-<li><a href="#_what_to_do_when_things_don_t_work">12. What to do when things don’t work?</a></li>
-<li><a href="#_hacking">13. Hacking</a>
+<li><a href="#_creating_code_npm_code_packages">8.3. Creating <code>npm</code> packages</a></li>
+</ul>
+</li>
+<li><a href="#target-npm-module">9. Embedding in the JS Ecosystem&#8201;&#8212;&#8201;The <code>:npm-module</code> Target</a>
 <ul class="sectlevel2">
-<li><a href="#_patching_libraries">13.1. Patching Libraries</a></li>
+<li><a href="#_convenience_mode">9.1. Convenience Mode</a></li>
+<li><a href="#_explicit_configuration">9.2. Explicit Configuration</a></li>
+<li><a href="#_working_with_optimizations">9.3. Working with Optimizations</a></li>
+</ul>
+</li>
+<li><a href="#_testing">10. Testing</a>
+<ul class="sectlevel2">
+<li><a href="#target-browser-test">10.1. Browser Test</a>
+<ul class="sectlevel3">
+<li><a href="#_generated_output_in_code_test_dir_code">10.1.1. Generated output in <code>:test-dir</code></a></li>
+</ul>
+</li>
+<li><a href="#target-karma">10.2. Targeting Tests to Karma for Continuous Integration</a>
+<ul class="sectlevel3">
+<li><a href="#_installing_karma">10.2.1. Installing Karma</a></li>
+<li><a href="#_the_build">10.2.2. The Build</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_generating_production_code_all_targets">11. Generating Production Code&#8201;&#8212;&#8201;All Targets</a>
+<ul class="sectlevel2">
+<li><a href="#Optimization">11.1. Optimizations</a></li>
+<li><a href="#_release_specific_vs_development_configuration">11.2. Release-Specific vs. Development Configuration</a></li>
+</ul>
+</li>
+<li><a href="#_custom_targets">12. Custom Targets</a>
+<ul class="sectlevel2">
+<li><a href="#_example">12.1. Example</a></li>
+<li><a href="#_compilation_stages">12.2. Compilation Stages</a></li>
+</ul>
+</li>
+<li><a href="#_editor_ide_repl_setup">13. Editor/IDE/REPL Setup</a>
+<ul class="sectlevel2">
+<li><a href="#_repl">13.1. REPL</a></li>
+<li><a href="#_cursive">13.2. Cursive</a>
+<ul class="sectlevel3">
+<li><a href="#_cursive_repl_integration">13.2.1. Cursive REPL Integration</a></li>
+</ul>
+</li>
+<li><a href="#_cider">13.3. CIDER</a></li>
+</ul>
+</li>
+<li><a href="#_what_to_do_when_things_don_t_work">14. What to do when things don’t work?</a></li>
+<li><a href="#_hacking">15. Hacking</a>
+<ul class="sectlevel2">
+<li><a href="#_patching_libraries">15.1. Patching Libraries</a></li>
 </ul>
 </li>
 </ul>
@@ -806,7 +815,7 @@ interest:</p>
 <h2 id="_quick_start"><a class="anchor" href="#_quick_start"></a><a class="link" href="#_quick_start">2. Quick Start</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_installing_the_tools"><a class="anchor" href="#_installing_the_tools"></a><a class="link" href="#_installing_the_tools">2.1. Installing the Tools</a></h3>
+<h3 id="_installing_via_code_npm_code"><a class="anchor" href="#_installing_via_code_npm_code"></a><a class="link" href="#_installing_via_code_npm_code">2.1. Installing via <code>npm</code></a></h3>
 <div class="paragraph">
 <p>You will need:</p>
 </div>
@@ -1043,39 +1052,10 @@ configuration and a <code>:builds</code> entry for all your builds.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:source-paths</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">src</span><span class="delimiter">&quot;</span></span>]
- <span class="symbol">:dependencies</span> [] <span class="comment">; These are CLJS dependencies, NOT node. Use package.json for npm.</span>
- <span class="symbol">:builds</span> {}}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:source-paths</span> [<span class="keyword">..</span><span class="keyword">.</span>]
+ <span class="symbol">:dependencies</span> [<span class="keyword">..</span><span class="keyword">.</span>]
+ <span class="symbol">:builds</span> {<span class="keyword">..</span><span class="keyword">.</span>}}</code></pre>
 </div>
-</div>
-<div class="hdlist">
-<table>
-<tr>
-<td class="hdlist1">
-<code>:dependencies</code>
-</td>
-<td class="hdlist2">
-<p>manage your CLJS dependencies in the same format as <code>leiningen</code> or <code>boot</code>. These are for JVM dependencies
-in all target modes. External JS dependencies use the standard <code>package.json</code>, installed via <code>npm</code> or <code>yarn</code>.</p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
-<code>:source-paths</code>
-</td>
-<td class="hdlist2">
-<p>define where the compiler will look for <code>.cljs</code> and <code>.cljc</code> source files.</p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
-<code>:builds</code>
-</td>
-<td class="hdlist2">
-<p>is a map of build-id (a keyword) to the build config.</p>
-</td>
-</tr>
-</table>
 </div>
 <div class="paragraph">
 <p>An example config could look like this:</p>
@@ -1100,95 +1080,117 @@ in all target modes. External JS dependencies use the standard <code>package.jso
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure"><span class="keyword">.</span>
-<span class="error">├</span><span class="error">─</span><span class="error">─</span> package.json
-<span class="error">├</span><span class="error">─</span><span class="error">─</span> shadow-cljs.edn
-<span class="error">└</span><span class="error">─</span><span class="error">─</span> src
-    <span class="error">└</span><span class="error">─</span><span class="error">─</span> my
-        <span class="error">└</span><span class="error">─</span><span class="error">─</span> app.cljs</code></pre>
+<pre class="CodeRay highlight"><code data-lang="text">.
+├── package.json
+├── shadow-cljs.edn
+└── src
+    └── my
+        └── app.cljs</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_build_targets"><a class="anchor" href="#_build_targets"></a><a class="link" href="#_build_targets">3.1. Build Targets</a></h3>
-<div class="paragraph">
-<p>Each build in <code>shadow-cljs</code> must define a <code>:target</code> which defines where you intend
-your code to be executed. There are default built-ins for the <a href="#BrowserTarget">browser</a> and <a href="#NodeTarget"><code>node.js</code></a>.
-They all share the basic concept of having <code>:dev</code> and <code>:release</code> modes.
-<code>:dev</code> mode provides all the usual development goodies like fast compilation, live code
-reloading and a REPL. <code>:release</code> mode will produce optimized output intended for production.</p>
-</div>
-<div class="paragraph">
-<p>Targets are covered in separate chapters.</p>
-</div>
+<h3 id="_dependencies"><a class="anchor" href="#_dependencies"></a><a class="link" href="#_dependencies">3.1. Dependencies</a></h3>
+
 </div>
 <div class="sect2">
-<h3 id="_compilation"><a class="anchor" href="#_compilation"></a><a class="link" href="#_compilation">3.2. Compilation</a></h3>
+<h3 id="_source_paths"><a class="anchor" href="#_source_paths"></a><a class="link" href="#_source_paths">3.2. Source Paths</a></h3>
 <div class="paragraph">
-<p><code>shadow-cljs</code> has 2 compilation modes: <code>:dev</code> and <code>:release</code>. <code>:dev</code> will inject a few
-development helpers for dealing with things like a CLJS REPL and live code reloading.
-In <code>:release</code> mode those things will not be included and the code will be optimized by the Closure Compiler.</p>
-</div>
-<div class="listingblock">
-<div class="title">Sample Development Mode Commands</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash"># compile a build once in :dev mode
-$ shadow-cljs compile app
-
-# compile and watch
-$ shadow-cljs watch app
-
-# connect to REPL for the build (available while watch is running)
-$ shadow-cljs cljs-repl app
-
-# (if you are targeting node) connect to node-repl
-$ shadow-cljs node-repl</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Running a release build optimized for production use.</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">$ shadow-cljs release app</code></pre>
-</div>
+<p><code>:source-paths</code> configures your JVM classpath. The compiler will use this config to find Clojure(Script) source files (eg. <code>.cljs</code>).</p>
 </div>
 <div class="paragraph">
-<p>Sometimes you may run into some release issues due to <code>:advanced</code> compilation. These
-commands can help track down the causes.</p>
+<p>It is fine to put everything into one source path but you can use multiple if you want to "group" source files in certain ways. It is useful if you want to keep your tests separate for example.</p>
 </div>
 <div class="listingblock">
-<div class="title">Release debugging commands.</div>
+<div class="title">Using multiple source paths</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">$ shadow-cljs check app
-$ shadow-cljs release app --debug</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:source-paths</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">src/main</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">src/test</span><span class="delimiter">&quot;</span></span>]
+ <span class="keyword">..</span><span class="keyword">.</span>}</code></pre>
 </div>
 </div>
+<div class="listingblock">
+<div class="title">File Structure</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="text">.
+├── package.json
+├── shadow-cljs.edn
+└── src
+    └── main
+        └── my
+            └── app.cljs
+    └── test
+        └── my
+            └── app_test.cljs</code></pre>
 </div>
-<div class="sect2">
-<h3 id="CommonConfig"><a class="anchor" href="#CommonConfig"></a><a class="link" href="#CommonConfig">3.3. Main Configuration</a></h3>
+</div>
 <div class="paragraph">
-<p>The first options you need to set are the location of your source folder(s) and your dependencies.
-All settings go in <code>shadow-cljs.edn</code> in the top-level directory of your project. In this book
-any ambiguous reference to "configuration file" should be assumed to mean this file.</p>
+<p>It is not recommended to separate source files by extension (eg. <code>src/clj</code>, <code>src/cljs</code>, <code>src/cljc</code>). For some reason this is widely used in CLJS project templates but it just makes things harder to use.</p>
 </div>
-<div class="listingblock">
-<div class="title">The main configuration file: <code>shadow-cljs.edn</code></div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:dependencies</span> [[some-library <span class="string"><span class="delimiter">&quot;</span><span class="content">1.2.1</span><span class="delimiter">&quot;</span></span>] <span class="keyword">..</span><span class="keyword">.</span>]
- <span class="symbol">:source-paths</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">src</span><span class="delimiter">&quot;</span></span>]
- <span class="keyword">..</span><span class="keyword">.</span></code></pre>
+<div class="sect3">
+<h4 id="_clojure_script"><a class="anchor" href="#_clojure_script"></a><a class="link" href="#_clojure_script">3.2.1. Clojure(Script)</a></h4>
+<div class="paragraph">
+<p>Your dependencies are managed via the <code>:dependencies</code> key at the root of the <code>shadow-cljs.edn</code> config file. They are declared in the same notation that other Clojure tools like <code>lein</code> or <code>boot</code> use.</p>
+</div>
+<div class="paragraph">
+<p>Notice that the source path is <strong>only</strong> specified once in the entire configuration. The system will use namespace dependency graphs to determine what code is needed in the final output of any given build.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_code_source_paths_code"><a class="anchor" href="#_code_source_paths_code"></a><a class="link" href="#_code_source_paths_code">3.3.1. <code>:source-paths</code></a></h4>
+<h4 id="_javascript_via_code_npm_code"><a class="anchor" href="#_javascript_via_code_npm_code"></a><a class="link" href="#_javascript_via_code_npm_code">3.2.2. JavaScript (via <code>npm</code>)</a></h4>
 <div class="paragraph">
-<p>Notice that the source path is <strong>only</strong> specified once in the entire configuration. The system will
-use namespace dependency graphs to determine what code is needed in the final output of any given
-build.</p>
+<p><code>:dependencies</code> is only used to configure JVM dependencies. JavaScript dependencies are handled via the standard <code>npm</code> <code>package.json</code>. See the <a href="#JS Dependencies">JavaScript Dependencies</a> section for more details.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_server_options"><a class="anchor" href="#_server_options"></a><a class="link" href="#_server_options">3.3. Server Options</a></h3>
+<div class="paragraph">
+<p>This section is for other options that configure the <code>shadow-cljs</code> server instance. They are optional.</p>
+</div>
+<div class="sect3">
+<h4 id="nREPL"><a class="anchor" href="#nREPL"></a><a class="link" href="#nREPL">3.3.1. nREPL</a></h4>
+<div class="paragraph">
+<p>The <code>shadow-cljs</code> server provides a nREPL server via TCP. If you look at the startup message you&#8217;ll see
+the port of nREPL, and the port will also be stored in <code>target/shadow-cljs/nrepl.port</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ shadow-cljs watch dev
+shadow-cljs - HTTP server for &quot;:app&quot; available at http://localhost:8020
+shadow-cljs - server running at http://0.0.0.0:9630
+shadow-cljs - nrepl running at /0.0.0.0:9462
+shadow-cljs - watching build :app
+[:app] Configuring build.
+[:app] Compiling ...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can configure the port and additional middleware with <code>shadow-cljs.edn</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:nrepl</span> {<span class="symbol">:port</span> <span class="integer">9000</span>
+         <span class="symbol">:middleware</span> []} <span class="comment">; list of namespace-qualified symbols</span>
+}</code></pre>
+</div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_code_builds_code"><a class="anchor" href="#_code_builds_code"></a><a class="link" href="#_code_builds_code">3.3.2. <code>:builds</code></a></h4>
+<h4 id="_http"><a class="anchor" href="#_http"></a><a class="link" href="#_http">3.3.2. HTTP</a></h4>
+
+</div>
+<div class="sect3">
+<h4 id="_ssl"><a class="anchor" href="#_ssl"></a><a class="link" href="#_ssl">3.3.3. SSL</a></h4>
+
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_build_configuration"><a class="anchor" href="#_build_configuration"></a><a class="link" href="#_build_configuration">4. Build Configuration</a></h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>You will also need a <code>:builds</code> section. Builds should be a map of builds <strong>keyed</strong> by build ID:</p>
+<p><code>shadow-cljs.edn</code> will also need a <code>:builds</code> section. Builds should be a map of builds <strong>keyed</strong> by build ID:</p>
 </div>
 <div class="listingblock">
 <div class="title">A configuration file with a build map.</div>
@@ -1196,22 +1198,29 @@ build.</p>
 <pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:dependencies</span> [[some-library <span class="string"><span class="delimiter">&quot;</span><span class="content">1.2.1</span><span class="delimiter">&quot;</span></span>] <span class="keyword">..</span><span class="keyword">.</span>]
  <span class="symbol">:source-paths</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">src</span><span class="delimiter">&quot;</span></span>]
  <span class="symbol">:builds</span>
- {<span class="symbol">:app</span>  {<span class="symbol">:target</span>     <span class="symbol">:browser</span>
-         <span class="keyword">..</span><span class="keyword">.</span> target-specific options <span class="keyword">..</span><span class="keyword">.</span>}
- <span class="symbol">:tests</span> {<span class="symbol">:target</span> <span class="symbol">:karma</span>
-         <span class="keyword">..</span><span class="keyword">.</span> target-specific options <span class="keyword">..</span><span class="keyword">.</span>}}}</code></pre>
+ {<span class="symbol">:app</span>   {<span class="symbol">:target</span>     <span class="symbol">:browser</span>
+          <span class="keyword">..</span><span class="keyword">.</span> browser-specific options <span class="keyword">..</span><span class="keyword">.</span>}
+  <span class="symbol">:tests</span> {<span class="symbol">:target</span> <span class="symbol">:karma</span>
+          <span class="keyword">..</span><span class="keyword">.</span> karma-specific options <span class="keyword">..</span><span class="keyword">.</span>}}}</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Each build describes artifacts that the compiler will build. The build target is an
-extensible feature of <code>shadow-cljs</code>, and the compiler comes with quite a few of them already.</p>
+<p>Each build describes artifacts that the compiler will build. The build target is an extensible feature of <code>shadow-cljs</code>, and the compiler comes with quite a few of them already.</p>
+</div>
+<div class="sect2">
+<h3 id="_build_target"><a class="anchor" href="#_build_target"></a><a class="link" href="#_build_target">4.1. Build Target</a></h3>
+<div class="paragraph">
+<p>Each build in <code>shadow-cljs</code> must define a <code>:target</code> which defines where you intend your code to be executed. There are default built-ins for the <a href="#BrowserTarget">browser</a> and <a href="#NodeTarget"><code>node.js</code></a>. They all share the basic concept of having <code>:dev</code> and <code>:release</code> modes. <code>:dev</code> mode provides all the usual development goodies like fast compilation, live code reloading and a REPL. <code>:release</code> mode will produce optimized output intended for production.</p>
+</div>
+<div class="paragraph">
+<p>Targets are covered in separate chapters.</p>
 </div>
 <div class="paragraph">
 <p>Here are some of them:</p>
 </div>
 <div class="dlist Horizontal">
 <dl>
-<dt><code>:browser</code></dt>
+<dt><a href="#target-browser"><code>:browser</code></a></dt>
 <dd>
 <p>Output code suitable for running in a web browser.</p>
 </dd>
@@ -1246,57 +1255,13 @@ extensible feature of <code>shadow-cljs</code>, and the compiler comes with quit
 the target you select.</p>
 </div>
 </div>
-</div>
 <div class="sect2">
-<h3 id="_server_options"><a class="anchor" href="#_server_options"></a><a class="link" href="#_server_options">3.4. Server Options</a></h3>
-<div class="paragraph">
-<p>This section is for other options that configure the <code>shadow-cljs</code> server instance.</p>
-</div>
-<div class="sect3">
-<h4 id="nREPL"><a class="anchor" href="#nREPL"></a><a class="link" href="#nREPL">3.4.1. nREPL</a></h4>
-<div class="paragraph">
-<p>The <code>shadow-cljs</code> server provides a nREPL server via TCP. If you look at the startup message you&#8217;ll see
-the port of nREPL, and the port will also be stored in <code>target/shadow-cljs/nrepl.port</code>:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">$ shadow-cljs watch dev
-shadow-cljs - HTTP server for &quot;:app&quot; available at http://localhost:8020
-shadow-cljs - server running at http://0.0.0.0:9630
-shadow-cljs - nrepl running at /0.0.0.0:9462
-shadow-cljs - watching build :app
-[:app] Configuring build.
-[:app] Compiling ...</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>You can configure the port and additional middleware with <code>shadow-cljs.edn</code>:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
- <span class="symbol">:nrepl</span> {<span class="symbol">:port</span> <span class="integer">9000</span>
-         <span class="symbol">:middleware</span> []} <span class="comment">; list of namespace-qualified symbols</span>
-}</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_http"><a class="anchor" href="#_http"></a><a class="link" href="#_http">3.4.2. HTTP</a></h4>
-
-</div>
-<div class="sect3">
-<h4 id="_ssl"><a class="anchor" href="#_ssl"></a><a class="link" href="#_ssl">3.4.3. SSL</a></h4>
-
-</div>
-</div>
-<div class="sect2">
-<h3 id="_development_options"><a class="anchor" href="#_development_options"></a><a class="link" href="#_development_options">3.5. Development Options</a></h3>
+<h3 id="_development_options"><a class="anchor" href="#_development_options"></a><a class="link" href="#_development_options">4.2. Development Options</a></h3>
 <div class="paragraph">
 <p>Each build <code>:target</code> typically provides some development support. They are grouped under the <code>:devtools</code> key for each <code>:build</code>.</p>
 </div>
 <div class="sect3">
-<h4 id="_preloads"><a class="anchor" href="#_preloads"></a><a class="link" href="#_preloads">3.5.1. Preloads</a></h4>
+<h4 id="_preloads"><a class="anchor" href="#_preloads"></a><a class="link" href="#_preloads">4.2.1. Preloads</a></h4>
 <div class="paragraph">
 <p>As a developer most of your time is spent in development mode. You&#8217;re probably familiar with tools like <code>figwheel</code>,
 <code>boot-reload</code>, and <code>devtools</code>. It&#8217;s almost certain that you want one or more of these in your builds.</p>
@@ -1332,7 +1297,7 @@ Since version 2.0.130 shadow-cljs automatically adds "binaryage/cljs-devtools" t
 </div>
 </div>
 <div class="sect3">
-<h4 id="_hot_code_reload"><a class="anchor" href="#_hot_code_reload"></a><a class="link" href="#_hot_code_reload">3.5.2. Hot Code Reload</a></h4>
+<h4 id="_hot_code_reload"><a class="anchor" href="#_hot_code_reload"></a><a class="link" href="#_hot_code_reload">4.2.2. Hot Code Reload</a></h4>
 <div class="paragraph">
 <p>The React and ClojureScript ecosystems combine to make this kind of thing super useful. The <code>shadow-cljs</code>
 system includes everything you need to do your hot code reload, without needing to resort to external tools.</p>
@@ -1347,7 +1312,7 @@ system includes everything you need to do your hot code reload, without needing 
 </div>
 </div>
 <div class="sect3">
-<h4 id="_lifecycle_hooks"><a class="anchor" href="#_lifecycle_hooks"></a><a class="link" href="#_lifecycle_hooks">3.5.3. Lifecycle Hooks</a></h4>
+<h4 id="_lifecycle_hooks"><a class="anchor" href="#_lifecycle_hooks"></a><a class="link" href="#_lifecycle_hooks">4.2.3. Lifecycle Hooks</a></h4>
 <div class="paragraph">
 <p>The build configuration supports hooks that allow you to run functions just before hot code reload
 brings in updated code, and just after. These are useful for stopping/starting things that would otherwise
@@ -1387,7 +1352,53 @@ can do async processing, but <strong>must</strong> call <code>(done)</code> to i
 </div>
 </div>
 <div class="sect1">
-<h2 id="UsingNPMModules"><a class="anchor" href="#UsingNPMModules"></a><a class="link" href="#UsingNPMModules">4. Using JavaScript Dependencies</a></h2>
+<h2 id="_using_code_shadow_cljs_code"><a class="anchor" href="#_using_code_shadow_cljs_code"></a><a class="link" href="#_using_code_shadow_cljs_code">5. Using <code>shadow-cljs</code></a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_compilation"><a class="anchor" href="#_compilation"></a><a class="link" href="#_compilation">5.1. Compilation</a></h3>
+<div class="paragraph">
+<p><code>shadow-cljs</code> has 2 compilation modes: <code>:dev</code> and <code>:release</code>. <code>:dev</code> will inject a few
+development helpers for dealing with things like a CLJS REPL and live code reloading.
+In <code>:release</code> mode those things will not be included and the code will be optimized by the Closure Compiler.</p>
+</div>
+<div class="listingblock">
+<div class="title">Sample Development Mode Commands</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash"># compile a build once in :dev mode
+$ shadow-cljs compile app
+
+# compile and watch
+$ shadow-cljs watch app
+
+# connect to REPL for the build (available while watch is running)
+$ shadow-cljs cljs-repl app
+
+# (if you are targeting node) connect to node-repl
+$ shadow-cljs node-repl</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Running a release build optimized for production use.</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">$ shadow-cljs release app</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Sometimes you may run into some release issues due to <code>:advanced</code> compilation. These
+commands can help track down the causes.</p>
+</div>
+<div class="listingblock">
+<div class="title">Release debugging commands.</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">$ shadow-cljs check app
+$ shadow-cljs release app --debug</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="js-deps"><a class="anchor" href="#js-deps"></a><a class="link" href="#js-deps">6. JavaScript Dependencies</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The standard ClojureScript compiler has <a href="https://code.thheller.com/blog/shadow-cljs/2017/09/15/js-dependencies-the-problem.html">some issues</a>
@@ -1415,7 +1426,7 @@ The intention is to make the vast majority of the JS ecosystem easily accessible
 Javascript.</p>
 </div>
 <div class="sect2">
-<h3 id="_installing_js_dependencies"><a class="anchor" href="#_installing_js_dependencies"></a><a class="link" href="#_installing_js_dependencies">4.1. Installing JS Dependencies</a></h3>
+<h3 id="_installing_via_code_npm_code_2"><a class="anchor" href="#_installing_via_code_npm_code_2"></a><a class="link" href="#_installing_via_code_npm_code_2">6.1. Installing via <code>npm</code></a></h3>
 <div class="paragraph">
 <p>Almost every package on npm will explain how to install it. Those instructions now apply to shadow-cljs
 as well. So if a library tells you to run:</p>
@@ -1436,7 +1447,7 @@ to try everything described in this section.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_using_js_dependencies"><a class="anchor" href="#_using_js_dependencies"></a><a class="link" href="#_using_js_dependencies">4.2. Using JS Dependencies</a></h3>
+<h3 id="_using_js_dependencies"><a class="anchor" href="#_using_js_dependencies"></a><a class="link" href="#_using_js_dependencies">6.2. Using JS Dependencies</a></h3>
 <div class="paragraph">
 <p>Most npm packages will also include some instructions on how to use the actual code. The
 “old” CommonJS style just has require calls which translates directly:</p>
@@ -1568,7 +1579,7 @@ leading to much less code in your final build.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_resolving_js_dependencies"><a class="anchor" href="#_resolving_js_dependencies"></a><a class="link" href="#_resolving_js_dependencies">4.3. Resolving JS Dependencies</a></h3>
+<h3 id="_resolving_js_dependencies"><a class="anchor" href="#_resolving_js_dependencies"></a><a class="link" href="#_resolving_js_dependencies">6.3. Resolving JS Dependencies</a></h3>
 <div class="paragraph">
 <p>By default <code>shadow-cljs</code> will resolve all <code>(:require ["thing" :as x])</code> requires following the npm convention.
 This means it will look at <code>&lt;project&gt;/node_modules/thing/&#8230;&#8203;</code> and follow the code from there. To
@@ -1576,7 +1587,7 @@ customize how this works <code>shadow-cljs</code> exposes a <code>:resolve</code
 things are resolved.</p>
 </div>
 <div class="sect3">
-<h4 id="_using_a_cdn"><a class="anchor" href="#_using_a_cdn"></a><a class="link" href="#_using_a_cdn">4.3.1. Using a CDN</a></h4>
+<h4 id="_using_a_cdn"><a class="anchor" href="#_using_a_cdn"></a><a class="link" href="#_using_a_cdn">6.3.1. Using a CDN</a></h4>
 <div class="paragraph">
 <p>Say you already have React included in your page via a CDN. You could just start using <code>js/React</code> again
 but we stopped doing that for a good reason. Instead you can continue to use <code>(:require ["react" :as react])</code>
@@ -1607,7 +1618,7 @@ the "react" npm package! No need to fiddle with the code to make this work.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_redirecting_require"><a class="anchor" href="#_redirecting_require"></a><a class="link" href="#_redirecting_require">4.3.2. Redirecting “require”</a></h4>
+<h4 id="_redirecting_require"><a class="anchor" href="#_redirecting_require"></a><a class="link" href="#_redirecting_require">6.3.2. Redirecting “require”</a></h4>
 <div class="paragraph">
 <p>Some packages provide multiple “dist” files and sometimes the default one described doesn’t quite work
 in <code>shadow-cljs</code>. One good example for this is "d3". Their default "main" points to "build/d3.node.js" but
@@ -1631,7 +1642,7 @@ so we can’t use that. Instead we just redirect the require to some other file:
 </div>
 </div>
 <div class="sect3">
-<h4 id="_using_local_files"><a class="anchor" href="#_using_local_files"></a><a class="link" href="#_using_local_files">4.3.3. Using local Files</a></h4>
+<h4 id="_using_local_files"><a class="anchor" href="#_using_local_files"></a><a class="link" href="#_using_local_files">6.3.3. Using local Files</a></h4>
 <div class="paragraph">
 <p>You may also use :resolve to directly map to files in your project.</p>
 </div>
@@ -1650,7 +1661,7 @@ so we can’t use that. Instead we just redirect the require to some other file:
 </div>
 </div>
 <div class="sect2">
-<h3 id="_migrating_cljsjs"><a class="anchor" href="#_migrating_cljsjs"></a><a class="link" href="#_migrating_cljsjs">4.4. Migrating cljsjs.*</a></h3>
+<h3 id="_migrating_cljsjs"><a class="anchor" href="#_migrating_cljsjs"></a><a class="link" href="#_migrating_cljsjs">6.4. Migrating cljsjs.*</a></h3>
 <div class="paragraph">
 <p>Many CLJS libraries are still using CLJSJS packages and they would break with <code>shadow-cljs</code> since it
 no longer supports <code>:foreign-libs</code>. I have a clear migration path for this and it just
@@ -1695,7 +1706,7 @@ The <code>shadow-cljsjs</code> library only provides the shim files. You’ll st
 </div>
 </div>
 <div class="sect1">
-<h2 id="BrowserTarget"><a class="anchor" href="#BrowserTarget"></a><a class="link" href="#BrowserTarget">5. Targeting the Browser</a></h2>
+<h2 id="target-browser"><a class="anchor" href="#target-browser"></a><a class="link" href="#target-browser">7. Targeting the Browser</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>There are a few targets that target web browsers in various ways, and since the targets are pluggable
@@ -1719,7 +1730,7 @@ browser-related targets.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_output_settings"><a class="anchor" href="#_output_settings"></a><a class="link" href="#_output_settings">5.1. Output Settings</a></h3>
+<h3 id="_output_settings"><a class="anchor" href="#_output_settings"></a><a class="link" href="#_output_settings">7.1. Output Settings</a></h3>
 <div class="paragraph">
 <p>The browser target outputs a lot of files, and a directory is needed for them all. You&#8217;ll need to serve
 these assets with some kind of server, and the Javascript loading code needs to know the server-centric
@@ -1773,7 +1784,7 @@ You are not required to use an absolute asset path, but it is highly recommended
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modules"><a class="anchor" href="#_modules"></a><a class="link" href="#_modules">5.2. Modules</a></h3>
+<h3 id="_modules"><a class="anchor" href="#_modules"></a><a class="link" href="#_modules">7.2. Modules</a></h3>
 <div class="paragraph">
 <p>The <code>modules</code> section of the config is always a map keyed by module ID. The module ID is also used
 to generate the Javascript filename. This is so the module loading code can easily find the correct file
@@ -1869,7 +1880,7 @@ to find everything needed to actually run.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_web_workers"><a class="anchor" href="#_web_workers"></a><a class="link" href="#_web_workers">5.3. Web Workers</a></h3>
+<h3 id="_web_workers"><a class="anchor" href="#_web_workers"></a><a class="link" href="#_web_workers">7.3. Web Workers</a></h3>
 <div class="paragraph">
 <p>The <code>:modules</code> configuration may also be used to generate files intended to be used as a Web Workers.
 You may declare any module (except the default) as a Web Worker by setting <code>:web-worker true</code>. The
@@ -1915,7 +1926,7 @@ in the <code>:after-load</code>.
 </div>
 </div>
 <div class="sect2">
-<h3 id="CodeSplitting"><a class="anchor" href="#CodeSplitting"></a><a class="link" href="#CodeSplitting">5.4. Code Splitting</a></h3>
+<h3 id="CodeSplitting"><a class="anchor" href="#CodeSplitting"></a><a class="link" href="#CodeSplitting">7.4. Code Splitting</a></h3>
 <div class="paragraph">
 <p>You&#8217;ve already seen how to configure your main module. Adding additional modules requires a little
 bit of care, but the technical details are simple:</p>
@@ -1934,7 +1945,7 @@ bit of care, but the technical details are simple:</p>
 </ol>
 </div>
 <div class="sect3">
-<h4 id="_using_shadow_cljs_s_built_in_loader_support"><a class="anchor" href="#_using_shadow_cljs_s_built_in_loader_support"></a><a class="link" href="#_using_shadow_cljs_s_built_in_loader_support">5.4.1. Using shadow-cljs&#8217;s built-in Loader Support</a></h4>
+<h4 id="_using_shadow_cljs_s_built_in_loader_support"><a class="anchor" href="#_using_shadow_cljs_s_built_in_loader_support"></a><a class="link" href="#_using_shadow_cljs_s_built_in_loader_support">7.4.1. Using shadow-cljs&#8217;s built-in Loader Support</a></h4>
 <div class="paragraph">
 <p>The compiler supports generating the required data for <code>goog.module.ModuleManager</code> to work.
 It exposes a simple interface to let you load modules on-demand at runtime.</p>
@@ -2013,7 +2024,7 @@ you are already using, and what level of optimization you use for your release b
 </div>
 </div>
 <div class="sect3">
-<h4 id="_using_the_standard_clojurescript_api"><a class="anchor" href="#_using_the_standard_clojurescript_api"></a><a class="link" href="#_using_the_standard_clojurescript_api">5.4.2. Using the Standard ClojureScript API</a></h4>
+<h4 id="_using_the_standard_clojurescript_api"><a class="anchor" href="#_using_the_standard_clojurescript_api"></a><a class="link" href="#_using_the_standard_clojurescript_api">7.4.2. Using the Standard ClojureScript API</a></h4>
 <div class="paragraph">
 <p>The generated code is capable of using the standard ClojureScript <code>cljs.loader</code> API. See the
 <a href="https://clojurescript.org/news/2017-07-10-code-splitting">documentation</a> on the ClojureScript
@@ -2028,7 +2039,7 @@ support in <code>shadow-cljs</code>.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="NameHashing"><a class="anchor" href="#NameHashing"></a><a class="link" href="#NameHashing">5.5. Cacheable Output</a></h3>
+<h3 id="NameHashing"><a class="anchor" href="#NameHashing"></a><a class="link" href="#NameHashing">7.5. Cacheable Output</a></h3>
 <div class="paragraph">
 <p>In a web setting it is desirable to cache <code>.js</code> files for a very long time to avoid extra request. It is common
 practice the generate a unique name for the <code>.js</code> file for every released version. This changes the URL used to
@@ -2068,7 +2079,7 @@ of generating conflicts. I recommend using the full hash.</p>
 in your HTML. The <a href="#BrowserManifest">Output Manifest</a> can help with that.</p>
 </div>
 <div class="sect3">
-<h4 id="BrowserManifest"><a class="anchor" href="#BrowserManifest"></a><a class="link" href="#BrowserManifest">5.5.1. Output Manifest</a></h4>
+<h4 id="BrowserManifest"><a class="anchor" href="#BrowserManifest"></a><a class="link" href="#BrowserManifest">7.5.1. Output Manifest</a></h4>
 <div class="paragraph">
 <p><code>shadow-cljs</code> generates a <code>manifest.edn</code> file in the configured <code>:output-dir</code>.
 This file contains a description of the module config together with an extra <code>:output-name</code> property which
@@ -2123,13 +2134,13 @@ be relative to the configured <code>:output-dir</code>.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_development_support"><a class="anchor" href="#_development_support"></a><a class="link" href="#_development_support">5.6. Development Support</a></h3>
+<h3 id="_development_support"><a class="anchor" href="#_development_support"></a><a class="link" href="#_development_support">7.6. Development Support</a></h3>
 <div class="paragraph">
 <p>The <code>:devtools</code> section of the configuration for <code>:browser</code> supports a few additional
 options for configuring an optional dev-time HTTP server for a build and CSS reloading.</p>
 </div>
 <div class="sect3">
-<h4 id="_http_server"><a class="anchor" href="#_http_server"></a><a class="link" href="#_http_server">5.6.1. HTTP Server</a></h4>
+<h4 id="_http_server"><a class="anchor" href="#_http_server"></a><a class="link" href="#_http_server">7.6.1. HTTP Server</a></h4>
 <div class="paragraph">
 <p>The server supports the following options:</p>
 </div>
@@ -2204,7 +2215,7 @@ real resource (so you can just hit browser reload on your SPA even on odd URIs).
 </div>
 </div>
 <div class="sect3">
-<h4 id="_css_reloading"><a class="anchor" href="#_css_reloading"></a><a class="link" href="#_css_reloading">5.6.2. CSS Reloading</a></h4>
+<h4 id="_css_reloading"><a class="anchor" href="#_css_reloading"></a><a class="link" href="#_css_reloading">7.6.2. CSS Reloading</a></h4>
 <div class="paragraph">
 <p>The Browser devtools can also reload CSS for you. This is enabled by default and in most cases requires no additional
 configuration when you are using the built-in HTTP dev server.</p>
@@ -2250,7 +2261,7 @@ document root used to serve your content.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_targeting_node"><a class="anchor" href="#_targeting_node"></a><a class="link" href="#_targeting_node">6. Targeting Node</a></h2>
+<h2 id="_targeting_node_js"><a class="anchor" href="#_targeting_node_js"></a><a class="link" href="#_targeting_node_js">8. Targeting node.js</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>There is built-in support for generating code that is intended to be use as a stand-alone
@@ -2272,7 +2283,7 @@ You can use the normal configuration options to set the <a href="#Optimization">
 </table>
 </div>
 <div class="sect2">
-<h3 id="_node_scripts"><a class="anchor" href="#_node_scripts"></a><a class="link" href="#_node_scripts">6.1. Node Scripts</a></h3>
+<h3 id="target-node-script"><a class="anchor" href="#target-node-script"></a><a class="link" href="#target-node-script">8.1. node.js Scripts</a></h3>
 <div class="paragraph">
 <p>The <code>:target :node-script</code> produces single-file stand-alone output that can be run using <code>node.js</code>.
 The code is just ClojureScript, and an entry point is easy to define:</p>
@@ -2286,7 +2297,7 @@ The code is just ClojureScript, and an entry point is easy to define:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_build_options"><a class="anchor" href="#_build_options"></a><a class="link" href="#_build_options">6.1.1. Build Options</a></h4>
+<h4 id="_build_options"><a class="anchor" href="#_build_options"></a><a class="link" href="#_build_options">8.1.1. Build Options</a></h4>
 <div class="paragraph">
 <p>You will need the same basic <a href="#CommonConfig">main configuration</a> as in other targets (like
 <code>:source-paths</code>), but you&#8217;ll need some node-specific build target options:</p>
@@ -2339,7 +2350,7 @@ function on startup. This only ever produces the file specified in <code>:output
 </div>
 </div>
 <div class="sect3">
-<h4 id="NodeHotCodeReload"><a class="anchor" href="#NodeHotCodeReload"></a><a class="link" href="#NodeHotCodeReload">6.1.2. Hot Code Reload</a></h4>
+<h4 id="NodeHotCodeReload"><a class="anchor" href="#NodeHotCodeReload"></a><a class="link" href="#NodeHotCodeReload">8.1.2. Hot Code Reload</a></h4>
 <div class="paragraph">
 <p>You will often write scripts that run as servers or some other long-running process. Hot code reload can
 be quite useful when working with these, and it is simple to set up:</p>
@@ -2435,7 +2446,7 @@ artifacts used.
 </div>
 </div>
 <div class="sect2">
-<h3 id="NodeLibrary"><a class="anchor" href="#NodeLibrary"></a><a class="link" href="#NodeLibrary">6.2. Node Libraries</a></h3>
+<h3 id="target-node-library"><a class="anchor" href="#target-node-library"></a><a class="link" href="#target-node-library">8.2. node.js Libraries</a></h3>
 <div class="paragraph">
 <p>The <code>:target :node-library</code> emits code that can be used (via <code>require</code>) as a standard node library, and is
 useful for publishing your code for re-use as a compiled Javascript artifact.</p>
@@ -2485,7 +2496,7 @@ The target-specific options are:</p>
 since it cannot as easily control all of the code that is loaded.</p>
 </div>
 <div class="sect3">
-<h4 id="_exports"><a class="anchor" href="#_exports"></a><a class="link" href="#_exports">6.2.1. Exports</a></h4>
+<h4 id="_exports"><a class="anchor" href="#_exports"></a><a class="link" href="#_exports">8.2.1. Exports</a></h4>
 <div class="paragraph">
 <p>The <code>:exports</code> option deserves some specific examples. There are two possible ways to specify what should be exported:</p>
 </div>
@@ -2560,7 +2571,7 @@ stage. This means that anything listed in <code>:exports</code> will not be rena
 </div>
 </div>
 <div class="sect3">
-<h4 id="_full_example"><a class="anchor" href="#_full_example"></a><a class="link" href="#_full_example">6.2.2. Full Example</a></h4>
+<h4 id="_full_example"><a class="anchor" href="#_full_example"></a><a class="link" href="#_full_example">8.2.2. Full Example</a></h4>
 <div class="paragraph">
 <p>The example below creates a <code>lib.js</code> file intended to be consumed via the normal Node <code>require</code> mechanism.</p>
 </div>
@@ -2617,19 +2628,157 @@ Development mode has the <a href="#NodeModes">same setup</a> as for node scripts
 </div>
 </div>
 <div class="sect2">
-<h3 id="_distributing_on_npm"><a class="anchor" href="#_distributing_on_npm"></a><a class="link" href="#_distributing_on_npm">6.3. Distributing on NPM</a></h3>
+<h3 id="_creating_code_npm_code_packages"><a class="anchor" href="#_creating_code_npm_code_packages"></a><a class="link" href="#_creating_code_npm_code_packages">8.3. Creating <code>npm</code> packages</a></h3>
 
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_testing"><a class="anchor" href="#_testing"></a><a class="link" href="#_testing">7. Testing</a></h2>
+<h2 id="target-npm-module"><a class="anchor" href="#target-npm-module"></a><a class="link" href="#target-npm-module">9. Embedding in the JS Ecosystem&#8201;&#8212;&#8201;The <code>:npm-module</code> Target</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>There is an additional target that is intended to help you use <code>shadow-cljs</code> as <strong>part</strong> of
+a project and provide seamless integration with existing JS tools (eg. webpack, browserify, babel,
+create-react-app, &#8230;&#8203;) with as little configuration as possible.</p>
+</div>
+<div class="paragraph">
+<p>It can be configured like other targets, but since it is meant to work in the JS ecosystem it
+comes with a convenience mode that makes such integration easier.</p>
+</div>
+<div class="sect2">
+<h3 id="_convenience_mode"><a class="anchor" href="#_convenience_mode"></a><a class="link" href="#_convenience_mode">9.1. Convenience Mode</a></h3>
+<div class="paragraph">
+<p>This target is meant to be as easy to access as possible, and does not actually require a specific
+build in the config. You still need a non-empty config file, but the default one from
+<code>shadow-cljs init</code> will do.</p>
+</div>
+<div class="paragraph">
+<p>ClojureScript organizes files into namespaces which means that a <code>demo.foo</code> namespace should be inside a
+<code>src/demo/foo.cljs</code> file. Where <code>src</code> is the default source path the shadow-cljs tool (see <a href="#CommonConfig">main configuration</a>).</p>
+</div>
+<div class="paragraph">
+<p>If you have this file in <code>src/demo</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Sample source for <code>foo.cljs</code></div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">demo.foo</span>)
+
+(<span class="keyword">defn</span> <span class="function">hello</span> [who]
+  (<span class="keyword">str</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Hello, </span><span class="delimiter">&quot;</span></span> who <span class="string"><span class="delimiter">&quot;</span><span class="content">!</span><span class="delimiter">&quot;</span></span>))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>you can compile it (and any others) via:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ shadow-cljs compile npm
+[:npm] Build completed. (16 files, 5 compiled, 0 warnings, 7.91s)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The generated exports will be named <code>shadow-cljs/</code> with the CLJS namespace.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="js"><span class="predefined">$</span> node
+&gt; <span class="keyword">var</span> x = require(<span class="string"><span class="delimiter">&quot;</span><span class="content">shadow-cljs/demo.foo</span><span class="delimiter">&quot;</span></span>);
+<span class="predefined-constant">undefined</span>
+&gt; x.hello(<span class="string"><span class="delimiter">&quot;</span><span class="content">JS</span><span class="delimiter">&quot;</span></span>)
+<span class="string"><span class="delimiter">'</span><span class="content">Hello, JS!</span><span class="delimiter">'</span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Watching with incremental compile is as simple as running <code>shadow-cljs watch npm</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_explicit_configuration"><a class="anchor" href="#_explicit_configuration"></a><a class="link" href="#_explicit_configuration">9.2. Explicit Configuration</a></h3>
+<div class="paragraph">
+<p>You can also treat <code>:npm-module</code> on the same footing with your other builds: give it explicit
+configuration. This allows you to also customize the code generation options. Of course
+you will configure the <a href="#CommonConfig">main configuration</a> as in all targets. The target-specific
+options are:</p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+<code>:target</code>
+</td>
+<td class="hdlist2">
+<p>Use :npm-module</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>:entries</code>
+</td>
+<td class="hdlist2">
+<p>(optinal) A vector of namespaces to include. Everything from these will be included.
+Defaults to everything it can find.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>:output-dir</code>
+</td>
+<td class="hdlist2">
+<p>(optional). The path for supporting files in development mode. Defaults to
+<code>node_modules/shadow-cljs</code>.</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The <code>:entries</code> setting can be used to limit what things get included, and the <code>:output-dir</code> is
+particularly useful for naming the directory in <code>node_modules</code> so that you can
+customize what name you use with <code>require</code>.</p>
+</div>
+<div class="paragraph">
+<p>Each entry will still result in a file with that namespace name in the specified output directory.</p>
+</div>
+<div class="paragraph">
+<p>Of course all of this is generated with standard Node conventions.</p>
+</div>
+<div class="paragraph">
+<p>If you plan to distribute code on NPM, then you may want to use the
+<a href="#NodeLibrary"><code>:node-library</code> target</a> instead since it allows for a finer level of control
+over exports and optimization.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_working_with_optimizations"><a class="anchor" href="#_working_with_optimizations"></a><a class="link" href="#_working_with_optimizations">9.3. Working with Optimizations</a></h3>
+<div class="paragraph">
+<p>Unlike the <code>:node-library</code> target, the module target does not know what you want to call the
+symbols you&#8217;re exporting, so it just exports them as-is. If you use advanced compilation, then everything
+will get a minified munged name!</p>
+</div>
+<div class="paragraph">
+<p>This is easy to remedy, simply add <code>:export</code> metadata on any symbols that you want to preserve:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">def</span> ^<span class="symbol">:export</span> my-constant <span class="float">5.662</span>)
+(<span class="keyword">defn</span> ^<span class="symbol">:export</span> my-function [] <span class="keyword">..</span><span class="keyword">.</span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is a standard annotation that is understood by ClojureScript and prevents Google Closure from
+renaming an artifact.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_testing"><a class="anchor" href="#_testing"></a><a class="link" href="#_testing">10. Testing</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p><code>shadow-cljs</code> provides a few ultility targets to make building tests a little easier.</p>
 </div>
 <div class="sect2">
-<h3 id="_browser_test"><a class="anchor" href="#_browser_test"></a><a class="link" href="#_browser_test">7.1. Browser Test</a></h3>
+<h3 id="target-browser-test"><a class="anchor" href="#target-browser-test"></a><a class="link" href="#target-browser-test">10.1. Browser Test</a></h3>
 <div class="paragraph">
 <p>This target is meant for gathering up namespaces that contain tests (based on a filename pattern match),
 and triggering a test runner. It contains a built-in runner that will automatically scan for <code>cljs.test</code>
@@ -2713,7 +2862,7 @@ In general you will need a config that looks like this:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_generated_output_in_code_test_dir_code"><a class="anchor" href="#_generated_output_in_code_test_dir_code"></a><a class="link" href="#_generated_output_in_code_test_dir_code">7.1.1. Generated output in <code>:test-dir</code></a></h4>
+<h4 id="_generated_output_in_code_test_dir_code"><a class="anchor" href="#_generated_output_in_code_test_dir_code"></a><a class="link" href="#_generated_output_in_code_test_dir_code">10.1.1. Generated output in <code>:test-dir</code></a></h4>
 <div class="paragraph">
 <p>The output includes two primary artifacts in your <code>test-dir</code> folder:</p>
 </div>
@@ -2733,7 +2882,7 @@ auto-generated.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_targeting_tests_to_karma_for_continuous_integration"><a class="anchor" href="#_targeting_tests_to_karma_for_continuous_integration"></a><a class="link" href="#_targeting_tests_to_karma_for_continuous_integration">7.2. Targeting Tests to Karma for Continuous Integration</a></h3>
+<h3 id="target-karma"><a class="anchor" href="#target-karma"></a><a class="link" href="#target-karma">10.2. Targeting Tests to Karma for Continuous Integration</a></h3>
 <div class="paragraph">
 <p>When you want to run your CLJS tests against a browser on some kind of CI server you&#8217;ll need to
 be able to run the tests from a command line and get back a status code. Karma is a well-known
@@ -2741,7 +2890,7 @@ and supported test runner that can do this for you, and <code>shadow-cljs</code>
 can add the appropriate wrappers around your tests so the will work in it.</p>
 </div>
 <div class="sect3">
-<h4 id="_installing_karma"><a class="anchor" href="#_installing_karma"></a><a class="link" href="#_installing_karma">7.2.1. Installing Karma</a></h4>
+<h4 id="_installing_karma"><a class="anchor" href="#_installing_karma"></a><a class="link" href="#_installing_karma">10.2.1. Installing Karma</a></h4>
 <div class="paragraph">
 <p>See their <a href="http://karma-runner.github.io">website</a> for full instructions. You&#8217;ll typically need
 something like this is your <code>package.json</code>:</p>
@@ -2769,7 +2918,7 @@ something like this is your <code>package.json</code>:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_the_build"><a class="anchor" href="#_the_build"></a><a class="link" href="#_the_build">7.2.2. The Build</a></h4>
+<h4 id="_the_build"><a class="anchor" href="#_the_build"></a><a class="link" href="#_the_build">10.2.2. The Build</a></h4>
 <div class="paragraph">
 <p>The build options are:</p>
 </div>
@@ -2796,7 +2945,7 @@ something like this is your <code>package.json</code>:</p>
 <code>:ns-regexp</code>
 </td>
 <td class="hdlist2">
-<p>(optional) A regex to match the test namespaces.</p>
+<p>(optional) A regex to match the test namespaces, defaults to "-test$</p>
 </td>
 </tr>
 </table>
@@ -2807,10 +2956,9 @@ something like this is your <code>package.json</code>:</p>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
- <span class="symbol">:builds</span> { <span class="symbol">:ci-tests</span> {<span class="symbol">:target</span>     <span class="symbol">:karma</span>
-                      <span class="symbol">:js-options</span> {<span class="symbol">:js-provider</span> <span class="symbol">:shadow</span>} <span class="comment">; needed in older versions of shadow-cljs</span>
-                      <span class="symbol">:output-to</span>  <span class="string"><span class="delimiter">&quot;</span><span class="content">target/ci.js</span><span class="delimiter">&quot;</span></span>
-                      <span class="symbol">:ns-regexp</span>  <span class="string"><span class="delimiter">&quot;</span><span class="content">-spec$</span><span class="delimiter">&quot;</span></span>}</code></pre>
+ <span class="symbol">:builds</span> {<span class="symbol">:ci-tests</span> {<span class="symbol">:target</span>     <span class="symbol">:karma</span>
+                     <span class="symbol">:output-to</span>  <span class="string"><span class="delimiter">&quot;</span><span class="content">target/ci.js</span><span class="delimiter">&quot;</span></span>
+                     <span class="symbol">:ns-regexp</span>  <span class="string"><span class="delimiter">&quot;</span><span class="content">-spec$</span><span class="delimiter">&quot;</span></span>}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2818,23 +2966,23 @@ something like this is your <code>package.json</code>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="json"><span class="error">m</span><span class="error">o</span><span class="error">d</span><span class="error">u</span><span class="error">l</span><span class="error">e</span><span class="error">.</span><span class="error">e</span><span class="error">x</span><span class="error">p</span><span class="error">o</span><span class="error">r</span><span class="error">t</span><span class="error">s</span> <span class="error">=</span> <span class="error">f</span><span class="error">u</span><span class="error">n</span><span class="error">c</span><span class="error">t</span><span class="error">i</span><span class="error">o</span><span class="error">n</span> <span class="error">(</span><span class="error">c</span><span class="error">o</span><span class="error">n</span><span class="error">f</span><span class="error">i</span><span class="error">g</span><span class="error">)</span> {
-    <span class="error">c</span><span class="error">o</span><span class="error">n</span><span class="error">f</span><span class="error">i</span><span class="error">g</span><span class="error">.</span><span class="error">s</span><span class="error">e</span><span class="error">t</span><span class="error">(</span>{
-        <span class="error">b</span><span class="error">r</span><span class="error">o</span><span class="error">w</span><span class="error">s</span><span class="error">e</span><span class="error">r</span><span class="error">s</span>: [<span class="error">'</span><span class="error">C</span><span class="error">h</span><span class="error">r</span><span class="error">o</span><span class="error">m</span><span class="error">e</span><span class="error">H</span><span class="error">e</span><span class="error">a</span><span class="error">d</span><span class="error">l</span><span class="error">e</span><span class="error">s</span><span class="error">s</span><span class="error">'</span>],
-        <span class="error">/</span><span class="error">/</span> <span class="error">T</span><span class="error">h</span><span class="error">e</span> <span class="error">d</span><span class="error">i</span><span class="error">r</span><span class="error">e</span><span class="error">c</span><span class="error">t</span><span class="error">o</span><span class="error">r</span><span class="error">y</span> <span class="error">w</span><span class="error">h</span><span class="error">e</span><span class="error">r</span><span class="error">e</span> <span class="error">t</span><span class="error">h</span><span class="error">e</span> <span class="error">o</span><span class="error">u</span><span class="error">t</span><span class="error">p</span><span class="error">u</span><span class="error">t</span> <span class="error">f</span><span class="error">i</span><span class="error">l</span><span class="error">e</span> <span class="error">l</span><span class="error">i</span><span class="error">v</span><span class="error">e</span><span class="error">s</span>
-        <span class="error">b</span><span class="error">a</span><span class="error">s</span><span class="error">e</span><span class="error">P</span><span class="error">a</span><span class="error">t</span><span class="error">h</span>: <span class="error">'</span><span class="error">t</span><span class="error">a</span><span class="error">r</span><span class="error">g</span><span class="error">e</span><span class="error">t</span><span class="error">'</span>,
-        <span class="error">/</span><span class="error">/</span> <span class="error">T</span><span class="error">h</span><span class="error">e</span> <span class="error">f</span><span class="error">i</span><span class="error">l</span><span class="error">e</span> <span class="error">i</span><span class="error">t</span><span class="error">s</span><span class="error">e</span><span class="error">l</span><span class="error">f</span>
-        <span class="error">f</span><span class="error">i</span><span class="error">l</span><span class="error">e</span><span class="error">s</span>: [<span class="error">'</span><span class="error">c</span><span class="error">i</span><span class="error">.</span><span class="error">j</span><span class="error">s</span><span class="error">'</span>],
-        <span class="error">f</span><span class="error">r</span><span class="error">a</span><span class="error">m</span><span class="error">e</span><span class="error">w</span><span class="error">o</span><span class="error">r</span><span class="error">k</span><span class="error">s</span>: [<span class="error">'</span><span class="error">c</span><span class="error">l</span><span class="error">j</span><span class="error">s</span><span class="error">-</span><span class="error">t</span><span class="error">e</span><span class="error">s</span><span class="error">t</span><span class="error">'</span>],
-        <span class="error">p</span><span class="error">l</span><span class="error">u</span><span class="error">g</span><span class="error">i</span><span class="error">n</span><span class="error">s</span>: [<span class="error">'</span><span class="error">k</span><span class="error">a</span><span class="error">r</span><span class="error">m</span><span class="error">a</span><span class="error">-</span><span class="error">c</span><span class="error">l</span><span class="error">j</span><span class="error">s</span><span class="error">-</span><span class="error">t</span><span class="error">e</span><span class="error">s</span><span class="error">t</span><span class="error">'</span>, <span class="error">'</span><span class="error">k</span><span class="error">a</span><span class="error">r</span><span class="error">m</span><span class="error">a</span><span class="error">-</span><span class="error">c</span><span class="error">h</span><span class="error">r</span><span class="error">o</span><span class="error">m</span><span class="error">e</span><span class="error">-</span><span class="error">l</span><span class="error">a</span><span class="error">u</span><span class="error">n</span><span class="error">c</span><span class="error">h</span><span class="error">e</span><span class="error">r</span><span class="error">'</span>],
-        <span class="error">c</span><span class="error">o</span><span class="error">l</span><span class="error">o</span><span class="error">r</span><span class="error">s</span>: <span class="value">true</span>,
-        <span class="error">l</span><span class="error">o</span><span class="error">g</span><span class="error">L</span><span class="error">e</span><span class="error">v</span><span class="error">e</span><span class="error">l</span>: <span class="error">c</span><span class="error">o</span><span class="error">n</span><span class="error">f</span><span class="error">i</span><span class="error">g</span><span class="error">.</span><span class="error">L</span><span class="error">O</span><span class="error">G</span><span class="error">_</span><span class="error">I</span><span class="error">N</span><span class="error">F</span><span class="error">O</span>,
-        <span class="error">c</span><span class="error">l</span><span class="error">i</span><span class="error">e</span><span class="error">n</span><span class="error">t</span>: {
-            <span class="error">a</span><span class="error">r</span><span class="error">g</span><span class="error">s</span>: [<span class="string"><span class="delimiter">&quot;</span><span class="content">shadow.test.karma.init</span><span class="delimiter">&quot;</span></span>],
-            <span class="error">s</span><span class="error">i</span><span class="error">n</span><span class="error">g</span><span class="error">l</span><span class="error">e</span><span class="error">R</span><span class="error">u</span><span class="error">n</span>: <span class="value">true</span>
+<pre class="CodeRay highlight"><code data-lang="javascript">module.<span class="function">exports</span> = <span class="keyword">function</span> (config) {
+    config.set({
+        <span class="key">browsers</span>: [<span class="string"><span class="delimiter">'</span><span class="content">ChromeHeadless</span><span class="delimiter">'</span></span>],
+        <span class="comment">// The directory where the output file lives</span>
+        <span class="key">basePath</span>: <span class="string"><span class="delimiter">'</span><span class="content">target</span><span class="delimiter">'</span></span>,
+        <span class="comment">// The file itself</span>
+        <span class="key">files</span>: [<span class="string"><span class="delimiter">'</span><span class="content">ci.js</span><span class="delimiter">'</span></span>],
+        <span class="key">frameworks</span>: [<span class="string"><span class="delimiter">'</span><span class="content">cljs-test</span><span class="delimiter">'</span></span>],
+        <span class="key">plugins</span>: [<span class="string"><span class="delimiter">'</span><span class="content">karma-cljs-test</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">karma-chrome-launcher</span><span class="delimiter">'</span></span>],
+        <span class="key">colors</span>: <span class="predefined-constant">true</span>,
+        <span class="key">logLevel</span>: config.LOG_INFO,
+        <span class="key">client</span>: {
+            <span class="key">args</span>: [<span class="string"><span class="delimiter">&quot;</span><span class="content">shadow.test.karma.init</span><span class="delimiter">&quot;</span></span>],
+            <span class="key">singleRun</span>: <span class="predefined-constant">true</span>
         }
-    }<span class="error">)</span>
-}<span class="error">;</span></code></pre>
+    })
+};</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2842,14 +2990,14 @@ something like this is your <code>package.json</code>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">$ shadow-cljs <span class="keyword">compile</span> ci
+<pre class="CodeRay highlight"><code data-lang="bash">$ shadow-cljs compile ci
 $ karma start --single-run
-<span class="integer">12</span> <span class="integer">01</span> <span class="integer">2018</span> <span class="integer">01</span><span class="error">:</span><span class="integer">19</span><span class="error">:</span><span class="float">24.222</span><span class="symbol">:INFO</span> [karma]<span class="error">:</span> Karma v2.<span class="float">0.0</span> server started at http<span class="symbol">://0.</span><span class="float">0.0</span><span class="keyword">.</span><span class="integer">0</span><span class="error">:</span><span class="integer">9876</span><span class="keyword">/</span>
-<span class="integer">12</span> <span class="integer">01</span> <span class="integer">2018</span> <span class="integer">01</span><span class="error">:</span><span class="integer">19</span><span class="error">:</span><span class="float">24.224</span><span class="symbol">:INFO</span> [launcher]<span class="error">:</span> Launching browser ChromeHeadless with unlimited concurrency
-<span class="integer">12</span> <span class="integer">01</span> <span class="integer">2018</span> <span class="integer">01</span><span class="error">:</span><span class="integer">19</span><span class="error">:</span><span class="float">24.231</span><span class="symbol">:INFO</span> [launcher]<span class="error">:</span> Starting browser ChromeHeadless
-<span class="integer">12</span> <span class="integer">01</span> <span class="integer">2018</span> <span class="integer">01</span><span class="error">:</span><span class="integer">19</span><span class="error">:</span><span class="float">24.478</span><span class="symbol">:INFO</span> [HeadlessChrome <span class="float">0.0</span><span class="keyword">.</span><span class="integer">0</span> (Mac OS X <span class="float">10.12</span><span class="keyword">.</span><span class="integer">6</span>)]<span class="error">:</span> Connected on socket TcfrjxVKmx7xN6enAAAA with id <span class="integer">85554456</span>
-LOG<span class="error">:</span> 'Testing boo.sample-spec'
-HeadlessChrome <span class="float">0.0</span><span class="keyword">.</span><span class="integer">0</span> (Mac OS X <span class="float">10.12</span><span class="keyword">.</span><span class="integer">6</span>)<span class="error">:</span> Executed <span class="integer">1</span> of <span class="integer">1</span> SUCCESS (<span class="float">0.007</span> secs <span class="keyword">/</span> <span class="float">0.002</span> secs)</code></pre>
+12 01 2018 01:19:24.222:INFO [karma]: Karma v2.0.0 server started at http://0.0.0.0:9876/
+12 01 2018 01:19:24.224:INFO [launcher]: Launching browser ChromeHeadless with unlimited concurrency
+12 01 2018 01:19:24.231:INFO [launcher]: Starting browser ChromeHeadless
+12 01 2018 01:19:24.478:INFO [HeadlessChrome 0.0.0 (Mac OS X 10.12.6)]: Connected on socket TcfrjxVKmx7xN6enAAAA with id 85554456
+LOG: 'Testing boo.sample-spec'
+HeadlessChrome 0.0.0 (Mac OS X 10.12.6): Executed 1 of 1 SUCCESS (0.007 secs / 0.002 secs)</code></pre>
 </div>
 </div>
 </div>
@@ -2857,145 +3005,7 @@ HeadlessChrome <span class="float">0.0</span><span class="keyword">.</span><span
 </div>
 </div>
 <div class="sect1">
-<h2 id="_embedding_in_the_js_ecosystem_the_code_node_module_code_target"><a class="anchor" href="#_embedding_in_the_js_ecosystem_the_code_node_module_code_target"></a><a class="link" href="#_embedding_in_the_js_ecosystem_the_code_node_module_code_target">8. Embedding in the JS Ecosystem&#8201;&#8212;&#8201;The <code>:node-module</code> Target</a></h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>There is an additional target that is intended to help you use <code>shadow-cljs</code> as <strong>part</strong> of
-a project and provide seamless integration with existing JS tools (eg. webpack, browserify, babel,
-create-react-app, &#8230;&#8203;) with as little configuration as possible.</p>
-</div>
-<div class="paragraph">
-<p>It can be configured like other targets, but since it is meant to work in the JS ecosystem it
-comes with a convenience mode that makes such integration easier.</p>
-</div>
-<div class="sect2">
-<h3 id="_convenience_mode"><a class="anchor" href="#_convenience_mode"></a><a class="link" href="#_convenience_mode">8.1. Convenience Mode</a></h3>
-<div class="paragraph">
-<p>This target is meant to be as easy to access as possible, and does not actually require a specific
-build in the config. You still need a non-empty config file, but the default one from
-<code>shadow-cljs init</code> will do.</p>
-</div>
-<div class="paragraph">
-<p>ClojureScript organizes files into namespaces which means that a <code>demo.foo</code> namespace should be inside a
-<code>src/demo/foo.cljs</code> file. Where <code>src</code> is the default source path the shadow-cljs tool (see <a href="#CommonConfig">main configuration</a>).</p>
-</div>
-<div class="paragraph">
-<p>If you have this file in <code>src/demo</code>:</p>
-</div>
-<div class="listingblock">
-<div class="title">Sample source for <code>foo.cljs</code></div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">demo.foo</span>)
-
-(<span class="keyword">defn</span> <span class="function">hello</span> [who]
-  (<span class="keyword">str</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Hello, </span><span class="delimiter">&quot;</span></span> who <span class="string"><span class="delimiter">&quot;</span><span class="content">!</span><span class="delimiter">&quot;</span></span>))</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>you can compile it (and any others) via:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">$ shadow-cljs compile npm
-[:npm] Build completed. (16 files, 5 compiled, 0 warnings, 7.91s)</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The generated exports will be named <code>shadow-cljs/</code> with the CLJS namespace.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="js"><span class="predefined">$</span> node
-&gt; <span class="keyword">var</span> x = require(<span class="string"><span class="delimiter">&quot;</span><span class="content">shadow-cljs/demo.foo</span><span class="delimiter">&quot;</span></span>);
-<span class="predefined-constant">undefined</span>
-&gt; x.hello(<span class="string"><span class="delimiter">&quot;</span><span class="content">JS</span><span class="delimiter">&quot;</span></span>)
-<span class="string"><span class="delimiter">'</span><span class="content">Hello, JS!</span><span class="delimiter">'</span></span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Watching with incremental compile is as simple as running <code>shadow-cljs watch npm</code>.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_explicit_configuration"><a class="anchor" href="#_explicit_configuration"></a><a class="link" href="#_explicit_configuration">8.2. Explicit Configuration</a></h3>
-<div class="paragraph">
-<p>You can also treat <code>:npm-module</code> on the same footing with your other builds: give it explicit
-configuration. This allows you to also customize the code generation options. Of course
-you will configure the <a href="#CommonConfig">main configuration</a> as in all targets. The target-specific
-options are:</p>
-</div>
-<div class="hdlist">
-<table>
-<tr>
-<td class="hdlist1">
-<code>:target</code>
-</td>
-<td class="hdlist2">
-<p>Use :node-module</p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
-<code>:entries</code>
-</td>
-<td class="hdlist2">
-<p>(optinal) A vector of namespaces to include. Everything from these will be included.
-Defaults to everything it can find.</p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
-<code>:output-dir</code>
-</td>
-<td class="hdlist2">
-<p>(optional). The path for supporting files in development mode. Defaults to
-<code>node_modules/shadow-cljs</code>.</p>
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>The <code>:entries</code> setting can be used to limit what things get included, and the <code>:output-dir</code> is
-particularly useful for naming the directory in <code>node_modules</code> so that you can
-customize what name you use with <code>require</code>.</p>
-</div>
-<div class="paragraph">
-<p>Each entry will still result in a file with that namespace name in the specified output directory.</p>
-</div>
-<div class="paragraph">
-<p>Of course all of this is generated with standard Node conventions.</p>
-</div>
-<div class="paragraph">
-<p>If you plan to distribute code on NPM, then you may want to use the
-<a href="#NodeLibrary"><code>:node-library</code> target</a> instead since it allows for a finer level of control
-over exports and optimization.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_working_with_optimizations"><a class="anchor" href="#_working_with_optimizations"></a><a class="link" href="#_working_with_optimizations">8.3. Working with Optimizations</a></h3>
-<div class="paragraph">
-<p>Unlike the <code>:node-library</code> target, the module target does not know what you want to call the
-symbols you&#8217;re exporting, so it just exports them as-is. If you use advanced compilation, then everything
-will get a minified munged name!</p>
-</div>
-<div class="paragraph">
-<p>This is easy to remedy, simply add <code>:export</code> metadata on any symbols that you want to preserve:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">def</span> ^<span class="symbol">:export</span> my-constant <span class="float">5.662</span>)
-(<span class="keyword">defn</span> ^<span class="symbol">:export</span> my-function [] <span class="keyword">..</span><span class="keyword">.</span>)</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This is a standard annotation that is understood by ClojureScript and prevents Google Closure from
-renaming an artifact.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_generating_production_code_all_targets"><a class="anchor" href="#_generating_production_code_all_targets"></a><a class="link" href="#_generating_production_code_all_targets">9. Generating Production Code&#8201;&#8212;&#8201;All Targets</a></h2>
+<h2 id="_generating_production_code_all_targets"><a class="anchor" href="#_generating_production_code_all_targets"></a><a class="link" href="#_generating_production_code_all_targets">11. Generating Production Code&#8201;&#8212;&#8201;All Targets</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Development mode always outputs individual files for each namespace so that they can be hot loaded
@@ -3014,7 +3024,7 @@ may use <a href="#NameHashing">filename hashing</a> to improve caching character
 </div>
 </div>
 <div class="sect2">
-<h3 id="Optimization"><a class="anchor" href="#Optimization"></a><a class="link" href="#Optimization">9.1. Optimizations</a></h3>
+<h3 id="Optimization"><a class="anchor" href="#Optimization"></a><a class="link" href="#Optimization">11.1. Optimizations</a></h3>
 <div class="paragraph">
 <p>You can choose the optimization level using the <code>:compiler-options</code> section of the configuration:</p>
 </div>
@@ -3033,7 +3043,7 @@ for more information on available optimization levels.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_release_specific_vs_development_configuration"><a class="anchor" href="#_release_specific_vs_development_configuration"></a><a class="link" href="#_release_specific_vs_development_configuration">9.2. Release-Specific vs. Development Configuration</a></h3>
+<h3 id="_release_specific_vs_development_configuration"><a class="anchor" href="#_release_specific_vs_development_configuration"></a><a class="link" href="#_release_specific_vs_development_configuration">11.2. Release-Specific vs. Development Configuration</a></h3>
 <div class="paragraph">
 <p>If you wish to have separate configuration values in a build when running a release build then you
 can override settings by including a <code>:dev</code> and/or <code>:release</code> section in the build section:</p>
@@ -3060,7 +3070,7 @@ can override settings by including a <code>:dev</code> and/or <code>:release</co
 </div>
 </div>
 <div class="sect1">
-<h2 id="_custom_targets"><a class="anchor" href="#_custom_targets"></a><a class="link" href="#_custom_targets">10. Custom Targets</a></h2>
+<h2 id="_custom_targets"><a class="anchor" href="#_custom_targets"></a><a class="link" href="#_custom_targets">12. Custom Targets</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>You might have guess that with so many targets the ecosystem probably allows easy extension.
@@ -3103,7 +3113,7 @@ state) and must return it after doing its work. This function is called once for
 In this case :target <code>build/custom</code>. The namespace is up to you.</p>
 </div>
 <div class="sect2">
-<h3 id="_example"><a class="anchor" href="#_example"></a><a class="link" href="#_example">10.1. Example</a></h3>
+<h3 id="_example"><a class="anchor" href="#_example"></a><a class="link" href="#_example">12.1. Example</a></h3>
 <div class="paragraph">
 <p>If your <code>:source-path</code> is <code>["src"]</code> then create a <code>src/build.clj</code>:</p>
 </div>
@@ -3129,7 +3139,7 @@ dev build.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_compilation_stages"><a class="anchor" href="#_compilation_stages"></a><a class="link" href="#_compilation_stages">10.2. Compilation Stages</a></h3>
+<h3 id="_compilation_stages"><a class="anchor" href="#_compilation_stages"></a><a class="link" href="#_compilation_stages">12.2. Compilation Stages</a></h3>
 <div class="paragraph">
 <p>The stages are:</p>
 </div>
@@ -3149,10 +3159,10 @@ again (in order) when autobuild is active and files are re-compiled on change.</
 </div>
 </div>
 <div class="sect1">
-<h2 id="_editor_ide_repl_setup"><a class="anchor" href="#_editor_ide_repl_setup"></a><a class="link" href="#_editor_ide_repl_setup">11. Editor/IDE/REPL Setup</a></h2>
+<h2 id="_editor_ide_repl_setup"><a class="anchor" href="#_editor_ide_repl_setup"></a><a class="link" href="#_editor_ide_repl_setup">13. Editor/IDE/REPL Setup</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_repl"><a class="anchor" href="#_repl"></a><a class="link" href="#_repl">11.1. REPL</a></h3>
+<h3 id="_repl"><a class="anchor" href="#_repl"></a><a class="link" href="#_repl">13.1. REPL</a></h3>
 <div class="paragraph">
 <p>You can use the command-line utility to connect to a REPL simply by using a running build ID:</p>
 </div>
@@ -3170,7 +3180,7 @@ again (in order) when autobuild is active and files are re-compiled on change.</
 </div>
 </div>
 <div class="sect2">
-<h3 id="_cursive"><a class="anchor" href="#_cursive"></a><a class="link" href="#_cursive">11.2. Cursive</a></h3>
+<h3 id="_cursive"><a class="anchor" href="#_cursive"></a><a class="link" href="#_cursive">13.2. Cursive</a></h3>
 <div class="paragraph">
 <p>If you&#8217;re a Cursive user then you currently need at least a dummy <code>project.clj</code> file. You may also wish to
 read the</p>
@@ -3193,7 +3203,7 @@ read the</p>
 <a href="#Leiningen">Leiningen integration</a>.</p>
 </div>
 <div class="sect3">
-<h4 id="_cursive_repl_integration"><a class="anchor" href="#_cursive_repl_integration"></a><a class="link" href="#_cursive_repl_integration">11.2.1. Cursive REPL Integration</a></h4>
+<h4 id="_cursive_repl_integration"><a class="anchor" href="#_cursive_repl_integration"></a><a class="link" href="#_cursive_repl_integration">13.2.1. Cursive REPL Integration</a></h4>
 <div class="paragraph">
 <p>An <a href="#nREPL">nREPL</a> is created by <code>shadow-cljs</code> when it is in development mode. You can connect to it to get
 REPL integration using a Clojure Remote REPL run configuration.</p>
@@ -3262,7 +3272,7 @@ standard nrepl port:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_cider"><a class="anchor" href="#_cider"></a><a class="link" href="#_cider">11.3. CIDER</a></h3>
+<h3 id="_cider"><a class="anchor" href="#_cider"></a><a class="link" href="#_cider">13.3. CIDER</a></h3>
 <div class="paragraph">
 <p>CIDER support requires the simple combination of having the <code>cider-nrepl</code> dependency on your
 classpath and configuring nREPL. The entries to <code>shadow-cljs.edn</code> are simply:</p>
@@ -3319,7 +3329,7 @@ on your classpath, i.e. in your dependencies.
 </div>
 </div>
 <div class="sect1">
-<h2 id="_what_to_do_when_things_don_t_work"><a class="anchor" href="#_what_to_do_when_things_don_t_work"></a><a class="link" href="#_what_to_do_when_things_don_t_work">12. What to do when things don’t work?</a></h2>
+<h2 id="_what_to_do_when_things_don_t_work"><a class="anchor" href="#_what_to_do_when_things_don_t_work"></a><a class="link" href="#_what_to_do_when_things_don_t_work">14. What to do when things don’t work?</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Since the JS world is still evolving rapidly and not everyone is using the same way to write and
@@ -3333,10 +3343,10 @@ can usually be solved with custom <code>:resolve</code> configs, but there may a
 </div>
 </div>
 <div class="sect1">
-<h2 id="_hacking"><a class="anchor" href="#_hacking"></a><a class="link" href="#_hacking">13. Hacking</a></h2>
+<h2 id="_hacking"><a class="anchor" href="#_hacking"></a><a class="link" href="#_hacking">15. Hacking</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_patching_libraries"><a class="anchor" href="#_patching_libraries"></a><a class="link" href="#_patching_libraries">13.1. Patching Libraries</a></h3>
+<h3 id="_patching_libraries"><a class="anchor" href="#_patching_libraries"></a><a class="link" href="#_patching_libraries">15.1. Patching Libraries</a></h3>
 <div class="paragraph">
 <p>The shadow-cljs compiler ensure that things on your source paths are
 compiled last. Things from JAR files go first. This means that
@@ -3352,7 +3362,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-01-12 21:17:19 CET
+Last updated 2018-01-16 11:21:48 CET
 </div>
 </div>
 </body>

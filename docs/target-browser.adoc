@@ -1,0 +1,358 @@
+There are a few targets that target web browsers in various ways, and since the targets are pluggable
+it is easy to imagine additional targets for specific scenarios. This chapter concentrates on the
+most commonly-used `:browser` target, but many of the configuration options may apply to other
+browser-related targets.
+
+A basic browser configuration looks like this:
+
+```
+{:dependencies [...]
+ :source-paths [...]
+
+ :builds
+ {:app {:target :browser
+        :output-dir "public/assets/app/js"
+        :asset-path "/assets/app/js"
+        :modules {:main {:entries [my.app]}}}]}
+```
+
+== Output Settings
+
+The browser target outputs a lot of files, and a directory is needed for them all. You'll need to serve
+these assets with some kind of server, and the Javascript loading code needs to know the server-centric
+path to these assets. The options you need to specify are:
+
+[Horizontal]
+`:output-dir`:: The directory to use for all js output.
+`:asset-path`:: The relative path from *web server's root* to the resources in `:output-dir`.
+
+Your entry point javascript file and all related js files will appear in `:output-dir`.
+
+WARNING: Each build requires its own :output-dir, you may not put multiple builds into the same directory.
+This directory should also be exclusively owned by the build. There should be no other files in there.
+While `shadow-cljs` won't delete anything it is safer to leave it alone. Compilation
+creates many more files than just the main entry point javascript file during development:
+source maps, original sources, and generated sources.
+
+The `:asset-path` is a prefix that gets added to the paths of module loading code inside of the
+generated javascript. It allows you to output your javascript module to a particular subdirectory
+of your web server's root. The dynamic loading during development (hot code reload) and production
+(code splitting) need this to correctly locate files.
+
+Locating your generated files in a directory and asset path like this make it so that other assets
+(images, css, etc.) can easily co-exist on the same server without accidental collisions.
+
+For example: if your web server will serve the folder `public/x` when asked for the URI `/x`,
+and your `output-dir` for a module is `public/assets/app/js` then your asset-path should be `/assets/app/js`.
+You are not required to use an absolute asset path, but it is highly recommended.
+
+== Modules
+
+The `modules` section of the config is always a map keyed by module ID. The module ID is also used
+to generate the Javascript filename. This is so the module loading code can easily find the correct file
+without additional configuration.
+
+All projects will have one or more modules. If you're doing code splitting, then you will have more than one.
+If you're not <<CodeSpliting,code splitting>> then you'll typically have just have one.
+
+NOTE: It's perfectly
+fine for a module's `:entries` to contain as many "entry points", "mini apps", or global functions as you care
+to put in it, so you do *not* need separate modules to do that.
+
+The available options in a module are:
+
+[horizontal]
+`:entries`:: The namespaces that serve as the root nodes of the dependency graph for the output code of this module.
+`:depends-on`:: The names of other modules that must be loaded in order for this one to have everything it needs.
+`:prepend`:: String content that will be prepended to the js output. Useful for comments, copyright notice, etc.
+`:append`:: String content that will be appended to the js output. Useful for comments, copyright notice, etc.
+`:prepend-js`:: A string to prepend to the module output containing valid javascript that will be run through Closure optimizer.
+`:append-js`:: A string to append to the module output containing valid javascript that will be run through Closure optimizer.
+
+The following example shows a minimum module configuration:
+
+```
+{...
+ :builds
+ {:app {...
+        :modules {:main {:entries [my.app.main]}}}}}
+```
+
+`shadow-cljs` will follow the dependency graph from the root set of code entry points in the `:entries`
+to find everything needed to actually run.
+
+
+== Web Workers
+
+The `:modules` configuration may also be used to generate files intended to be used as a Web Workers.
+You may declare any module (except the default) as a Web Worker by setting `:web-worker true`. The
+generated file will contain some additional bootstrap code which will load its dependencies
+automatically. The way `:modules` work also ensures that code used only by the worker will also only
+be in the final file for the worker. Each worker should have a dedicated CLJS namespace.
+
+.An example of generating a web worker script
+```
+{...
+ :builds
+   {:app
+    {:target :browser
+     ...
+     :modules {:main   {:entries [my.app]}
+               :extra  {:entries [my.app.extra]
+                        :depends-on #{:main}}
+               :worker {:entries [my.app.worker]
+                        :depends-on #{:main}
+                        :web-worker true}}}}}
+```
+
+The above configuration will generate `worker.js` which you can use to start the Web Worker.
+It will have all code from the `:main` module available (but not `:extra`). The code in the
+`my.app.worker` namespace will only ever execute in the worker. Worker generation happens in
+both development and release modes.
+
+NOTE: Hot code reload does not support reloading code in the worker while it is running.
+I suggest shutting down all workers using the `:devtools :before-load` function and restarting it
+in the `:after-load`.
+
+== Code Splitting [[CodeSplitting]]
+
+You've already seen how to configure your main module. Adding additional modules requires a little
+bit of care, but the technical details are simple:
+
+. Ensure you don't require things you don't use in any namespace.
+. Put the top-level namespace(s) for each module into a module config.
+. Choose you dynamic loading API
+
+=== Using shadow-cljs's built-in Loader Support
+
+The compiler supports generating the required data for `goog.module.ModuleManager` to work.
+It exposes a simple interface to let you load modules on-demand at runtime.
+
+You only need to add `:module-loader true` to your build config. The loader will
+always be injected into the default module (the one everything else depends on).
+
+At runtime you may use the `shadow.loader` namespace to load modules. You may also load a
+module eagerly by just using a `<script>` tag in your page.
+
+```
+{...
+ :builds
+   {:app
+     {:target :browser
+      ...
+      :module-loader true
+      :modules {:main  {:entries [my.app]}
+                :extra {:entries [my.app.extra]
+                        :depends-on #{:main}}}}}}
+```
+
+If you had the following for your main entry point:
+
+```
+(ns my.app
+  (:require [shadow.loader :as loader]))
+
+(defn fn-to-call-on-load []
+  (js/console.log "extra loaded"))
+
+(defn fn-to-call-on-error []
+  (js/console.log "extra load failed"))
+```
+
+Then the following expressions can be used for loading code:
+
+.Loading a module
+```
+;; load returns a goog.async.Deferred, and can be used like a promise
+(-> (loader/load "extra")
+    (.then fn-to-call-on-load fn-to-call-on-error))
+```
+
+.Loading many modules
+```
+;; must be a JS array, also returns goog.async.Deferred
+(loader/load-many #js ["foo" "bar"])
+```
+
+.Including a callback
+```
+(loader/with-module "extra" fn-to-call-on-load)
+```
+
+You can check if a module is loaded using `(loaded? "module-name")`.
+
+==== Loader Costs
+
+Using the loader is very lightweight. It has a few dependencies which you may not be otherwise using.
+In practice using `:module-loader true` adds about 8KB gzip'd
+to the default module. This will vary depending on how much of `goog.net` and `goog.events`
+you are already using, and what level of optimization you use for your release builds.
+
+=== Using the Standard ClojureScript API
+
+The generated code is capable of using the standard ClojureScript `cljs.loader` API. See the
+https://clojurescript.org/news/2017-07-10-code-splitting[documentation] on the ClojureScript
+website for instructions.
+
+The advantage of using the standard API is that your code will play well with others. This
+may be of particular importance to library authors. The disadvantage is that the dynamic module
+loading API in the standard distribution is currently somewhat less easy-to-use than the
+support in `shadow-cljs`.
+
+== Cacheable Output [[NameHashing]]
+
+In a web setting it is desirable to cache `.js` files for a very long time to avoid extra request. It is common
+practice the generate a unique name for the `.js` file for every released version. This changes the URL used to
+access it and thereby is safe to cache forever.
+
+You can add `:module-hash-names true` to your build config to automatically create a MD5
+signature for each generated output module file. That means that a `:main` module will generate
+a `main.<md5hash>.js` instead of just the default `main.js`.
+
+`:module-hash-names true` will include the full 32-length md5 hash, if you prefer a shorter version you can specify a
+number between 1-32 instead (eg. `:module-hash-names 8`). Be aware that shortening the hash may increase the chances
+of generating conflicts. I recommend using the full hash.
+
+.Example :module-hash-names config
+```
+{...
+ :builds
+   {:app
+     {:target :browser
+      ...
+      :output-dir "public/js"
+      :asset-path "/js"
+      :module-hash-names true
+      :modules {:main  {:entries [my.app]}
+                :extra {:entries [my.app.extra]
+                        :depends-on #{:main}}}}}}
+```
+
+Instead of generating `main.js` it will now generate `main.<hash>.js` in the `:output-dir`.
+
+Since the filename can change with every release it gets a little bit more complicated to include them
+in your HTML. The <<BrowserManifest, Output Manifest>> can help with that.
+
+=== Output Manifest [[BrowserManifest]]
+
+`shadow-cljs` generates a `manifest.edn` file in the configured `:output-dir`.
+This file contains a description of the module config together with an extra `:output-name` property which
+maps the original module name to the hashed name.
+
+.Sample output of manifest.edn when using hashed filenames.
+```
+[{:module-id :common,
+  :name :common,
+  :output-name "common.15D142F7841E2838B46283EA558634EE.js",
+  :entries [...],
+  :depends-on #{},
+  :sources [...]}
+ {:module-id :page-a,
+  :name :page-a,
+  :output-name "page-a.D8844E305644135CBD5CBCF7E359168A.js",
+  :entries [...],
+  :depends-on #{:common},
+  :sources [...]}
+ ...]
+```
+
+The manifest contains all `:modules` sorted in dependency order. You can use it to map the `:module-id` back to the
+actual generated filename.
+
+Development builds also produce this file and you may check if for modifications to
+know when a new build completed. `:module-hash-names` does not apply during development so you'll get the usual
+filenames.
+
+You can configure the name of the generated manifest file via the `:build-options :manifest-name` entry. It defaults to
+`manifest.edn`. If you configure a filename with `.json` ending the output will be JSON instead of EDN. The file will
+be relative to the configured `:output-dir`.
+
+.Example manifest.json config
+```
+{...
+ :builds
+   {:app
+     {:target :browser
+      ...
+      :build-options {:manifest-name "manifest.json"}
+      :modules {:main  {:entries [my.app]}
+                :extra {:entries [my.app.extra]
+                        :depends-on #{:main}}}}}}
+```
+
+== Development Support
+
+The `:devtools` section of the configuration for `:browser` supports a few additional
+options for configuring an optional dev-time HTTP server for a build and CSS reloading.
+
+=== HTTP Server
+
+The server supports the following options:
+
+[Horizontal]
+`:http-root`:: The disk path from which to serve root filesystem requests. If not supplied,
+no disk files are served.
+`:http-port`:: The port to serve from.
+`:http-host`:: The hostname to listen on. Defaults to localhost).
+`:http-resource-root`:: A path relative to classpath from which resources can be served.
+If not supplied, no resources are served.
+`:http-handler`:: A namespace (as a symbol). A `(fn [req] resp)` that is used
+if a resource is not found for the given request. Defaults to a not-found handler.
+
+
+==== HTTP and URI-based Routing (Push state)
+
+If your browser application uses browser push state then you will typically want
+the server to respond with `index.html` instead of "Not Found" on URIs that have no
+real resource (so you can just hit browser reload on your SPA even on odd URIs).
+
+There is a built-in handler that you can add for this:
+
+```
+{...
+    {:builds
+      {:app { ...
+              :devtools { :http-handler shadow.http.push-state/handle }}}}
+```
+
+It supports two additional options (in the `devtools` section):
+
+[horizontal]
+`:push-state/headers`:: (optional) A map of HTTP headers to respond with. Defaults to `text/html` standard headers.
+`:push-state/index`:: (optional) The file to serve. Defaults to `index.html`.
+
+=== CSS Reloading
+
+The Browser devtools can also reload CSS for you. This is enabled by default and in most cases requires no additional
+configuration when you are using the built-in HTTP dev server.
+
+The server will watch the configured `:http-root` and notify the client about file updates. If a `.css` file is linked
+with an absolute path it will be reloaded on change. Relative paths are currently not supported.
+
+.Example HTML snippet
+```html
+<link rel="stylesheet" href="/css/main.css"/>
+```
+
+.Example Hiccup since we aren't savages
+```
+[:link {:rel "stylesheet" :href "/css/main.css"}]
+```
+
+This will cause an update if the file `<:http-root>/css/main.css` is changed.
+
+`shadow-cljs` currently provides no support for directly compiling CSS but the usual tools will work and should
+be run separately. Just make sure the output is generated into the correct places.
+
+When you are not using the built-in HTTP Server you can specify `:watch-dir` instead which should be a path to the
+document root used to serve your content.
+
+.Example :watch-dir config
+```
+{...
+    {:builds
+      {:app {...
+             :devtools {:watch-dir "public"}}}}
+```
+
+

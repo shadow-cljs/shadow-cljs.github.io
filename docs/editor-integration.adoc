@@ -1,0 +1,112 @@
+== REPL
+
+You can use the command-line utility to connect to a REPL simply by using a running build ID:
+
+.Browser REPL
+```
+shadow-cljs cljs-repl app
+```
+
+.Node REPL
+```
+shadow-cljs node-repl
+```
+
+== Cursive
+
+If you're a Cursive user then you currently need at least a dummy `project.clj` file. You may also wish to
+read the
+
+```
+(defproject your/project "0.0.0"
+  :dependencies
+  [[thheller/shadow-cljs "1.0.20170629"]]
+
+  :source-paths
+  ["src"])
+```
+
+This will allow Cursive to detect the proper source paths for the project.
+
+If you want the full Cursive experience including proper code navigation then you want to use full
+<<Leiningen, Leiningen integration>>.
+
+=== Cursive REPL Integration
+
+An <<nREPL>> is created by `shadow-cljs` when it is in development mode. You can connect to it to get
+REPL integration using a Clojure Remote REPL run configuration.
+
+By default the network port number is random, but that will be a major pain. You have
+two choices:
+
+. Configure the nREPL port
+. Use a symlink to get the port into the standard location.
+
+Option 1 is nice because it doesn't require any filesystem interactions:
+
+.NREPL in shadow-cljs.edn
+```
+{:nrepl {:port 9000}}
+```
+
+Option 2 is simple, but involves using the standard nREPL port file, which you may need for other
+network REPLs like your server. The port for the `shadow-cljs` REPL is written out to
+`target/shadow-cljs/nrepl.port`, so simply symbolically link this file to the standard
+`~/.nrepl-port`:
+
+.Using a symbolic link for REPL port
+```
+ln -sv target/shadow-cljs/nrepl.port .nrepl-port
+```
+
+Once you've chosen your option for tracking the port, you can add a run configuration via
+`Run -> Edit Configurations...`:
+
+.Clicking on the `+` icon will add a new run configuration.
+image::cursive-repl-1.png[]
+
+.Choose a Clojure Remote REPL
+image::cursive-repl-2.png[]
+
+In the last step either type in the port you've set in your config, or choose to use the
+standard nrepl port:
+
+.If you're using `.nrepl-port`, then configure as shown. If you configured the port number in `shadow-cljs.edn` then use `localhost` and the configured port number.
+image::cursive-repl-3.png[]
+
+== CIDER
+
+CIDER support requires the simple combination of having the `cider-nrepl` dependency on your
+classpath and configuring nREPL. The entries to `shadow-cljs.edn` are simply:
+
+```
+{:dependencies [[cider/cider-nrepl "0.16.0"]]
+ :nrepl {:port 8202}
+
+ ...
+}
+```
+
+then invoke the `cider-connect` function from emacs.
+
+When you connect to the nREPL it will start out in CLJ mode. If you select a running build it should
+switch the nREPL session to CLJS.
+
+Internally, it does this either by calling a fake piggieback function or the "official" API:
+
+```
+(cemerick.piggieback/cljs-repl :id-of-build)
+;; or
+(shadow.cljs.devtools.api/nrepl-select :id-of-build)
+```
+
+Once connected you should be able to eval code using `C-c C-c` (eval a block), `C-x C-e` (eval sexp),
+or `C-c C-k` (eval buffer).
+
+If you see an error like "`cider-load-buffer' needs a ClojureScript REPL", you need to hit
+enter once in the repl buffer. Emacs should then recognize that you have a cljs repl buffer and
+evals should start working.
+
+NOTE: `shadow-cljs` will automatically add the required `cider-nrepl` middleware when it finds `cider.nrepl`
+on your classpath, i.e. in your dependencies.
+

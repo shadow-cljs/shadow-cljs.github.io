@@ -1,0 +1,54 @@
+This target is meant for gathering up namespaces that contain tests (based on a filename pattern match),
+and triggering a test runner. It contains a built-in runner that will automatically scan for `cljs.test`
+tests and run them.
+
+The relevant configuration options are:
+
+[horizontal]
+`:target`::    `:browser-test`
+`:test-dir`::  A folder in which to output files. See below.
+`:ns-regexp`:: (optional) A regular expression matching namespaces against project files. This only scans files, and
+will not scan jars. Defaults to "-test$".
+`:runner-ns`:: (optional) A namespace that can contain a start, stop, and init function. Defaults to
+`shadow.test.browser`.
+
+The normal `:devtools` options are supported, so you will usually create an http server to serve the files.
+In general you will need a config that looks like this:
+
+```
+{...
+ :builds {:test     {:target    :browser-test
+                     :test-dir  "resources/public/js/test"
+                     :ns-regexp "-spec$"
+                     :runner-ns tests.client-test-main
+                     :devtools  {:http-port          8021
+                                 :http-root          "resources/public/js/test"}}
+```
+
+Remember that the test directory will have the index.html, and a js folder.
+
+If you choose to supply a test main, it might look like this:
+
+```
+(ns tests.client-test-main)
+
+(defn start []
+  ... run the tests...)
+
+(defn stop [done]
+  ; tests can be async. You must call done so that the runner knows you actually finished
+  (done))
+
+(defn ^:export init []
+  (start))
+```
+
+=== Generated output in `:test-dir`
+
+The output includes two primary artifacts in your `test-dir` folder:
+
+* `index.html` - If and only if there was not already an `index.html` file present. By default the generated
+file loads the tests and runs `init` in the `:runner-ns`. You may edit or add a custom version that will
+not be overwritten.
+* `js/test.js` - The Javascript tests. The tests will always have this name. The entries for the module are
+auto-generated.

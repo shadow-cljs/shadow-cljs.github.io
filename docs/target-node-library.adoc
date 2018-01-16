@@ -1,0 +1,100 @@
+The `:target :node-library` emits code that can be used (via `require`) as a standard node library, and is
+useful for publishing your code for re-use as a compiled Javascript artifact.
+
+As with other modes the <<CommonConfig, main configuration options>> apply and must be set.
+The target-specific options are:
+
+[horizontal]
+`:target`:: Use :node-library
+`:output-to`:: (required). The path and filename for the generated library.
+`:exports`:: (required) Either a single namespace-qualified symbol or a map from keywords to namespace-qualified symbols.
+`:output-dir`:: (optional). The path for supporting files in development mode. Defaults to a cache directory.
+
+The hot code reload story is similar to <<NodeHotCodeReload, the script target>>, but may not work as well
+since it cannot as easily control all of the code that is loaded.
+
+=== Exports
+
+The `:exports` option deserves some specific examples. There are two possible ways to specify what should be exported:
+
+. Export a single artifact
+. Export any number of artifacts
+
+In the first case, you can use a single symbol:
+
+.Build configuration with a single export
+```
+{...
+ :builds {:lib {:exports demo.ns/f
+                ...}}}
+```
+
+and the resulting `require` in Node will give you *that* artifact:
+
+```bash
+$ node
+> var f = require('./lib.js');
+f(); // the object I get is exactly what I exported
+```
+
+In the second case you supply a map from keyword names to artifacts:
+
+.Build configuration with multiple exports
+```
+{...
+ :builds {:lib {:exports {:g       demo.ns/f
+                          :h       other.ns/thing
+                          :ns/ok?  another.ns/ok?}
+                ...}}}
+```
+
+The keyword is used as the name of the entry in the exported object. *No munging is done* to this keyword name
+(but namespaces are dropped). So, the above example maps cljs `f` to `g`, etc.:
+
+```bash
+$ node
+> var lib = require('./lib.js');
+lib.g(); // call demo-ns/f
+lib["ok?"](); // call another-ns/ok?
+```
+
+NOTE: The exports config automatically tracks exported symbols and passes them on to the optimization
+stage. This means that anything listed in `:exports` will not be renamed by Google Closure optimizations.
+
+=== Full Example
+
+The example below creates a `lib.js` file intended to be consumed via the normal Node `require` mechanism.
+
+```
+(ns demo.lib)
+
+(defn hello []
+  (prn "hello")
+  "hello")
+```
+
+The build configuration would be:
+
+```
+{...
+ :builds {:library {:target    :node-library
+                    :output-to "out/demo-library/lib.js"
+                    :exports   {:hello demo.lib/hello}}}}
+```
+
+and the runtime use is as you would expect:
+
+```
+$ cd out/demo-library
+$ node
+> var x = require('./lib');
+undefined
+> x.hello()
+hello
+'hello'
+```
+
+As :node-script this will only create the file specified in :output-to. The :exports map maps CLJS vars
+to the name they should be exported to.
+
+NOTE: Development mode has the <<NodeModes,same setup>> as for node scripts (extra dependencies).

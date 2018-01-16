@@ -1,0 +1,82 @@
+When you want to run your CLJS tests against a browser on some kind of CI server you'll need to
+be able to run the tests from a command line and get back a status code. Karma is a well-known
+and supported test runner that can do this for you, and `shadow-cljs` includes a target that
+can add the appropriate wrappers around your tests so the will work in it.
+
+=== Installing Karma
+
+See their http://karma-runner.github.io[website] for full instructions. You'll typically need
+something like this is your `package.json`:
+
+```json
+{
+  "name": "CITests",
+  "version": "1.0.0",
+  "description": "Testing",
+  ...
+  "devDependencies": {
+    "karma": "^2.0.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-cljs-test": "^0.1.0",
+    ...
+  },
+  "author": "",
+  "license": "MIT"
+}
+```
+
+So, you need Karma, a browser launcher, and the cljs-test integration.
+
+=== The Build
+
+The build options are:
+
+[horizontal]
+`:target`::     `:karma`
+`:output-to`::  A path/filename for the js file.
+`:ns-regexp`::  (optional) A regex to match the test namespaces, defaults to "-test$
+
+So you might have something like this:
+
+```
+{...
+ :builds {:ci-tests {:target     :karma
+                     :output-to  "target/ci.js"
+                     :ns-regexp  "-spec$"}
+```
+
+You also need a `karma.conf.js`:
+
+```javascript
+module.exports = function (config) {
+    config.set({
+        browsers: ['ChromeHeadless'],
+        // The directory where the output file lives
+        basePath: 'target',
+        // The file itself
+        files: ['ci.js'],
+        frameworks: ['cljs-test'],
+        plugins: ['karma-cljs-test', 'karma-chrome-launcher'],
+        colors: true,
+        logLevel: config.LOG_INFO,
+        client: {
+            args: ["shadow.test.karma.init"],
+            singleRun: true
+        }
+    })
+};
+```
+
+then you can run the tests as follows (assuming you've installed global executables of the tools):
+
+```bash
+$ shadow-cljs compile ci
+$ karma start --single-run
+12 01 2018 01:19:24.222:INFO [karma]: Karma v2.0.0 server started at http://0.0.0.0:9876/
+12 01 2018 01:19:24.224:INFO [launcher]: Launching browser ChromeHeadless with unlimited concurrency
+12 01 2018 01:19:24.231:INFO [launcher]: Starting browser ChromeHeadless
+12 01 2018 01:19:24.478:INFO [HeadlessChrome 0.0.0 (Mac OS X 10.12.6)]: Connected on socket TcfrjxVKmx7xN6enAAAA with id 85554456
+LOG: 'Testing boo.sample-spec'
+HeadlessChrome 0.0.0 (Mac OS X 10.12.6): Executed 1 of 1 SUCCESS (0.007 secs / 0.002 secs)
+```
+
