@@ -108,16 +108,14 @@ interest:
 
 Code examples may are similarly shortened.
 
+= Installation
 
-= Quick Start
-
-== Installing via `npm`
+== Standalone via `npm`
 
 You will need:
 
-* `npm` or `yarn`.
-* A `package.json` file describing your development dependencies.
-* (optional) A global install of the `shadow-cljs` CLI.
+- https://www.npmjs.com[`npm`] or https://www.yarnpkg.com[`yarn`].
+- Java Virtual Machine (Version 8). http://openjdk.java.net/install/[OpenJDK] or http://www.oracle.com/technetwork/java/javase/downloads/index.html[Oracle]
 
 .NPM
 ```bash
@@ -131,9 +129,19 @@ $ yarn add --dev shadow-cljs
 $ yarn global add shadow-cljs
 ```
 
-== Running `shadow-cljs`
+== Library
 
-If installed globally you can just invoke it directly
+Although it is recommended to run the standalone version via `npm` you can also embed `shadow-cljs` into any other Clojure JVM tool (eg. `lein`, `boot`, ...).
+
+The artifact can be found at:
+[link=https://clojars.org/thheller/shadow-cljs]
+image::https://camo.githubusercontent.com/f91298f67b2b1c7a75124738f669be1f6928e976/68747470733a2f2f696d672e736869656c64732e696f2f636c6f6a6172732f762f746868656c6c65722f736861646f772d636c6a732e737667[]
+
+= Usage
+
+== Command Line
+
+Once <<Installation, installed>> you can use the `shadow-cljs` command to use the tool.
 
 ```bash
 $ shadow-cljs help
@@ -152,11 +160,38 @@ $ yarn shadow-cljs help
 $ ./node_modules/.bin/shadow-cljs help
 ```
 
+.Commonly used shadow-cljs commands during development
+```bash
+# compile a build once and exit
+$ shadow-cljs compile app
+
+# compile and watch
+$ shadow-cljs watch app
+
+# connect to REPL for the build (available while watch is running)
+$ shadow-cljs cljs-repl app
+
+# connect to standalone node repl
+$ shadow-cljs node-repl
+```
+
+.Running a release build optimized for production use.
+```
+$ shadow-cljs release app
+```
+
+Sometimes you may run into some release issues due to `:advanced` compilation. These
+commands can help track down the causes.
+
+.Release debugging commands.
+```
+$ shadow-cljs check app
+$ shadow-cljs release app --debug
+```
+
 === Server Mode
 
-Starting a `shadow-cljs` command can be fairly slow to start. To improve this `shadow-cljs` can run in "server mode" which
-means that a dedicated process is started which all other commands can use to execute a lot faster since they won't have
-to start a new JVM/Clojure instance.
+Starting a `shadow-cljs` command can be fairly slow to start. To improve this `shadow-cljs` can run in "server mode" which means that a dedicated process is started which all other commands can use to execute a lot faster since they won't have to start a new JVM/Clojure instance.
 
 Commands that do long running things implicitly start a server instance (eg. `watch`) but it is often advisable to have
 a dedicated server process running.
@@ -192,19 +227,10 @@ in your `shadow-cljs.edn` file that causes it to derive `:source-paths` and `:de
  ; source-paths and dependencies are now ignored in this file, and come from project.clj instead
  :builds { ... }
 ```
-
-Remember that you don't need to split up your source paths for `shadow-cljs`. It can derive which files are needed
-from the namespace dependency graph and module settings.
-
 ==== Running Tasks Directly From Leiningen
 
 shadow-cljs is built as a Clojure library, which means you can use it directly from lein without
 installing the CLI command via npm.
-
-You only need to add `shadow-cljs` to your `project.clj` `:dependencies`.
-
-[link=https://clojars.org/thheller/shadow-cljs]
-image::https://camo.githubusercontent.com/f91298f67b2b1c7a75124738f669be1f6928e976/68747470733a2f2f696d672e736869656c64732e696f2f636c6f6a6172732f762f746868656c6c65722f736861646f772d636c6a732e737667[]
 
 The classpath of your project will be used to search for .cljs files. There is no
 other dedicated configuration for shadow-cljs in project.clj. If you have a dedicated
@@ -234,7 +260,6 @@ $ lein run -m shadow.cljs.devtools.cli compile build-id
 ```bash
 lein run -m shadow.cljs.devtools.cli release build-id
 ```
-
 ==== Full Integration
 
 The `shadow-cljs` command-line utility can also use `lein` to run your commands. You can enable this
@@ -274,7 +299,6 @@ It is possible to run `shadow-cljs` inside your JVM.
 (shadow.cljs.devtools.server/stop!)
 ```
 
-
 = Configuration
 
 `shadow-cljs` is configured by a `shadow-cljs.edn` file in your project root directory. You can
@@ -313,8 +337,6 @@ The file structure for this example should look like this:
         └── app.cljs
 ```
 
-== Dependencies
-
 == Source Paths
 
 `:source-paths` configures your JVM classpath. The compiler will use this config to find Clojure(Script) source files (eg. `.cljs`).
@@ -343,15 +365,38 @@ It is fine to put everything into one source path but you can use multiple if yo
 
 It is not recommended to separate source files by extension (eg. `src/clj`, `src/cljs`, `src/cljc`). For some reason this is widely used in CLJS project templates but it just makes things harder to use.
 
+== Dependencies
+
 === Clojure(Script)
 
 Your dependencies are managed via the `:dependencies` key at the root of the `shadow-cljs.edn` config file. They are declared in the same notation that other Clojure tools like `lein` or `boot` use.
 
 Notice that the source path is *only* specified once in the entire configuration. The system will use namespace dependency graphs to determine what code is needed in the final output of any given build.
 
-=== JavaScript (via `npm`)
+=== JavaScript
 
-`:dependencies` is only used to configure JVM dependencies. JavaScript dependencies are handled via the standard `npm` `package.json`. See the <<JS Dependencies, JavaScript Dependencies>> section for more details.
+`shadow-cljs` integrates fully with the https://www.npmjs.com/[`npm`] ecosystem to manage JavaScript dependencies.
+
+You can use `npm` or `yarn` to manage your dependencies, please refer to their respective documentation.
+
+[horizontal]
+npm:: https://docs.npmjs.com/
+yarn:: https://yarnpkg.com/en/docs
+
+Almost every package available via `npm` will explain how to install it. Those instructions now apply to shadow-cljs as well.
+
+.Installing a JavaScript package
+```bash
+# npm
+$ npm install the-thing
+
+# yarn
+$ yarn add the-thing
+```
+
+Nothing more is required. Dependencies will be added to the `package.json` file and this will be used to manage them.
+
+If you don’t have a `package.json` yet run `npm init` from a command line.
 
 == Server Options
 
@@ -488,47 +533,6 @@ can do async processing, but *must* call `(done)` to indicate it is complete.
                    ...}}}}
 ```
 
-# Using `shadow-cljs`
-
-== Compilation
-
-`shadow-cljs` has 2 compilation modes: `:dev` and `:release`. `:dev` will inject a few
-development helpers for dealing with things like a CLJS REPL and live code reloading.
-In `:release` mode those things will not be included and the code will be optimized by the Closure Compiler.
-
-.Sample Development Mode Commands
-```bash
-# compile a build once in :dev mode
-$ shadow-cljs compile app
-
-# compile and watch
-$ shadow-cljs watch app
-
-# connect to REPL for the build (available while watch is running)
-$ shadow-cljs cljs-repl app
-
-# (if you are targeting node) connect to node-repl
-$ shadow-cljs node-repl
-```
-
-.Running a release build optimized for production use.
-```
-$ shadow-cljs release app
-```
-
-Sometimes you may run into some release issues due to `:advanced` compilation. These
-commands can help track down the causes.
-
-.Release debugging commands.
-```
-$ shadow-cljs check app
-$ shadow-cljs release app --debug
-```
-
-= JavaScript Dependencies [[js-deps]]
-
-include::js-deps.adoc[]
-
 = Targeting the Browser [[target-browser]]
 
 include::target-browser.adoc[]
@@ -572,6 +576,9 @@ include::target-browser-test.adoc[]
 
 include::target-karma.adoc[]
 
+= Custom Targets
+
+include::target-custom.adoc[]
 
 = Generating Production Code -- All Targets
 
@@ -624,9 +631,9 @@ can override settings by including a `:dev` and/or `:release` section in the bui
    :release {:compiler-options {:optimizations :whitespace}}}}}
 ```
 
-= Custom Targets
+= JavaScript Dependencies [[js-deps]]
 
-include::target-custom.adoc[]
+include::js-deps.adoc[]
 
 = Editor/IDE/REPL Setup
 

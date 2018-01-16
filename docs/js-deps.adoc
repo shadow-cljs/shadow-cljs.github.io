@@ -1,34 +1,4 @@
-The standard ClojureScript compiler has https://code.thheller.com/blog/shadow-cljs/2017/09/15/js-dependencies-the-problem.html[some issues]
-when dealing with Javascript dependencies.
-
-The summary of these is
-
-* CLJSJS/:foreign-libs do not scale
-* Custom bundles are tedious to work with
-* Closure Compiler can’t yet reliably process a large portion of npm packages
-
-To address these issues `shadow-cljs` implements a custom JS bundler and removes :foreign-libs support.
-The intention is to make the vast majority of the JS ecosystem easily accessible from
-Javascript.
-
-== Installing via `npm`
-
-Almost every package on npm will explain how to install it. Those instructions now apply to shadow-cljs
-as well. So if a library tells you to run:
-
-```bash
-$ npm install the-thing
-```
-
-then that is exactly what to do. Nothing more is required. You may use yarn if prefer. Dependencies will
-be added to the `package.json` file and this will be used to manage them. If you don’t have a
-`package.json` yet run `npm init` from a command line.
-
-
-You can use this https://github.com/shadow-cljs/quickstart-browser[Quick-Start template]
-to try everything described in this section.
-
-== Using JS Dependencies
+== Using npm packages
 
 Most npm packages will also include some instructions on how to use the actual code. The
 “old” CommonJS style just has require calls which translates directly:

@@ -41,12 +41,12 @@ The state is a clojure map representing the full `shadow-build` compiler state.
 
 The stages are:
 
-`:init`
-`:compile-prepare`
-`:compile-finish`
-`:optimize-prepare` (`:release` only)
-`:optimize-finish` (`:release` only)
-`:flush`
+- `:init`
+- `:compile-prepare`
+- `:compile-finish`
+- `:optimize-prepare` (`:release` only)
+- `:optimize-finish` (`:release` only)
+- `:flush`
 
 When mode is `:dev` the `:init` is only called once. Any of the others may be called
 again (in order) when autobuild is active and files are re-compiled on change.
