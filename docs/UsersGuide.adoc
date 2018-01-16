@@ -40,29 +40,31 @@ endif::[]
 
 = Introduction
 
-This is a work in progress. It has not been proofread and may contain errors. If you find an error, please
-submit a PR to fix it, or an issue with details of the problem.
+The `shadow-cljs` compiler provides everything you need to compile your ClojureScript code with a focus on simplicity and ease of use. It augments the official ClojureScript compiler with a number of additional features and enhancements:
 
-== Why shadow-cljs?
-
-The shadow-cljs compiler provides everything you need to compile your
-ClojureScript code with a focus on simplicity and ease of use. It augments
-the official ClojureScript compiler with a number of additional
-features and enhancements:
-
-* More reliable NPM integration
-** More likely your favorite js library will work
 * Less configuration
 * Deterministic build order
+* More reliable NPM integration
+** More likely your favorite JS library will work
 * No need for build-specific source directories
 * Better externs checker
 * Better warning tracker
 * Easier use with js projects
 * Includes hot code reload
-* Smart integration with CLJS testing for the browser and CI
+* Smart integration with `cljs.test` for the browser and CI
 * The built-in development server aggressively fixes browser caching issues
 
-== Conventions Used in this Book
+== About this Book
+
+=== Work in Progress
+
+This is a work in progress. If you find an error, please submit a PR to fix it, or an issue with details of the problem.
+
+=== Contributing
+
+This source for this book is hosted on https://github.com/shadow-cljs/shadow-cljs.github.io[Github].
+
+=== Conventions Used
 
 There are many examples in this book. Most things used in these should be obvious from their context,
 but to prevent misunderstanding it is important to know the author's intentions.
@@ -108,13 +110,15 @@ interest:
 
 Code examples may are similarly shortened.
 
+
 = Installation
 
 == Standalone via `npm`
 
 You will need:
 
-- https://www.npmjs.com[`npm`] or https://www.yarnpkg.com[`yarn`].
+- https://nodejs.org[`node.js`] (v7.0.0+)
+- https://www.npmjs.com[`npm`] or https://www.yarnpkg.com[`yarn`]
 - Java Virtual Machine (Version 8). http://openjdk.java.net/install/[OpenJDK] or http://www.oracle.com/technetwork/java/javase/downloads/index.html[Oracle]
 
 .NPM

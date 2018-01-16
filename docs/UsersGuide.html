@@ -530,8 +530,13 @@ table.CodeRay td.code>pre{padding:0}
 <ul class="sectlevel1">
 <li><a href="#_introduction">1. Introduction</a>
 <ul class="sectlevel2">
-<li><a href="#_why_shadow_cljs">1.1. Why shadow-cljs?</a></li>
-<li><a href="#_conventions_used_in_this_book">1.2. Conventions Used in this Book</a></li>
+<li><a href="#_about_this_book">1.1. About this Book</a>
+<ul class="sectlevel3">
+<li><a href="#_work_in_progress">1.1.1. Work in Progress</a></li>
+<li><a href="#_contributing">1.1.2. Contributing</a></li>
+<li><a href="#_conventions_used">1.1.3. Conventions Used</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#_installation">2. Installation</a>
@@ -699,34 +704,25 @@ table.CodeRay td.code>pre{padding:0}
 <h2 id="_introduction"><a class="anchor" href="#_introduction"></a><a class="link" href="#_introduction">1. Introduction</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This is a work in progress. It has not been proofread and may contain errors. If you find an error, please
-submit a PR to fix it, or an issue with details of the problem.</p>
-</div>
-<div class="sect2">
-<h3 id="_why_shadow_cljs"><a class="anchor" href="#_why_shadow_cljs"></a><a class="link" href="#_why_shadow_cljs">1.1. Why shadow-cljs?</a></h3>
-<div class="paragraph">
-<p>The shadow-cljs compiler provides everything you need to compile your
-ClojureScript code with a focus on simplicity and ease of use. It augments
-the official ClojureScript compiler with a number of additional
-features and enhancements:</p>
+<p>The <code>shadow-cljs</code> compiler provides everything you need to compile your ClojureScript code with a focus on simplicity and ease of use. It augments the official ClojureScript compiler with a number of additional features and enhancements:</p>
 </div>
 <div class="ulist">
 <ul>
-<li>
-<p>More reliable NPM integration</p>
-<div class="ulist">
-<ul>
-<li>
-<p>More likely your favorite js library will work</p>
-</li>
-</ul>
-</div>
-</li>
 <li>
 <p>Less configuration</p>
 </li>
 <li>
 <p>Deterministic build order</p>
+</li>
+<li>
+<p>More reliable NPM integration</p>
+<div class="ulist">
+<ul>
+<li>
+<p>More likely your favorite JS library will work</p>
+</li>
+</ul>
+</div>
 </li>
 <li>
 <p>No need for build-specific source directories</p>
@@ -744,16 +740,29 @@ features and enhancements:</p>
 <p>Includes hot code reload</p>
 </li>
 <li>
-<p>Smart integration with CLJS testing for the browser and CI</p>
+<p>Smart integration with <code>cljs.test</code> for the browser and CI</p>
 </li>
 <li>
 <p>The built-in development server aggressively fixes browser caching issues</p>
 </li>
 </ul>
 </div>
-</div>
 <div class="sect2">
-<h3 id="_conventions_used_in_this_book"><a class="anchor" href="#_conventions_used_in_this_book"></a><a class="link" href="#_conventions_used_in_this_book">1.2. Conventions Used in this Book</a></h3>
+<h3 id="_about_this_book"><a class="anchor" href="#_about_this_book"></a><a class="link" href="#_about_this_book">1.1. About this Book</a></h3>
+<div class="sect3">
+<h4 id="_work_in_progress"><a class="anchor" href="#_work_in_progress"></a><a class="link" href="#_work_in_progress">1.1.1. Work in Progress</a></h4>
+<div class="paragraph">
+<p>This is a work in progress. If you find an error, please submit a PR to fix it, or an issue with details of the problem.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_contributing"><a class="anchor" href="#_contributing"></a><a class="link" href="#_contributing">1.1.2. Contributing</a></h4>
+<div class="paragraph">
+<p>This source for this book is hosted on <a href="https://github.com/shadow-cljs/shadow-cljs.github.io">Github</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_conventions_used"><a class="anchor" href="#_conventions_used"></a><a class="link" href="#_conventions_used">1.1.3. Conventions Used</a></h4>
 <div class="paragraph">
 <p>There are many examples in this book. Most things used in these should be obvious from their context,
 but to prevent misunderstanding it is important to know the author&#8217;s intentions.</p>
@@ -810,6 +819,7 @@ interest:</p>
 </div>
 </div>
 </div>
+</div>
 <div class="sect1">
 <h2 id="_installation"><a class="anchor" href="#_installation"></a><a class="link" href="#_installation">2. Installation</a></h2>
 <div class="sectionbody">
@@ -821,7 +831,10 @@ interest:</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://www.npmjs.com"><code>npm</code></a> or <a href="https://www.yarnpkg.com"><code>yarn</code></a>.</p>
+<p><a href="https://nodejs.org"><code>node.js</code></a> (v7.0.0+)</p>
+</li>
+<li>
+<p><a href="https://www.npmjs.com"><code>npm</code></a> or <a href="https://www.yarnpkg.com"><code>yarn</code></a></p>
 </li>
 <li>
 <p>Java Virtual Machine (Version 8). <a href="http://openjdk.java.net/install/">OpenJDK</a> or <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">Oracle</a></p>
@@ -3359,7 +3372,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-01-16 12:13:47 CET
+Last updated 2018-01-16 21:26:47 CET
 </div>
 </div>
 </body>
