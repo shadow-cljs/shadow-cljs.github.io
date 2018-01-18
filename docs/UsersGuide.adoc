@@ -119,7 +119,7 @@ You will need:
 
 - https://nodejs.org[`node.js`] (v7.0.0+)
 - https://www.npmjs.com[`npm`] or https://www.yarnpkg.com[`yarn`]
-- Java Virtual Machine (Version 8). http://openjdk.java.net/install/[OpenJDK] or http://www.oracle.com/technetwork/java/javase/downloads/index.html[Oracle]
+- Java SDK (Version 8). http://openjdk.java.net/install/[OpenJDK] or http://www.oracle.com/technetwork/java/javase/downloads/index.html[Oracle]
 
 .NPM
 ```bash
@@ -430,13 +430,66 @@ You can configure the port and additional middleware with `shadow-cljs.edn`:
 }
 ```
 
-=== HTTP
-
-// TODO
-
 === SSL
 
-// TODO
+The `shadow-cljs` HTTP servers support SSL. It requires a Java Keystore that provides a matching private key and certificate.
+
+.`shadow-cljs.edn` with SSL configured
+```
+{...
+ :ssl {:keystore "ssl/keystore.jks"
+       :password "shadow-cljs"}
+ ...}
+```
+
+The above are the defaults so if you want to use those it is fine to just set `:ssl {}` to use those.
+
+You can create a Keystore using the java `keytool` command. Creating a trusted self-signed certificate is also possible but somewhat complicated.
+
+I used https://certsimple.com/blog/localhost-ssl-fix[this guide] to create a self-signed certificate using macOS. Importing the created `.p12` file can be turned into the required `keystore.jks` via the `keytool` utility.
+
+```bash
+$ keytool -importkeystore -destkeystore keystore.jks -srcstoretype PKCS12 -srckeystore <the-cert>.p12
+```
+
+IMPORTANT: You must generate the Certificate with a SAN (Subject Alternative Name) for "localhost" (or whichever host you want to use). SAN is required to get Chrome to trust the Certificate and now show warnings. The password used when exporting must match the password assigned to the Keystore.
+
+// TODO: full guide, other platforms
+
+=== HTTP(S)
+
+The `shadow-cljs` server starts one primary HTTP server. It is used by the builds to connect the Hot Reload and REPL clients via websocket. By default it listens on Port 9630. If that Port is in use it will increment by one and attempt again until an open Port is found.
+
+.Startup message indicating the Port used
+```bash
+shadow-cljs - server running at http://0.0.0.0:9630
+```
+
+When `:ssl` is configured the server will be available via `https://` instead.
+
+TIP: The server automatically supports HTTP/2 when using `:ssl`.
+
+The UI served by this server is still in development so the main purpose of this HTTP server currently is serving the websockets.
+
+If you prefer to set your own port instead you can do this via the `:http` config.
+
+.`shadow-cljs.edn` with `:http` config
+```
+{...
+ :http {:port 12345
+        :host "my.machine.local"}
+ ...}
+```
+
+`:ssl` switches the server to server `https://` only. If you want to keep the `http://` version you can configure a separate `:ssl-port` as well.
+
+```
+{...
+ :http {:port 12345
+        :ssl-port 23456
+        :host "localhost"}
+ ...}
+```
 
 
 = Build Configuration
