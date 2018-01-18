@@ -595,22 +595,18 @@ table.CodeRay td.code>pre{padding:0}
 <ul class="sectlevel2">
 <li><a href="#_output_settings">6.1. Output Settings</a></li>
 <li><a href="#_modules">6.2. Modules</a></li>
-<li><a href="#_web_workers">6.3. Web Workers</a></li>
-<li><a href="#CodeSplitting">6.4. Code Splitting</a>
+<li><a href="#CodeSplitting">6.3. Code Splitting</a>
 <ul class="sectlevel3">
-<li><a href="#_using_shadow_cljs_s_built_in_loader_support">6.4.1. Using shadow-cljs&#8217;s built-in Loader Support</a></li>
-<li><a href="#_using_the_standard_clojurescript_api">6.4.2. Using the Standard ClojureScript API</a></li>
+<li><a href="#_loading_code_dynamically">6.3.1. Loading code dynamically</a></li>
 </ul>
 </li>
-<li><a href="#NameHashing">6.5. Cacheable Output</a>
+<li><a href="#_web_workers">6.4. Web Workers</a></li>
+<li><a href="#NameHashing">6.5. Cacheable Output</a></li>
+<li><a href="#BrowserManifest">6.6. Output Manifest</a></li>
+<li><a href="#_development_support">6.7. Development Support</a>
 <ul class="sectlevel3">
-<li><a href="#BrowserManifest">6.5.1. Output Manifest</a></li>
-</ul>
-</li>
-<li><a href="#_development_support">6.6. Development Support</a>
-<ul class="sectlevel3">
-<li><a href="#_http_server">6.6.1. HTTP Server</a></li>
-<li><a href="#_css_reloading">6.6.2. CSS Reloading</a></li>
+<li><a href="#_http_server">6.7.1. HTTP Server</a></li>
+<li><a href="#_css_reloading">6.7.2. CSS Reloading</a></li>
 </ul>
 </li>
 </ul>
@@ -1528,10 +1524,7 @@ can do async processing, but <strong>must</strong> call <code>(done)</code> to i
 <h2 id="target-browser"><a class="anchor" href="#target-browser"></a><a class="link" href="#target-browser">6. Targeting the Browser</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>There are a few targets that target web browsers in various ways, and since the targets are pluggable
-it is easy to imagine additional targets for specific scenarios. This chapter concentrates on the
-most commonly-used <code>:browser</code> target, but many of the configuration options may apply to other
-browser-related targets.</p>
+<p>The <code>:browser</code> target produces output intended to run in a Browser environment. During development it supports live code reloading, REPL, CSS reloading. The <code>release</code> output will be minified by the Closure Compiler with <code>:advanced</code> optimizations.</p>
 </div>
 <div class="paragraph">
 <p>A basic browser configuration looks like this:</p>
@@ -1559,7 +1552,7 @@ path to these assets. The options you need to specify are:</p>
 <dl>
 <dt><code>:output-dir</code></dt>
 <dd>
-<p>The directory to use for all js output.</p>
+<p>The directory to use for all compiler output.</p>
 </dd>
 <dt><code>:asset-path</code></dt>
 <dd>
@@ -1568,7 +1561,7 @@ path to these assets. The options you need to specify are:</p>
 </dl>
 </div>
 <div class="paragraph">
-<p>Your entry point javascript file and all related js files will appear in <code>:output-dir</code>.</p>
+<p>Your entry point javascript file and all related JS files will appear in <code>:output-dir</code>.</p>
 </div>
 <div class="admonitionblock warning">
 <table>
@@ -1605,27 +1598,23 @@ You are not required to use an absolute asset path, but it is highly recommended
 <div class="sect2">
 <h3 id="_modules"><a class="anchor" href="#_modules"></a><a class="link" href="#_modules">6.2. Modules</a></h3>
 <div class="paragraph">
-<p>The <code>modules</code> section of the config is always a map keyed by module ID. The module ID is also used
-to generate the Javascript filename. This is so the module loading code can easily find the correct file
-without additional configuration.</p>
+<p>Modules configure how the compiled sources are bundled together and how the final <code>.js</code> are generated. Each Module declares a list of Entry Namespace and from that dependency graph is built. When using multiple Modules the code is split so that the maximum amount of code is moved to the outer edges of the graph. The goal is to minimize the amount of code the browser has to load initially and loading the rest on-demand.</p>
 </div>
-<div class="paragraph">
-<p>All projects will have one or more modules. If you&#8217;re doing code splitting, then you will have more than one.
-If you&#8217;re not <a href="#CodeSpliting">code splitting</a> then you&#8217;ll typically have just have one.</p>
-</div>
-<div class="admonitionblock note">
+<div class="admonitionblock tip">
 <table>
 <tr>
 <td class="icon">
-<div class="title">Note</div>
+<div class="title">Tip</div>
 </td>
 <td class="content">
-It&#8217;s perfectly
-fine for a module&#8217;s <code>:entries</code> to contain as many "entry points", "mini apps", or global functions as you care
-to put in it, so you do <strong>not</strong> need separate modules to do that.
+Don&#8217;t worry too much about :modules in the beginning. Start with one and split them later.
 </td>
 </tr>
 </table>
+</div>
+<div class="paragraph">
+<p>The <code>:modules</code> section of the config is always a map keyed by module ID. The module ID is also used
+to generate the Javascript filename. Module <code>:main</code> will generate <code>main.js</code> in <code>:output-dir</code>.</p>
 </div>
 <div class="paragraph">
 <p>The available options in a module are:</p>
@@ -1686,96 +1675,131 @@ to put in it, so you do <strong>not</strong> need separate modules to do that.
 <p>The following example shows a minimum module configuration:</p>
 </div>
 <div class="listingblock">
+<div class="title">Example :browser config</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
  <span class="symbol">:builds</span>
- {<span class="symbol">:app</span> {<span class="keyword">..</span><span class="keyword">.</span>
+ {<span class="symbol">:app</span> {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+        <span class="symbol">:output-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public/js</span><span class="delimiter">&quot;</span></span>
+        <span class="keyword">..</span><span class="keyword">.</span>
         <span class="symbol">:modules</span> {<span class="symbol">:main</span> {<span class="symbol">:entries</span> [my.app.main]}}}}}</code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p><code>shadow-cljs</code> will follow the dependency graph from the root set of code entry points in the <code>:entries</code>
-to find everything needed to actually run.</p>
+to find everything needed to actually compile and include in the output. Namespaces that are not required will not be included.</p>
+</div>
+<div class="paragraph">
+<p>The above config will create a <code>public/js/main.js</code> file. During development there will be an additional <code>public/js/cljs-runtime</code> directory with lots of files. This directory is not required for <code>release</code> builds.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_web_workers"><a class="anchor" href="#_web_workers"></a><a class="link" href="#_web_workers">6.3. Web Workers</a></h3>
+<h3 id="CodeSplitting"><a class="anchor" href="#CodeSplitting"></a><a class="link" href="#CodeSplitting">6.3. Code Splitting</a></h3>
 <div class="paragraph">
-<p>The <code>:modules</code> configuration may also be used to generate files intended to be used as a Web Workers.
-You may declare any module (except the default) as a Web Worker by setting <code>:web-worker true</code>. The
-generated file will contain some additional bootstrap code which will load its dependencies
-automatically. The way <code>:modules</code> work also ensures that code used only by the worker will also only
-be in the final file for the worker. Each worker should have a dedicated CLJS namespace.</p>
+<p>Declaring more than one Module requires a tiny bit of additional static configuration so the Compiler can figure out how the Modules are related to each other and how you will be loading them later.</p>
+</div>
+<div class="paragraph">
+<p>In addition to <code>:entries</code> you&#8217;ll need to declare which module depends on which (via <code>:depends-on</code>). How you structure this is entirely up to your needs and there is no one-size-fits-all solution unfortunately.</p>
+</div>
+<div class="paragraph">
+<p>Say you have a traditional website with actual different pages.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>www.acme.com</code> - serving the homepage</p>
+</li>
+<li>
+<p><code>www.acme.com/login</code> - serving the login form</p>
+</li>
+<li>
+<p><code>www.acme.com/protected</code> - protected section that is only available once the user is logged in</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>One good configuration for this would be to have one common module that is shared between all the pages. Then one for each page.</p>
 </div>
 <div class="listingblock">
-<div class="title">An example of generating a web worker script</div>
+<div class="title">Example config with multiple <code>:modules</code></div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
- <span class="symbol">:builds</span>
-   {<span class="symbol">:app</span>
-    {<span class="symbol">:target</span> <span class="symbol">:browser</span>
-     <span class="keyword">..</span><span class="keyword">.</span>
-     <span class="symbol">:modules</span> {<span class="symbol">:main</span>   {<span class="symbol">:entries</span> [my.app]}
-               <span class="symbol">:extra</span>  {<span class="symbol">:entries</span> [my.app.extra]
-                        <span class="symbol">:depends-on</span> #{<span class="symbol">:main</span>}}
-               <span class="symbol">:worker</span> {<span class="symbol">:entries</span> [my.app.worker]
-                        <span class="symbol">:depends-on</span> #{<span class="symbol">:main</span>}
-                        <span class="symbol">:web-worker</span> <span class="predefined-constant">true</span>}}}}}</code></pre>
+ <span class="symbol">:output-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public/js</span><span class="delimiter">&quot;</span></span>
+ <span class="symbol">:modules</span>
+ {<span class="symbol">:shared</span>
+  {<span class="symbol">:entries</span> [my.app.common]}
+  <span class="symbol">:home</span>
+  {<span class="symbol">:entries</span> [my.app.home]
+   <span class="symbol">:depends-on</span> #{<span class="symbol">:shared</span>}}
+  <span class="symbol">:login</span>
+  {<span class="symbol">:entries</span> [my.app.login]
+   <span class="symbol">:depends-on</span> #{<span class="symbol">:shared</span>}}
+  <span class="symbol">:protected</span>
+  {<span class="symbol">:entries</span> [my.app.protected]
+   <span class="symbol">:depends-on</span> #{<span class="symbol">:shared</span>}}</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>The above configuration will generate <code>worker.js</code> which you can use to start the Web Worker.
-It will have all code from the <code>:main</code> module available (but not <code>:extra</code>). The code in the
-<code>my.app.worker</code> namespace will only ever execute in the worker. Worker generation happens in
-both development and release modes.</p>
-</div>
-<div class="admonitionblock note">
+<div class="admonitionblock tip">
 <table>
 <tr>
 <td class="icon">
-<div class="title">Note</div>
+<div class="title">Tip</div>
 </td>
 <td class="content">
-Hot code reload does not support reloading code in the worker while it is running.
-I suggest shutting down all workers using the <code>:devtools :before-load</code> function and restarting it
-in the <code>:after-load</code>.
+You can leave the <code>:entries</code> of the <code>:shared</code> module empty to let the compiler figure out which namespaces are shared between the other modules.
 </td>
 </tr>
 </table>
 </div>
+<div class="listingblock">
+<div class="title">Generated file structure</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="text">.
+└── public
+    └── js
+        ├── shared.js
+        ├── home.js
+        ├── login.js
+        └── protected.js</code></pre>
 </div>
-<div class="sect2">
-<h3 id="CodeSplitting"><a class="anchor" href="#CodeSplitting"></a><a class="link" href="#CodeSplitting">6.4. Code Splitting</a></h3>
+</div>
 <div class="paragraph">
-<p>You&#8217;ve already seen how to configure your main module. Adding additional modules requires a little
-bit of care, but the technical details are simple:</p>
+<p>In your HTML for the Homepage you&#8217;d then always include the <code>shared.js</code> on each page and the others conditionally depending on which page the user is on.</p>
 </div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Ensure you don&#8217;t require things you don&#8217;t use in any namespace.</p>
-</li>
-<li>
-<p>Put the top-level namespace(s) for each module into a module config.</p>
-</li>
-<li>
-<p>Choose you dynamic loading API</p>
-</li>
-</ol>
+<div class="listingblock">
+<div class="title">HTML for the <code>/login</code> page</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="html"><span class="tag">&lt;script</span> <span class="attribute-name">src</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">/js/shared.js</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span><span class="tag">&lt;/script&gt;</span>
+<span class="tag">&lt;script</span> <span class="attribute-name">src</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">/js/login.js</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span><span class="tag">&lt;/script&gt;</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+The <code>.js</code> files must be included in the correct order. The <a href="#BrowserManifest"><code>manifest.edn</code></a> can help with this.
+</td>
+</tr>
+</table>
 </div>
 <div class="sect3">
-<h4 id="_using_shadow_cljs_s_built_in_loader_support"><a class="anchor" href="#_using_shadow_cljs_s_built_in_loader_support"></a><a class="link" href="#_using_shadow_cljs_s_built_in_loader_support">6.4.1. Using shadow-cljs&#8217;s built-in Loader Support</a></h4>
+<h4 id="_loading_code_dynamically"><a class="anchor" href="#_loading_code_dynamically"></a><a class="link" href="#_loading_code_dynamically">6.3.1. Loading code dynamically</a></h4>
 <div class="paragraph">
-<p>The compiler supports generating the required data for <code>goog.module.ModuleManager</code> to work.
-It exposes a simple interface to let you load modules on-demand at runtime.</p>
+<p>These days Single-Page-Apps (SPA) are becoming more popular and they work similarly only that instead of letting the Server decide which JS to include to Client does it by itself.</p>
+</div>
+<div class="sect4">
+<h5 id="_using_shadow_cljs_s_built_in_loader_support"><a class="anchor" href="#_using_shadow_cljs_s_built_in_loader_support"></a><a class="link" href="#_using_shadow_cljs_s_built_in_loader_support">Using shadow-cljs&#8217;s built-in Loader Support</a></h5>
+<div class="paragraph">
+<p>The compiler supports generating the required data for using the <code>shadow.loader</code> utility namespace. It exposes a simple interface to let you load modules on-demand at runtime.</p>
 </div>
 <div class="paragraph">
-<p>You only need to add <code>:module-loader true</code> to your build config. The loader will
-always be injected into the default module (the one everything else depends on).</p>
+<p>You only need to add <code>:module-loader true</code> to your build config. The loader will always be injected into the default module (the one everything else depends on).</p>
 </div>
 <div class="paragraph">
-<p>At runtime you may use the <code>shadow.loader</code> namespace to load modules. You may also load a
-module eagerly by just using a <code>&lt;script&gt;</code> tag in your page.</p>
+<p>At runtime you may use the <code>shadow.loader</code> namespace to load modules. You may also load a module eagerly by just using a <code>&lt;script&gt;</code> tag in your page.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1832,18 +1856,15 @@ module eagerly by just using a <code>&lt;script&gt;</code> tag in your page.</p>
 <div class="paragraph">
 <p>You can check if a module is loaded using <code>(loaded? "module-name")</code>.</p>
 </div>
-<div class="sect4">
-<h5 id="_loader_costs"><a class="anchor" href="#_loader_costs"></a><a class="link" href="#_loader_costs">Loader Costs</a></h5>
+<div class="sect5">
+<h6 id="_loader_costs"><a class="anchor" href="#_loader_costs"></a><a class="link" href="#_loader_costs">Loader Costs</a></h6>
 <div class="paragraph">
-<p>Using the loader is very lightweight. It has a few dependencies which you may not be otherwise using.
-In practice using <code>:module-loader true</code> adds about 8KB gzip&#8217;d
-to the default module. This will vary depending on how much of <code>goog.net</code> and <code>goog.events</code>
-you are already using, and what level of optimization you use for your release builds.</p>
+<p>Using the loader is very lightweight. It has a few dependencies which you may not be otherwise using. In practice using <code>:module-loader true</code> adds about 8KB gzip&#8217;d to the default module. This will vary depending on how much of <code>goog.net</code> and <code>goog.events</code> you are already using, and what level of optimization you use for your release builds.</p>
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_using_the_standard_clojurescript_api"><a class="anchor" href="#_using_the_standard_clojurescript_api"></a><a class="link" href="#_using_the_standard_clojurescript_api">6.4.2. Using the Standard ClojureScript API</a></h4>
+<div class="sect4">
+<h5 id="_using_the_standard_clojurescript_api"><a class="anchor" href="#_using_the_standard_clojurescript_api"></a><a class="link" href="#_using_the_standard_clojurescript_api">Using the Standard ClojureScript API</a></h5>
 <div class="paragraph">
 <p>The generated code is capable of using the standard ClojureScript <code>cljs.loader</code> API. See the
 <a href="https://clojurescript.org/news/2017-07-10-code-splitting">documentation</a> on the ClojureScript
@@ -1855,6 +1876,53 @@ may be of particular importance to library authors. The disadvantage is that the
 loading API in the standard distribution is currently somewhat less easy-to-use than the
 support in <code>shadow-cljs</code>.</p>
 </div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_web_workers"><a class="anchor" href="#_web_workers"></a><a class="link" href="#_web_workers">6.4. Web Workers</a></h3>
+<div class="paragraph">
+<p>The <code>:modules</code> configuration may also be used to generate files intended to be used as a Web Workers.
+You may declare any module (except the default) as a Web Worker by setting <code>:web-worker true</code>. The
+generated file will contain some additional bootstrap code which will load its dependencies
+automatically. The way <code>:modules</code> work also ensures that code used only by the worker will also only
+be in the final file for the worker. Each worker should have a dedicated CLJS namespace.</p>
+</div>
+<div class="listingblock">
+<div class="title">An example of generating a web worker script</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+   {<span class="symbol">:app</span>
+    {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+     <span class="keyword">..</span><span class="keyword">.</span>
+     <span class="symbol">:modules</span> {<span class="symbol">:main</span>   {<span class="symbol">:entries</span> [my.app]}
+               <span class="symbol">:extra</span>  {<span class="symbol">:entries</span> [my.app.extra]
+                        <span class="symbol">:depends-on</span> #{<span class="symbol">:main</span>}}
+               <span class="symbol">:worker</span> {<span class="symbol">:entries</span> [my.app.worker]
+                        <span class="symbol">:depends-on</span> #{<span class="symbol">:main</span>}
+                        <span class="symbol">:web-worker</span> <span class="predefined-constant">true</span>}}}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The above configuration will generate <code>worker.js</code> which you can use to start the Web Worker.
+It will have all code from the <code>:main</code> module available (but not <code>:extra</code>). The code in the
+<code>my.app.worker</code> namespace will only ever execute in the worker. Worker generation happens in
+both development and release modes.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Hot code reload does not support reloading code in the worker while it is running.
+I suggest shutting down all workers using the <code>:devtools :before-load</code> function and restarting it
+in the <code>:after-load</code>.
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect2">
@@ -1897,12 +1965,13 @@ of generating conflicts. I recommend using the full hash.</p>
 <p>Since the filename can change with every release it gets a little bit more complicated to include them
 in your HTML. The <a href="#BrowserManifest">Output Manifest</a> can help with that.</p>
 </div>
-<div class="sect3">
-<h4 id="BrowserManifest"><a class="anchor" href="#BrowserManifest"></a><a class="link" href="#BrowserManifest">6.5.1. Output Manifest</a></h4>
+</div>
+<div class="sect2">
+<h3 id="BrowserManifest"><a class="anchor" href="#BrowserManifest"></a><a class="link" href="#BrowserManifest">6.6. Output Manifest</a></h3>
 <div class="paragraph">
 <p><code>shadow-cljs</code> generates a <code>manifest.edn</code> file in the configured <code>:output-dir</code>.
 This file contains a description of the module config together with an extra <code>:output-name</code> property which
-maps the original module name to the hashed name.</p>
+maps the original module name to actual filename (important when using the <code>:module-hash-names</code> feature).</p>
 </div>
 <div class="listingblock">
 <div class="title">Sample output of manifest.edn when using hashed filenames.</div>
@@ -1951,15 +2020,14 @@ be relative to the configured <code>:output-dir</code>.</p>
 </div>
 </div>
 </div>
-</div>
 <div class="sect2">
-<h3 id="_development_support"><a class="anchor" href="#_development_support"></a><a class="link" href="#_development_support">6.6. Development Support</a></h3>
+<h3 id="_development_support"><a class="anchor" href="#_development_support"></a><a class="link" href="#_development_support">6.7. Development Support</a></h3>
 <div class="paragraph">
 <p>The <code>:devtools</code> section of the configuration for <code>:browser</code> supports a few additional
 options for configuring an optional dev-time HTTP server for a build and CSS reloading.</p>
 </div>
 <div class="sect3">
-<h4 id="_http_server"><a class="anchor" href="#_http_server"></a><a class="link" href="#_http_server">6.6.1. HTTP Server</a></h4>
+<h4 id="_http_server"><a class="anchor" href="#_http_server"></a><a class="link" href="#_http_server">6.7.1. HTTP Server</a></h4>
 <div class="paragraph">
 <p>The server supports the following options:</p>
 </div>
@@ -2034,7 +2102,7 @@ real resource (so you can just hit browser reload on your SPA even on odd URIs).
 </div>
 </div>
 <div class="sect3">
-<h4 id="_css_reloading"><a class="anchor" href="#_css_reloading"></a><a class="link" href="#_css_reloading">6.6.2. CSS Reloading</a></h4>
+<h4 id="_css_reloading"><a class="anchor" href="#_css_reloading"></a><a class="link" href="#_css_reloading">6.7.2. CSS Reloading</a></h4>
 <div class="paragraph">
 <p>The Browser devtools can also reload CSS for you. This is enabled by default and in most cases requires no additional
 configuration when you are using the built-in HTTP dev server.</p>

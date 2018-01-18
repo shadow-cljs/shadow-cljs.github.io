@@ -1,7 +1,4 @@
-There are a few targets that target web browsers in various ways, and since the targets are pluggable
-it is easy to imagine additional targets for specific scenarios. This chapter concentrates on the
-most commonly-used `:browser` target, but many of the configuration options may apply to other
-browser-related targets.
+The `:browser` target produces output intended to run in a Browser environment. During development it supports live code reloading, REPL, CSS reloading. The `release` output will be minified by the Closure Compiler with `:advanced` optimizations.
 
 A basic browser configuration looks like this:
 
@@ -23,10 +20,10 @@ these assets with some kind of server, and the Javascript loading code needs to 
 path to these assets. The options you need to specify are:
 
 [Horizontal]
-`:output-dir`:: The directory to use for all js output.
+`:output-dir`:: The directory to use for all compiler output.
 `:asset-path`:: The relative path from *web server's root* to the resources in `:output-dir`.
 
-Your entry point javascript file and all related js files will appear in `:output-dir`.
+Your entry point javascript file and all related JS files will appear in `:output-dir`.
 
 WARNING: Each build requires its own :output-dir, you may not put multiple builds into the same directory.
 This directory should also be exclusively owned by the build. There should be no other files in there.
@@ -48,16 +45,12 @@ You are not required to use an absolute asset path, but it is highly recommended
 
 == Modules
 
-The `modules` section of the config is always a map keyed by module ID. The module ID is also used
-to generate the Javascript filename. This is so the module loading code can easily find the correct file
-without additional configuration.
+Modules configure how the compiled sources are bundled together and how the final `.js` are generated. Each Module declares a list of Entry Namespace and from that dependency graph is built. When using multiple Modules the code is split so that the maximum amount of code is moved to the outer edges of the graph. The goal is to minimize the amount of code the browser has to load initially and loading the rest on-demand.
 
-All projects will have one or more modules. If you're doing code splitting, then you will have more than one.
-If you're not <<CodeSpliting,code splitting>> then you'll typically have just have one.
+TIP: Don't worry too much about :modules in the beginning. Start with one and split them later.
 
-NOTE: It's perfectly
-fine for a module's `:entries` to contain as many "entry points", "mini apps", or global functions as you care
-to put in it, so you do *not* need separate modules to do that.
+The `:modules` section of the config is always a map keyed by module ID. The module ID is also used
+to generate the Javascript filename. Module `:main` will generate `main.js` in `:output-dir`.
 
 The available options in a module are:
 
@@ -71,68 +64,87 @@ The available options in a module are:
 
 The following example shows a minimum module configuration:
 
+.Example :browser config
 ```
 {...
  :builds
- {:app {...
+ {:app {:target :browser
+        :output-dir "public/js"
+        ...
         :modules {:main {:entries [my.app.main]}}}}}
 ```
 
 `shadow-cljs` will follow the dependency graph from the root set of code entry points in the `:entries`
-to find everything needed to actually run.
+to find everything needed to actually compile and include in the output. Namespaces that are not required will not be included.
 
-
-== Web Workers
-
-The `:modules` configuration may also be used to generate files intended to be used as a Web Workers.
-You may declare any module (except the default) as a Web Worker by setting `:web-worker true`. The
-generated file will contain some additional bootstrap code which will load its dependencies
-automatically. The way `:modules` work also ensures that code used only by the worker will also only
-be in the final file for the worker. Each worker should have a dedicated CLJS namespace.
-
-.An example of generating a web worker script
-```
-{...
- :builds
-   {:app
-    {:target :browser
-     ...
-     :modules {:main   {:entries [my.app]}
-               :extra  {:entries [my.app.extra]
-                        :depends-on #{:main}}
-               :worker {:entries [my.app.worker]
-                        :depends-on #{:main}
-                        :web-worker true}}}}}
-```
-
-The above configuration will generate `worker.js` which you can use to start the Web Worker.
-It will have all code from the `:main` module available (but not `:extra`). The code in the
-`my.app.worker` namespace will only ever execute in the worker. Worker generation happens in
-both development and release modes.
-
-NOTE: Hot code reload does not support reloading code in the worker while it is running.
-I suggest shutting down all workers using the `:devtools :before-load` function and restarting it
-in the `:after-load`.
+The above config will create a `public/js/main.js` file. During development there will be an additional `public/js/cljs-runtime` directory with lots of files. This directory is not required for `release` builds.
 
 == Code Splitting [[CodeSplitting]]
 
-You've already seen how to configure your main module. Adding additional modules requires a little
-bit of care, but the technical details are simple:
+Declaring more than one Module requires a tiny bit of additional static configuration so the Compiler can figure out how the Modules are related to each other and how you will be loading them later.
 
-. Ensure you don't require things you don't use in any namespace.
-. Put the top-level namespace(s) for each module into a module config.
-. Choose you dynamic loading API
+In addition to `:entries` you'll need to declare which module depends on which (via `:depends-on`). How you structure this is entirely up to your needs and there is no one-size-fits-all solution unfortunately.
 
-=== Using shadow-cljs's built-in Loader Support
+Say you have a traditional website with actual different pages.
 
-The compiler supports generating the required data for `goog.module.ModuleManager` to work.
-It exposes a simple interface to let you load modules on-demand at runtime.
+- `www.acme.com` - serving the homepage
+- `www.acme.com/login` - serving the login form
+- `www.acme.com/protected` - protected section that is only available once the user is logged in
 
-You only need to add `:module-loader true` to your build config. The loader will
-always be injected into the default module (the one everything else depends on).
+One good configuration for this would be to have one common module that is shared between all the pages. Then one for each page.
 
-At runtime you may use the `shadow.loader` namespace to load modules. You may also load a
-module eagerly by just using a `<script>` tag in your page.
+.Example config with multiple `:modules`
+```clojure
+{...
+ :output-dir "public/js"
+ :modules
+ {:shared
+  {:entries [my.app.common]}
+  :home
+  {:entries [my.app.home]
+   :depends-on #{:shared}}
+  :login
+  {:entries [my.app.login]
+   :depends-on #{:shared}}
+  :protected
+  {:entries [my.app.protected]
+   :depends-on #{:shared}}
+```
+
+TIP: You can leave the `:entries` of the `:shared` module empty to let the compiler figure out which namespaces are shared between the other modules.
+
+.Generated file structure
+```text
+.
+└── public
+    └── js
+        ├── shared.js
+        ├── home.js
+        ├── login.js
+        └── protected.js
+```
+
+In your HTML for the Homepage you'd then always include the `shared.js` on each page and the others conditionally depending on which page the user is on.
+
+.HTML for the `/login` page
+```html
+<script src="/js/shared.js"></script>
+<script src="/js/login.js"></script>
+```
+
+IMPORTANT: The `.js` files must be included in the correct order. The <<BrowserManifest, `manifest.edn`>> can help with this.
+
+=== Loading code dynamically
+
+These days Single-Page-Apps (SPA) are becoming more popular and they work similarly only that instead of letting the Server decide which JS to include to Client does it by itself.
+
+==== Using shadow-cljs's built-in Loader Support
+
+The compiler supports generating the required data for using the `shadow.loader` utility namespace. It exposes a simple interface to let you load modules on-demand at runtime.
+
+You only need to add `:module-loader true` to your build config. The loader will always be injected into the default module (the one everything else depends on).
+
+At runtime you may use the `shadow.loader` namespace to load modules. You may also load a module eagerly by just using a `<script>` tag in your page.
 
 ```
 {...
@@ -181,14 +193,11 @@ Then the following expressions can be used for loading code:
 
 You can check if a module is loaded using `(loaded? "module-name")`.
 
-==== Loader Costs
+===== Loader Costs
 
-Using the loader is very lightweight. It has a few dependencies which you may not be otherwise using.
-In practice using `:module-loader true` adds about 8KB gzip'd
-to the default module. This will vary depending on how much of `goog.net` and `goog.events`
-you are already using, and what level of optimization you use for your release builds.
+Using the loader is very lightweight. It has a few dependencies which you may not be otherwise using. In practice using `:module-loader true` adds about 8KB gzip'd to the default module. This will vary depending on how much of `goog.net` and `goog.events` you are already using, and what level of optimization you use for your release builds.
 
-=== Using the Standard ClojureScript API
+==== Using the Standard ClojureScript API
 
 The generated code is capable of using the standard ClojureScript `cljs.loader` API. See the
 https://clojurescript.org/news/2017-07-10-code-splitting[documentation] on the ClojureScript
@@ -198,6 +207,40 @@ The advantage of using the standard API is that your code will play well with ot
 may be of particular importance to library authors. The disadvantage is that the dynamic module
 loading API in the standard distribution is currently somewhat less easy-to-use than the
 support in `shadow-cljs`.
+
+== Web Workers
+
+The `:modules` configuration may also be used to generate files intended to be used as a Web Workers.
+You may declare any module (except the default) as a Web Worker by setting `:web-worker true`. The
+generated file will contain some additional bootstrap code which will load its dependencies
+automatically. The way `:modules` work also ensures that code used only by the worker will also only
+be in the final file for the worker. Each worker should have a dedicated CLJS namespace.
+
+.An example of generating a web worker script
+```
+{...
+ :builds
+   {:app
+    {:target :browser
+     ...
+     :modules {:main   {:entries [my.app]}
+               :extra  {:entries [my.app.extra]
+                        :depends-on #{:main}}
+               :worker {:entries [my.app.worker]
+                        :depends-on #{:main}
+                        :web-worker true}}}}}
+```
+
+The above configuration will generate `worker.js` which you can use to start the Web Worker.
+It will have all code from the `:main` module available (but not `:extra`). The code in the
+`my.app.worker` namespace will only ever execute in the worker. Worker generation happens in
+both development and release modes.
+
+NOTE: Hot code reload does not support reloading code in the worker while it is running.
+I suggest shutting down all workers using the `:devtools :before-load` function and restarting it
+in the `:after-load`.
+
+
 
 == Cacheable Output [[NameHashing]]
 
@@ -233,11 +276,11 @@ Instead of generating `main.js` it will now generate `main.<hash>.js` in the `:o
 Since the filename can change with every release it gets a little bit more complicated to include them
 in your HTML. The <<BrowserManifest, Output Manifest>> can help with that.
 
-=== Output Manifest [[BrowserManifest]]
+== Output Manifest [[BrowserManifest]]
 
 `shadow-cljs` generates a `manifest.edn` file in the configured `:output-dir`.
 This file contains a description of the module config together with an extra `:output-name` property which
-maps the original module name to the hashed name.
+maps the original module name to actual filename (important when using the `:module-hash-names` feature).
 
 .Sample output of manifest.edn when using hashed filenames.
 ```
