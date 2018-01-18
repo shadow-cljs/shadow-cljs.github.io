@@ -221,37 +221,53 @@ Once any server is running every other command will use that and run much faster
 
 == Build Tool Integration
 
-=== Leiningen Integration [[Leiningen]]
+`shadow-cljs` can integrate with other Clojure tools since the primary distribution is just a `.jar` file available via Clojars.
+
+CAUTION: It is absolutely recommended to use the standalone `shadow-cljs` version. The command does a lot of things to optimize the user experience (eg. faster startup) which are not done by other tools. You'll also save yourself a lot of headaches dealing with dependency conflicts and other related errors.
+
+=== Leiningen [[Leiningen]]
 
 If you'd like to use Leiningen for your build system (particularly if you use Cursive) then there is a simple option
 in your `shadow-cljs.edn` file that causes it to derive `:source-paths` and `:dependencies` from `project.clj`:
 
+The `shadow-cljs` command-line utility can also use `lein` to run your commands. You can enable this
+by adding a :lein entry to your shadow-cljs.edn config. With `:lein` set the `shadow-cljs` will use `lein` to launch the JVM.
+
 ```
 {:lein true
- ; source-paths and dependencies are now ignored in this file, and come from project.clj instead
+ ; :source-paths and :dependencies are now ignored in this file
+ ; configure them via project.clj
  :builds { ... }
 ```
+
+.Using a dedicated `lein` profile
+```
+{:lein {:profile "+cljs"}
+ :builds {...}}
+```
+
+.The `lein` command used by `shadow-cljs` as configured above
+```bash
+lein with-profile +cljs run -m shadow.cljs.devtools.cli ...
+```
+
 ==== Running Tasks Directly From Leiningen
 
-shadow-cljs is built as a Clojure library, which means you can use it directly from lein without
-installing the CLI command via npm.
-
-The classpath of your project will be used to search for .cljs files. There is no
-other dedicated configuration for shadow-cljs in project.clj. If you have a dedicated
-directory for your .cljs files add that to your top-level `:source-paths`.
-
-NOTE: This works even if you don't enable full integration in the `shadow-cljs.edn` configuration
-file.
+You may also directly execute `shadow-cljs` commands via `lein` if you prefer to not use the `shadow-cljs` command itself. Most commands should work if you just replace `shadow-cljs ...` with `lein run -m shadow.cljs.devtools.cli ...`.
 
 Some sample commands are listed below:
 
 .Listing Options
 ```bash
+$ shadow-cljs help
+# or
 lein run -m shadow.cljs.devtools.cli help
 ```
 
 .Start a dev mode build with a REPL and live-reload
 ```bash
+$ shadow-cljs watch build-id
+# or
 $ lein run -m shadow.cljs.devtools.cli watch build-id
 ```
 
@@ -263,24 +279,6 @@ $ lein run -m shadow.cljs.devtools.cli compile build-id
 .Create a :release mode optimized build:
 ```bash
 lein run -m shadow.cljs.devtools.cli release build-id
-```
-==== Full Integration
-
-The `shadow-cljs` command-line utility can also use `lein` to run your commands. You can enable this
-by adding a :lein entry to your shadow-cljs.edn config.
-
-```
-{:lein {:profile "+cljs"}
- :builds {...}}
-```
-
-This will execute all `shadow-cljs` commands via `lein` instead of launching its own JVM. The `:profile` is optional,
-`:lein true` or `:lein {}` is enough to enable lein support. When this mode is active the `:source-paths` and
-`:dependencies` inside `shadow-cljs.edn` will be ignored.
-
-.The `lein` command used by `shadow-cljs` as configured above
-```bash
-lein with-profile +cljs run -m shadow.cljs.devtools.cli ...
 ```
 
 === Boot
@@ -295,6 +293,8 @@ https://github.com/jgdavey/boot-shadow-cljs
 == Embedding
 
 It is possible to run `shadow-cljs` inside your JVM.
+
+// TODO: explain embedding
 
 .TODO
 ```
@@ -584,60 +584,13 @@ include::target-karma.adoc[]
 
 include::target-custom.adoc[]
 
-= Generating Production Code -- All Targets
-
-Development mode always outputs individual files for each namespace so that they can be hot loaded
-in isolation. When you're ready to deploy code to a real server you want to run the Closure Compiler
-on it to generate a single minified result for each <<Modules, module>>.
-
-By default the release mode output file should just be a drop-in replacements for the
-development mode file: there is no difference in the way you include them in your HTML. You
-may use <<NameHashing, filename hashing>> to improve caching characteristics on browser targets.
-
-.Generating Minified Output
-```
-$ shadow-cljs release build-id
-```
-== Optimizations [[Optimization]]
-
-You can choose the optimization level using the `:compiler-options` section of the configuration:
-
-```
-{...
- :build
-   {:build-id
-     {...
-      :compiler-options {:optimizations :whitespace}}}}
-```
-
-See the https://developers.google.com/closure/compiler/docs/compilation_levels[the Closure compiler's documentation]
-for more information on available optimization levels.
-
-== Release-Specific vs. Development Configuration
-
-If you wish to have separate configuration values in a build when running a release build then you
-can override settings by including a `:dev` and/or `:release` section in the build section:
-
-```
-{:source-paths ["src"]
- :dependencies []
- :builds
- {:app
-  {:target :browser
-   :output-dir "public/js"
-   :asset-path "/js"
-   :modules {:base {:entries [my.app.core]}}
-
-   ;; Here is some dev-specific config
-   :dev {:compiler-options {:devcards true}}
-
-   ;; Here is some production config
-   :release {:compiler-options {:optimizations :whitespace}}}}}
-```
-
 = JavaScript Dependencies [[js-deps]]
 
 include::js-deps.adoc[]
+
+= Generating Production Code -- All Targets
+
+include::release.adoc[]
 
 = Editor/IDE/REPL Setup
 
@@ -656,9 +609,7 @@ https://clojurians.slack.com/messages/C6N245JGG[`#shadow-cljs` Slack channel].
 
 == Patching Libraries
 
-The shadow-cljs compiler ensure that things on your source paths are
-compiled last. Things from JAR files go first. This means that
-you can copy a source file from a library, patch it, and include it
-in your own source directory. This is a convenient way to test out
-fixes (even to `shadow-cljs` itself!) without having to clone
+The `shadow-cljs` compiler ensure that things on your source paths are compiled first, overriding files from JARs. This means that you can copy a source file from a library, patch it, and include it in your own source directory.
+
+This is a convenient way to test out fixes (even to `shadow-cljs` itself!) without having to clone
 that project and understand its setup, build, etc.

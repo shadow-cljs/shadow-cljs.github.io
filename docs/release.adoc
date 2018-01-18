@@ -1,0 +1,60 @@
+Development mode always outputs individual files for each namespace so that they can be hot loaded
+in isolation. When you're ready to deploy code to a real server you want to run the Closure Compiler
+on it to generate a single minified result for each <<Modules, module>>.
+
+By default the release mode output file should just be a drop-in replacements for the
+development mode file: there is no difference in the way you include them in your HTML. You
+may use <<NameHashing, filename hashing>> to improve caching characteristics on browser targets.
+
+.Generating Minified Output
+```
+$ shadow-cljs release build-id
+```
+
+== Release Configuration
+
+Usually you won't need to add any extra configuration to create a release version for your build. The default config already captures everything necessary and should only require extra configuration if you want to override the defaults.
+
+Each `:target` already provides good defaults optimized for each platform so you'll have less to worry about.
+
+=== Optimizations [[Optimization]]
+
+You can choose the optimization level using the `:compiler-options` section of the configuration:
+
+IMPORTANT: You do not usually need to set `:optimizations` since the `:target` already sets it to an appropriate level.
+
+IMPORTANT: `:optimizations` only apply when using the `release` command. Development builds are never optimized by the Closure Compiler. Development builds are always set to `:none`.
+
+```clojure
+{...
+ :build
+   {:build-id
+     {...
+      :compiler-options {:optimizations :simple}}}}
+```
+
+See the https://developers.google.com/closure/compiler/docs/compilation_levels[the Closure compiler's documentation]
+for more information on available optimization levels.
+
+=== Release-Specific vs. Development Configuration
+
+If you wish to have separate configuration values in a build when running a release build then you
+can override settings by including a `:dev` and/or `:release` section in the build section:
+
+.Example `shadow-cljs.edn` build config
+```clojure
+{:source-paths ["src"]
+ :dependencies []
+ :builds
+ {:app
+  {:target :browser
+   :output-dir "public/js"
+   :asset-path "/js"
+   :modules {:base {:entries [my.app.core]}}
+
+   ;; Here is some dev-specific config
+   :dev {:compiler-options {:devcards true}}
+
+   ;; Here is some production config
+   :release {:compiler-options {:optimizations :simple}}}}}
+```

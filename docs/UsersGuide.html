@@ -554,7 +554,7 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 <li><a href="#_build_tool_integration">3.2. Build Tool Integration</a>
 <ul class="sectlevel3">
-<li><a href="#Leiningen">3.2.1. Leiningen Integration</a></li>
+<li><a href="#Leiningen">3.2.1. Leiningen</a></li>
 <li><a href="#_boot">3.2.2. Boot</a></li>
 </ul>
 </li>
@@ -660,23 +660,27 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_compilation_stages">10.2. Compilation Stages</a></li>
 </ul>
 </li>
-<li><a href="#_generating_production_code_all_targets">11. Generating Production Code&#8201;&#8212;&#8201;All Targets</a>
+<li><a href="#js-deps">11. JavaScript Dependencies</a>
 <ul class="sectlevel2">
-<li><a href="#Optimization">11.1. Optimizations</a></li>
-<li><a href="#_release_specific_vs_development_configuration">11.2. Release-Specific vs. Development Configuration</a></li>
-</ul>
-</li>
-<li><a href="#js-deps">12. JavaScript Dependencies</a>
-<ul class="sectlevel2">
-<li><a href="#_using_npm_packages">12.1. Using npm packages</a></li>
-<li><a href="#_resolving_js_dependencies">12.2. Resolving JS Dependencies</a>
+<li><a href="#_using_npm_packages">11.1. Using npm packages</a></li>
+<li><a href="#_resolving_js_dependencies">11.2. Resolving JS Dependencies</a>
 <ul class="sectlevel3">
-<li><a href="#_using_a_cdn">12.2.1. Using a CDN</a></li>
-<li><a href="#_redirecting_require">12.2.2. Redirecting “require”</a></li>
-<li><a href="#_using_local_files">12.2.3. Using local Files</a></li>
+<li><a href="#_using_a_cdn">11.2.1. Using a CDN</a></li>
+<li><a href="#_redirecting_require">11.2.2. Redirecting “require”</a></li>
+<li><a href="#_using_local_files">11.2.3. Using local Files</a></li>
 </ul>
 </li>
-<li><a href="#_migrating_cljsjs">12.3. Migrating cljsjs.*</a></li>
+<li><a href="#_migrating_cljsjs">11.3. Migrating cljsjs.*</a></li>
+</ul>
+</li>
+<li><a href="#_generating_production_code_all_targets">12. Generating Production Code&#8201;&#8212;&#8201;All Targets</a>
+<ul class="sectlevel2">
+<li><a href="#_release_configuration">12.1. Release Configuration</a>
+<ul class="sectlevel3">
+<li><a href="#Optimization">12.1.1. Optimizations</a></li>
+<li><a href="#_release_specific_vs_development_configuration">12.1.2. Release-Specific vs. Development Configuration</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#_editor_ide_repl_setup">13. Editor/IDE/REPL Setup</a>
@@ -970,42 +974,56 @@ $ shadow-cljs restart</code></pre>
 </div>
 <div class="sect2">
 <h3 id="_build_tool_integration"><a class="anchor" href="#_build_tool_integration"></a><a class="link" href="#_build_tool_integration">3.2. Build Tool Integration</a></h3>
+<div class="paragraph">
+<p><code>shadow-cljs</code> can integrate with other Clojure tools since the primary distribution is just a <code>.jar</code> file available via Clojars.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Caution</div>
+</td>
+<td class="content">
+It is absolutely recommended to use the standalone <code>shadow-cljs</code> version. The command does a lot of things to optimize the user experience (eg. faster startup) which are not done by other tools. You&#8217;ll also save yourself a lot of headaches dealing with dependency conflicts and other related errors.
+</td>
+</tr>
+</table>
+</div>
 <div class="sect3">
-<h4 id="Leiningen"><a class="anchor" href="#Leiningen"></a><a class="link" href="#Leiningen">3.2.1. Leiningen Integration</a></h4>
+<h4 id="Leiningen"><a class="anchor" href="#Leiningen"></a><a class="link" href="#Leiningen">3.2.1. Leiningen</a></h4>
 <div class="paragraph">
 <p>If you&#8217;d like to use Leiningen for your build system (particularly if you use Cursive) then there is a simple option
 in your <code>shadow-cljs.edn</code> file that causes it to derive <code>:source-paths</code> and <code>:dependencies</code> from <code>project.clj</code>:</p>
 </div>
+<div class="paragraph">
+<p>The <code>shadow-cljs</code> command-line utility can also use <code>lein</code> to run your commands. You can enable this
+by adding a :lein entry to your shadow-cljs.edn config. With <code>:lein</code> set the <code>shadow-cljs</code> will use <code>lein</code> to launch the JVM.</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:lein</span> <span class="predefined-constant">true</span>
- <span class="comment">; source-paths and dependencies are now ignored in this file, and come from project.clj instead</span>
+ <span class="comment">; :source-paths and :dependencies are now ignored in this file</span>
+ <span class="comment">; configure them via project.clj</span>
  <span class="symbol">:builds</span> { <span class="keyword">..</span><span class="keyword">.</span> }</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Using a dedicated <code>lein</code> profile</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:lein</span> {<span class="symbol">:profile</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">+cljs</span><span class="delimiter">&quot;</span></span>}
+ <span class="symbol">:builds</span> {<span class="keyword">..</span><span class="keyword">.</span>}}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">The <code>lein</code> command used by <code>shadow-cljs</code> as configured above</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">lein with-profile +cljs run -m shadow.cljs.devtools.cli ...</code></pre>
 </div>
 </div>
 <div class="sect4">
 <h5 id="_running_tasks_directly_from_leiningen"><a class="anchor" href="#_running_tasks_directly_from_leiningen"></a><a class="link" href="#_running_tasks_directly_from_leiningen">Running Tasks Directly From Leiningen</a></h5>
 <div class="paragraph">
-<p>shadow-cljs is built as a Clojure library, which means you can use it directly from lein without
-installing the CLI command via npm.</p>
-</div>
-<div class="paragraph">
-<p>The classpath of your project will be used to search for .cljs files. There is no
-other dedicated configuration for shadow-cljs in project.clj. If you have a dedicated
-directory for your .cljs files add that to your top-level <code>:source-paths</code>.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-This works even if you don&#8217;t enable full integration in the <code>shadow-cljs.edn</code> configuration
-file.
-</td>
-</tr>
-</table>
+<p>You may also directly execute <code>shadow-cljs</code> commands via <code>lein</code> if you prefer to not use the <code>shadow-cljs</code> command itself. Most commands should work if you just replace <code>shadow-cljs &#8230;&#8203;</code> with <code>lein run -m shadow.cljs.devtools.cli &#8230;&#8203;</code>.</p>
 </div>
 <div class="paragraph">
 <p>Some sample commands are listed below:</p>
@@ -1013,13 +1031,17 @@ file.
 <div class="listingblock">
 <div class="title">Listing Options</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">lein run -m shadow.cljs.devtools.cli help</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">$ shadow-cljs help
+# or
+lein run -m shadow.cljs.devtools.cli help</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">Start a dev mode build with a REPL and live-reload</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">$ lein run -m shadow.cljs.devtools.cli watch build-id</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">$ shadow-cljs watch build-id
+# or
+$ lein run -m shadow.cljs.devtools.cli watch build-id</code></pre>
 </div>
 </div>
 <div class="listingblock">
@@ -1032,30 +1054,6 @@ file.
 <div class="title">Create a :release mode optimized build:</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">lein run -m shadow.cljs.devtools.cli release build-id</code></pre>
-</div>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_full_integration"><a class="anchor" href="#_full_integration"></a><a class="link" href="#_full_integration">Full Integration</a></h5>
-<div class="paragraph">
-<p>The <code>shadow-cljs</code> command-line utility can also use <code>lein</code> to run your commands. You can enable this
-by adding a :lein entry to your shadow-cljs.edn config.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:lein</span> {<span class="symbol">:profile</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">+cljs</span><span class="delimiter">&quot;</span></span>}
- <span class="symbol">:builds</span> {<span class="keyword">..</span><span class="keyword">.</span>}}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This will execute all <code>shadow-cljs</code> commands via <code>lein</code> instead of launching its own JVM. The <code>:profile</code> is optional,
-<code>:lein true</code> or <code>:lein {}</code> is enough to enable lein support. When this mode is active the <code>:source-paths</code> and
-<code>:dependencies</code> inside <code>shadow-cljs.edn</code> will be ignored.</p>
-</div>
-<div class="listingblock">
-<div class="title">The <code>lein</code> command used by <code>shadow-cljs</code> as configured above</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">lein with-profile +cljs run -m shadow.cljs.devtools.cli ...</code></pre>
 </div>
 </div>
 </div>
@@ -2842,75 +2840,10 @@ again (in order) when autobuild is active and files are re-compiled on change.</
 </div>
 </div>
 <div class="sect1">
-<h2 id="_generating_production_code_all_targets"><a class="anchor" href="#_generating_production_code_all_targets"></a><a class="link" href="#_generating_production_code_all_targets">11. Generating Production Code&#8201;&#8212;&#8201;All Targets</a></h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Development mode always outputs individual files for each namespace so that they can be hot loaded
-in isolation. When you&#8217;re ready to deploy code to a real server you want to run the Closure Compiler
-on it to generate a single minified result for each <a href="#_modules">module</a>.</p>
-</div>
-<div class="paragraph">
-<p>By default the release mode output file should just be a drop-in replacements for the
-development mode file: there is no difference in the way you include them in your HTML. You
-may use <a href="#NameHashing">filename hashing</a> to improve caching characteristics on browser targets.</p>
-</div>
-<div class="listingblock">
-<div class="title">Generating Minified Output</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">$ shadow-cljs release build-id</code></pre>
-</div>
-</div>
-<div class="sect2">
-<h3 id="Optimization"><a class="anchor" href="#Optimization"></a><a class="link" href="#Optimization">11.1. Optimizations</a></h3>
-<div class="paragraph">
-<p>You can choose the optimization level using the <code>:compiler-options</code> section of the configuration:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
- <span class="symbol">:build</span>
-   {<span class="symbol">:build-id</span>
-     {<span class="keyword">..</span><span class="keyword">.</span>
-      <span class="symbol">:compiler-options</span> {<span class="symbol">:optimizations</span> <span class="symbol">:whitespace</span>}}}}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>See the <a href="https://developers.google.com/closure/compiler/docs/compilation_levels">the Closure compiler&#8217;s documentation</a>
-for more information on available optimization levels.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_release_specific_vs_development_configuration"><a class="anchor" href="#_release_specific_vs_development_configuration"></a><a class="link" href="#_release_specific_vs_development_configuration">11.2. Release-Specific vs. Development Configuration</a></h3>
-<div class="paragraph">
-<p>If you wish to have separate configuration values in a build when running a release build then you
-can override settings by including a <code>:dev</code> and/or <code>:release</code> section in the build section:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:source-paths</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">src</span><span class="delimiter">&quot;</span></span>]
- <span class="symbol">:dependencies</span> []
- <span class="symbol">:builds</span>
- {<span class="symbol">:app</span>
-  {<span class="symbol">:target</span> <span class="symbol">:browser</span>
-   <span class="symbol">:output-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public/js</span><span class="delimiter">&quot;</span></span>
-   <span class="symbol">:asset-path</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">/js</span><span class="delimiter">&quot;</span></span>
-   <span class="symbol">:modules</span> {<span class="symbol">:base</span> {<span class="symbol">:entries</span> [my.app.core]}}
-
-   <span class="comment">;; Here is some dev-specific config</span>
-   <span class="symbol">:dev</span> {<span class="symbol">:compiler-options</span> {<span class="symbol">:devcards</span> <span class="predefined-constant">true</span>}}
-
-   <span class="comment">;; Here is some production config</span>
-   <span class="symbol">:release</span> {<span class="symbol">:compiler-options</span> {<span class="symbol">:optimizations</span> <span class="symbol">:whitespace</span>}}}}}</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="js-deps"><a class="anchor" href="#js-deps"></a><a class="link" href="#js-deps">12. JavaScript Dependencies</a></h2>
+<h2 id="js-deps"><a class="anchor" href="#js-deps"></a><a class="link" href="#js-deps">11. JavaScript Dependencies</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_using_npm_packages"><a class="anchor" href="#_using_npm_packages"></a><a class="link" href="#_using_npm_packages">12.1. Using npm packages</a></h3>
+<h3 id="_using_npm_packages"><a class="anchor" href="#_using_npm_packages"></a><a class="link" href="#_using_npm_packages">11.1. Using npm packages</a></h3>
 <div class="paragraph">
 <p>Most npm packages will also include some instructions on how to use the actual code. The
 “old” CommonJS style just has require calls which translates directly:</p>
@@ -3042,7 +2975,7 @@ leading to much less code in your final build.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_resolving_js_dependencies"><a class="anchor" href="#_resolving_js_dependencies"></a><a class="link" href="#_resolving_js_dependencies">12.2. Resolving JS Dependencies</a></h3>
+<h3 id="_resolving_js_dependencies"><a class="anchor" href="#_resolving_js_dependencies"></a><a class="link" href="#_resolving_js_dependencies">11.2. Resolving JS Dependencies</a></h3>
 <div class="paragraph">
 <p>By default <code>shadow-cljs</code> will resolve all <code>(:require ["thing" :as x])</code> requires following the npm convention.
 This means it will look at <code>&lt;project&gt;/node_modules/thing/&#8230;&#8203;</code> and follow the code from there. To
@@ -3050,7 +2983,7 @@ customize how this works <code>shadow-cljs</code> exposes a <code>:resolve</code
 things are resolved.</p>
 </div>
 <div class="sect3">
-<h4 id="_using_a_cdn"><a class="anchor" href="#_using_a_cdn"></a><a class="link" href="#_using_a_cdn">12.2.1. Using a CDN</a></h4>
+<h4 id="_using_a_cdn"><a class="anchor" href="#_using_a_cdn"></a><a class="link" href="#_using_a_cdn">11.2.1. Using a CDN</a></h4>
 <div class="paragraph">
 <p>Say you already have React included in your page via a CDN. You could just start using <code>js/React</code> again
 but we stopped doing that for a good reason. Instead you can continue to use <code>(:require ["react" :as react])</code>
@@ -3081,7 +3014,7 @@ the "react" npm package! No need to fiddle with the code to make this work.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_redirecting_require"><a class="anchor" href="#_redirecting_require"></a><a class="link" href="#_redirecting_require">12.2.2. Redirecting “require”</a></h4>
+<h4 id="_redirecting_require"><a class="anchor" href="#_redirecting_require"></a><a class="link" href="#_redirecting_require">11.2.2. Redirecting “require”</a></h4>
 <div class="paragraph">
 <p>Some packages provide multiple “dist” files and sometimes the default one described doesn’t quite work
 in <code>shadow-cljs</code>. One good example for this is "d3". Their default "main" points to "build/d3.node.js" but
@@ -3105,7 +3038,7 @@ so we can’t use that. Instead we just redirect the require to some other file:
 </div>
 </div>
 <div class="sect3">
-<h4 id="_using_local_files"><a class="anchor" href="#_using_local_files"></a><a class="link" href="#_using_local_files">12.2.3. Using local Files</a></h4>
+<h4 id="_using_local_files"><a class="anchor" href="#_using_local_files"></a><a class="link" href="#_using_local_files">11.2.3. Using local Files</a></h4>
 <div class="paragraph">
 <p>You may also use :resolve to directly map to files in your project.</p>
 </div>
@@ -3124,7 +3057,7 @@ so we can’t use that. Instead we just redirect the require to some other file:
 </div>
 </div>
 <div class="sect2">
-<h3 id="_migrating_cljsjs"><a class="anchor" href="#_migrating_cljsjs"></a><a class="link" href="#_migrating_cljsjs">12.3. Migrating cljsjs.*</a></h3>
+<h3 id="_migrating_cljsjs"><a class="anchor" href="#_migrating_cljsjs"></a><a class="link" href="#_migrating_cljsjs">11.3. Migrating cljsjs.*</a></h3>
 <div class="paragraph">
 <p>Many CLJS libraries are still using CLJSJS packages and they would break with <code>shadow-cljs</code> since it
 no longer supports <code>:foreign-libs</code>. I have a clear migration path for this and it just
@@ -3164,6 +3097,105 @@ The <code>shadow-cljsjs</code> library only provides the shim files. You’ll st
 </td>
 </tr>
 </table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_generating_production_code_all_targets"><a class="anchor" href="#_generating_production_code_all_targets"></a><a class="link" href="#_generating_production_code_all_targets">12. Generating Production Code&#8201;&#8212;&#8201;All Targets</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Development mode always outputs individual files for each namespace so that they can be hot loaded
+in isolation. When you&#8217;re ready to deploy code to a real server you want to run the Closure Compiler
+on it to generate a single minified result for each <a href="#_modules">module</a>.</p>
+</div>
+<div class="paragraph">
+<p>By default the release mode output file should just be a drop-in replacements for the
+development mode file: there is no difference in the way you include them in your HTML. You
+may use <a href="#NameHashing">filename hashing</a> to improve caching characteristics on browser targets.</p>
+</div>
+<div class="listingblock">
+<div class="title">Generating Minified Output</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">$ shadow-cljs release build-id</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_release_configuration"><a class="anchor" href="#_release_configuration"></a><a class="link" href="#_release_configuration">12.1. Release Configuration</a></h3>
+<div class="paragraph">
+<p>Usually you won&#8217;t need to add any extra configuration to create a release version for your build. The default config already captures everything necessary and should only require extra configuration if you want to override the defaults.</p>
+</div>
+<div class="paragraph">
+<p>Each <code>:target</code> already provides good defaults optimized for each platform so you&#8217;ll have less to worry about.</p>
+</div>
+<div class="sect3">
+<h4 id="Optimization"><a class="anchor" href="#Optimization"></a><a class="link" href="#Optimization">12.1.1. Optimizations</a></h4>
+<div class="paragraph">
+<p>You can choose the optimization level using the <code>:compiler-options</code> section of the configuration:</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+You do not usually need to set <code>:optimizations</code> since the <code>:target</code> already sets it to an appropriate level.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+<code>:optimizations</code> only apply when using the <code>release</code> command. Development builds are never optimized by the Closure Compiler. Development builds are always set to <code>:none</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:build</span>
+   {<span class="symbol">:build-id</span>
+     {<span class="keyword">..</span><span class="keyword">.</span>
+      <span class="symbol">:compiler-options</span> {<span class="symbol">:optimizations</span> <span class="symbol">:simple</span>}}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>See the <a href="https://developers.google.com/closure/compiler/docs/compilation_levels">the Closure compiler&#8217;s documentation</a>
+for more information on available optimization levels.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_release_specific_vs_development_configuration"><a class="anchor" href="#_release_specific_vs_development_configuration"></a><a class="link" href="#_release_specific_vs_development_configuration">12.1.2. Release-Specific vs. Development Configuration</a></h4>
+<div class="paragraph">
+<p>If you wish to have separate configuration values in a build when running a release build then you
+can override settings by including a <code>:dev</code> and/or <code>:release</code> section in the build section:</p>
+</div>
+<div class="listingblock">
+<div class="title">Example <code>shadow-cljs.edn</code> build config</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:source-paths</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">src</span><span class="delimiter">&quot;</span></span>]
+ <span class="symbol">:dependencies</span> []
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span>
+  {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+   <span class="symbol">:output-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public/js</span><span class="delimiter">&quot;</span></span>
+   <span class="symbol">:asset-path</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">/js</span><span class="delimiter">&quot;</span></span>
+   <span class="symbol">:modules</span> {<span class="symbol">:base</span> {<span class="symbol">:entries</span> [my.app.core]}}
+
+   <span class="comment">;; Here is some dev-specific config</span>
+   <span class="symbol">:dev</span> {<span class="symbol">:compiler-options</span> {<span class="symbol">:devcards</span> <span class="predefined-constant">true</span>}}
+
+   <span class="comment">;; Here is some production config</span>
+   <span class="symbol">:release</span> {<span class="symbol">:compiler-options</span> {<span class="symbol">:optimizations</span> <span class="symbol">:simple</span>}}}}}</code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -3358,11 +3390,10 @@ can usually be solved with custom <code>:resolve</code> configs, but there may a
 <div class="sect2">
 <h3 id="_patching_libraries"><a class="anchor" href="#_patching_libraries"></a><a class="link" href="#_patching_libraries">15.1. Patching Libraries</a></h3>
 <div class="paragraph">
-<p>The shadow-cljs compiler ensure that things on your source paths are
-compiled last. Things from JAR files go first. This means that
-you can copy a source file from a library, patch it, and include it
-in your own source directory. This is a convenient way to test out
-fixes (even to <code>shadow-cljs</code> itself!) without having to clone
+<p>The <code>shadow-cljs</code> compiler ensure that things on your source paths are compiled first, overriding files from JARs. This means that you can copy a source file from a library, patch it, and include it in your own source directory.</p>
+</div>
+<div class="paragraph">
+<p>This is a convenient way to test out fixes (even to <code>shadow-cljs</code> itself!) without having to clone
 that project and understand its setup, build, etc.</p>
 </div>
 </div>
@@ -3372,7 +3403,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-01-16 21:26:47 CET
+Last updated 2018-01-18 13:49:25 CET
 </div>
 </div>
 </body>
