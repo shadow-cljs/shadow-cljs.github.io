@@ -1,0 +1,257 @@
+== Command Line
+
+Once <<Installation, installed>> you can use the `shadow-cljs` command to use the tool.
+
+```bash
+$ shadow-cljs help
+```
+
+If you prefer to only use the local install you can invoke it via `npx` or `yarn`.
+
+```bash
+# npm
+$ npx shadow-cljs help
+
+# yarn
+$ yarn shadow-cljs help
+
+# manually
+$ ./node_modules/.bin/shadow-cljs help
+```
+
+.Commonly used shadow-cljs commands during development
+```bash
+# compile a build once and exit
+$ shadow-cljs compile app
+
+# compile and watch
+$ shadow-cljs watch app
+
+# connect to REPL for the build (available while watch is running)
+$ shadow-cljs cljs-repl app
+
+# connect to standalone node repl
+$ shadow-cljs node-repl
+```
+
+.Running a release build optimized for production use.
+```
+$ shadow-cljs release app
+```
+
+Sometimes you may run into some release issues due to `:advanced` compilation. These
+commands can help track down the causes.
+
+.Release debugging commands.
+```
+$ shadow-cljs check app
+$ shadow-cljs release app --debug
+```
+
+=== Server Mode
+
+Starting a `shadow-cljs` command can be fairly slow to start. To improve this `shadow-cljs` can run in "server mode" which means that a dedicated process is started which all other commands can use to execute a lot faster since they won't have to start a new JVM/Clojure instance.
+
+Commands that do long running things implicitly start a server instance (eg. `watch`) but it is often advisable to have
+a dedicated server process running.
+
+You can either run the process in the foreground in a dedicated terminal. Use `CTRL+C` to terminate the server.
+
+```bash
+$ shadow-cljs server
+
+# or (if you'd like REPL to control the server process)
+$ shadow-cljs clj-repl
+```
+
+You can also run the server in the background controlled via the common `start|stop|restart` functions.
+
+```bash
+$ shadow-cljs start
+$ shadow-cljs stop
+$ shadow-cljs restart
+```
+
+Once any server is running every other command will use that and run much faster.
+
+== Build Tool Integration
+
+`shadow-cljs` can integrate with other Clojure tools since the primary distribution is just a `.jar` file available via Clojars.
+
+CAUTION: It is absolutely recommended to use the standalone `shadow-cljs` version. The command does a lot of things to optimize the user experience (eg. faster startup) which are not done by other tools. You'll also save yourself a lot of headaches dealing with dependency conflicts and other related errors.
+
+=== Leiningen [[Leiningen]]
+
+If you'd like to use Leiningen for your build system (particularly if you use Cursive) then there is a simple option
+in your `shadow-cljs.edn` file that causes it to derive `:source-paths` and `:dependencies` from `project.clj`:
+
+The `shadow-cljs` command-line utility can also use `lein` to run your commands. You can enable this
+by adding a :lein entry to your shadow-cljs.edn config. With `:lein` set the `shadow-cljs` will use `lein` to launch the JVM.
+
+```
+{:lein true
+ ; :source-paths and :dependencies are now ignored in this file
+ ; configure them via project.clj
+ :builds { ... }
+```
+
+.Using a dedicated `lein` profile
+```
+{:lein {:profile "+cljs"}
+ :builds {...}}
+```
+
+.The `lein` command used by `shadow-cljs` as configured above
+```bash
+lein with-profile +cljs run -m shadow.cljs.devtools.cli ...
+```
+
+==== Running Tasks Directly From Leiningen
+
+You may also directly execute `shadow-cljs` commands via `lein` if you prefer to not use the `shadow-cljs` command itself. Most commands should work if you just replace `shadow-cljs ...` with `lein run -m shadow.cljs.devtools.cli ...`.
+
+Some sample commands are listed below:
+
+.Listing Options
+```bash
+$ shadow-cljs help
+# or
+lein run -m shadow.cljs.devtools.cli help
+```
+
+.Start a dev mode build with a REPL and live-reload
+```bash
+$ shadow-cljs watch build-id
+# or
+$ lein run -m shadow.cljs.devtools.cli watch build-id
+```
+
+.Just compile :dev mode once, no REPL or live-reload:
+```bash
+$ lein run -m shadow.cljs.devtools.cli compile build-id
+```
+
+.Create a :release mode optimized build:
+```bash
+lein run -m shadow.cljs.devtools.cli release build-id
+```
+
+=== Boot
+
+The authors have little Boot experience, so this chapter is in need of contributions. We understand
+that Boot allows you to build your tool chain out of functions. Since `shadow-cljs` is a normal
+JVM library with functions that you can call to invoke tasks.
+
+Some boot tasks are available here:
+https://github.com/jgdavey/boot-shadow-cljs
+
+== Clojure REPL
+
+It is possible to use `shadow-cljs` entirely via a Clojure REPL. You can start a Clojure REPL via `shadow-cljs` itself or by any of the usual ways to get one (eg. `lein repl`, `clj`). If the `thheller/shadow-cljs` artifact is on the classpath you are good to go.
+
+.Lets start with the "easy" way.
+```bash
+$ shadow-cljs clj-repl
+...
+shadow-cljs - REPL - see (help), :repl/quit to exit
+[1:0]~shadow.user=>
+```
+
+The `shadow.cljs.devtools.api` namespace has functions that map more or less 1:1 to the CLI counterparts.
+
+.Example commands
+```clojure
+;; shadow-cljs watch foo
+(shadow.cljs.devtools.api/watch :foo)
+;; the shadow.user ns already has an alias for shadow.cljs.devtools.api
+(shadow/watch :foo)
+;; shadow-cljs watch foo --verbose
+(shadow/watch :foo {:verbose true})
+;; shadow-cljs compile foo
+(shadow/compile :foo)
+;; shadow-cljs release foo
+(shadow/release :foo)
+```
+
+=== Embedded
+
+When you are not using the `shadow-cljs clj-repl` but instead a REPL started by any other means you need to start the embedded server.
+
+.Example using `lein repl`
+```bash
+$ lein repl
+nREPL server started on port 57098 on host 127.0.0.1 - nrepl://127.0.0.1:57098
+REPL-y 0.3.7, nREPL 0.2.13
+Clojure 1.9.0
+...
+
+user=> (require '[shadow.cljs.devtools.server :as server])
+nil
+user=> (server/start!)
+...
+:shadow.cljs.devtools.server/started
+user=> (require '[shadow.cljs.devtools.api :as shadow])
+nil
+user=> (shadow/compile :foo)
+...
+```
+
+You can stop the embedded server by running `(shadow.cljs.devtools.server/stop!)`. This will also stop all running build processes.
+
+== ClojureScript REPL
+
+Most `:target` configurations automatically inject the necessary code for a ClojureScript REPL. It should not require any additional configuration. For the CLJS REPL to work you need 2 things
+
+. a running `watch` for your build
+. connect the JS runtime of the `:target`. Meaning if you are using the `:browser` target you need to open a Browser that has the generated JS loaded. For node.js builds that means running the `node` process.
+
+Once you have both you can connect to the CLJS REPL via the command line or from the Clojure REPL.
+
+.CLI
+```bash
+$ shadow-cljs watch build-id
+...
+
+# different terminal
+$ shadow-cljs cljs-repl build-id
+shadow-cljs - connected to server
+[3:1]~cljs.user=>
+```
+
+.REPL
+```bash
+$ shadow-cljs clj-repl
+...
+[2:0]~shadow.user=> (shadow/watch :browser)
+[:browser] Configuring build.
+[:browser] Compiling ...
+[:browser] Build completed. (341 files, 1 compiled, 0 warnings, 3,19s)
+:watching
+[2:0]~shadow.user=> (shadow/repl :browser)
+[2:1]~cljs.user=>
+```
+
+TIP: Type `:repl/quit` to exit the REPL. This will only exit the REPL, the `watch` will remain running.
+
+TIP: You may run multiple `watch` "workers" in parallel and connect/disconnect to their REPLs at any given time.
+
+.No connected runtime error.
+``` text
+[3:1]~cljs.user=> (js/alert "foo")
+There is no connected JS runtime.
+```
+
+
+=== Node REPL
+
+The above REPLs were all coupled to a specific build where you are responsible for running the given `:target`. You may also launch an embedded `node` REPL where a process is started for you.
+
+```bash
+$ shadow-cljs node-repl
+```
+
+This starts a blank CLJS REPL with an already connected `node` process.
+
+IMPORTANT: If you exit the Node REPL the `node` process is also killed!
+
+`node-repl` lets you get started without any additional configuration. It has access to all your code via the usual means. Since it is not connected to any build it does not do any live-reloading.
