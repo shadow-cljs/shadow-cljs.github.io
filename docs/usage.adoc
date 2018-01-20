@@ -241,6 +241,8 @@ TIP: You may run multiple `watch` "workers" in parallel and connect/disconnect t
 There is no connected JS runtime.
 ```
 
+If you see this you need to open your App in the Browser or start the `node` process.
+
 
 === Node REPL
 
