@@ -41,7 +41,7 @@ function on startup. This only ever produces the file specified in `:output-to`.
 You will often write scripts that run as servers or some other long-running process. Hot code reload can
 be quite useful when working with these, and it is simple to set up:
 
-. Add start/top hook functions.
+. Add start/stop callback functions.
 . Configure the build use those hooks.
 
 Here is an example http server in node:
@@ -92,7 +92,7 @@ Here is an example http server in node:
 
 The associated configuration is (`shadow-cljs.edn`):
 
-.Adding hooks for hot core reload.
+.Adding hooks for hot code reload.
 ```
 {...
  :builds
