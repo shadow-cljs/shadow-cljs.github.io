@@ -58,3 +58,116 @@ can override settings by including a `:dev` and/or `:release` section in the bui
    ;; Here is some production config
    :release {:compiler-options {:optimizations :simple}}}}}
 ```
+
+== Externs
+
+Since we want builds to be fully optimized by the Closure Compiler `:advanced` compilation we need to deal with https://developers.google.com/closure/compiler/docs/api-tutorial3[Externs]. Externs represent pieces of code that are not included when doing `:advanced` compilation. `:advanced` works by doing whole program optimizations but some code we just won't be able to include so Externs inform the Compiler about this code. Without Externs the Compiler may rename of remove some code that it shouldn't.
+
+Typically all JS Dependencies are foreign and won't be passed through `:advanced` and thus require Externs.
+
+TIP: Externs are only required for `:advanced`, they are not required in `:simple` mode.
+
+=== Externs Inference
+
+To help deal with Externs the `shadow-cljs` compiler provides enhanced externs inference which can be enabled by setting `:infer-externs :auto` for your build.
+
+.Example Config
+```clojure
+{...
+ :builds
+ {:app
+  {:target :browser
+   ...
+   :compiler-options {:infer-externs :auto}
+   }}}}
+```
+
+With `:auto` the compiler will perform additional checks at compile time for your files only. It won't warn you about possible externs issues in library code. `:all` will enable it for everthing but be aware that you may get a lot of warnings.
+
+When enabled you'll get warnings whenever the Compiler cannot figure out whether you are working with JS or CLJS code.
+
+.Example Code
+```
+(defn wrap-baz [x]
+  (.baz x))
+```
+
+.Example Warning
+```text
+------ WARNING #1 --------------------------------------------------------------
+ File: ~/project/src/demo/thing.cljs:23:3
+--------------------------------------------------------------------------------
+  21 |
+  22 | (defn wrap-baz [x]
+  23 |   (.baz x))
+---------^----------------------------------------------------------------------
+ Cannot infer target type in expression (. x baz)
+--------------------------------------------------------------------------------
+```
+
+In `:advanced` the compiler will be renaming `.baz` to something "shorter" and Externs inform the Compiler that this is an external property that should not be renamed.
+
+`shadow-cljs` can generate the appropriate externs if you add a small typehint to the object you are performing native interop on.
+
+.Type-hint to help externs generation
+```clojure
+(defn wrap-baz [x]
+  (.baz ^js x))
+```
+
+The `^js` typehint will cause the compiler to generate proper externs and the warning will go away. The property is now safe from renaming.
+
+.Multiple interop calls
+```clojure
+(defn wrap-baz [x]
+  (.foo ^js x)
+  (.baz ^js x))
+```
+
+It can get tedious to annotate every single interop call so you can annotate the variable binding itself. It will be used in the entire scope for this variable. Externs for both calls will still be generated.
+
+.Annotate `x` directly
+```clojure
+(defn wrap-baz [^js x]
+  (.foo x)
+  (.baz x))
+```
+
+IMPORTANT: Don't annotate everything with `^js`. Sometimes you may be doing interop on CLJS or ClosureJS objects. Those do not require externs. If you are certain you are working with a CLJS Object prefer using the `^clj` hint.
+ It is not the end of the world when using `^js` incorrectly but it may affect some optimizations when a variable is not renamed when it could be.
+
+
+Calls on globals do not require a typehint when using direct `js/` calls.
+
+.No hint required, externs inferred automatically
+```
+(js/Some.Thing.coolFunction)
+```
+
+Calls on `:require` bindings are also inferred automatically.
+
+.No hint required for `:as` and `:refer` bindings
+```
+(ns my.app
+  (:require ["react" :as react :refer (createElement)]))
+
+(react/createElement "div" nil "hello world")
+(createElement "div" nil "hello world")
+```
+
+=== Manual Externs
+
+Some libraries provide Externs as separate `.js` files. You can include them into your build via the `:externs` compiler options.
+
+.Manual Externs Config
+```
+{...
+ :builds
+ {:app
+  {:target :browser
+   ...
+   :compiler-options {:externs ["path/to/externs.js" ...]}
+   }}}
+```
+
+TIP: The compiler look for files relative to the project root first. It will also attempt to load them from the classpath if no file is found.

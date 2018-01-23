@@ -96,12 +96,46 @@ With our improved support we we can easily translate this to:
             ["react-virtualized/dist/commonjs/List" :default virtual-list]))
 ```
 
+== Providing JS Dependencies
+
+`shadow-cljs` supports several different ways to include native JS into your build. They are configurable via the `:js-options :js-provider` setting. Each `:target` usually sets the on appropriate for your build most often you won't need to touch this setting.
+
+Currently there are 3 supported JS Providers:
+
+[Horizontal]
+`:require`:: Maps directly to the JS `require("thing")` function call. It is the default for all `node.js` targets since it can resolve `require` natively at runtime. The included JS is not processed in any way.
+`:shadow`:: Resolves the JS via `node_modules` and includes a minified version version of each referenced file in the build. It is the default for the `:browser` target. `node_modules` sources do not go through `:advanced` compilation.
+`:closure`:: Resolves similarly to `:shadow` but attempts to process all included files via the Closure Compiler CommonJS/ES6 rewrite facilities. They will also be processed via `:advanced` compilation.
+
+.`:shadow` vs `:closure`
+****
+Ideally we want to use `:closure` as our primary JS Provider since that will run the entire application through `:advanced` giving us the most optimized output. In practice however lots of code available via `npm` is not compatible with the aggressive optimizations that `:advanced` compilation does. They either fail to compile at all or expose subtle bugs at runtime that are very hard to identify.
+
+`:shadow` is sort of a stopgap solution that only processes code via `:simple` and achieves much more reliable support while still getting reasonably optimized code. The output is comparable (or often better) to what other tools like `webpack` generate.
+
+Until support in Closure gets more reliable `:shadow` is the recommend JS Provider for `:browser` builds.
+****
+
+
+.Example config for using `:closure` in a `:browser` build.
+```clojure
+{...
+ :builds
+ {:app
+  {:target :browser
+   ...
+   :js-options {:js-provider :closure}
+   }}}
+```
+
 == Resolving JS Dependencies
 
-By default `shadow-cljs` will resolve all `(:require ["thing" :as x])` requires following the npm convention.
-This means it will look at `<project>/node_modules/thing/...` and follow the code from there. To
+By default `shadow-cljs` will resolve all `(:require ["thing" :as x])` requires following the `npm` convention.
+This means it will look at `<project>/node_modules/thing/package.json` and follow the code from there. To
 customize how this works `shadow-cljs` exposes a `:resolve` config option that lets you override how
 things are resolved.
+
+IMPORTANT: Currently only the `:shadow` and `:closure` JS Providers support custom resolving configuration. Since `:require` maps directly to JS `require` we can't influence what that does.
 
 === Using a CDN
 

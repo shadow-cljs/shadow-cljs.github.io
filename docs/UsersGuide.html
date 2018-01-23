@@ -668,14 +668,15 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#js-deps">11. JavaScript Dependencies</a>
 <ul class="sectlevel2">
 <li><a href="#_using_npm_packages">11.1. Using npm packages</a></li>
-<li><a href="#_resolving_js_dependencies">11.2. Resolving JS Dependencies</a>
+<li><a href="#_providing_js_dependencies">11.2. Providing JS Dependencies</a></li>
+<li><a href="#_resolving_js_dependencies">11.3. Resolving JS Dependencies</a>
 <ul class="sectlevel3">
-<li><a href="#_using_a_cdn">11.2.1. Using a CDN</a></li>
-<li><a href="#_redirecting_require">11.2.2. Redirecting “require”</a></li>
-<li><a href="#_using_local_files">11.2.3. Using local Files</a></li>
+<li><a href="#_using_a_cdn">11.3.1. Using a CDN</a></li>
+<li><a href="#_redirecting_require">11.3.2. Redirecting “require”</a></li>
+<li><a href="#_using_local_files">11.3.3. Using local Files</a></li>
 </ul>
 </li>
-<li><a href="#_migrating_cljsjs">11.3. Migrating cljsjs.*</a></li>
+<li><a href="#_migrating_cljsjs">11.4. Migrating cljsjs.*</a></li>
 </ul>
 </li>
 <li><a href="#_generating_production_code_all_targets">12. Generating Production Code&#8201;&#8212;&#8201;All Targets</a>
@@ -684,6 +685,12 @@ table.CodeRay td.code>pre{padding:0}
 <ul class="sectlevel3">
 <li><a href="#Optimization">12.1.1. Optimizations</a></li>
 <li><a href="#_release_specific_vs_development_configuration">12.1.2. Release-Specific vs. Development Configuration</a></li>
+</ul>
+</li>
+<li><a href="#_externs">12.2. Externs</a>
+<ul class="sectlevel3">
+<li><a href="#_externs_inference">12.2.1. Externs Inference</a></li>
+<li><a href="#_manual_externs">12.2.2. Manual Externs</a></li>
 </ul>
 </li>
 </ul>
@@ -840,7 +847,7 @@ interest:</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://nodejs.org"><code>node.js</code></a> (v7.0.0+)</p>
+<p><a href="https://nodejs.org"><code>node.js</code></a> (v6.0.0+, most recent version preferred)</p>
 </li>
 <li>
 <p><a href="https://www.npmjs.com"><code>npm</code></a> or <a href="https://www.yarnpkg.com"><code>yarn</code></a></p>
@@ -3295,15 +3302,78 @@ leading to much less code in your final build.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_resolving_js_dependencies"><a class="anchor" href="#_resolving_js_dependencies"></a><a class="link" href="#_resolving_js_dependencies">11.2. Resolving JS Dependencies</a></h3>
+<h3 id="_providing_js_dependencies"><a class="anchor" href="#_providing_js_dependencies"></a><a class="link" href="#_providing_js_dependencies">11.2. Providing JS Dependencies</a></h3>
 <div class="paragraph">
-<p>By default <code>shadow-cljs</code> will resolve all <code>(:require ["thing" :as x])</code> requires following the npm convention.
-This means it will look at <code>&lt;project&gt;/node_modules/thing/&#8230;&#8203;</code> and follow the code from there. To
+<p><code>shadow-cljs</code> supports several different ways to include native JS into your build. They are configurable via the <code>:js-options :js-provider</code> setting. Each <code>:target</code> usually sets the on appropriate for your build most often you won&#8217;t need to touch this setting.</p>
+</div>
+<div class="paragraph">
+<p>Currently there are 3 supported JS Providers:</p>
+</div>
+<div class="dlist Horizontal">
+<dl>
+<dt><code>:require</code></dt>
+<dd>
+<p>Maps directly to the JS <code>require("thing")</code> function call. It is the default for all <code>node.js</code> targets since it can resolve <code>require</code> natively at runtime. The included JS is not processed in any way.</p>
+</dd>
+<dt><code>:shadow</code></dt>
+<dd>
+<p>Resolves the JS via <code>node_modules</code> and includes a minified version version of each referenced file in the build. It is the default for the <code>:browser</code> target. <code>node_modules</code> sources do not go through <code>:advanced</code> compilation.</p>
+</dd>
+<dt><code>:closure</code></dt>
+<dd>
+<p>Resolves similarly to <code>:shadow</code> but attempts to process all included files via the Closure Compiler CommonJS/ES6 rewrite facilities. They will also be processed via <code>:advanced</code> compilation.</p>
+</dd>
+</dl>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title"><code>:shadow</code> vs <code>:closure</code></div>
+<div class="paragraph">
+<p>Ideally we want to use <code>:closure</code> as our primary JS Provider since that will run the entire application through <code>:advanced</code> giving us the most optimized output. In practice however lots of code available via <code>npm</code> is not compatible with the aggressive optimizations that <code>:advanced</code> compilation does. They either fail to compile at all or expose subtle bugs at runtime that are very hard to identify.</p>
+</div>
+<div class="paragraph">
+<p><code>:shadow</code> is sort of a stopgap solution that only processes code via <code>:simple</code> and achieves much more reliable support while still getting reasonably optimized code. The output is comparable (or often better) to what other tools like <code>webpack</code> generate.</p>
+</div>
+<div class="paragraph">
+<p>Until support in Closure gets more reliable <code>:shadow</code> is the recommend JS Provider for <code>:browser</code> builds.</p>
+</div>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Example config for using <code>:closure</code> in a <code>:browser</code> build.</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span>
+  {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+   <span class="keyword">..</span><span class="keyword">.</span>
+   <span class="symbol">:js-options</span> {<span class="symbol">:js-provider</span> <span class="symbol">:closure</span>}
+   }}}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_resolving_js_dependencies"><a class="anchor" href="#_resolving_js_dependencies"></a><a class="link" href="#_resolving_js_dependencies">11.3. Resolving JS Dependencies</a></h3>
+<div class="paragraph">
+<p>By default <code>shadow-cljs</code> will resolve all <code>(:require ["thing" :as x])</code> requires following the <code>npm</code> convention.
+This means it will look at <code>&lt;project&gt;/node_modules/thing/package.json</code> and follow the code from there. To
 customize how this works <code>shadow-cljs</code> exposes a <code>:resolve</code> config option that lets you override how
 things are resolved.</p>
 </div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Currently only the <code>:shadow</code> and <code>:closure</code> JS Providers support custom resolving configuration. Since <code>:require</code> maps directly to JS <code>require</code> we can&#8217;t influence what that does.
+</td>
+</tr>
+</table>
+</div>
 <div class="sect3">
-<h4 id="_using_a_cdn"><a class="anchor" href="#_using_a_cdn"></a><a class="link" href="#_using_a_cdn">11.2.1. Using a CDN</a></h4>
+<h4 id="_using_a_cdn"><a class="anchor" href="#_using_a_cdn"></a><a class="link" href="#_using_a_cdn">11.3.1. Using a CDN</a></h4>
 <div class="paragraph">
 <p>Say you already have React included in your page via a CDN. You could just start using <code>js/React</code> again
 but we stopped doing that for a good reason. Instead you can continue to use <code>(:require ["react" :as react])</code>
@@ -3334,7 +3404,7 @@ the "react" npm package! No need to fiddle with the code to make this work.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_redirecting_require"><a class="anchor" href="#_redirecting_require"></a><a class="link" href="#_redirecting_require">11.2.2. Redirecting “require”</a></h4>
+<h4 id="_redirecting_require"><a class="anchor" href="#_redirecting_require"></a><a class="link" href="#_redirecting_require">11.3.2. Redirecting “require”</a></h4>
 <div class="paragraph">
 <p>Some packages provide multiple “dist” files and sometimes the default one described doesn’t quite work
 in <code>shadow-cljs</code>. One good example for this is "d3". Their default "main" points to "build/d3.node.js" but
@@ -3358,7 +3428,7 @@ so we can’t use that. Instead we just redirect the require to some other file:
 </div>
 </div>
 <div class="sect3">
-<h4 id="_using_local_files"><a class="anchor" href="#_using_local_files"></a><a class="link" href="#_using_local_files">11.2.3. Using local Files</a></h4>
+<h4 id="_using_local_files"><a class="anchor" href="#_using_local_files"></a><a class="link" href="#_using_local_files">11.3.3. Using local Files</a></h4>
 <div class="paragraph">
 <p>You may also use :resolve to directly map to files in your project.</p>
 </div>
@@ -3377,7 +3447,7 @@ so we can’t use that. Instead we just redirect the require to some other file:
 </div>
 </div>
 <div class="sect2">
-<h3 id="_migrating_cljsjs"><a class="anchor" href="#_migrating_cljsjs"></a><a class="link" href="#_migrating_cljsjs">11.3. Migrating cljsjs.*</a></h3>
+<h3 id="_migrating_cljsjs"><a class="anchor" href="#_migrating_cljsjs"></a><a class="link" href="#_migrating_cljsjs">11.4. Migrating cljsjs.*</a></h3>
 <div class="paragraph">
 <p>Many CLJS libraries are still using CLJSJS packages and they would break with <code>shadow-cljs</code> since it
 no longer supports <code>:foreign-libs</code>. I have a clear migration path for this and it just
@@ -3515,6 +3585,172 @@ can override settings by including a <code>:dev</code> and/or <code>:release</co
    <span class="comment">;; Here is some production config</span>
    <span class="symbol">:release</span> {<span class="symbol">:compiler-options</span> {<span class="symbol">:optimizations</span> <span class="symbol">:simple</span>}}}}}</code></pre>
 </div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_externs"><a class="anchor" href="#_externs"></a><a class="link" href="#_externs">12.2. Externs</a></h3>
+<div class="paragraph">
+<p>Since we want builds to be fully optimized by the Closure Compiler <code>:advanced</code> compilation we need to deal with <a href="https://developers.google.com/closure/compiler/docs/api-tutorial3">Externs</a>. Externs represent pieces of code that are not included when doing <code>:advanced</code> compilation. <code>:advanced</code> works by doing whole program optimizations but some code we just won&#8217;t be able to include so Externs inform the Compiler about this code. Without Externs the Compiler may rename of remove some code that it shouldn&#8217;t.</p>
+</div>
+<div class="paragraph">
+<p>Typically all JS Dependencies are foreign and won&#8217;t be passed through <code>:advanced</code> and thus require Externs.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+Externs are only required for <code>:advanced</code>, they are not required in <code>:simple</code> mode.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_externs_inference"><a class="anchor" href="#_externs_inference"></a><a class="link" href="#_externs_inference">12.2.1. Externs Inference</a></h4>
+<div class="paragraph">
+<p>To help deal with Externs the <code>shadow-cljs</code> compiler provides enhanced externs inference which can be enabled by setting <code>:infer-externs :auto</code> for your build.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example Config</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span>
+  {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+   <span class="keyword">..</span><span class="keyword">.</span>
+   <span class="symbol">:compiler-options</span> {<span class="symbol">:infer-externs</span> <span class="symbol">:auto</span>}
+   }}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With <code>:auto</code> the compiler will perform additional checks at compile time for your files only. It won&#8217;t warn you about possible externs issues in library code. <code>:all</code> will enable it for everthing but be aware that you may get a lot of warnings.</p>
+</div>
+<div class="paragraph">
+<p>When enabled you&#8217;ll get warnings whenever the Compiler cannot figure out whether you are working with JS or CLJS code.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example Code</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">defn</span> <span class="function">wrap-baz</span> [x]
+  (<span class="keyword">.</span>baz x))</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Example Warning</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="text">------ WARNING #1 --------------------------------------------------------------
+ File: ~/project/src/demo/thing.cljs:23:3
+--------------------------------------------------------------------------------
+  21 |
+  22 | (defn wrap-baz [x]
+  23 |   (.baz x))
+---------^----------------------------------------------------------------------
+ Cannot infer target type in expression (. x baz)
+--------------------------------------------------------------------------------</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In <code>:advanced</code> the compiler will be renaming <code>.baz</code> to something "shorter" and Externs inform the Compiler that this is an external property that should not be renamed.</p>
+</div>
+<div class="paragraph">
+<p><code>shadow-cljs</code> can generate the appropriate externs if you add a small typehint to the object you are performing native interop on.</p>
+</div>
+<div class="listingblock">
+<div class="title">Type-hint to help externs generation</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">defn</span> <span class="function">wrap-baz</span> [x]
+  (<span class="keyword">.</span>baz ^js x))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>^js</code> typehint will cause the compiler to generate proper externs and the warning will go away. The property is now safe from renaming.</p>
+</div>
+<div class="listingblock">
+<div class="title">Multiple interop calls</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">defn</span> <span class="function">wrap-baz</span> [x]
+  (<span class="keyword">.</span>foo ^js x)
+  (<span class="keyword">.</span>baz ^js x))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It can get tedious to annotate every single interop call so you can annotate the variable binding itself. It will be used in the entire scope for this variable. Externs for both calls will still be generated.</p>
+</div>
+<div class="listingblock">
+<div class="title">Annotate <code>x</code> directly</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">defn</span> <span class="function">wrap-baz</span> [^js x]
+  (<span class="keyword">.</span>foo x)
+  (<span class="keyword">.</span>baz x))</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Don&#8217;t annotate everything with <code>^js</code>. Sometimes you may be doing interop on CLJS or ClosureJS objects. Those do not require externs. If you are certain you are working with a CLJS Object prefer using the <code>^clj</code> hint.
+ It is not the end of the world when using <code>^js</code> incorrectly but it may affect some optimizations when a variable is not renamed when it could be.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Calls on globals do not require a typehint when using direct <code>js/</code> calls.</p>
+</div>
+<div class="listingblock">
+<div class="title">No hint required, externs inferred automatically</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(js/Some.Thing.coolFunction)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Calls on <code>:require</code> bindings are also inferred automatically.</p>
+</div>
+<div class="listingblock">
+<div class="title">No hint required for <code>:as</code> and <code>:refer</code> bindings</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">my.app</span>
+  (<span class="symbol">:require</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">react</span><span class="delimiter">&quot;</span></span> <span class="symbol">:as</span> react <span class="symbol">:refer</span> (createElement)]))
+
+(react/createElement <span class="string"><span class="delimiter">&quot;</span><span class="content">div</span><span class="delimiter">&quot;</span></span> <span class="predefined-constant">nil</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">hello world</span><span class="delimiter">&quot;</span></span>)
+(createElement <span class="string"><span class="delimiter">&quot;</span><span class="content">div</span><span class="delimiter">&quot;</span></span> <span class="predefined-constant">nil</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">hello world</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_manual_externs"><a class="anchor" href="#_manual_externs"></a><a class="link" href="#_manual_externs">12.2.2. Manual Externs</a></h4>
+<div class="paragraph">
+<p>Some libraries provide Externs as separate <code>.js</code> files. You can include them into your build via the <code>:externs</code> compiler options.</p>
+</div>
+<div class="listingblock">
+<div class="title">Manual Externs Config</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span>
+  {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+   <span class="keyword">..</span><span class="keyword">.</span>
+   <span class="symbol">:compiler-options</span> {<span class="symbol">:externs</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">path/to/externs.js</span><span class="delimiter">&quot;</span></span> <span class="keyword">..</span><span class="keyword">.</span>]}
+   }}}</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+The compiler look for files relative to the project root first. It will also attempt to load them from the classpath if no file is found.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -3723,7 +3959,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-01-20 16:01:04 CET
+Last updated 2018-01-23 12:05:30 CET
 </div>
 </div>
 </body>
