@@ -247,8 +247,7 @@ This section is for other options that configure the `shadow-cljs` server instan
 
 === nREPL [[nREPL]]
 
-The `shadow-cljs` server provides a nREPL server via TCP. If you look at the startup message you'll see
-the port of nREPL, and the port will also be stored in `target/shadow-cljs/nrepl.port`:
+The `shadow-cljs` <<server-mode, server>> provides a nREPL server via TCP. If you look at the startup message you'll see the port of nREPL, and the port will also be stored in `target/shadow-cljs/nrepl.port`:
 
 ```bash
 $ shadow-cljs watch dev
@@ -268,6 +267,43 @@ You can configure the port and additional middleware with `shadow-cljs.edn`:
          :middleware []} ; list of namespace-qualified symbols
 }
 ```
+
+If the popular https://github.com/clojure-emacs/cider-nrepl[cider-nrepl] is found on the classpath it will be added automatically. No additional configuration required.
+
+==== nREPL Usage
+
+When connecting to the nREPL server the connection always starts out as a Clojure REPL. Switching to a CLJS REPL works similarly to the <<cljs-repl, non-nREPL version>>. First the `watch` for the given build needs to be started and then we need to select this build to switch the current nREPL session to that build. After selecting the build everything will be eval'd in ClojureScript instead of Clojure.
+
+
+```repl
+(require '[shadow.cljs.devtools.api :as shadow])
+(shadow/watch :the-build)
+(shadow/nrepl-select :the-build)
+```
+
+TIP: Use `:repl/quit` to return to Clojure.
+
+
+==== Embedded nREPL Server
+
+When you use `shadow-cljs` embedded in other tools that provide their own nREPL server (eg. `lein`) you need to configure the `shadow-cljs` middleware. Otherwise you won't be able to switch between CLJ and CLJS REPLs.
+
+.Example Leiningen `project.clj`
+```clojure
+(defproject my-amazing-project "1.0.0"
+  ...
+  :repl-options
+  {:init-ns shadow.user ;; or any of your choosing
+   :nrepl-middleware
+   [shadow.cljs.devtools.server.nrepl/cljs-load-file
+    shadow.cljs.devtools.server.nrepl/cljs-eval
+    shadow.cljs.devtools.server.nrepl/cljs-select
+    ;; required by some tools, not by shadow-cljs.
+    cemerick.piggieback/wrap-cljs-repl]}
+  ...)
+```
+
+TIP: You still need to start the <<embedded, embedded server>> manually before using the CLJS REPL.
 
 === SSL
 
@@ -484,7 +520,7 @@ include::js-deps.adoc[]
 
 include::release.adoc[]
 
-= Editor/IDE/REPL Setup
+= Editor Integration
 
 include::editor-integration.adoc[]
 
