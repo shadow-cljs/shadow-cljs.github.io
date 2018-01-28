@@ -260,7 +260,7 @@ IMPORTANT: If you exit the Node REPL the `node` process is also killed!
 
 == nREPL
 
-When a `shadow-cljs` <<server-mode, server instance>> is running it also provides a nREPL server which tools can connect to. It uses a random port on startup by default and writes this port for `target/shadow-cljs/nrepl.port` on startup. You can also configure this port in `shadow-cljs.edn`
+When a `shadow-cljs` <<server-mode, server instance>> is running it also provides a nREPL server which tools can connect to. It uses a random port by default and writes this port for `target/shadow-cljs/nrepl.port` on startup. You can also configure this port in `shadow-cljs.edn`
 
 .nREPL port config
 ```clojure
@@ -315,3 +315,46 @@ When you use `shadow-cljs` embedded in other tools that provide their own nREPL 
 ```
 
 TIP: You still need to start the <<embedded, embedded server>> manually before using the CLJS REPL.
+
+
+== Scripting the Compiler [[clj-run]]
+
+You can use the `shadow-cljs` CLI to call specific Clojure functions from the command line. This is useful when you want run some code before/after certain tasks. Suppose you wanted to `rsync` the output of your `release` build to a remote server.
+
+.Example Clojure Namespace in `src/my/build.clj`
+```clojure
+(ns my.build
+  (:require
+    [shadow.cljs.devtools.api :as shadow]
+    [clojure.java.shell :refer (sh)]))
+
+(defn release []
+  (shadow/release :my-build)
+  (sh "rsync" "-arzt" "path/to/output-dir" "my@server.com:some/path"))
+```
+
+.Running the `release` function
+```bash
+$ shadow-cljs clj-run my.build/release
+```
+
+You can pass arguments to the invoked functions via the command line.
+
+.Using arguments via normal Clojure fn args
+```clojure
+...
+(defn release [server]
+  (shadow/release :my-build)
+  (sh "rsync" "-arzt" "path/to/output-dir" server)
+```
+
+.Passing the server from the command line
+```bash
+$ shadow-cljs cljs-run my.build/release my@server.com:some/path
+```
+
+TIP: The usual `(defn release [& args])` structure also works if you want to parse the args with something like https://github.com/clojure/tools.cli[tools.cli].
+
+You have access to the full power of Clojure here. You can build entire tools on top of this if you like. As a bonus everything you write this way is also directly available via the Clojure REPL.
+
+IMPORTANT: When the <<server-mode, server>> is running the namespace will not be reloaded automatically, it will only be loaded once. It is recommended to do the development using a REPL and reload the file as usual (eg. `(require 'my.build :reload)`). You may also run `shadow-cljs clj-eval "(require 'my.build :reload)"` to reload manually from the command line.

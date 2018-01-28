@@ -574,6 +574,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_embedded_nrepl_server">3.5.2. Embedded nREPL Server</a></li>
 </ul>
 </li>
+<li><a href="#clj-run">3.6. Scripting the Compiler</a></li>
 </ul>
 </li>
 <li><a href="#_configuration">4. Configuration</a>
@@ -1259,7 +1260,7 @@ If you exit the Node REPL the <code>node</code> process is also killed!
 <div class="sect2">
 <h3 id="_nrepl"><a class="anchor" href="#_nrepl"></a><a class="link" href="#_nrepl">3.5. nREPL</a></h3>
 <div class="paragraph">
-<p>When a <code>shadow-cljs</code> <a href="#server-mode">server instance</a> is running it also provides a nREPL server which tools can connect to. It uses a random port on startup by default and writes this port for <code>target/shadow-cljs/nrepl.port</code> on startup. You can also configure this port in <code>shadow-cljs.edn</code></p>
+<p>When a <code>shadow-cljs</code> <a href="#server-mode">server instance</a> is running it also provides a nREPL server which tools can connect to. It uses a random port by default and writes this port for <code>target/shadow-cljs/nrepl.port</code> on startup. You can also configure this port in <code>shadow-cljs.edn</code></p>
 </div>
 <div class="listingblock">
 <div class="title">nREPL port config</div>
@@ -1342,6 +1343,76 @@ You still need to start the <a href="#embedded">embedded server</a> manually bef
 </tr>
 </table>
 </div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="clj-run"><a class="anchor" href="#clj-run"></a><a class="link" href="#clj-run">3.6. Scripting the Compiler</a></h3>
+<div class="paragraph">
+<p>You can use the <code>shadow-cljs</code> CLI to call specific Clojure functions from the command line. This is useful when you want run some code before/after certain tasks. Suppose you wanted to <code>rsync</code> the output of your <code>release</code> build to a remote server.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example Clojure Namespace in <code>src/my/build.clj</code></div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">my.build</span>
+  (<span class="symbol">:require</span>
+    [shadow.cljs.devtools.api <span class="symbol">:as</span> shadow]
+    [clojure.java.shell <span class="symbol">:refer</span> (sh)]))
+
+(<span class="keyword">defn</span> <span class="function">release</span> []
+  (shadow/release <span class="symbol">:my-build</span>)
+  (sh <span class="string"><span class="delimiter">&quot;</span><span class="content">rsync</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">-arzt</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">path/to/output-dir</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">my@server.com:some/path</span><span class="delimiter">&quot;</span></span>))</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Running the <code>release</code> function</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ shadow-cljs clj-run my.build/release</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can pass arguments to the invoked functions via the command line.</p>
+</div>
+<div class="listingblock">
+<div class="title">Using arguments via normal Clojure fn args</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="keyword">..</span><span class="keyword">.</span>
+(<span class="keyword">defn</span> <span class="function">release</span> [server]
+  (shadow/release <span class="symbol">:my-build</span>)
+  (sh <span class="string"><span class="delimiter">&quot;</span><span class="content">rsync</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">-arzt</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">path/to/output-dir</span><span class="delimiter">&quot;</span></span> server)</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Passing the server from the command line</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ shadow-cljs cljs-run my.build/release my@server.com:some/path</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+The usual <code>(defn release [&amp; args])</code> structure also works if you want to parse the args with something like <a href="https://github.com/clojure/tools.cli">tools.cli</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>You have access to the full power of Clojure here. You can build entire tools on top of this if you like. As a bonus everything you write this way is also directly available via the Clojure REPL.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+When the <a href="#server-mode">server</a> is running the namespace will not be reloaded automatically, it will only be loaded once. It is recommended to do the development using a REPL and reload the file as usual (eg. <code>(require 'my.build :reload)</code>). You may also run <code>shadow-cljs clj-eval "(require 'my.build :reload)"</code> to reload manually from the command line.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
