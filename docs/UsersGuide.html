@@ -549,7 +549,7 @@ table.CodeRay td.code>pre{padding:0}
 <ul class="sectlevel2">
 <li><a href="#_command_line">3.1. Command Line</a>
 <ul class="sectlevel3">
-<li><a href="#_server_mode">3.1.1. Server Mode</a></li>
+<li><a href="#server-mode">3.1.1. Server Mode</a></li>
 </ul>
 </li>
 <li><a href="#_build_tool_integration">3.2. Build Tool Integration</a>
@@ -560,12 +560,18 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 <li><a href="#_clojure_repl">3.3. Clojure REPL</a>
 <ul class="sectlevel3">
-<li><a href="#_embedded">3.3.1. Embedded</a></li>
+<li><a href="#embedded">3.3.1. Embedded</a></li>
 </ul>
 </li>
-<li><a href="#_clojurescript_repl">3.4. ClojureScript REPL</a>
+<li><a href="#cljs-repl">3.4. ClojureScript REPL</a>
 <ul class="sectlevel3">
 <li><a href="#_node_repl">3.4.1. Node REPL</a></li>
+</ul>
+</li>
+<li><a href="#_nrepl">3.5. nREPL</a>
+<ul class="sectlevel3">
+<li><a href="#_nrepl_middleware">3.5.1. nREPL Middleware</a></li>
+<li><a href="#_embedded_nrepl_server">3.5.2. Embedded nREPL Server</a></li>
 </ul>
 </li>
 </ul>
@@ -798,10 +804,7 @@ project.clj
 </div>
 </div>
 <div class="paragraph">
-<p>Many of the examples are of the configuration file for the compiler. This file contains an EDN map.
-Where we have already discussed required options we will often elide them for clarity. In this
-case we&#8217;ll usually include an elipsis to indicate "content that is required but isn&#8217;t in our
-current focus":</p>
+<p>Many of the examples are of the configuration file for the compiler. This file contains an EDN map. Where we have already discussed required options we will often elide them for clarity. In this case we&#8217;ll usually include an elipsis to indicate "content that is required but isn&#8217;t in our current focus":</p>
 </div>
 <div class="listingblock">
 <div class="title">Example 1. Specify dependencies</div>
@@ -950,7 +953,7 @@ $ shadow-cljs release app --debug</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_server_mode"><a class="anchor" href="#_server_mode"></a><a class="link" href="#_server_mode">3.1.1. Server Mode</a></h4>
+<h4 id="server-mode"><a class="anchor" href="#server-mode"></a><a class="link" href="#server-mode">3.1.1. Server Mode</a></h4>
 <div class="paragraph">
 <p>Starting a <code>shadow-cljs</code> command can be fairly slow to start. To improve this <code>shadow-cljs</code> can run in "server mode" which means that a dedicated process is started which all other commands can use to execute a lot faster since they won&#8217;t have to start a new JVM/Clojure instance.</p>
 </div>
@@ -1116,7 +1119,7 @@ shadow-cljs - REPL - see (help), :repl/quit to exit
 </div>
 </div>
 <div class="sect3">
-<h4 id="_embedded"><a class="anchor" href="#_embedded"></a><a class="link" href="#_embedded">3.3.1. Embedded</a></h4>
+<h4 id="embedded"><a class="anchor" href="#embedded"></a><a class="link" href="#embedded">3.3.1. Embedded</a></h4>
 <div class="paragraph">
 <p>When you are not using the <code>shadow-cljs clj-repl</code> but instead a REPL started by any other means you need to start the embedded server.</p>
 </div>
@@ -1146,7 +1149,7 @@ user=&gt; (shadow/compile :foo)
 </div>
 </div>
 <div class="sect2">
-<h3 id="_clojurescript_repl"><a class="anchor" href="#_clojurescript_repl"></a><a class="link" href="#_clojurescript_repl">3.4. ClojureScript REPL</a></h3>
+<h3 id="cljs-repl"><a class="anchor" href="#cljs-repl"></a><a class="link" href="#cljs-repl">3.4. ClojureScript REPL</a></h3>
 <div class="paragraph">
 <p>Most <code>:target</code> configurations automatically inject the necessary code for a ClojureScript REPL. It should not require any additional configuration. For the CLJS REPL to work you need 2 things</p>
 </div>
@@ -1250,6 +1253,94 @@ If you exit the Node REPL the <code>node</code> process is also killed!
 </div>
 <div class="paragraph">
 <p><code>node-repl</code> lets you get started without any additional configuration. It has access to all your code via the usual means. Since it is not connected to any build it does not do any live-reloading.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_nrepl"><a class="anchor" href="#_nrepl"></a><a class="link" href="#_nrepl">3.5. nREPL</a></h3>
+<div class="paragraph">
+<p>When a <code>shadow-cljs</code> <a href="#server-mode">server instance</a> is running it also provides a nREPL server which tools can connect to. It uses a random port on startup by default and writes this port for <code>target/shadow-cljs/nrepl.port</code> on startup. You can also configure this port in <code>shadow-cljs.edn</code></p>
+</div>
+<div class="listingblock">
+<div class="title">nREPL port config</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:source-paths</span> [<span class="keyword">..</span><span class="keyword">.</span>]
+ <span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:nrepl</span> {<span class="symbol">:port</span> <span class="integer">9600</span>}
+ <span class="symbol">:builds</span> {<span class="keyword">..</span><span class="keyword">.</span>}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When connecting to the nREPL server the connection always starts out as a Clojure REPL. Switching to a CLJS REPL works similarly to the <a href="#cljs-repl">non-nREPL version</a>. First the <code>watch</code> for the given build needs to be started and then we need to select this build to switch the current nREPL session to that build. After selecting the build everything will be eval&#8217;d in ClojureScript instead of Clojure.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="repl">(require '[shadow.cljs.devtools.api :as shadow])
+(shadow/watch :the-build)
+(shadow/nrepl-select :the-build)</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+Use <code>:repl/quit</code> to return to Clojure.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_nrepl_middleware"><a class="anchor" href="#_nrepl_middleware"></a><a class="link" href="#_nrepl_middleware">3.5.1. nREPL Middleware</a></h4>
+<div class="paragraph">
+<p>You can configure additional nREPL middleware via <code>shadow-cljs.edn</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:source-paths</span> [<span class="keyword">..</span><span class="keyword">.</span>]
+ <span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:nrepl</span> {<span class="symbol">:port</span> <span class="keyword">..</span><span class="keyword">.</span>
+         <span class="symbol">:middleware</span> [some.other/middleware <span class="keyword">..</span><span class="keyword">.</span>]}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the popular <a href="https://github.com/clojure-emacs/cider-nrepl">cider-nrepl</a> is found on the classpath it will be added automatically. No additional configuration required.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_embedded_nrepl_server"><a class="anchor" href="#_embedded_nrepl_server"></a><a class="link" href="#_embedded_nrepl_server">3.5.2. Embedded nREPL Server</a></h4>
+<div class="paragraph">
+<p>When you use <code>shadow-cljs</code> embedded in other tools that provide their own nREPL server (eg. <code>lein</code>) you need to configure the <code>shadow-cljs</code> middleware. Otherwise you won&#8217;t be able to switch between CLJ and CLJS REPLs.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example Leiningen <code>project.clj</code></div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(defproject my-amazing-project <span class="string"><span class="delimiter">&quot;</span><span class="content">1.0.0</span><span class="delimiter">&quot;</span></span>
+  <span class="keyword">..</span><span class="keyword">.</span>
+  <span class="symbol">:repl-options</span>
+  {<span class="symbol">:init-ns</span> shadow.user <span class="comment">;; or any of your choosing</span>
+   <span class="symbol">:nrepl-middleware</span>
+   [shadow.cljs.devtools.server.nrepl/cljs-load-file
+    shadow.cljs.devtools.server.nrepl/cljs-eval
+    shadow.cljs.devtools.server.nrepl/cljs-select
+    <span class="comment">;; required by some tools, not by shadow-cljs.</span>
+    cemerick.piggieback/wrap-cljs-repl]}
+  <span class="keyword">..</span><span class="keyword">.</span>)</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+You still need to start the <a href="#embedded">embedded server</a> manually before using the CLJS REPL.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -3959,7 +4050,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-01-23 12:05:30 CET
+Last updated 2018-01-27 14:24:41 STD
 </div>
 </div>
 </body>

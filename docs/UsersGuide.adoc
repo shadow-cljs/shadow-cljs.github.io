@@ -81,10 +81,7 @@ project.clj
 ...
 ```
 
-Many of the examples are of the configuration file for the compiler. This file contains an EDN map.
-Where we have already discussed required options we will often elide them for clarity. In this
-case we'll usually include an elipsis to indicate "content that is required but isn't in our
-current focus":
+Many of the examples are of the configuration file for the compiler. This file contains an EDN map. Where we have already discussed required options we will often elide them for clarity. In this case we'll usually include an elipsis to indicate "content that is required but isn't in our current focus":
 
 .Example 1. Specify dependencies
 ```
