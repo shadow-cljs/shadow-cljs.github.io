@@ -597,7 +597,6 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_preloads">5.2.1. Preloads</a></li>
 <li><a href="#_hot_code_reload">5.2.2. Hot Code Reload</a></li>
 <li><a href="#_lifecycle_hooks">5.2.3. Lifecycle Hooks</a></li>
-<li><a href="#hud">5.2.4. Heads-Up Display (HUD)</a></li>
 </ul>
 </li>
 </ul>
@@ -616,8 +615,9 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#BrowserManifest">6.6. Output Manifest</a></li>
 <li><a href="#_development_support">6.7. Development Support</a>
 <ul class="sectlevel3">
-<li><a href="#_http_server">6.7.1. HTTP Server</a></li>
-<li><a href="#_css_reloading">6.7.2. CSS Reloading</a></li>
+<li><a href="#hud">6.7.1. Heads-Up Display (HUD)</a></li>
+<li><a href="#_http_server">6.7.2. HTTP Server</a></li>
+<li><a href="#_css_reloading">6.7.3. CSS Reloading</a></li>
 </ul>
 </li>
 </ul>
@@ -1813,85 +1813,6 @@ can do async processing, but <strong>must</strong> call <code>(done)</code> to i
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="hud"><a class="anchor" href="#hud"></a><a class="link" href="#hud">5.2.4. Heads-Up Display (HUD)</a></h4>
-<div class="paragraph">
-<p>The <code>:browser</code> target now uses a HUD to display a loading indicator when a build is started. It will also display warnings and errors if there are any.</p>
-</div>
-<div class="paragraph">
-<p>You can disable this by setting <code>:hud false</code> in the <code>:devtools</code> section.</p>
-</div>
-<div class="sect4">
-<h5 id="_opening_files"><a class="anchor" href="#_opening_files"></a><a class="link" href="#_opening_files">Opening Files</a></h5>
-<div class="paragraph">
-<p>Warnings include a link to source location which can be clicked to open the file in your editor. For this a little bit of config is required.</p>
-</div>
-<div class="paragraph">
-<p>You can either configure this in your <code>shadow-cljs.edn</code> config for the project or globally in your home directory under <code>~/.shadow-cljs/config.edn</code>.</p>
-</div>
-<div class="listingblock">
-<div class="title"><code>:open-file-command</code> configuration</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:open-file-command</span>
- [<span class="string"><span class="delimiter">&quot;</span><span class="content">idea</span><span class="delimiter">&quot;</span></span> <span class="symbol">:pwd</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">--line</span><span class="delimiter">&quot;</span></span> <span class="symbol">:line</span> <span class="symbol">:file</span>]}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The <code>:open-file-command</code> expects a vector representing a very simple DSL. Strings are kept as they are and keyword are replaced by their respective values. A nested vector can be used in case you need to combine multiple params, using <code>clojure.core/format</code> style pattern.</p>
-</div>
-<div class="paragraph">
-<p>The above example would execute</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">$ idea /path/to/project-root --line 3 /path/to/project-root/srv/main/demo/foo.cljs</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title"><code>emacsclient</code> example</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:open-file-command</span>
- [<span class="string"><span class="delimiter">&quot;</span><span class="content">emacsclient</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">-n</span><span class="delimiter">&quot;</span></span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">+%s:%s</span><span class="delimiter">&quot;</span></span> <span class="symbol">:line</span> <span class="symbol">:column</span>] <span class="symbol">:file</span>]}</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">$ emacsclient -n +3:1 /path/to/project-root/srv/main/demo/foo.cljs</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The available replacement variables are:</p>
-</div>
-<div class="dlist Horizontal">
-<dl>
-<dt><code>:pwd</code></dt>
-<dd>
-<p>Process Working Directory (aka project root)</p>
-</dd>
-<dt><code>:file</code></dt>
-<dd>
-<p>Absolute File Path</p>
-</dd>
-<dt><code>:line</code></dt>
-<dd>
-<p>Line Number with Warning/Error</p>
-</dd>
-<dt><code>:column</code></dt>
-<dd>
-<p>Column Number</p>
-</dd>
-<dt><code>:wsl-file</code></dt>
-<dd>
-<p>Translated WSL file path. Useful when running <code>shadow-cljs</code> via WSL Bash. Translates a <code>/mnt/c/Users/someone/code/project/src/main/demo/foo.cljs</code> path into <code>C:\Users...</code></p>
-</dd>
-<dt><code>:wsl-pwd</code></dt>
-<dd>
-<p>Translated <code>:pwd</code></p>
-</dd>
-</dl>
-</div>
-</div>
-</div>
 </div>
 </div>
 </div>
@@ -2402,7 +2323,86 @@ be relative to the configured <code>:output-dir</code>.</p>
 options for configuring an optional dev-time HTTP server for a build and CSS reloading.</p>
 </div>
 <div class="sect3">
-<h4 id="_http_server"><a class="anchor" href="#_http_server"></a><a class="link" href="#_http_server">6.7.1. HTTP Server</a></h4>
+<h4 id="hud"><a class="anchor" href="#hud"></a><a class="link" href="#hud">6.7.1. Heads-Up Display (HUD)</a></h4>
+<div class="paragraph">
+<p>The <code>:browser</code> target now uses a HUD to display a loading indicator when a build is started. It will also display warnings and errors if there are any.</p>
+</div>
+<div class="paragraph">
+<p>You can disable this by setting <code>:hud false</code> in the <code>:devtools</code> section.</p>
+</div>
+<div class="sect4">
+<h5 id="_opening_files"><a class="anchor" href="#_opening_files"></a><a class="link" href="#_opening_files">Opening Files</a></h5>
+<div class="paragraph">
+<p>Warnings include a link to source location which can be clicked to open the file in your editor. For this a little bit of config is required.</p>
+</div>
+<div class="paragraph">
+<p>You can either configure this in your <code>shadow-cljs.edn</code> config for the project or globally in your home directory under <code>~/.shadow-cljs/config.edn</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title"><code>:open-file-command</code> configuration</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:open-file-command</span>
+ [<span class="string"><span class="delimiter">&quot;</span><span class="content">idea</span><span class="delimiter">&quot;</span></span> <span class="symbol">:pwd</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">--line</span><span class="delimiter">&quot;</span></span> <span class="symbol">:line</span> <span class="symbol">:file</span>]}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>:open-file-command</code> expects a vector representing a very simple DSL. Strings are kept as they are and keyword are replaced by their respective values. A nested vector can be used in case you need to combine multiple params, using <code>clojure.core/format</code> style pattern.</p>
+</div>
+<div class="paragraph">
+<p>The above example would execute</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ idea /path/to/project-root --line 3 /path/to/project-root/srv/main/demo/foo.cljs</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title"><code>emacsclient</code> example</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:open-file-command</span>
+ [<span class="string"><span class="delimiter">&quot;</span><span class="content">emacsclient</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">-n</span><span class="delimiter">&quot;</span></span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">+%s:%s</span><span class="delimiter">&quot;</span></span> <span class="symbol">:line</span> <span class="symbol">:column</span>] <span class="symbol">:file</span>]}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ emacsclient -n +3:1 /path/to/project-root/srv/main/demo/foo.cljs</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The available replacement variables are:</p>
+</div>
+<div class="dlist Horizontal">
+<dl>
+<dt><code>:pwd</code></dt>
+<dd>
+<p>Process Working Directory (aka project root)</p>
+</dd>
+<dt><code>:file</code></dt>
+<dd>
+<p>Absolute File Path</p>
+</dd>
+<dt><code>:line</code></dt>
+<dd>
+<p>Line Number of Warning/Error</p>
+</dd>
+<dt><code>:column</code></dt>
+<dd>
+<p>Column Number</p>
+</dd>
+<dt><code>:wsl-file</code></dt>
+<dd>
+<p>Translated WSL file path. Useful when running <code>shadow-cljs</code> via WSL Bash. Translates a <code>/mnt/c/Users/someone/code/project/src/main/demo/foo.cljs</code> path into <code>C:\Users...</code></p>
+</dd>
+<dt><code>:wsl-pwd</code></dt>
+<dd>
+<p>Translated <code>:pwd</code></p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_http_server"><a class="anchor" href="#_http_server"></a><a class="link" href="#_http_server">6.7.2. HTTP Server</a></h4>
 <div class="paragraph">
 <p>The server supports the following options:</p>
 </div>
@@ -2477,7 +2477,7 @@ real resource (so you can just hit browser reload on your SPA even on odd URIs).
 </div>
 </div>
 <div class="sect3">
-<h4 id="_css_reloading"><a class="anchor" href="#_css_reloading"></a><a class="link" href="#_css_reloading">6.7.2. CSS Reloading</a></h4>
+<h4 id="_css_reloading"><a class="anchor" href="#_css_reloading"></a><a class="link" href="#_css_reloading">6.7.3. CSS Reloading</a></h4>
 <div class="paragraph">
 <p>The Browser devtools can also reload CSS for you. This is enabled by default and in most cases requires no additional
 configuration when you are using the built-in HTTP dev server.</p>
@@ -4019,7 +4019,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-02-01 00:17:09 STD
+Last updated 2018-02-01 00:25:12 STD
 </div>
 </div>
 </body>

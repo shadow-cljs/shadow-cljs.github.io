@@ -328,6 +328,62 @@ be relative to the configured `:output-dir`.
 The `:devtools` section of the configuration for `:browser` supports a few additional
 options for configuring an optional dev-time HTTP server for a build and CSS reloading.
 
+=== Heads-Up Display (HUD) [[hud]]
+
+The `:browser` target now uses a HUD to display a loading indicator when a build is started. It will also display warnings and errors if there are any.
+
+You can disable this by setting `:hud false` in the `:devtools` section.
+
+==== Opening Files
+
+Warnings include a link to source location which can be clicked to open the file in your editor. For this a little bit of config is required.
+
+You can either configure this in your `shadow-cljs.edn` config for the project or globally in your home directory under `~/.shadow-cljs/config.edn`.
+
+.`:open-file-command` configuration
+```clojure
+{:open-file-command
+ ["idea" :pwd "--line" :line :file]}
+```
+
+The `:open-file-command` expects a vector representing a very simple DSL. Strings are kept as they are and keyword are replaced by their respective values. A nested vector can be used in case you need to combine multiple params, using `clojure.core/format` style pattern.
+
+The above example would execute
+```bash
+$ idea /path/to/project-root --line 3 /path/to/project-root/srv/main/demo/foo.cljs
+```
+
+.`emacsclient` example
+```
+{:open-file-command
+ ["emacsclient" "-n" ["+%s:%s" :line :column] :file]}
+```
+
+```bash
+$ emacsclient -n +3:1 /path/to/project-root/srv/main/demo/foo.cljs
+```
+
+The available replacement variables are:
+
+[Horizontal]
+`:pwd`::
+Process Working Directory (aka project root)
+
+`:file`::
+Absolute File Path
+
+`:line`::
+Line Number of Warning/Error
+
+`:column`::
+Column Number
+
+`:wsl-file`::
+Translated WSL file path. Useful when running `shadow-cljs` via WSL Bash. Translates a `/mnt/c/Users/someone/code/project/src/main/demo/foo.cljs` path into `C:\Users\...`
+
+`:wsl-pwd`::
+Translated `:pwd`
+
 === HTTP Server
 
 The server supports the following options:
