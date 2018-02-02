@@ -386,7 +386,7 @@ Each build describes artifacts that the compiler will build. The build target is
 
 == Build Target
 
-Each build in `shadow-cljs` must define a `:target` which defines where you intend your code to be executed. There are default built-ins for the <<BrowserTarget,browser>> and <<NodeTarget,`node.js`>>. They all share the basic concept of having `:dev` and `:release` modes. `:dev` mode provides all the usual development goodies like fast compilation, live code reloading and a REPL. `:release` mode will produce optimized output intended for production.
+Each build in `shadow-cljs` must define a `:target` which defines where you intend your code to be executed. There are default built-ins for the <<target-browser,browser>> and <<target-node,`node.js`>>. They all share the basic concept of having `:dev` and `:release` modes. `:dev` mode provides all the usual development goodies like fast compilation, live code reloading and a REPL. `:release` mode will produce optimized output intended for production.
 
 Targets are covered in separate chapters.
 
@@ -394,18 +394,18 @@ Here are some of them:
 
 [Horizontal]
 <<target-browser, `:browser`>>:: Output code suitable for running in a web browser.
-`:bootstrap`:: Output code suitable for running in bootstrapped cljs environment.
-`:browser-test`:: Scan for tests to determine required files, and output tests suitable for running in the browser.
-`:karma`:: Scan for tests to determine required files, and output karma-runner compatible tests. See http://karma-runner.github.io/2.0/index.html[Karma].
-`:node-library`:: Output code suitable for use as a node library.
-`:node-script`:: Output code suitable for use as a node script.
-`:npm-module`:: Output code suitable for use as an NPM module.
+<<target-bootstrap, `:bootstrap`>>:: Output code suitable for running in bootstrapped cljs environment.
+<<target-browser-test, `:browser-test`>>:: Scan for tests to determine required files, and output tests suitable for running in the browser.
+<<target-karma, `:karma`>>:: Scan for tests to determine required files, and output karma-runner compatible tests. See http://karma-runner.github.io/2.0/index.html[Karma].
+<<target-node-library, `:node-library`>>:: Output code suitable for use as a node library.
+<<target-node-script, `:node-script`>>:: Output code suitable for use as a node script.
+<<target-npm-module, `:npm-module`>>:: Output code suitable for use as an NPM module.
 
 Each target is covered in more detail in its own chapter since the remaining build options vary on
 the target you select.
 
 
-== Development Options
+== Development Options [[devtools]]
 
 Each build `:target` typically provides some development support. They are grouped under the `:devtools` key for each `:build`.
 
@@ -472,7 +472,7 @@ can do async processing, but *must* call `(done)` to indicate it is complete.
 
 include::target-browser.adoc[]
 
-= Targeting node.js
+= Targeting node.js [[target-node]]
 
 There is built-in support for generating code that is intended to be use as a stand-alone
 script, and also for code that is intended to be used as a library. See the
@@ -519,7 +519,7 @@ include::target-custom.adoc[]
 
 include::js-deps.adoc[]
 
-= Generating Production Code -- All Targets
+= Generating Production Code -- All Targets [[release]]
 
 include::release.adoc[]
 

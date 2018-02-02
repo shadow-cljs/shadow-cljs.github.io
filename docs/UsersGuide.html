@@ -592,7 +592,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_build_configuration">5. Build Configuration</a>
 <ul class="sectlevel2">
 <li><a href="#_build_target">5.1. Build Target</a></li>
-<li><a href="#_development_options">5.2. Development Options</a>
+<li><a href="#devtools">5.2. Development Options</a>
 <ul class="sectlevel3">
 <li><a href="#_preloads">5.2.1. Preloads</a></li>
 <li><a href="#_hot_code_reload">5.2.2. Hot Code Reload</a></li>
@@ -622,7 +622,7 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 </ul>
 </li>
-<li><a href="#_targeting_node_js">7. Targeting node.js</a>
+<li><a href="#target-node">7. Targeting node.js</a>
 <ul class="sectlevel2">
 <li><a href="#target-node-script">7.1. node.js Scripts</a>
 <ul class="sectlevel3">
@@ -681,7 +681,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_migrating_cljsjs">11.4. Migrating cljsjs.*</a></li>
 </ul>
 </li>
-<li><a href="#_generating_production_code_all_targets">12. Generating Production Code&#8201;&#8212;&#8201;All Targets</a>
+<li><a href="#release">12. Generating Production Code&#8201;&#8212;&#8201;All Targets</a>
 <ul class="sectlevel2">
 <li><a href="#_release_configuration">12.1. Release Configuration</a>
 <ul class="sectlevel3">
@@ -884,10 +884,19 @@ $ yarn global add shadow-cljs</code></pre>
 <div class="sect1">
 <h2 id="_usage"><a class="anchor" href="#_usage"></a><a class="link" href="#_usage">3. Usage</a></h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p><code>shadow-cljs</code> can be used in many different ways but the general workflow stays the same.</p>
+</div>
+<div class="paragraph">
+<p>During development you have the option to <code>compile</code> a build once or run a <code>watch</code> worker which watches your source files for changes and re-compiles them automatically. When <a href="#devtools">enabled</a> the <code>watch</code> will also hot-reload your code and provide a REPL. During development the focus is on developer experience with fast feedback cycles. Development code should never be shipped to the public.</p>
+</div>
+<div class="paragraph">
+<p>When it is time to get serious you create a <a href="#release"><code>release</code></a> build which creates an optimized build suitable for production. For this the <a href="https://developers.google.com/closure/compiler/">Closure Compiler</a> is used which applies some seriously <code>:advanced</code> optimizations to your code to create the most optimal output available. This may require some tuning to work properly when using lots of interop with native JavaScript but works flawlessly for ClojureScript (and the code from the <a href="https://developers.google.com/closure/library/">Closure Library</a>).</p>
+</div>
 <div class="sect2">
 <h3 id="_command_line"><a class="anchor" href="#_command_line"></a><a class="link" href="#_command_line">3.1. Command Line</a></h3>
 <div class="paragraph">
-<p>Once <a href="#_installation">installed</a> you can use the <code>shadow-cljs</code> command to use the tool.</p>
+<p>Once <a href="#_installation">installed</a> you can use the <code>shadow-cljs</code> command directly if installed globally.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -895,7 +904,7 @@ $ yarn global add shadow-cljs</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>If you prefer to only use the local install you can invoke it via <code>npx</code> or <code>yarn</code>.</p>
+<p>If you prefer to only use the local <code>npm</code> install you can invoke it via <code>npx</code> or <code>yarn</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -980,7 +989,7 @@ $ shadow-cljs restart</code></pre>
 <div class="sect2">
 <h3 id="_build_tool_integration"><a class="anchor" href="#_build_tool_integration"></a><a class="link" href="#_build_tool_integration">3.2. Build Tool Integration</a></h3>
 <div class="paragraph">
-<p><code>shadow-cljs</code> can integrate with other Clojure tools since the primary distribution is just a <code>.jar</code> file available via Clojars.</p>
+<p><code>shadow-cljs</code> can integrate with other Clojure tools since the primary distribution is just a <code>.jar</code> file available via <a href="https://clojars.org/thheller/shadow-cljs">Clojars</a>.</p>
 </div>
 <div class="admonitionblock caution">
 <table>
@@ -997,12 +1006,10 @@ It is absolutely recommended to use the standalone <code>shadow-cljs</code> vers
 <div class="sect3">
 <h4 id="Leiningen"><a class="anchor" href="#Leiningen"></a><a class="link" href="#Leiningen">3.2.1. Leiningen</a></h4>
 <div class="paragraph">
-<p>If you&#8217;d like to use Leiningen for your build system (particularly if you use Cursive) then there is a simple option
-in your <code>shadow-cljs.edn</code> file that causes it to derive <code>:source-paths</code> and <code>:dependencies</code> from <code>project.clj</code>:</p>
+<p>If you&#8217;d like to use Leiningen for your build system (particularly if you use Cursive) then there is a simple option in your <code>shadow-cljs.edn</code> file that causes it to derive <code>:source-paths</code> and <code>:dependencies</code> from <code>project.clj</code>:</p>
 </div>
 <div class="paragraph">
-<p>The <code>shadow-cljs</code> command-line utility can also use <code>lein</code> to run your commands. You can enable this
-by adding a :lein entry to your shadow-cljs.edn config. With <code>:lein</code> set the <code>shadow-cljs</code> will use <code>lein</code> to launch the JVM.</p>
+<p>The <code>shadow-cljs</code> command-line utility can also use <code>lein</code> to run your commands. You can enable this by adding a <code>:lein</code> entry to your <code>shadow-cljs.edn</code> config. With <code>:lein</code> set the <code>shadow-cljs</code> command will use <code>lein</code> to launch the JVM.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1038,7 +1045,7 @@ by adding a :lein entry to your shadow-cljs.edn config. With <code>:lein</code> 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">$ shadow-cljs help
 # or
-lein run -m shadow.cljs.devtools.cli help</code></pre>
+$ lein run -m shadow.cljs.devtools.cli help</code></pre>
 </div>
 </div>
 <div class="listingblock">
@@ -1058,7 +1065,7 @@ $ lein run -m shadow.cljs.devtools.cli watch build-id</code></pre>
 <div class="listingblock">
 <div class="title">Create a :release mode optimized build:</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">lein run -m shadow.cljs.devtools.cli release build-id</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">$ lein run -m shadow.cljs.devtools.cli release build-id</code></pre>
 </div>
 </div>
 </div>
@@ -1079,7 +1086,7 @@ JVM library with functions that you can call to invoke tasks.</p>
 <div class="sect2">
 <h3 id="_clojure_repl"><a class="anchor" href="#_clojure_repl"></a><a class="link" href="#_clojure_repl">3.3. Clojure REPL</a></h3>
 <div class="paragraph">
-<p>It is possible to use <code>shadow-cljs</code> entirely via a Clojure REPL. You can start a Clojure REPL via <code>shadow-cljs</code> itself or by any of the usual ways to get one (eg. <code>lein repl</code>, <code>clj</code>). If the <code>thheller/shadow-cljs</code> artifact is on the classpath you are good to go.</p>
+<p>It is possible to use <code>shadow-cljs</code> entirely via a Clojure REPL. You can start a Clojure REPL via <code>shadow-cljs</code> itself or by any of the usual ways to get one (eg. <code>lein repl</code>, <code>clj</code>). If the <a href="https://clojars.org/thheller/shadow-cljs">thheller/shadow-cljs</a> artifact is on the classpath you are good to go.</p>
 </div>
 <div class="listingblock">
 <div class="title">Lets start with the "easy" way.</div>
@@ -1675,7 +1682,7 @@ The server automatically supports HTTP/2 when using <code>:ssl</code>.
 <div class="sect2">
 <h3 id="_build_target"><a class="anchor" href="#_build_target"></a><a class="link" href="#_build_target">5.1. Build Target</a></h3>
 <div class="paragraph">
-<p>Each build in <code>shadow-cljs</code> must define a <code>:target</code> which defines where you intend your code to be executed. There are default built-ins for the <a href="#BrowserTarget">browser</a> and <a href="#NodeTarget"><code>node.js</code></a>. They all share the basic concept of having <code>:dev</code> and <code>:release</code> modes. <code>:dev</code> mode provides all the usual development goodies like fast compilation, live code reloading and a REPL. <code>:release</code> mode will produce optimized output intended for production.</p>
+<p>Each build in <code>shadow-cljs</code> must define a <code>:target</code> which defines where you intend your code to be executed. There are default built-ins for the <a href="#target-browser">browser</a> and <a href="#target-node"><code>node.js</code></a>. They all share the basic concept of having <code>:dev</code> and <code>:release</code> modes. <code>:dev</code> mode provides all the usual development goodies like fast compilation, live code reloading and a REPL. <code>:release</code> mode will produce optimized output intended for production.</p>
 </div>
 <div class="paragraph">
 <p>Targets are covered in separate chapters.</p>
@@ -1689,27 +1696,27 @@ The server automatically supports HTTP/2 when using <code>:ssl</code>.
 <dd>
 <p>Output code suitable for running in a web browser.</p>
 </dd>
-<dt><code>:bootstrap</code></dt>
+<dt><a href="#target-bootstrap"><code>:bootstrap</code></a></dt>
 <dd>
 <p>Output code suitable for running in bootstrapped cljs environment.</p>
 </dd>
-<dt><code>:browser-test</code></dt>
+<dt><a href="#target-browser-test"><code>:browser-test</code></a></dt>
 <dd>
 <p>Scan for tests to determine required files, and output tests suitable for running in the browser.</p>
 </dd>
-<dt><code>:karma</code></dt>
+<dt><a href="#target-karma"><code>:karma</code></a></dt>
 <dd>
 <p>Scan for tests to determine required files, and output karma-runner compatible tests. See <a href="http://karma-runner.github.io/2.0/index.html">Karma</a>.</p>
 </dd>
-<dt><code>:node-library</code></dt>
+<dt><a href="#target-node-library"><code>:node-library</code></a></dt>
 <dd>
 <p>Output code suitable for use as a node library.</p>
 </dd>
-<dt><code>:node-script</code></dt>
+<dt><a href="#target-node-script"><code>:node-script</code></a></dt>
 <dd>
 <p>Output code suitable for use as a node script.</p>
 </dd>
-<dt><code>:npm-module</code></dt>
+<dt><a href="#target-npm-module"><code>:npm-module</code></a></dt>
 <dd>
 <p>Output code suitable for use as an NPM module.</p>
 </dd>
@@ -1721,7 +1728,7 @@ the target you select.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_development_options"><a class="anchor" href="#_development_options"></a><a class="link" href="#_development_options">5.2. Development Options</a></h3>
+<h3 id="devtools"><a class="anchor" href="#devtools"></a><a class="link" href="#devtools">5.2. Development Options</a></h3>
 <div class="paragraph">
 <p>Each build <code>:target</code> typically provides some development support. They are grouped under the <code>:devtools</code> key for each <code>:build</code>.</p>
 </div>
@@ -2523,7 +2530,7 @@ document root used to serve your content.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_targeting_node_js"><a class="anchor" href="#_targeting_node_js"></a><a class="link" href="#_targeting_node_js">7. Targeting node.js</a></h2>
+<h2 id="target-node"><a class="anchor" href="#target-node"></a><a class="link" href="#target-node">7. Targeting node.js</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>There is built-in support for generating code that is intended to be use as a stand-alone
@@ -3695,7 +3702,7 @@ The <code>shadow-cljsjs</code> library only provides the shim files. You’ll st
 </div>
 </div>
 <div class="sect1">
-<h2 id="_generating_production_code_all_targets"><a class="anchor" href="#_generating_production_code_all_targets"></a><a class="link" href="#_generating_production_code_all_targets">12. Generating Production Code&#8201;&#8212;&#8201;All Targets</a></h2>
+<h2 id="release"><a class="anchor" href="#release"></a><a class="link" href="#release">12. Generating Production Code&#8201;&#8212;&#8201;All Targets</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Development mode always outputs individual files for each namespace so that they can be hot loaded
@@ -4019,7 +4026,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-02-01 00:25:12 STD
+Last updated 2018-02-02 00:51:09 STD
 </div>
 </div>
 </body>

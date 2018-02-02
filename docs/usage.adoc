@@ -1,12 +1,19 @@
+`shadow-cljs` can be used in many different ways but the general workflow stays the same.
+
+During development you have the option to `compile` a build once or run a `watch` worker which watches your source files for changes and re-compiles them automatically. When <<devtools, enabled>> the `watch` will also hot-reload your code and provide a REPL. During development the focus is on developer experience with fast feedback cycles. Development code should never be shipped to the public.
+
+When it is time to get serious you create a <<release, `release`>> build which creates an optimized build suitable for production. For this the https://developers.google.com/closure/compiler/[Closure Compiler] is used which applies some seriously `:advanced` optimizations to your code to create the most optimal output available. This may require some tuning to work properly when using lots of interop with native JavaScript but works flawlessly for ClojureScript (and the code from the https://developers.google.com/closure/library/[Closure Library]).
+
+
 == Command Line
 
-Once <<Installation, installed>> you can use the `shadow-cljs` command to use the tool.
+Once <<Installation, installed>> you can use the `shadow-cljs` command directly if installed globally.
 
 ```bash
 $ shadow-cljs help
 ```
 
-If you prefer to only use the local install you can invoke it via `npx` or `yarn`.
+If you prefer to only use the local `npm` install you can invoke it via `npx` or `yarn`.
 
 ```bash
 # npm
@@ -76,17 +83,15 @@ Once any server is running every other command will use that and run much faster
 
 == Build Tool Integration
 
-`shadow-cljs` can integrate with other Clojure tools since the primary distribution is just a `.jar` file available via Clojars.
+`shadow-cljs` can integrate with other Clojure tools since the primary distribution is just a `.jar` file available via https://clojars.org/thheller/shadow-cljs[Clojars].
 
 CAUTION: It is absolutely recommended to use the standalone `shadow-cljs` version. The command does a lot of things to optimize the user experience (eg. faster startup) which are not done by other tools. You'll also save yourself a lot of headaches dealing with dependency conflicts and other related errors.
 
 === Leiningen [[Leiningen]]
 
-If you'd like to use Leiningen for your build system (particularly if you use Cursive) then there is a simple option
-in your `shadow-cljs.edn` file that causes it to derive `:source-paths` and `:dependencies` from `project.clj`:
+If you'd like to use Leiningen for your build system (particularly if you use Cursive) then there is a simple option in your `shadow-cljs.edn` file that causes it to derive `:source-paths` and `:dependencies` from `project.clj`:
 
-The `shadow-cljs` command-line utility can also use `lein` to run your commands. You can enable this
-by adding a :lein entry to your shadow-cljs.edn config. With `:lein` set the `shadow-cljs` will use `lein` to launch the JVM.
+The `shadow-cljs` command-line utility can also use `lein` to run your commands. You can enable this by adding a `:lein` entry to your `shadow-cljs.edn` config. With `:lein` set the `shadow-cljs` command will use `lein` to launch the JVM.
 
 ```
 {:lein true
@@ -116,7 +121,7 @@ Some sample commands are listed below:
 ```bash
 $ shadow-cljs help
 # or
-lein run -m shadow.cljs.devtools.cli help
+$ lein run -m shadow.cljs.devtools.cli help
 ```
 
 .Start a dev mode build with a REPL and live-reload
@@ -133,7 +138,7 @@ $ lein run -m shadow.cljs.devtools.cli compile build-id
 
 .Create a :release mode optimized build:
 ```bash
-lein run -m shadow.cljs.devtools.cli release build-id
+$ lein run -m shadow.cljs.devtools.cli release build-id
 ```
 
 === Boot
@@ -147,7 +152,7 @@ https://github.com/jgdavey/boot-shadow-cljs
 
 == Clojure REPL
 
-It is possible to use `shadow-cljs` entirely via a Clojure REPL. You can start a Clojure REPL via `shadow-cljs` itself or by any of the usual ways to get one (eg. `lein repl`, `clj`). If the `thheller/shadow-cljs` artifact is on the classpath you are good to go.
+It is possible to use `shadow-cljs` entirely via a Clojure REPL. You can start a Clojure REPL via `shadow-cljs` itself or by any of the usual ways to get one (eg. `lein repl`, `clj`). If the https://clojars.org/thheller/shadow-cljs[thheller/shadow-cljs] artifact is on the classpath you are good to go.
 
 .Lets start with the "easy" way.
 ```bash
