@@ -700,6 +700,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_editor_integration">13. Editor Integration</a>
 <ul class="sectlevel2">
 <li><a href="#_cursive">13.1. Cursive</a></li>
+<li><a href="#cider">13.2. emacs / cider</a></li>
 </ul>
 </li>
 <li><a href="#_what_to_do_when_things_don_t_work">14. What to do when things don’t work?</a></li>
@@ -3969,6 +3970,9 @@ The compiler look for files relative to the project root first. It will also att
 <div class="sect1">
 <h2 id="_editor_integration"><a class="anchor" href="#_editor_integration"></a><a class="link" href="#_editor_integration">13. Editor Integration</a></h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>Unfortunately most editors these days expect you to work with the Leiningen <code>project.clj</code> setup so you might need to use the <a href="#Leiningen">Leiningen integration</a> for them to work properly.</p>
+</div>
 <div class="sect2">
 <h3 id="_cursive"><a class="anchor" href="#_cursive"></a><a class="link" href="#_cursive">13.1. Cursive</a></h3>
 <div class="paragraph">
@@ -3981,7 +3985,7 @@ The compiler look for files relative to the project root first. It will also att
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">(defproject your/project <span class="string"><span class="delimiter">&quot;</span><span class="content">0.0.0</span><span class="delimiter">&quot;</span></span>
   <span class="symbol">:dependencies</span>
-  [[thheller/shadow-cljs <span class="string"><span class="delimiter">&quot;</span><span class="content">2.0.145</span><span class="delimiter">&quot;</span></span>]]
+  [[thheller/shadow-cljs <span class="string"><span class="delimiter">&quot;</span><span class="content">2.0.150</span><span class="delimiter">&quot;</span></span>]]
 
   <span class="symbol">:source-paths</span>
   [<span class="string"><span class="delimiter">&quot;</span><span class="content">src</span><span class="delimiter">&quot;</span></span>])</code></pre>
@@ -3989,6 +3993,15 @@ The compiler look for files relative to the project root first. It will also att
 </div>
 <div class="paragraph">
 <p>You can run <code>npx shadow-cljs server</code> inside the Terminal provided by IntelliJ and use <code>Clojure REPL &#8594; Remote</code> Run Configuration to connect to the provided <a href="#nREPL">nREPL server</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cider"><a class="anchor" href="#cider"></a><a class="link" href="#cider">13.2. emacs / cider</a></h3>
+<div class="paragraph">
+<p><a href="https://github.com/shadow-cljs/shadow-cljs.github.io">HELP WANTED!</a></p>
+</div>
+<div class="paragraph">
+<p>The generic <a href="#nrepl">nREPL</a> instructions should provide everything required but additional config might be required.</p>
 </div>
 </div>
 </div>

@@ -1,3 +1,5 @@
+Unfortunately most editors these days expect you to work with the Leiningen `project.clj` setup so you might need to use the <<Leiningen, Leiningen integration>> for them to work properly.
+
 == Cursive
 
 Cursive does not currently support resolving dependencies via `shadow-cljs.edn`. You can run `shadow-cljs pom` to generate a `pom.xml` and import that using the IntelliJ.
@@ -7,10 +9,17 @@ Alternatively you can create a dummy `project.clj` or use the full <<Leiningen, 
 ```
 (defproject your/project "0.0.0"
   :dependencies
-  [[thheller/shadow-cljs "2.0.145"]]
+  [[thheller/shadow-cljs "2.0.150"]]
 
   :source-paths
   ["src"])
 ```
 
 You can run `npx shadow-cljs server` inside the Terminal provided by IntelliJ and use `Clojure REPL -> Remote` Run Configuration to connect to the provided <<nREPL, nREPL server>>.
+
+
+== emacs / cider [[cider]]
+
+https://github.com/shadow-cljs/shadow-cljs.github.io[HELP WANTED!]
+
+The generic <<nrepl, nREPL>> instructions should provide everything required but additional config might be required.
