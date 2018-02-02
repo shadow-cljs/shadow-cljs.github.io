@@ -689,7 +689,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_release_specific_vs_development_configuration">12.1.2. Release-Specific vs. Development Configuration</a></li>
 </ul>
 </li>
-<li><a href="#_externs">12.2. Externs</a>
+<li><a href="#externs">12.2. Externs</a>
 <ul class="sectlevel3">
 <li><a href="#_externs_inference">12.2.1. Externs Inference</a></li>
 <li><a href="#_manual_externs">12.2.2. Manual Externs</a></li>
@@ -891,7 +891,7 @@ $ yarn global add shadow-cljs</code></pre>
 <p>During development you have the option to <code>compile</code> a build once or run a <code>watch</code> worker which watches your source files for changes and re-compiles them automatically. When <a href="#devtools">enabled</a> the <code>watch</code> will also hot-reload your code and provide a REPL. During development the focus is on developer experience with fast feedback cycles. Development code should never be shipped to the public.</p>
 </div>
 <div class="paragraph">
-<p>When it is time to get serious you create a <a href="#release"><code>release</code></a> build which creates an optimized build suitable for production. For this the <a href="https://developers.google.com/closure/compiler/">Closure Compiler</a> is used which applies some seriously <code>:advanced</code> optimizations to your code to create the most optimal output available. This may require some tuning to work properly when using lots of interop with native JavaScript but works flawlessly for ClojureScript (and the code from the <a href="https://developers.google.com/closure/library/">Closure Library</a>).</p>
+<p>When it is time to get serious you create a <a href="#release"><code>release</code></a> build which creates an optimized build suitable for production. For this the <a href="https://developers.google.com/closure/compiler/">Closure Compiler</a> is used which applies some seriously <code>:advanced</code> optimizations to your code to create the most optimal output available. This may require some <a href="#externs">tuning</a> to work properly when using lots of interop with native JavaScript but works flawlessly for ClojureScript (and the code from the <a href="https://developers.google.com/closure/library/">Closure Library</a>).</p>
 </div>
 <div class="sect2">
 <h3 id="_command_line"><a class="anchor" href="#_command_line"></a><a class="link" href="#_command_line">3.1. Command Line</a></h3>
@@ -3799,7 +3799,7 @@ can override settings by including a <code>:dev</code> and/or <code>:release</co
 </div>
 </div>
 <div class="sect2">
-<h3 id="_externs"><a class="anchor" href="#_externs"></a><a class="link" href="#_externs">12.2. Externs</a></h3>
+<h3 id="externs"><a class="anchor" href="#externs"></a><a class="link" href="#externs">12.2. Externs</a></h3>
 <div class="paragraph">
 <p>Since we want builds to be fully optimized by the Closure Compiler <code>:advanced</code> compilation we need to deal with <a href="https://developers.google.com/closure/compiler/docs/api-tutorial3">Externs</a>. Externs represent pieces of code that are not included when doing <code>:advanced</code> compilation. <code>:advanced</code> works by doing whole program optimizations but some code we just won&#8217;t be able to include so Externs inform the Compiler about this code. Without Externs the Compiler may rename of remove some code that it shouldn&#8217;t.</p>
 </div>
