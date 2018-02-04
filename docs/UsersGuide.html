@@ -584,7 +584,7 @@ table.CodeRay td.code>pre{padding:0}
 <ul class="sectlevel3">
 <li><a href="#nREPL">4.3.1. nREPL</a></li>
 <li><a href="#_ssl">4.3.2. SSL</a></li>
-<li><a href="#_http_s">4.3.3. HTTP(S)</a></li>
+<li><a href="#http">4.3.3. HTTP(S)</a></li>
 </ul>
 </li>
 </ul>
@@ -618,6 +618,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#hud">6.7.1. Heads-Up Display (HUD)</a></li>
 <li><a href="#_http_server">6.7.2. HTTP Server</a></li>
 <li><a href="#_css_reloading">6.7.3. CSS Reloading</a></li>
+<li><a href="#_proxy_support">6.7.4. Proxy Support</a></li>
 </ul>
 </li>
 </ul>
@@ -1603,7 +1604,7 @@ You must generate the Certificate with a SAN (Subject Alternative Name) for "loc
 </div>
 </div>
 <div class="sect3">
-<h4 id="_http_s"><a class="anchor" href="#_http_s"></a><a class="link" href="#_http_s">4.3.3. HTTP(S)</a></h4>
+<h4 id="http"><a class="anchor" href="#http"></a><a class="link" href="#http">4.3.3. HTTP(S)</a></h4>
 <div class="paragraph">
 <p>The <code>shadow-cljs</code> server starts one primary HTTP server. It is used by the builds to connect the Hot Reload and REPL clients via websocket. By default it listens on Port 9630. If that Port is in use it will increment by one and attempt again until an open Port is found.</p>
 </div>
@@ -1788,8 +1789,7 @@ system includes everything you need to do your hot code reload, without needing 
 <h4 id="_lifecycle_hooks"><a class="anchor" href="#_lifecycle_hooks"></a><a class="link" href="#_lifecycle_hooks">5.2.3. Lifecycle Hooks</a></h4>
 <div class="paragraph">
 <p>The build configuration supports hooks that allow you to run functions just before hot code reload
-brings in updated code, and just after. These are useful for stopping/starting things that would otherwise
-close over old code. The options go in the <code>:devtools</code> section of the build config and are:</p>
+brings in updated code, and just after. These are useful for stopping/starting things that would otherwise close over old code. The options go in the <code>:devtools</code> section of the build config and are:</p>
 </div>
 <div class="dlist Horizontal">
 <dl>
@@ -1819,6 +1819,18 @@ can do async processing, but <strong>must</strong> call <code>(done)</code> to i
                    <span class="symbol">:after-load</span>   my.app/start
                    <span class="keyword">..</span><span class="keyword">.</span>}}}}</code></pre>
 </div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+If neither <code>:after-load</code> nor <code>:before-load</code> are set the compiler will not attempt to hot reload the code. If you still want hot reloading but don&#8217;t need any of the callbacks you can set <code>:autoload true</code> instead.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -2525,6 +2537,53 @@ document root used to serve your content.</p>
       {<span class="symbol">:app</span> {<span class="keyword">..</span><span class="keyword">.</span>
              <span class="symbol">:devtools</span> {<span class="symbol">:watch-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public</span><span class="delimiter">&quot;</span></span>}}}}</code></pre>
 </div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_proxy_support"><a class="anchor" href="#_proxy_support"></a><a class="link" href="#_proxy_support">6.7.4. Proxy Support</a></h4>
+<div class="paragraph">
+<p>By default the devtools client will attempt to connect to the <code>shadow-cljs</code> process via the configured <a href="#http">HTTP server</a> (usually <code>localhost</code>). If you are using a reverse proxy to serve your HTML that might not be possible. You can set <code>:devtools-url</code> to configure which URL to use.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span> {<span class="keyword">..</span><span class="keyword">.</span>
+        <span class="symbol">:devtools</span> {<span class="symbol">:before-load</span>  my.app/stop
+                   <span class="symbol">:after-load</span>   my.app/start
+                   <span class="symbol">:devtools-url</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">https://some.host/shadow-cljs</span><span class="delimiter">&quot;</span></span>
+                   <span class="keyword">..</span><span class="keyword">.</span>}}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>shadow-cljs</code> will then use the <code>:devtools-url</code> as the base when making requests. It is not the final URL so you must ensure that all request starting with the path you configured (eg. <code>/shadow-cljs/*</code>) are forwarded to the host <code>shadow-cljs</code> is running on.</p>
+</div>
+<div class="listingblock">
+<div class="title">Incoming Request to Proxy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="text">https://some.host/shadow-cljs/ws/foo/bar?asdf</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">must forward to</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">http<span class="symbol">://localhost</span><span class="error">:</span><span class="integer">9630</span>/foo/bar?asdf</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The client will make WebSocket request as well as normal XHR requests to load files. Ensure that your proxy properly upgrades WebSockets.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+The requests must be forwarded to the main <a href="#http">HTTP server</a>, not the one configured in the build itself.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -4039,7 +4098,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-02-02 00:51:09 STD
+Last updated 2018-02-04 22:48:40 STD
 </div>
 </div>
 </body>

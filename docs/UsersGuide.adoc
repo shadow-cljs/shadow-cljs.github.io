@@ -331,7 +331,7 @@ IMPORTANT: You must generate the Certificate with a SAN (Subject Alternative Nam
 
 // TODO: full guide, other platforms
 
-=== HTTP(S)
+=== HTTP(S) [[http]]
 
 The `shadow-cljs` server starts one primary HTTP server. It is used by the builds to connect the Hot Reload and REPL clients via websocket. By default it listens on Port 9630. If that Port is in use it will increment by one and attempt again until an open Port is found.
 
@@ -445,8 +445,7 @@ shadow-cljs watch build-id
 === Lifecycle Hooks
 
 The build configuration supports hooks that allow you to run functions just before hot code reload
-brings in updated code, and just after. These are useful for stopping/starting things that would otherwise
-close over old code. The options go in the `:devtools` section of the build config and are:
+brings in updated code, and just after. These are useful for stopping/starting things that would otherwise close over old code. The options go in the `:devtools` section of the build config and are:
 
 [Horizontal]
 `:before-load`:: A symbol (with namespace) of a function to run just before refreshing
@@ -465,8 +464,7 @@ can do async processing, but *must* call `(done)` to indicate it is complete.
                    ...}}}}
 ```
 
-
-
+TIP: If neither `:after-load` nor `:before-load` are set the compiler will not attempt to hot reload the code. If you still want hot reloading but don't need any of the callbacks you can set `:autoload true` instead.
 
 = Targeting the Browser [[target-browser]]
 

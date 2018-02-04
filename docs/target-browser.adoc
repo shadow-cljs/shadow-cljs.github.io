@@ -454,4 +454,32 @@ document root used to serve your content.
              :devtools {:watch-dir "public"}}}}
 ```
 
+=== Proxy Support
 
+By default the devtools client will attempt to connect to the `shadow-cljs` process via the configured <<http, HTTP server>> (usually `localhost`). If you are using a reverse proxy to serve your HTML that might not be possible. You can set `:devtools-url` to configure which URL to use.
+
+```
+{...
+ :builds
+ {:app {...
+        :devtools {:before-load  my.app/stop
+                   :after-load   my.app/start
+                   :devtools-url "https://some.host/shadow-cljs"
+                   ...}}}}
+```
+
+`shadow-cljs` will then use the `:devtools-url` as the base when making requests. It is not the final URL so you must ensure that all request starting with the path you configured (eg. `/shadow-cljs/*`) are forwarded to the host `shadow-cljs` is running on.
+
+
+.Incoming Request to Proxy
+```text
+https://some.host/shadow-cljs/ws/foo/bar?asdf
+```
+.must forward to
+```
+http://localhost:9630/foo/bar?asdf
+```
+
+The client will make WebSocket request as well as normal XHR requests to load files. Ensure that your proxy properly upgrades WebSockets.
+
+IMPORTANT: The requests must be forwarded to the main <<http, HTTP server>>, not the one configured in the build itself.
