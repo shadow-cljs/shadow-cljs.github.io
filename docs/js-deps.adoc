@@ -1,7 +1,10 @@
-== Using npm packages
+== NPM [[npm]]
 
-Most npm packages will also include some instructions on how to use the actual code. The
-“old” CommonJS style just has require calls which translates directly:
+https://www.npmjs.com/[npm] has come the de-facto standard package manager for JavaScript. Almost all JS libraries can be found there and shadow-cljs provides seamless integration for accessing those packages.
+
+=== Using npm packages
+
+Most npm packages will also include some instructions on how to use the actual code. The “old” CommonJS style just has require calls which translates directly:
 
 ```js
 var react = require("react");
@@ -12,22 +15,19 @@ var react = require("react");
   (:require ["react" :as react]))
 ```
 
-Whatever "string" parameter is used when calling require we transfer to the `:require` as-is.
-The `:as` alias is up to you. Once we have that we can use the code like any other CLJS namespace!
+Whatever "string" parameter is used when calling require we transfer to the `:require` as-is. The `:as` alias is up to you. Once we have that we can use the code like any other CLJS namespace!
 
 ```
 (react/createElement "div" nil "hello world")
 ```
 
-In `shadow-cljs`: *always use the `ns` form and whatever `:as` alias you provided.*
-You may also use `:refer` and `:rename`. This is different than what `:foreign-libs`/CLJSJS does
-where you include the thing in the namespace but then used a global `js/Thing` in your code.
+In `shadow-cljs`: *always use the `ns` form and whatever `:as` alias you provided.* You may also use `:refer` and `:rename`. This is different than what `:foreign-libs`/CLJSJS does where you include the thing in the namespace but then used a global `js/Thing` in your code.
 
 Some packages just export a single function which you can call directly by
 using `(:require ["thing" :as thing])` and then `(thing)`.
 
-More recently some packages started using ES6 `import` statements in their examples. Those also
-translate pretty much 1:1 with one slight difference related to default exports.
+More recently some packages started using ES6 `import` statements in their examples. Those also translate pretty much 1:1 with one slight difference related to default exports.
+
 The following table can be used for translation:
 
 .ES6 Import to CLJS Require
@@ -63,14 +63,10 @@ The following table can be used for translation:
 |===
 
 The `:default` option is currently only available in `shadow-cljs`, you can
-https://dev.clojure.org/jira/browse/CLJS-2376[vote here] to hopefully make it standard.
-You can always use `:as alias` and then call `alias/default` if you prefer to stay compatible
-with standard CLJS in the meantime.
+https://dev.clojure.org/jira/browse/CLJS-2376[vote here] to hopefully make it standard. You can always use `:as alias` and then call `alias/default` if you prefer to stay compatible with standard CLJS in the meantime.
 
-Notice that previously we were stuck using bundled code which included a lot of code we
-didn’t actually need. Now we're in a better situation:
-Some libraries are also packaged in ways  ways that allow you to include only the parts you need,
-leading to much less code in your final build.
+Notice that previously we were stuck using bundled code which included a lot of code we didn’t actually need. Now we're in a better situation:
+Some libraries are also packaged in ways  ways that allow you to include only the parts you need, leading to much less code in your final build.
 
 `react-virtualized` is a great example:
 
@@ -96,9 +92,9 @@ With our improved support we we can easily translate this to:
             ["react-virtualized/dist/commonjs/List" :default virtual-list]))
 ```
 
-== Providing JS Dependencies
+=== Package Provider
 
-`shadow-cljs` supports several different ways to include native JS into your build. They are configurable via the `:js-options :js-provider` setting. Each `:target` usually sets the on appropriate for your build most often you won't need to touch this setting.
+`shadow-cljs` supports several different ways to include `npm` packages into your build. They are configurable via the `:js-options :js-provider` setting. Each `:target` usually sets the on appropriate for your build most often you won't need to touch this setting.
 
 Currently there are 3 supported JS Providers:
 
@@ -128,7 +124,7 @@ Until support in Closure gets more reliable `:shadow` is the recommend JS Provid
    }}}
 ```
 
-== Resolving JS Dependencies
+=== Resolving Packages
 
 By default `shadow-cljs` will resolve all `(:require ["thing" :as x])` requires following the `npm` convention.
 This means it will look at `<project>/node_modules/thing/package.json` and follow the code from there. To
@@ -137,7 +133,7 @@ things are resolved.
 
 IMPORTANT: Currently only the `:shadow` and `:closure` JS Providers support custom resolving configuration. Since `:require` maps directly to JS `require` we can't influence what that does.
 
-=== Using a CDN
+==== Using a CDN
 
 Say you already have React included in your page via a CDN. You could just start using `js/React` again
 but we stopped doing that for a good reason. Instead you can continue to use `(:require ["react" :as react])`
@@ -163,7 +159,7 @@ Here is a sample `shadow-cljs.edn` config for such a build:
 The `:app` build will now use the global `React` instance while the `:server` build continues using
 the "react" npm package! No need to fiddle with the code to make this work.
 
-=== Redirecting “require”
+==== Redirecting “require”
 
 Some packages provide multiple “dist” files and sometimes the default one described doesn’t quite work
 in `shadow-cljs`. One good example for this is "d3". Their default "main" points to "build/d3.node.js" but
@@ -183,26 +179,147 @@ so we can’t use that. Instead we just redirect the require to some other file:
 
 You can also just `(:require ["d3/build/d3.js" :as d3])` as well if you only care about the Browser.
 
-=== Using local Files
+== Dealing with .js Files
 
-You may also use :resolve to directly map to files in your project.
+****
+*DANGER: This feature is an experiment!* It is currently only supported in `shadow-cljs` and other CLJS tools will yell at you if you attempt to use it. Use at your own risk. The feature was initially rejected from CLJS core but I think it is useful and should not have been https://dev.clojure.org/jira/browse/CLJS-2061?focusedCommentId=46191&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-46191[dismissed] without further discussion.
+
+CLJS has an alternate https://clojurescript.org/guides/javascript-modules[implementation] which in turn is not supported by `shadow-cljs`. I found this implementation to be lacking in certain aspects so I opted for the different solution. Happy to discuss the pros/cons of both approaches though.
+****
+
+We covered how <<npm, npm>> packages are used but you may be working on a codebase that already has lots of plain JavaScript and you don't want to rewrite everything in ClojureScript just yet. `shadow-cljs` provides 100% full interop between JavaScript and ClojureScript. Which means your JS can use your CLJS and CLJS can use your JS.
+
+There are only a few conventions you need to follow in order for this to work reliably but chances are that you are already doing that anyways.
+
+
+=== The Classpath
+
+`shadow-cljs` uses the Java Virtual Machine (JVM) and its "classpath" when resolving files. This is sort of a virtual filesystem composed of either filesystem directories or `.jar` files (which basically are just `.zip` files). This is slightly different from `npm` where you are always dealing with files.
+
+In ClojureScript everything is namespaced and each name is expected to resolve to a file. If you have a `(ns demo.app)` namespace the compiler expects to find a `demo/app.cljs` (or `.cljc`) on the classpath. The classpath will be searched in order until it is found. Suppose you configured the `:source-paths ["src/main" "src/test"]` the compiler will first look in `src/main/demo/app.cljs` and then `src/test/demo/app.cljs`. When the file is not found the JVM will begin looking into the `.jar` files on the classpath. So if there is a `demo/app.cljs` at the root of that "zip" file it will be used instead.
+
+IMPORTANT: You can not escape this classpath, meaning that if you configured `src/main` you cannot get to `src`.
+
+If multiple paths contain the same file only the "first" one is used. Everything in Java and Clojure(Script) is namespaced to avoid such conflicts. Very similar to `npm` where each package must have a unique name.
+
+=== Requiring JS
+
+We already covered how `npm` packages are accessed by their name but on the classpath we access `.js` files by either a full path or relative to the current namespace.
+
+.Loading JS from the classpath
+```clojure
+(ns demo.app
+  (:require
+    ["/some-library/components/foo" :as foo]
+    ["./bar" :as bar :refer (myComponent)]))
+```
+
+TIP: For string requires the extension `.js` will be added automatically but you can specify the extension if you prefer. Note that currently only `.js` is supported though.
+
+Absolute requires like `/some-library/components/foo` mean that the compiler will look for a `some-library/components/foo.js` on the classpath. Unlike `node` which would attempt to load the file from the local filesystem. The same classpath rules apply so the file may either be in your `:source-paths` or in some third-party `.jar` library you are using.
+
+Relative requires are resolved by first looking at the current namespace and then resolving a relative path from that name. In the above example we are in `demo/app.cljs` to the `./bar` require resolve to `demo/bar.js`, so it is identical to `(:require ["/demo/bar"])`.
+
+IMPORTANT: The files must not be physically located in the same directory. The lookup for the file appears on the classpath instead. This is unlike node which expects relative requires to always resolve to physical files.
+
+.Example File Structure with Separate Paths
+```text
+.
+├── package.json
+├── shadow-cljs.edn
+└── src
+    └── main
+        └── demo
+            └── app.cljs
+    └── js
+        └── demo
+            └── bar.js
+```
+
+=== Language Support
+
+IMPORTANT: It is expected that the classpath only contains JavaScript that can be consumed without any pre-processing by the Compiler. `npm` has a very similar convention.
+
+The Closure Compiler is used for processing all JavaScript found on the classpath using its `ECMASCRIPT_NEXT` language setting. What exactly this setting means is not well documented but it mostly represents the next generation JavaScript code which might not even be supported by most browsers yet. ES6 is very well supported as well as most ES7 features. Similarly to standard CLJS this will be compiled down to ES5 with polyfills when required.
+
+=== JavaScript Dialects
+
+Since there are many popular JavaScript dialects (JSX, CoffeeScript, etc) that are not directly parsable by the Closure Compiler we need to pre-process them before putting them onto the classpath. https://babeljs.io/[babel] is commonly used in the JavaScript world so we are going to use `babel` to process `.jsx` files as an example here.
+
+.Example shadow-cljs.edn Config
+```
+{:source-paths
+ ["src/main"
+  "src/gen"]
+ ...}
+```
+
+.Example File Structure
+```text
+.
+├── package.json
+├── shadow-cljs.edn
+└── src
+    └── main
+        └── demo
+            └── app.cljs
+    └── js
+        ├── .babelrc
+        └── demo
+            └── bar.jsx
+```
+
+IMPORTANT: Notice how `src/js` is not added to `:source-paths` which means it will not be on the classpath.
+
+.src/js/demo/bar.jsx
+```jsx
+import React from "react";
+
+function myComponent() {
+  return <h1>JSX!</h1>;
+}
+
+export { myComponent };
+```
+
+We run https://babeljs.io/docs/usage/cli/[babel] to convert the files and write them to the configured `src/gen` directory. Which directory you use it up to you. I prefer `src/gen` for generated files.
+
+```bash
+$ babel src/js --out-dir src/gen
+# or during development
+$ babel src/js --out-dir src/gen --watch
+```
+
+`babel` itself is configured via the `src/js/.babelrc`. See the official https://babeljs.io/docs/plugins/transform-react-jsx/[example for JSX].
+
+.JSX minimal .babelrc
+```json
+{
+  "plugins": ["transform-react-jsx"]
+}
+```
+
+Once `babel` writes the `src/gen/demo/bar.js` it will be available to use via ClojureScript and will even be hot loaded just like your ClojureScript sources.
+
+IMPORTANT: `shadow-cljs` currently does not provide any support for running those transformation steps. Please use the standard tools (eg. `babel`, `coffeescript`, etc.) directly until it does.
+
+=== Access CLJS from JS
+
+The JS sources can access all your ClojureScript (and the Closure Library) directly by importing their namespaces with a `goog:` prefix which the Compiler will rewrite to expose the namespace as the default ES6 export.
 
 ```
-...
-    {:resolve {"my-thing" {:target :file
-                           :file "path/to/file.js"}}}
-...
+import cljs, { keyword } from "goog:cljs.core";
+
+// construct {:foo "hello world"} in JS
+cljs.array_map(keyword("foo"), "hello world");
 ```
 
-The `:file` is always relative to the project directory. The included file may use require or
-`import/export` and those will be followed and included properly as well.
+TIP: The `goog:` prefix currently only works for ES6 file. `require("goog:cljs.core")` does not work.
 
 == Migrating cljsjs.*
 
 Many CLJS libraries are still using CLJSJS packages and they would break with `shadow-cljs` since it
-no longer supports `:foreign-libs`. I have a clear migration path for this and it just
-requires one shim file that maps the `cljsjs.thing` back to its original npm package and
-exposes the expected global variable.
+no longer supports `:foreign-libs`. It is however very easy to mimick those `cljsjs` namespaces since they are mostly build from `npm` packages anyways. It just requires one shim file that maps the `cljsjs.thing` back to its original `npm` package and exposes the expected global variable.
 
 For React this requires a file like `src/cljsjs/react.cljs`:
 

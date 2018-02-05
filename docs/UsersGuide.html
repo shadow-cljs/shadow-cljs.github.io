@@ -668,18 +668,25 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_compilation_stages">10.2. Compilation Stages</a></li>
 </ul>
 </li>
-<li><a href="#js-deps">11. JavaScript Dependencies</a>
+<li><a href="#js-deps">11. JavaScript Integration</a>
 <ul class="sectlevel2">
-<li><a href="#_using_npm_packages">11.1. Using npm packages</a></li>
-<li><a href="#_providing_js_dependencies">11.2. Providing JS Dependencies</a></li>
-<li><a href="#_resolving_js_dependencies">11.3. Resolving JS Dependencies</a>
+<li><a href="#npm">11.1. NPM</a>
 <ul class="sectlevel3">
-<li><a href="#_using_a_cdn">11.3.1. Using a CDN</a></li>
-<li><a href="#_redirecting_require">11.3.2. Redirecting “require”</a></li>
-<li><a href="#_using_local_files">11.3.3. Using local Files</a></li>
+<li><a href="#_using_npm_packages">11.1.1. Using npm packages</a></li>
+<li><a href="#_package_provider">11.1.2. Package Provider</a></li>
+<li><a href="#_resolving_packages">11.1.3. Resolving Packages</a></li>
 </ul>
 </li>
-<li><a href="#_migrating_cljsjs">11.4. Migrating cljsjs.*</a></li>
+<li><a href="#_dealing_with_js_files">11.2. Dealing with .js Files</a>
+<ul class="sectlevel3">
+<li><a href="#_the_classpath">11.2.1. The Classpath</a></li>
+<li><a href="#_requiring_js">11.2.2. Requiring JS</a></li>
+<li><a href="#_language_support">11.2.3. Language Support</a></li>
+<li><a href="#_javascript_dialects">11.2.4. JavaScript Dialects</a></li>
+<li><a href="#_access_cljs_from_js">11.2.5. Access CLJS from JS</a></li>
+</ul>
+</li>
+<li><a href="#_migrating_cljsjs">11.3. Migrating cljsjs.*</a></li>
 </ul>
 </li>
 <li><a href="#release">12. Generating Production Code&#8201;&#8212;&#8201;All Targets</a>
@@ -3437,13 +3444,17 @@ again (in order) when autobuild is active and files are re-compiled on change.</
 </div>
 </div>
 <div class="sect1">
-<h2 id="js-deps"><a class="anchor" href="#js-deps"></a><a class="link" href="#js-deps">11. JavaScript Dependencies</a></h2>
+<h2 id="js-deps"><a class="anchor" href="#js-deps"></a><a class="link" href="#js-deps">11. JavaScript Integration</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_using_npm_packages"><a class="anchor" href="#_using_npm_packages"></a><a class="link" href="#_using_npm_packages">11.1. Using npm packages</a></h3>
+<h3 id="npm"><a class="anchor" href="#npm"></a><a class="link" href="#npm">11.1. NPM</a></h3>
 <div class="paragraph">
-<p>Most npm packages will also include some instructions on how to use the actual code. The
-“old” CommonJS style just has require calls which translates directly:</p>
+<p><a href="https://www.npmjs.com/">npm</a> has come the de-facto standard package manager for JavaScript. Almost all JS libraries can be found there and shadow-cljs provides seamless integration for accessing those packages.</p>
+</div>
+<div class="sect3">
+<h4 id="_using_npm_packages"><a class="anchor" href="#_using_npm_packages"></a><a class="link" href="#_using_npm_packages">11.1.1. Using npm packages</a></h4>
+<div class="paragraph">
+<p>Most npm packages will also include some instructions on how to use the actual code. The “old” CommonJS style just has require calls which translates directly:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -3457,8 +3468,7 @@ again (in order) when autobuild is active and files are re-compiled on change.</
 </div>
 </div>
 <div class="paragraph">
-<p>Whatever "string" parameter is used when calling require we transfer to the <code>:require</code> as-is.
-The <code>:as</code> alias is up to you. Once we have that we can use the code like any other CLJS namespace!</p>
+<p>Whatever "string" parameter is used when calling require we transfer to the <code>:require</code> as-is. The <code>:as</code> alias is up to you. Once we have that we can use the code like any other CLJS namespace!</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -3466,18 +3476,17 @@ The <code>:as</code> alias is up to you. Once we have that we can use the code l
 </div>
 </div>
 <div class="paragraph">
-<p>In <code>shadow-cljs</code>: <strong>always use the <code>ns</code> form and whatever <code>:as</code> alias you provided.</strong>
-You may also use <code>:refer</code> and <code>:rename</code>. This is different than what <code>:foreign-libs</code>/CLJSJS does
-where you include the thing in the namespace but then used a global <code>js/Thing</code> in your code.</p>
+<p>In <code>shadow-cljs</code>: <strong>always use the <code>ns</code> form and whatever <code>:as</code> alias you provided.</strong> You may also use <code>:refer</code> and <code>:rename</code>. This is different than what <code>:foreign-libs</code>/CLJSJS does where you include the thing in the namespace but then used a global <code>js/Thing</code> in your code.</p>
 </div>
 <div class="paragraph">
 <p>Some packages just export a single function which you can call directly by
 using <code>(:require ["thing" :as thing])</code> and then <code>(thing)</code>.</p>
 </div>
 <div class="paragraph">
-<p>More recently some packages started using ES6 <code>import</code> statements in their examples. Those also
-translate pretty much 1:1 with one slight difference related to default exports.
-The following table can be used for translation:</p>
+<p>More recently some packages started using ES6 <code>import</code> statements in their examples. Those also translate pretty much 1:1 with one slight difference related to default exports.</p>
+</div>
+<div class="paragraph">
+<p>The following table can be used for translation:</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Table 1. ES6 Import to CLJS Require</caption>
@@ -3532,15 +3541,11 @@ The following table can be used for translation:</p>
 </table>
 <div class="paragraph">
 <p>The <code>:default</code> option is currently only available in <code>shadow-cljs</code>, you can
-<a href="https://dev.clojure.org/jira/browse/CLJS-2376">vote here</a> to hopefully make it standard.
-You can always use <code>:as alias</code> and then call <code>alias/default</code> if you prefer to stay compatible
-with standard CLJS in the meantime.</p>
+<a href="https://dev.clojure.org/jira/browse/CLJS-2376">vote here</a> to hopefully make it standard. You can always use <code>:as alias</code> and then call <code>alias/default</code> if you prefer to stay compatible with standard CLJS in the meantime.</p>
 </div>
 <div class="paragraph">
-<p>Notice that previously we were stuck using bundled code which included a lot of code we
-didn’t actually need. Now we&#8217;re in a better situation:
-Some libraries are also packaged in ways  ways that allow you to include only the parts you need,
-leading to much less code in your final build.</p>
+<p>Notice that previously we were stuck using bundled code which included a lot of code we didn’t actually need. Now we&#8217;re in a better situation:
+Some libraries are also packaged in ways  ways that allow you to include only the parts you need, leading to much less code in your final build.</p>
 </div>
 <div class="paragraph">
 <p><code>react-virtualized</code> is a great example:</p>
@@ -3571,10 +3576,10 @@ leading to much less code in your final build.</p>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_providing_js_dependencies"><a class="anchor" href="#_providing_js_dependencies"></a><a class="link" href="#_providing_js_dependencies">11.2. Providing JS Dependencies</a></h3>
+<div class="sect3">
+<h4 id="_package_provider"><a class="anchor" href="#_package_provider"></a><a class="link" href="#_package_provider">11.1.2. Package Provider</a></h4>
 <div class="paragraph">
-<p><code>shadow-cljs</code> supports several different ways to include native JS into your build. They are configurable via the <code>:js-options :js-provider</code> setting. Each <code>:target</code> usually sets the on appropriate for your build most often you won&#8217;t need to touch this setting.</p>
+<p><code>shadow-cljs</code> supports several different ways to include <code>npm</code> packages into your build. They are configurable via the <code>:js-options :js-provider</code> setting. Each <code>:target</code> usually sets the on appropriate for your build most often you won&#8217;t need to touch this setting.</p>
 </div>
 <div class="paragraph">
 <p>Currently there are 3 supported JS Providers:</p>
@@ -3622,8 +3627,8 @@ leading to much less code in your final build.</p>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_resolving_js_dependencies"><a class="anchor" href="#_resolving_js_dependencies"></a><a class="link" href="#_resolving_js_dependencies">11.3. Resolving JS Dependencies</a></h3>
+<div class="sect3">
+<h4 id="_resolving_packages"><a class="anchor" href="#_resolving_packages"></a><a class="link" href="#_resolving_packages">11.1.3. Resolving Packages</a></h4>
 <div class="paragraph">
 <p>By default <code>shadow-cljs</code> will resolve all <code>(:require ["thing" :as x])</code> requires following the <code>npm</code> convention.
 This means it will look at <code>&lt;project&gt;/node_modules/thing/package.json</code> and follow the code from there. To
@@ -3642,8 +3647,8 @@ Currently only the <code>:shadow</code> and <code>:closure</code> JS Providers s
 </tr>
 </table>
 </div>
-<div class="sect3">
-<h4 id="_using_a_cdn"><a class="anchor" href="#_using_a_cdn"></a><a class="link" href="#_using_a_cdn">11.3.1. Using a CDN</a></h4>
+<div class="sect4">
+<h5 id="_using_a_cdn"><a class="anchor" href="#_using_a_cdn"></a><a class="link" href="#_using_a_cdn">Using a CDN</a></h5>
 <div class="paragraph">
 <p>Say you already have React included in your page via a CDN. You could just start using <code>js/React</code> again
 but we stopped doing that for a good reason. Instead you can continue to use <code>(:require ["react" :as react])</code>
@@ -3673,8 +3678,8 @@ but configure how "react" resolves!</p>
 the "react" npm package! No need to fiddle with the code to make this work.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_redirecting_require"><a class="anchor" href="#_redirecting_require"></a><a class="link" href="#_redirecting_require">11.3.2. Redirecting “require”</a></h4>
+<div class="sect4">
+<h5 id="_redirecting_require"><a class="anchor" href="#_redirecting_require"></a><a class="link" href="#_redirecting_require">Redirecting “require”</a></h5>
 <div class="paragraph">
 <p>Some packages provide multiple “dist” files and sometimes the default one described doesn’t quite work
 in <code>shadow-cljs</code>. One good example for this is "d3". Their default "main" points to "build/d3.node.js" but
@@ -3697,32 +3702,251 @@ so we can’t use that. Instead we just redirect the require to some other file:
 <p>You can also just <code>(:require ["d3/build/d3.js" :as d3])</code> as well if you only care about the Browser.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_using_local_files"><a class="anchor" href="#_using_local_files"></a><a class="link" href="#_using_local_files">11.3.3. Using local Files</a></h4>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_dealing_with_js_files"><a class="anchor" href="#_dealing_with_js_files"></a><a class="link" href="#_dealing_with_js_files">11.2. Dealing with .js Files</a></h3>
+<div class="sidebarblock">
+<div class="content">
 <div class="paragraph">
-<p>You may also use :resolve to directly map to files in your project.</p>
+<p><strong>DANGER: This feature is an experiment!</strong> It is currently only supported in <code>shadow-cljs</code> and other CLJS tools will yell at you if you attempt to use it. Use at your own risk. The feature was initially rejected from CLJS core but I think it is useful and should not have been <a href="https://dev.clojure.org/jira/browse/CLJS-2061?focusedCommentId=46191&amp;page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-46191">dismissed</a> without further discussion.</p>
+</div>
+<div class="paragraph">
+<p>CLJS has an alternate <a href="https://clojurescript.org/guides/javascript-modules">implementation</a> which in turn is not supported by <code>shadow-cljs</code>. I found this implementation to be lacking in certain aspects so I opted for the different solution. Happy to discuss the pros/cons of both approaches though.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>We covered how <a href="#npm">npm</a> packages are used but you may be working on a codebase that already has lots of plain JavaScript and you don&#8217;t want to rewrite everything in ClojureScript just yet. <code>shadow-cljs</code> provides 100% full interop between JavaScript and ClojureScript. Which means your JS can use your CLJS and CLJS can use your JS.</p>
+</div>
+<div class="paragraph">
+<p>There are only a few conventions you need to follow in order for this to work reliably but chances are that you are already doing that anyways.</p>
+</div>
+<div class="sect3">
+<h4 id="_the_classpath"><a class="anchor" href="#_the_classpath"></a><a class="link" href="#_the_classpath">11.2.1. The Classpath</a></h4>
+<div class="paragraph">
+<p><code>shadow-cljs</code> uses the Java Virtual Machine (JVM) and its "classpath" when resolving files. This is sort of a virtual filesystem composed of either filesystem directories or <code>.jar</code> files (which basically are just <code>.zip</code> files). This is slightly different from <code>npm</code> where you are always dealing with files.</p>
+</div>
+<div class="paragraph">
+<p>In ClojureScript everything is namespaced and each name is expected to resolve to a file. If you have a <code>(ns demo.app)</code> namespace the compiler expects to find a <code>demo/app.cljs</code> (or <code>.cljc</code>) on the classpath. The classpath will be searched in order until it is found. Suppose you configured the <code>:source-paths ["src/main" "src/test"]</code> the compiler will first look in <code>src/main/demo/app.cljs</code> and then <code>src/test/demo/app.cljs</code>. When the file is not found the JVM will begin looking into the <code>.jar</code> files on the classpath. So if there is a <code>demo/app.cljs</code> at the root of that "zip" file it will be used instead.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+You can not escape this classpath, meaning that if you configured <code>src/main</code> you cannot get to <code>src</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If multiple paths contain the same file only the "first" one is used. Everything in Java and Clojure(Script) is namespaced to avoid such conflicts. Very similar to <code>npm</code> where each package must have a unique name.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_requiring_js"><a class="anchor" href="#_requiring_js"></a><a class="link" href="#_requiring_js">11.2.2. Requiring JS</a></h4>
+<div class="paragraph">
+<p>We already covered how <code>npm</code> packages are accessed by their name but on the classpath we access <code>.js</code> files by either a full path or relative to the current namespace.</p>
+</div>
+<div class="listingblock">
+<div class="title">Loading JS from the classpath</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">demo.app</span>
+  (<span class="symbol">:require</span>
+    [<span class="string"><span class="delimiter">&quot;</span><span class="content">/some-library/components/foo</span><span class="delimiter">&quot;</span></span> <span class="symbol">:as</span> foo]
+    [<span class="string"><span class="delimiter">&quot;</span><span class="content">./bar</span><span class="delimiter">&quot;</span></span> <span class="symbol">:as</span> bar <span class="symbol">:refer</span> (myComponent)]))</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+For string requires the extension <code>.js</code> will be added automatically but you can specify the extension if you prefer. Note that currently only <code>.js</code> is supported though.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Absolute requires like <code>/some-library/components/foo</code> mean that the compiler will look for a <code>some-library/components/foo.js</code> on the classpath. Unlike <code>node</code> which would attempt to load the file from the local filesystem. The same classpath rules apply so the file may either be in your <code>:source-paths</code> or in some third-party <code>.jar</code> library you are using.</p>
+</div>
+<div class="paragraph">
+<p>Relative requires are resolved by first looking at the current namespace and then resolving a relative path from that name. In the above example we are in <code>demo/app.cljs</code> to the <code>./bar</code> require resolve to <code>demo/bar.js</code>, so it is identical to <code>(:require ["/demo/bar"])</code>.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+The files must not be physically located in the same directory. The lookup for the file appears on the classpath instead. This is unlike node which expects relative requires to always resolve to physical files.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">Example File Structure with Separate Paths</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="text">.
+├── package.json
+├── shadow-cljs.edn
+└── src
+    └── main
+        └── demo
+            └── app.cljs
+    └── js
+        └── demo
+            └── bar.js</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_language_support"><a class="anchor" href="#_language_support"></a><a class="link" href="#_language_support">11.2.3. Language Support</a></h4>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+It is expected that the classpath only contains JavaScript that can be consumed without any pre-processing by the Compiler. <code>npm</code> has a very similar convention.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The Closure Compiler is used for processing all JavaScript found on the classpath using its <code>ECMASCRIPT_NEXT</code> language setting. What exactly this setting means is not well documented but it mostly represents the next generation JavaScript code which might not even be supported by most browsers yet. ES6 is very well supported as well as most ES7 features. Similarly to standard CLJS this will be compiled down to ES5 with polyfills when required.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_javascript_dialects"><a class="anchor" href="#_javascript_dialects"></a><a class="link" href="#_javascript_dialects">11.2.4. JavaScript Dialects</a></h4>
+<div class="paragraph">
+<p>Since there are many popular JavaScript dialects (JSX, CoffeeScript, etc) that are not directly parsable by the Closure Compiler we need to pre-process them before putting them onto the classpath. <a href="https://babeljs.io/">babel</a> is commonly used in the JavaScript world so we are going to use <code>babel</code> to process <code>.jsx</code> files as an example here.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example shadow-cljs.edn Config</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:source-paths</span>
+ [<span class="string"><span class="delimiter">&quot;</span><span class="content">src/main</span><span class="delimiter">&quot;</span></span>
+  <span class="string"><span class="delimiter">&quot;</span><span class="content">src/gen</span><span class="delimiter">&quot;</span></span>]
+ <span class="keyword">..</span><span class="keyword">.</span>}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Example File Structure</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="text">.
+├── package.json
+├── shadow-cljs.edn
+└── src
+    └── main
+        └── demo
+            └── app.cljs
+    └── js
+        ├── .babelrc
+        └── demo
+            └── bar.jsx</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Notice how <code>src/js</code> is not added to <code>:source-paths</code> which means it will not be on the classpath.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">src/js/demo/bar.jsx</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="jsx">import React from &quot;react&quot;;
+
+function myComponent() {
+  return &lt;h1&gt;JSX!&lt;/h1&gt;;
+}
+
+export { myComponent };</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We run <a href="https://babeljs.io/docs/usage/cli/">babel</a> to convert the files and write them to the configured <code>src/gen</code> directory. Which directory you use it up to you. I prefer <code>src/gen</code> for generated files.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure"><span class="keyword">..</span><span class="keyword">.</span>
-    {<span class="symbol">:resolve</span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">my-thing</span><span class="delimiter">&quot;</span></span> {<span class="symbol">:target</span> <span class="symbol">:file</span>
-                           <span class="symbol">:file</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">path/to/file.js</span><span class="delimiter">&quot;</span></span>}}}
-<span class="keyword">..</span><span class="keyword">.</span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">$ babel src/js --out-dir src/gen
+# or during development
+$ babel src/js --out-dir src/gen --watch</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The <code>:file</code> is always relative to the project directory. The included file may use require or
-<code>import/export</code> and those will be followed and included properly as well.</p>
+<p><code>babel</code> itself is configured via the <code>src/js/.babelrc</code>. See the official <a href="https://babeljs.io/docs/plugins/transform-react-jsx/">example for JSX</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">JSX minimal .babelrc</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">plugins</span><span class="delimiter">&quot;</span></span>: [<span class="string"><span class="delimiter">&quot;</span><span class="content">transform-react-jsx</span><span class="delimiter">&quot;</span></span>]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once <code>babel</code> writes the <code>src/gen/demo/bar.js</code> it will be available to use via ClojureScript and will even be hot loaded just like your ClojureScript sources.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+<code>shadow-cljs</code> currently does not provide any support for running those transformation steps. Please use the standard tools (eg. <code>babel</code>, <code>coffeescript</code>, etc.) directly until it does.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_access_cljs_from_js"><a class="anchor" href="#_access_cljs_from_js"></a><a class="link" href="#_access_cljs_from_js">11.2.5. Access CLJS from JS</a></h4>
+<div class="paragraph">
+<p>The JS sources can access all your ClojureScript (and the Closure Library) directly by importing their namespaces with a <code>goog:</code> prefix which the Compiler will rewrite to expose the namespace as the default ES6 export.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="keyword">import</span> cljs, { <span class="keyword">keyword</span> } from <span class="string"><span class="delimiter">&quot;</span><span class="content">goog:cljs.core</span><span class="delimiter">&quot;</span></span><span class="comment">;</span>
+
+// construct {<span class="symbol">:foo</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">hello world</span><span class="delimiter">&quot;</span></span>} in JS
+cljs.array_map(<span class="keyword">keyword</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">foo</span><span class="delimiter">&quot;</span></span>), <span class="string"><span class="delimiter">&quot;</span><span class="content">hello world</span><span class="delimiter">&quot;</span></span>)<span class="comment">;</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+The <code>goog:</code> prefix currently only works for ES6 file. <code>require("goog:cljs.core")</code> does not work.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_migrating_cljsjs"><a class="anchor" href="#_migrating_cljsjs"></a><a class="link" href="#_migrating_cljsjs">11.4. Migrating cljsjs.*</a></h3>
+<h3 id="_migrating_cljsjs"><a class="anchor" href="#_migrating_cljsjs"></a><a class="link" href="#_migrating_cljsjs">11.3. Migrating cljsjs.*</a></h3>
 <div class="paragraph">
 <p>Many CLJS libraries are still using CLJSJS packages and they would break with <code>shadow-cljs</code> since it
-no longer supports <code>:foreign-libs</code>. I have a clear migration path for this and it just
-requires one shim file that maps the <code>cljsjs.thing</code> back to its original npm package and
-exposes the expected global variable.</p>
+no longer supports <code>:foreign-libs</code>. It is however very easy to mimick those <code>cljsjs</code> namespaces since they are mostly build from <code>npm</code> packages anyways. It just requires one shim file that maps the <code>cljsjs.thing</code> back to its original <code>npm</code> package and exposes the expected global variable.</p>
 </div>
 <div class="paragraph">
 <p>For React this requires a file like <code>src/cljsjs/react.cljs</code>:</p>
@@ -4098,7 +4322,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-02-04 22:48:40 STD
+Last updated 2018-02-05 11:47:40 STD
 </div>
 </div>
 </body>

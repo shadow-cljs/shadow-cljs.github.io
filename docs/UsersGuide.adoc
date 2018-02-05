@@ -513,7 +513,7 @@ include::target-karma.adoc[]
 
 include::target-custom.adoc[]
 
-= JavaScript Dependencies [[js-deps]]
+= JavaScript Integration [[js-deps]]
 
 include::js-deps.adoc[]
 
