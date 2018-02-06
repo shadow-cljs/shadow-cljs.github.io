@@ -1,0 +1,29 @@
+This target will create a test runner including all test namespaces matching the given regular expression.
+
+The relevant configuration options are:
+
+[horizontal]
+`:target`::    `:node-test`
+`:output-to`:: The final output file that will be used to run tests.
+`:ns-regexp`:: (optional) A regular expression matching namespaces against project files. This only scans files, and
+will not scan jars. Defaults to "-test$".
+
+```
+{...
+ :builds {:test     {:target    :node-test
+                     :output-to "out/node-tests.js"
+                     :ns-regexp "-spec$"}}}
+```
+
+The `:node-test` target only generates the test file. You can run it via `node`.
+
+```bash
+$ shadow-cljs compile test
+# or
+$ shadow-cljs release test
+
+$ node out/node-tests.js
+```
+
+The `node` process will exit code will be set top `0` when successful and `1` with any failures.
+

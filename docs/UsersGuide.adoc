@@ -501,7 +501,11 @@ include::target-npm-module.adoc[]
 
 `shadow-cljs` provides a few ultility targets to make building tests a little easier.
 
-== Browser Test [[target-browser-test]]
+== Testing in node.js [[target-node-test]]
+
+include::target-node-test.adoc[]
+
+== Testing in the Browser [[target-browser-test]]
 
 include::target-browser-test.adoc[]
 

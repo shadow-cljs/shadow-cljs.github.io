@@ -649,15 +649,16 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 <li><a href="#_testing">9. Testing</a>
 <ul class="sectlevel2">
-<li><a href="#target-browser-test">9.1. Browser Test</a>
+<li><a href="#target-node-test">9.1. Testing in node.js</a></li>
+<li><a href="#target-browser-test">9.2. Testing in the Browser</a>
 <ul class="sectlevel3">
-<li><a href="#_generated_output_in_code_test_dir_code">9.1.1. Generated output in <code>:test-dir</code></a></li>
+<li><a href="#_generated_output_in_code_test_dir_code">9.2.1. Generated output in <code>:test-dir</code></a></li>
 </ul>
 </li>
-<li><a href="#target-karma">9.2. Targeting Tests to Karma for Continuous Integration</a>
+<li><a href="#target-karma">9.3. Targeting Tests to Karma for Continuous Integration</a>
 <ul class="sectlevel3">
-<li><a href="#_installing_karma">9.2.1. Installing Karma</a></li>
-<li><a href="#_the_build">9.2.2. The Build</a></li>
+<li><a href="#_installing_karma">9.3.1. Installing Karma</a></li>
+<li><a href="#_the_build">9.3.2. The Build</a></li>
 </ul>
 </li>
 </ul>
@@ -3118,7 +3119,68 @@ renaming an artifact.</p>
 <p><code>shadow-cljs</code> provides a few ultility targets to make building tests a little easier.</p>
 </div>
 <div class="sect2">
-<h3 id="target-browser-test"><a class="anchor" href="#target-browser-test"></a><a class="link" href="#target-browser-test">9.1. Browser Test</a></h3>
+<h3 id="target-node-test"><a class="anchor" href="#target-node-test"></a><a class="link" href="#target-node-test">9.1. Testing in node.js</a></h3>
+<div class="paragraph">
+<p>This target will create a test runner including all test namespaces matching the given regular expression.</p>
+</div>
+<div class="paragraph">
+<p>The relevant configuration options are:</p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+<code>:target</code>
+</td>
+<td class="hdlist2">
+<p><code>:node-test</code></p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>:output-to</code>
+</td>
+<td class="hdlist2">
+<p>The final output file that will be used to run tests.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>:ns-regexp</code>
+</td>
+<td class="hdlist2">
+<p>(optional) A regular expression matching namespaces against project files. This only scans files, and
+will not scan jars. Defaults to "-test$".</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span> {<span class="symbol">:test</span>     {<span class="symbol">:target</span>    <span class="symbol">:node-test</span>
+                     <span class="symbol">:output-to</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">out/node-tests.js</span><span class="delimiter">&quot;</span></span>
+                     <span class="symbol">:ns-regexp</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">-spec$</span><span class="delimiter">&quot;</span></span>}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>:node-test</code> target only generates the test file. You can run it via <code>node</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ shadow-cljs compile test
+# or
+$ shadow-cljs release test
+
+$ node out/node-tests.js</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>node</code> process will exit code will be set top <code>0</code> when successful and <code>1</code> with any failures.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="target-browser-test"><a class="anchor" href="#target-browser-test"></a><a class="link" href="#target-browser-test">9.2. Testing in the Browser</a></h3>
 <div class="paragraph">
 <p>This target is meant for gathering up namespaces that contain tests (based on a filename pattern match),
 and triggering a test runner. It contains a built-in runner that will automatically scan for <code>cljs.test</code>
@@ -3184,7 +3246,7 @@ In general you will need a config that looks like this:</p>
 <p>Remember that the test directory will have the index.html, and a js folder.</p>
 </div>
 <div class="paragraph">
-<p>If you choose to supply a test main, it might look like this:</p>
+<p>If you choose to supply a custom <code>:runner-ns</code>, it might look like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -3201,8 +3263,23 @@ In general you will need a config that looks like this:</p>
   (start))</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>It just have <code>init</code>, <code>start</code>, <code>stop</code> methods. <code>init</code> will be called once on startup, <code>stop</code> will be called before any code is reloaded and <code>start</code> will be called after all code was reloaded.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+<code>:runner-ns</code> is optional, just leave it out to use the default.
+</td>
+</tr>
+</table>
+</div>
 <div class="sect3">
-<h4 id="_generated_output_in_code_test_dir_code"><a class="anchor" href="#_generated_output_in_code_test_dir_code"></a><a class="link" href="#_generated_output_in_code_test_dir_code">9.1.1. Generated output in <code>:test-dir</code></a></h4>
+<h4 id="_generated_output_in_code_test_dir_code"><a class="anchor" href="#_generated_output_in_code_test_dir_code"></a><a class="link" href="#_generated_output_in_code_test_dir_code">9.2.1. Generated output in <code>:test-dir</code></a></h4>
 <div class="paragraph">
 <p>The output includes two primary artifacts in your <code>test-dir</code> folder:</p>
 </div>
@@ -3222,7 +3299,7 @@ auto-generated.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="target-karma"><a class="anchor" href="#target-karma"></a><a class="link" href="#target-karma">9.2. Targeting Tests to Karma for Continuous Integration</a></h3>
+<h3 id="target-karma"><a class="anchor" href="#target-karma"></a><a class="link" href="#target-karma">9.3. Targeting Tests to Karma for Continuous Integration</a></h3>
 <div class="paragraph">
 <p>When you want to run your CLJS tests against a browser on some kind of CI server you&#8217;ll need to
 be able to run the tests from a command line and get back a status code. Karma is a well-known
@@ -3230,7 +3307,7 @@ and supported test runner that can do this for you, and <code>shadow-cljs</code>
 can add the appropriate wrappers around your tests so the will work in it.</p>
 </div>
 <div class="sect3">
-<h4 id="_installing_karma"><a class="anchor" href="#_installing_karma"></a><a class="link" href="#_installing_karma">9.2.1. Installing Karma</a></h4>
+<h4 id="_installing_karma"><a class="anchor" href="#_installing_karma"></a><a class="link" href="#_installing_karma">9.3.1. Installing Karma</a></h4>
 <div class="paragraph">
 <p>See their <a href="http://karma-runner.github.io">website</a> for full instructions. You&#8217;ll typically need
 something like this is your <code>package.json</code>:</p>
@@ -3258,7 +3335,7 @@ something like this is your <code>package.json</code>:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_the_build"><a class="anchor" href="#_the_build"></a><a class="link" href="#_the_build">9.2.2. The Build</a></h4>
+<h4 id="_the_build"><a class="anchor" href="#_the_build"></a><a class="link" href="#_the_build">9.3.2. The Build</a></h4>
 <div class="paragraph">
 <p>The build options are:</p>
 </div>
@@ -4356,7 +4433,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-02-05 22:04:30 STD
+Last updated 2018-02-06 23:14:50 STD
 </div>
 </div>
 </body>

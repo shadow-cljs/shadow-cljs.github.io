@@ -25,9 +25,10 @@ In general you will need a config that looks like this:
                                  :http-root          "resources/public/js/test"}}
 ```
 
+
 Remember that the test directory will have the index.html, and a js folder.
 
-If you choose to supply a test main, it might look like this:
+If you choose to supply a custom `:runner-ns`, it might look like this:
 
 ```
 (ns tests.client-test-main)
@@ -42,6 +43,10 @@ If you choose to supply a test main, it might look like this:
 (defn ^:export init []
   (start))
 ```
+
+It just have `init`, `start`, `stop` methods. `init` will be called once on startup, `stop` will be called before any code is reloaded and `start` will be called after all code was reloaded.
+
+TIP: `:runner-ns` is optional, just leave it out to use the default.
 
 === Generated output in `:test-dir`
 
