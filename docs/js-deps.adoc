@@ -318,8 +318,11 @@ TIP: The `goog:` prefix currently only works for ES6 file. `require("goog:cljs.c
 
 == Migrating cljsjs.*
 
-Many CLJS libraries are still using CLJSJS packages and they would break with `shadow-cljs` since it
-no longer supports `:foreign-libs`. It is however very easy to mimick those `cljsjs` namespaces since they are mostly build from `npm` packages anyways. It just requires one shim file that maps the `cljsjs.thing` back to its original `npm` package and exposes the expected global variable.
+> CLJSJS is an effort to package Javascript libraries to be able to use them from within ClojureScript.
+
+Since `shadow-cljs` can access <<npm, npm packages>> directly we do not need to rely on re-packaged https://github.com/cljsjs/packages[CLJSJS] packages.
+
+However many CLJS libraries are still using CLJSJS packages and they would break with `shadow-cljs` since it doesn't support those anymore. It is however very easy to mimick those `cljsjs` namespaces since they are mostly build from `npm` packages anyways. It just requires one shim file that maps the `cljsjs.thing` back to its original `npm` package and exposes the expected global variable.
 
 For React this requires a file like `src/cljsjs/react.cljs`:
 
@@ -342,3 +345,16 @@ NOTE: The `shadow-cljsjs` library only provides the shim files. You’ll still n
 `npm install` the actual packages yourself.
 
 
+=== Why not use CLJSJS?
+
+CLJSJS packages basically just take the package from `npm` and put them into a `.jar` and re-publish them via https://clojars.org[clojars]. As a bonus they often bundle Externs. The compiler otherwise does nothing with these files and only prepends them to the generated output.
+
+This was very useful when we had no access to `npm` directly but has certain issues since not all packages are easily combined with others. A package might rely on `react` but instead of expressing this via `npm` https://github.com/cljsjs/packages/tree/master/material-ui[they] bundle their own `react`. If you are not careful you could end up including 2 different `react` versions in your build which may lead to very confusing errors or at the very least increase the build size substantially.
+
+Apart from that not every `npm` package is available via CLJSJS and keeping the package versions in sync requires manual work, which means packages are often out of date.
+
+`shadow-cljs` does not support CLJSJS at all to avoid conflicts in your code. One library might attempt to use the "old" `cljsjs.react` while another uses the newer `(:require ["react"])` directly. This would again lead to 2 versions of `react` on your page again.
+
+So the only thing we are missing are the bundled Externs. In many instances these are not required due to improved <<infer-externs, externs inference>>. Often those Externs are generated using third-party tools which means they are not totally accurate anyways.
+
+Conclusion: Use <<npm, npm>> directly. Use <<infer-externs, :infer-externs auto>>.

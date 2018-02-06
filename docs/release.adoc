@@ -67,7 +67,7 @@ Typically all JS Dependencies are foreign and won't be passed through `:advanced
 
 TIP: Externs are only required for `:advanced`, they are not required in `:simple` mode.
 
-=== Externs Inference
+=== Externs Inference [[infer-externs]]
 
 To help deal with Externs the `shadow-cljs` compiler provides enhanced externs inference which can be enabled by setting `:infer-externs :auto` for your build.
 
