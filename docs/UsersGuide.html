@@ -3149,18 +3149,20 @@ renaming an artifact.</p>
 <code>:ns-regexp</code>
 </td>
 <td class="hdlist2">
-<p>(optional) A regular expression matching namespaces against project files. This only scans files, and
-will not scan jars. Defaults to "-test$".</p>
+<p>(optional) A regular expression matching namespaces against project files. This only scans files, and will not scan jars. Defaults to <code>"-test$"</code>.</p>
 </td>
 </tr>
 </table>
 </div>
 <div class="listingblock">
+<div class="title">Test config matching all <code>*-spec</code> namespaces</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
- <span class="symbol">:builds</span> {<span class="symbol">:test</span>     {<span class="symbol">:target</span>    <span class="symbol">:node-test</span>
-                     <span class="symbol">:output-to</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">out/node-tests.js</span><span class="delimiter">&quot;</span></span>
-                     <span class="symbol">:ns-regexp</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">-spec$</span><span class="delimiter">&quot;</span></span>}}}</code></pre>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:test</span>
+  {<span class="symbol">:target</span>    <span class="symbol">:node-test</span>
+   <span class="symbol">:output-to</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">out/node-tests.js</span><span class="delimiter">&quot;</span></span>
+   <span class="symbol">:ns-regexp</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">-spec$</span><span class="delimiter">&quot;</span></span>}}}</code></pre>
 </div>
 </div>
 <div class="paragraph">

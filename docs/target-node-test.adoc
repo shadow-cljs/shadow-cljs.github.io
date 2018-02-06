@@ -5,14 +5,16 @@ The relevant configuration options are:
 [horizontal]
 `:target`::    `:node-test`
 `:output-to`:: The final output file that will be used to run tests.
-`:ns-regexp`:: (optional) A regular expression matching namespaces against project files. This only scans files, and
-will not scan jars. Defaults to "-test$".
+`:ns-regexp`:: (optional) A regular expression matching namespaces against project files. This only scans files, and will not scan jars. Defaults to `"-test$"`.
 
+.Test config matching all `*-spec` namespaces
 ```
 {...
- :builds {:test     {:target    :node-test
-                     :output-to "out/node-tests.js"
-                     :ns-regexp "-spec$"}}}
+ :builds
+ {:test
+  {:target    :node-test
+   :output-to "out/node-tests.js"
+   :ns-regexp "-spec$"}}}
 ```
 
 The `:node-test` target only generates the test file. You can run it via `node`.
