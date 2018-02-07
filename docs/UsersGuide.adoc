@@ -501,6 +501,21 @@ include::target-npm-module.adoc[]
 
 `shadow-cljs` provides a few ultility targets to make building tests a little easier.
 
+All test targets generate a test runner and automatically add all namespaces given the configurable `:ns-regexp`. The default test runners were built for `cljs.test` but you can create custom runners if you prefer to use other test frameworks.
+
+The default `:ns-regexp` is `"-test$"`, so your first test could look like:
+
+.File: `src/test/demo/app_test.cljs`
+```clojure
+(ns demo.app-test
+  (:require [cljs.test :refer (deftest is)]))
+
+(deftest a-failing-test
+  (is (= 1 2))
+```
+
+In the Clojure world it is common to keep test files in their own source paths so the above example assumes you have configured `:source-paths ["src/main" "src/test"]` in your `shadow-cljs.edn` config. Your usual app code goes into `src/main` and the tests go into `src/test`. This however is optional and it is totally fine to keep everything in `src` and just use `:source-paths ["src"]`.
+
 == Testing in node.js [[target-node-test]]
 
 include::target-node-test.adoc[]

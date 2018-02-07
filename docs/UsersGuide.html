@@ -3118,6 +3118,25 @@ renaming an artifact.</p>
 <div class="paragraph">
 <p><code>shadow-cljs</code> provides a few ultility targets to make building tests a little easier.</p>
 </div>
+<div class="paragraph">
+<p>All test targets generate a test runner and automatically add all namespaces given the configurable <code>:ns-regexp</code>. The default test runners were built for <code>cljs.test</code> but you can create custom runners if you prefer to use other test frameworks.</p>
+</div>
+<div class="paragraph">
+<p>The default <code>:ns-regexp</code> is <code>"-test$"</code>, so your first test could look like:</p>
+</div>
+<div class="listingblock">
+<div class="title">File: <code>src/test/demo/app_test.cljs</code></div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">demo.app-test</span>
+  (<span class="symbol">:require</span> [cljs.test <span class="symbol">:refer</span> (deftest is)]))
+
+(deftest a-failing-test
+  (is (<span class="keyword">=</span> <span class="integer">1</span> <span class="integer">2</span>))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In the Clojure world it is common to keep test files in their own source paths so the above example assumes you have configured <code>:source-paths ["src/main" "src/test"]</code> in your <code>shadow-cljs.edn</code> config. Your usual app code goes into <code>src/main</code> and the tests go into <code>src/test</code>. This however is optional and it is totally fine to keep everything in <code>src</code> and just use <code>:source-paths ["src"]</code>.</p>
+</div>
 <div class="sect2">
 <h3 id="target-node-test"><a class="anchor" href="#target-node-test"></a><a class="link" href="#target-node-test">9.1. Testing in node.js</a></h3>
 <div class="paragraph">
@@ -4435,7 +4454,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-02-06 23:14:50 STD
+Last updated 2018-02-07 09:41:34 STD
 </div>
 </div>
 </body>
