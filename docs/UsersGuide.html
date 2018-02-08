@@ -2476,14 +2476,14 @@ if a resource is not found for the given request. Defaults to a not-found handle
   {<span class="symbol">:app</span> {<span class="symbol">:target</span> <span class="symbol">:browser</span>
          <span class="symbol">:output-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public/js</span><span class="delimiter">&quot;</span></span>
          <span class="symbol">:asset-path</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">/js</span><span class="delimiter">&quot;</span></span>
-         <span class="symbol">:modules</span> {<span class="symbol">:main</span> {<span class="symbol">:entry</span> [my.app]}}
+         <span class="symbol">:modules</span> {<span class="symbol">:main</span> {<span class="symbol">:entries</span> [my.app]}}
          <span class="keyword">..</span><span class="keyword">.</span>
          <span class="symbol">:devtools</span> {<span class="symbol">:http-root</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public</span><span class="delimiter">&quot;</span></span>
                     <span class="symbol">:http-port</span> <span class="integer">8080</span>}}}}</code></pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Example <code>index.html</code></div>
+<div class="title">Example <code>public/index.html</code></div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="html"><span class="doctype">&lt;!doctype html&gt;</span>
 <span class="tag">&lt;html&gt;</span>

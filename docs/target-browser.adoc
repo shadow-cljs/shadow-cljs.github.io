@@ -408,13 +408,13 @@ if a resource is not found for the given request. Defaults to a not-found handle
   {:app {:target :browser
          :output-dir "public/js"
          :asset-path "/js"
-         :modules {:main {:entry [my.app]}}
+         :modules {:main {:entries [my.app]}}
          ...
          :devtools {:http-root "public"
                     :http-port 8080}}}}
 ```
 
-.Example `index.html`
+.Example `public/index.html`
 ```html
 <!doctype html>
 <html>
