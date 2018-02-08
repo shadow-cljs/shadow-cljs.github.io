@@ -616,7 +616,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_development_support">6.7. Development Support</a>
 <ul class="sectlevel3">
 <li><a href="#hud">6.7.1. Heads-Up Display (HUD)</a></li>
-<li><a href="#_http_server">6.7.2. HTTP Server</a></li>
+<li><a href="#browser-http-server">6.7.2. HTTP Server</a></li>
 <li><a href="#_css_reloading">6.7.3. CSS Reloading</a></li>
 <li><a href="#_proxy_support">6.7.4. Proxy Support</a></li>
 </ul>
@@ -2434,7 +2434,10 @@ options for configuring an optional dev-time HTTP server for a build and CSS rel
 </div>
 </div>
 <div class="sect3">
-<h4 id="_http_server"><a class="anchor" href="#_http_server"></a><a class="link" href="#_http_server">6.7.2. HTTP Server</a></h4>
+<h4 id="browser-http-server"><a class="anchor" href="#browser-http-server"></a><a class="link" href="#browser-http-server">6.7.2. HTTP Server</a></h4>
+<div class="paragraph">
+<p><code>shadow-cljs</code> can provide a basic HTTP server for your build. By default it will serve all static files from the configured <code>:http-root</code> directory.</p>
+</div>
 <div class="paragraph">
 <p>The server supports the following options:</p>
 </div>
@@ -2451,19 +2454,45 @@ no disk files are served.</p>
 </dd>
 <dt><code>:http-host</code></dt>
 <dd>
-<p>The hostname to listen on. Defaults to localhost).</p>
+<p>Optional. The hostname to listen on. Defaults to localhost.</p>
 </dd>
 <dt><code>:http-resource-root</code></dt>
 <dd>
-<p>A path relative to classpath from which resources can be served.
+<p>Optional. A path relative to classpath from which resources can be served.
 If not supplied, no resources are served.</p>
 </dd>
 <dt><code>:http-handler</code></dt>
 <dd>
-<p>A namespace (as a symbol). A <code>(fn [req] resp)</code> that is used
+<p>Optional. A namespace (as a symbol). A <code>(fn [req] resp)</code> that is used
 if a resource is not found for the given request. Defaults to a not-found handler.</p>
 </dd>
 </dl>
+</div>
+<div class="listingblock">
+<div class="title">Typical HTTP config serving the "public" directory under <a href="http://localhost:8080" class="bare">http://localhost:8080</a></div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ {<span class="symbol">:builds</span>
+  {<span class="symbol">:app</span> {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+         <span class="symbol">:output-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public/js</span><span class="delimiter">&quot;</span></span>
+         <span class="symbol">:asset-path</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">/js</span><span class="delimiter">&quot;</span></span>
+         <span class="symbol">:modules</span> {<span class="symbol">:main</span> {<span class="symbol">:entry</span> [my.app]}}
+         <span class="keyword">..</span><span class="keyword">.</span>
+         <span class="symbol">:devtools</span> {<span class="symbol">:http-root</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public</span><span class="delimiter">&quot;</span></span>
+                    <span class="symbol">:http-port</span> <span class="integer">8080</span>}}}}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Example <code>index.html</code></div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="html"><span class="doctype">&lt;!doctype html&gt;</span>
+<span class="tag">&lt;html&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+<span class="tag">&lt;h1&gt;</span>Hello World<span class="tag">&lt;/h1&gt;</span>
+<span class="tag">&lt;script</span> <span class="attribute-name">src</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">/js/main.js</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span><span class="tag">&lt;/script&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+</div>
 </div>
 <div class="sect4">
 <h5 id="_http_and_uri_based_routing_push_state"><a class="anchor" href="#_http_and_uri_based_routing_push_state"></a><a class="link" href="#_http_and_uri_based_routing_push_state">HTTP and URI-based Routing (Push state)</a></h5>

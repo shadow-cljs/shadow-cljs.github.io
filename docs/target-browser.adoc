@@ -384,7 +384,9 @@ Translated WSL file path. Useful when running `shadow-cljs` via WSL Bash. Transl
 `:wsl-pwd`::
 Translated `:pwd`
 
-=== HTTP Server
+=== HTTP Server [[browser-http-server]]
+
+`shadow-cljs` can provide a basic HTTP server for your build. By default it will serve all static files from the configured `:http-root` directory.
 
 The server supports the following options:
 
@@ -392,12 +394,36 @@ The server supports the following options:
 `:http-root`:: The disk path from which to serve root filesystem requests. If not supplied,
 no disk files are served.
 `:http-port`:: The port to serve from.
-`:http-host`:: The hostname to listen on. Defaults to localhost).
-`:http-resource-root`:: A path relative to classpath from which resources can be served.
+`:http-host`:: Optional. The hostname to listen on. Defaults to localhost.
+`:http-resource-root`:: Optional. A path relative to classpath from which resources can be served.
 If not supplied, no resources are served.
-`:http-handler`:: A namespace (as a symbol). A `(fn [req] resp)` that is used
+`:http-handler`:: Optional. A namespace (as a symbol). A `(fn [req] resp)` that is used
 if a resource is not found for the given request. Defaults to a not-found handler.
 
+.Typical HTTP config serving the "public" directory under http://localhost:8080
+
+```clojure
+{...
+ {:builds
+  {:app {:target :browser
+         :output-dir "public/js"
+         :asset-path "/js"
+         :modules {:main {:entry [my.app]}}
+         ...
+         :devtools {:http-root "public"
+                    :http-port 8080}}}}
+```
+
+.Example `index.html`
+```html
+<!doctype html>
+<html>
+<body>
+<h1>Hello World</h1>
+<script src="/js/main.js"></script>
+</body>
+</html>
+```
 
 ==== HTTP and URI-based Routing (Push state)
 
