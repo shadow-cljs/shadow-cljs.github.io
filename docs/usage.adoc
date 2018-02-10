@@ -265,7 +265,7 @@ IMPORTANT: If you exit the Node REPL the `node` process is also killed!
 
 
 
-== Scripting the Compiler [[clj-run]]
+== Running Clojure Code [[clj-run]]
 
 You can use the `shadow-cljs` CLI to call specific Clojure functions from the command line. This is useful when you want run some code before/after certain tasks. Suppose you wanted to `rsync` the output of your `release` build to a remote server.
 

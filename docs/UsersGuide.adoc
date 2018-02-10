@@ -466,6 +466,60 @@ can do async processing, but *must* call `(done)` to indicate it is complete.
 
 TIP: If neither `:after-load` nor `:before-load` are set the compiler will not attempt to hot reload the code. If you still want hot reloading but don't need any of the callbacks you can set `:autoload true` instead.
 
+== Compiler Cache
+
+`shadow-cljs` will cache all compilation results by default. The cache is invalidated whenever anything relevant to the individual source files changes (eg. changed compiler setting, changed dependencies, etc.). This greatly improves the developer experience since incremental compilation will be **much** faster than starting from scratch.
+
+Invalidating the cache however can not always be done reliably if you are using a lot of macros with side-effects (reading files, storing things outside the compiler state, etc.). In those cases you might need to disable caching entirely.
+
+Namespaces that are known to include side-effecting macros can be blocked from caching. They won't be cached themselves and namespaces requiring them will not be cached as well. The https://github.com/cerner/clara-rules[clara-rules] library has side-effecting macros and is blocked by default. You can specify which namespaces to block globally via the `:cache-blockers` configuration. It expects a set of namespace symbols.
+
+.clara.rules cache blocking example (this is done by default)
+```
+{...
+ :cache-blockers #{clara.rules}
+ :builds {...}}
+```
+
+In addition you can control how much caching is done more broadly via the `:build-options` `:cache-level` entry. The supported options are:
+
+[horizontal]
+`:all`:: The default, all CLJS files are cached
+`:jars`:: Only caches files from libraries, ie. source files in `.jar` files
+`:off`:: Does not cache any CLJS compilation results (by far the slowest option)
+
+.Compiling without Cache
+```
+{...
+ :builds
+ {:app
+  {:target :browser
+   ...
+   :build-options
+   {:cache-level :off}}}}
+```
+
+The cache files are stored in a dedicated directory for each build so the cache is never shared between builds. A build with the id `:app` will have the `:dev` cache in the directory:
+
+.Cache location for `cljs/core.cljs`
+```
+target/shadow-cljs/builds/app/dev/ana/cljs/core.cljs.cache.transit.json
+```
+
+The `:cache-root` setting defaults to `target/shadow-cljs` and controls where ALL cache files will be written. It can only be configured globally, not per build.
+
+```
+{:source-paths [...]
+ :dependencies [...]
+ :cache-root ".shadow-cljs"
+ :builds ...}
+
+;; cache then goes to
+;; .shadow-cljs/builds/app/dev/ana/cljs/core.cljs.cache.transit.json
+```
+
+The `:cache-root` is always resolved relative to the project directory. You can also specify absolute paths (eg. `/tmp/shadow-cljs`).
+
 = Targeting the Browser [[target-browser]]
 
 include::target-browser.adoc[]

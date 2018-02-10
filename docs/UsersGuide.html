@@ -568,7 +568,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_node_repl">3.4.1. Node REPL</a></li>
 </ul>
 </li>
-<li><a href="#clj-run">3.5. Scripting the Compiler</a></li>
+<li><a href="#clj-run">3.5. Running Clojure Code</a></li>
 </ul>
 </li>
 <li><a href="#_configuration">4. Configuration</a>
@@ -599,6 +599,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_lifecycle_hooks">5.2.3. Lifecycle Hooks</a></li>
 </ul>
 </li>
+<li><a href="#_compiler_cache">5.3. Compiler Cache</a></li>
 </ul>
 </li>
 <li><a href="#target-browser">6. Targeting the Browser</a>
@@ -1268,7 +1269,7 @@ If you exit the Node REPL the <code>node</code> process is also killed!
 </div>
 </div>
 <div class="sect2">
-<h3 id="clj-run"><a class="anchor" href="#clj-run"></a><a class="link" href="#clj-run">3.5. Scripting the Compiler</a></h3>
+<h3 id="clj-run"><a class="anchor" href="#clj-run"></a><a class="link" href="#clj-run">3.5. Running Clojure Code</a></h3>
 <div class="paragraph">
 <p>You can use the <code>shadow-cljs</code> CLI to call specific Clojure functions from the command line. This is useful when you want run some code before/after certain tasks. Suppose you wanted to <code>rsync</code> the output of your <code>release</code> build to a remote server.</p>
 </div>
@@ -1844,6 +1845,95 @@ If neither <code>:after-load</code> nor <code>:before-load</code> are set the co
 </tr>
 </table>
 </div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_compiler_cache"><a class="anchor" href="#_compiler_cache"></a><a class="link" href="#_compiler_cache">5.3. Compiler Cache</a></h3>
+<div class="paragraph">
+<p><code>shadow-cljs</code> will cache all compilation results by default. The cache is invalidated whenever anything relevant to the individual source files changes (eg. changed compiler setting, changed dependencies, etc.). This greatly improves the developer experience since incremental compilation will be <strong>much</strong> faster than starting from scratch.</p>
+</div>
+<div class="paragraph">
+<p>Invalidating the cache however can not always be done reliably if you are using a lot of macros with side-effects (reading files, storing things outside the compiler state, etc.). In those cases you might need to disable caching entirely.</p>
+</div>
+<div class="paragraph">
+<p>Namespaces that are known to include side-effecting macros can be blocked from caching. They won&#8217;t be cached themselves and namespaces requiring them will not be cached as well. The <a href="https://github.com/cerner/clara-rules">clara-rules</a> library has side-effecting macros and is blocked by default. You can specify which namespaces to block globally via the <code>:cache-blockers</code> configuration. It expects a set of namespace symbols.</p>
+</div>
+<div class="listingblock">
+<div class="title">clara.rules cache blocking example (this is done by default)</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:cache-blockers</span> #{clara.rules}
+ <span class="symbol">:builds</span> {<span class="keyword">..</span><span class="keyword">.</span>}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In addition you can control how much caching is done more broadly via the <code>:build-options</code> <code>:cache-level</code> entry. The supported options are:</p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+<code>:all</code>
+</td>
+<td class="hdlist2">
+<p>The default, all CLJS files are cached</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>:jars</code>
+</td>
+<td class="hdlist2">
+<p>Only caches files from libraries, ie. source files in <code>.jar</code> files</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>:off</code>
+</td>
+<td class="hdlist2">
+<p>Does not cache any CLJS compilation results (by far the slowest option)</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">Compiling without Cache</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span>
+  {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+   <span class="keyword">..</span><span class="keyword">.</span>
+   <span class="symbol">:build-options</span>
+   {<span class="symbol">:cache-level</span> <span class="symbol">:off</span>}}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The cache files are stored in a dedicated directory for each build so the cache is never shared between builds. A build with the id <code>:app</code> will have the <code>:dev</code> cache in the directory:</p>
+</div>
+<div class="listingblock">
+<div class="title">Cache location for <code>cljs/core.cljs</code></div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">target/shadow-cljs/builds/app/dev/ana/cljs/core.cljs.cache.transit.json</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>:cache-root</code> setting defaults to <code>target/shadow-cljs</code> and controls where ALL cache files will be written. It can only be configured globally, not per build.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:source-paths</span> [<span class="keyword">..</span><span class="keyword">.</span>]
+ <span class="symbol">:dependencies</span> [<span class="keyword">..</span><span class="keyword">.</span>]
+ <span class="symbol">:cache-root</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">.shadow-cljs</span><span class="delimiter">&quot;</span></span>
+ <span class="symbol">:builds</span> <span class="keyword">..</span><span class="keyword">.</span>}
+
+<span class="comment">;; cache then goes to</span>
+<span class="comment">;; .shadow-cljs/builds/app/dev/ana/cljs/core.cljs.cache.transit.json</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>:cache-root</code> is always resolved relative to the project directory. You can also specify absolute paths (eg. <code>/tmp/shadow-cljs</code>).</p>
 </div>
 </div>
 </div>
@@ -4483,7 +4573,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-02-07 09:41:34 STD
+Last updated 2018-02-10 13:23:14 STD
 </div>
 </div>
 </body>
