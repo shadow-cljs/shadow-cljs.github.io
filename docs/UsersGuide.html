@@ -2313,6 +2313,8 @@ be in the final file for the worker. Each worker should have a dedicated CLJS na
  <span class="symbol">:builds</span>
    {<span class="symbol">:app</span>
     {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+     <span class="symbol">:output-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public/js</span><span class="delimiter">&quot;</span></span>
+     <span class="symbol">:asset-path</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">/js</span><span class="delimiter">&quot;</span></span>
      <span class="keyword">..</span><span class="keyword">.</span>
      <span class="symbol">:modules</span> {<span class="symbol">:main</span>   {<span class="symbol">:entries</span> [my.app]}
                <span class="symbol">:extra</span>  {<span class="symbol">:entries</span> [my.app.extra]
@@ -2327,6 +2329,26 @@ be in the final file for the worker. Each worker should have a dedicated CLJS na
 It will have all code from the <code>:main</code> module available (but not <code>:extra</code>). The code in the
 <code>my.app.worker</code> namespace will only ever execute in the worker. Worker generation happens in
 both development and release modes.</p>
+</div>
+<div class="listingblock">
+<div class="title">Sample echo worker</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">my.app.worker</span>)
+
+(js/self.addEventListener <span class="string"><span class="delimiter">&quot;</span><span class="content">message</span><span class="delimiter">&quot;</span></span>
+  (<span class="keyword">fn</span> [^js e]
+    (js/postMessage (<span class="keyword">..</span> e -data))</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Sample using the worker</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">my.app</span>)
+
+(<span class="keyword">let</span> [worker (js/Worker. <span class="string"><span class="delimiter">&quot;</span><span class="content">/js/worker.js</span><span class="delimiter">&quot;</span></span>))]
+  (<span class="keyword">..</span> worker (addEventListener (<span class="keyword">fn</span> [e] (js/console.log e))))
+  (<span class="keyword">..</span> worker (postMessage <span class="string"><span class="delimiter">&quot;</span><span class="content">hello world</span><span class="delimiter">&quot;</span></span>)))</code></pre>
+</div>
 </div>
 <div class="admonitionblock note">
 <table>

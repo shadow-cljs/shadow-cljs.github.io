@@ -222,6 +222,8 @@ be in the final file for the worker. Each worker should have a dedicated CLJS na
  :builds
    {:app
     {:target :browser
+     :output-dir "public/js"
+     :asset-path "/js"
      ...
      :modules {:main   {:entries [my.app]}
                :extra  {:entries [my.app.extra]
@@ -236,11 +238,27 @@ It will have all code from the `:main` module available (but not `:extra`). The 
 `my.app.worker` namespace will only ever execute in the worker. Worker generation happens in
 both development and release modes.
 
+.Sample echo worker
+```
+(ns my.app.worker)
+
+(js/self.addEventListener "message"
+  (fn [^js e]
+    (js/postMessage (.. e -data))
+```
+
+.Sample using the worker
+```
+(ns my.app)
+
+(let [worker (js/Worker. "/js/worker.js"))]
+  (.. worker (addEventListener (fn [e] (js/console.log e))))
+  (.. worker (postMessage "hello world")))
+```
+
 NOTE: Hot code reload does not support reloading code in the worker while it is running.
 I suggest shutting down all workers using the `:devtools :before-load` function and restarting it
 in the `:after-load`.
-
-
 
 == Cacheable Output [[NameHashing]]
 
