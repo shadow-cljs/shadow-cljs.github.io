@@ -715,6 +715,7 @@ table.CodeRay td.code>pre{padding:0}
 <ul class="sectlevel2">
 <li><a href="#_cursive">13.1. Cursive</a></li>
 <li><a href="#cider">13.2. emacs / cider</a></li>
+<li><a href="#_proto_repl_atom">13.3. Proto REPL (Atom)</a></li>
 </ul>
 </li>
 <li><a href="#_what_to_do_when_things_don_t_work">14. What to do when things don’t work?</a></li>
@@ -4558,6 +4559,52 @@ The compiler look for files relative to the project root first. It will also att
 </div>
 <div class="paragraph">
 <p>The generic <a href="#nrepl">nREPL</a> instructions should provide everything required but additional config might be required.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_proto_repl_atom"><a class="anchor" href="#_proto_repl_atom"></a><a class="link" href="#_proto_repl_atom">13.3. Proto REPL (Atom)</a></h3>
+<div class="paragraph">
+<p>Proto REPL is mostly intended for Clojure development so most features do not work for ClojureScript. It is however possible to use it for simple evals.</p>
+</div>
+<div class="paragraph">
+<p>You need to setup a couple of things to get it working.</p>
+</div>
+<div class="paragraph">
+<p>1)  Create a <code>user.clj</code> in on of your <code>:source-paths</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"> (<span class="keyword">ns</span> <span class="namespace">user</span>)
+
+ (<span class="keyword">defn</span> <span class="function">reset</span> [])</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The file must define the <code>user/reset</code> fn since Proto REPL will call that when connecting. If <code>user/reset</code> is not found it will call <code>tools.namespace</code> which destroys the running <code>shadow-cljs</code> server. We don&#8217;t want that. You could do something here but we don&#8217;t need to do anything for CLJS.</p>
+</div>
+<div class="paragraph">
+<p>2) add <code>[proto-repl "0.3.1"]</code> to your <code>:dependencies</code>.</p>
+</div>
+<div class="paragraph">
+<p>3) Configure a fixed <a href="#nREPL">nREPL port</a></p>
+</div>
+<div class="paragraph">
+<p>4) Start <code>shadow-cljs server</code> or <code>shadow-cljs watch your-build</code>.</p>
+</div>
+<div class="paragraph">
+<p>5) Run the Atom Command <code>Proto Repl: Remote Nrepl Connection</code> connect to <code>localhost</code> and the port you configured</p>
+</div>
+<div class="paragraph">
+<p>6) Eval <code>(shadow.cljs.devtools.api/watch :your-build)</code> (if you used <code>server</code> in 4)</p>
+</div>
+<div class="paragraph">
+<p>7) Eval <code>(shadow.cljs.devtools.api/nrepl-select :your-build)</code>. The REPL connection is now in CLJS mode, meaning that everything you eval will be eval&#8217;d in JS. You can eval <code>:repl/quit</code> to get back to Clojure Mode. If you get <code>[:no-worker :browser]</code> you need to start the <code>watch</code> first.</p>
+</div>
+<div class="paragraph">
+<p>8) Before you can eval CLJS you need to connect your client (eg. your Browser when building a <code>:browser</code> App).</p>
+</div>
+<div class="paragraph">
+<p>9) Eval some JS, eg. <code>(js/alert "foo")</code>. If you get <code>There is no connected JS runtime</code> the client is not connected properly. Otherwise the Browser should show an alert.</p>
 </div>
 </div>
 </div>

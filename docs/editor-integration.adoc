@@ -23,3 +23,37 @@ You can run `npx shadow-cljs server` inside the Terminal provided by IntelliJ an
 https://github.com/shadow-cljs/shadow-cljs.github.io[HELP WANTED!]
 
 The generic <<nrepl, nREPL>> instructions should provide everything required but additional config might be required.
+
+
+== Proto REPL (Atom)
+
+Proto REPL is mostly intended for Clojure development so most features do not work for ClojureScript. It is however possible to use it for simple evals.
+
+You need to setup a couple of things to get it working.
+
+1)  Create a `user.clj` in on of your `:source-paths`.
+
+```clojure
+ (ns user)
+
+ (defn reset [])
+```
+
+The file must define the `user/reset` fn since Proto REPL will call that when connecting. If `user/reset` is not found it will call `tools.namespace` which destroys the running `shadow-cljs` server. We don't want that. You could do something here but we don't need to do anything for CLJS.
+
+2) add `[proto-repl "0.3.1"]` to your `:dependencies`.
+
+3) Configure a fixed <<nREPL, nREPL port>>
+
+4) Start `shadow-cljs server` or `shadow-cljs watch your-build`.
+
+5) Run the Atom Command `Proto Repl: Remote Nrepl Connection` connect to `localhost` and the port you configured
+
+6) Eval `(shadow.cljs.devtools.api/watch :your-build)` (if you used `server` in 4)
+
+7) Eval `(shadow.cljs.devtools.api/nrepl-select :your-build)`. The REPL connection is now in CLJS mode, meaning that everything you eval will be eval'd in JS. You can eval `:repl/quit` to get back to Clojure Mode. If you get `[:no-worker :browser]` you need to start the `watch` first.
+
+8) Before you can eval CLJS you need to connect your client (eg. your Browser when building a `:browser` App).
+
+9) Eval some JS, eg. `(js/alert "foo")`. If you get `There is no connected JS runtime` the client is not connected properly. Otherwise the Browser should show an alert.
+
