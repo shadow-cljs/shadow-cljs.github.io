@@ -98,6 +98,8 @@ If you'd like to use https://leiningen.org/[Leiningen] for your build system (pa
  :builds { ... }
 ```
 
+When using `:lein` you must include the https://clojars.org/thheller/shadow-cljs[thheller/shadow-cljs] artifact in your `:dependencies` manually.
+
 .Using a dedicated `lein` profile
 ```
 {:lein {:profile "+cljs"}
