@@ -216,7 +216,7 @@ Your dependencies are managed via the `:dependencies` key at the root of the `sh
 
 Notice that the source path is *only* specified once in the entire configuration. The system will use namespace dependency graphs to determine what code is needed in the final output of any given build.
 
-=== JavaScript
+=== JavaScript [[npm-install]]
 
 `shadow-cljs` integrates fully with the https://www.npmjs.com/[`npm`] ecosystem to manage JavaScript dependencies.
 
@@ -226,7 +226,7 @@ You can use `npm` or `yarn` to manage your dependencies, please refer to their r
 npm:: https://docs.npmjs.com/
 yarn:: https://yarnpkg.com/en/docs
 
-Almost every package available via `npm` will explain how to install it. Those instructions now apply to shadow-cljs as well.
+Both manage your dependencies via a `package.json` file in your project directory.  Almost every package available via `npm` will explain how to install it. Those instructions now apply to `shadow-cljs` as well.
 
 .Installing a JavaScript package
 ```bash
@@ -239,7 +239,20 @@ $ yarn add the-thing
 
 Nothing more is required. Dependencies will be added to the `package.json` file and this will be used to manage them.
 
-If you don’t have a `package.json` yet run `npm init` from a command line.
+TIP: If you don’t have a `package.json` yet run `npm init` from a command line.
+
+==== Missing JS Dependency?
+
+You might run into errors related to missing JS dependencies. Most ClojureScript libraries do not yet declare the `npm` packages they use since they still expect to use <<cljsjs, CLJSJS>>. We want to use `npm` directly which means you must manually install the `npm` packages until libraries properly declare the `:npm-deps` themselves.
+
+```text
+The required JS dependency "react" is not available, it was required by ...
+```
+
+This means that you should `npm install react`.
+
+TIP: In the case of `react` you probably need these 3 packages: `npm install react react-dom create-react-class`.
+
 
 == Server Options
 

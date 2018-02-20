@@ -555,7 +555,8 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_build_tool_integration">3.2. Build Tool Integration</a>
 <ul class="sectlevel3">
 <li><a href="#Leiningen">3.2.1. Leiningen</a></li>
-<li><a href="#_boot">3.2.2. Boot</a></li>
+<li><a href="#deps-edn">3.2.2. tools.deps / deps.edn</a></li>
+<li><a href="#_boot">3.2.3. Boot</a></li>
 </ul>
 </li>
 <li><a href="#_clojure_repl">3.3. Clojure REPL</a>
@@ -577,7 +578,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_dependencies">4.2. Dependencies</a>
 <ul class="sectlevel3">
 <li><a href="#_clojure_script">4.2.1. Clojure(Script)</a></li>
-<li><a href="#_javascript">4.2.2. JavaScript</a></li>
+<li><a href="#npm-install">4.2.2. JavaScript</a></li>
 </ul>
 </li>
 <li><a href="#_server_options">4.3. Server Options</a>
@@ -688,7 +689,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_access_cljs_from_js">11.2.5. Access CLJS from JS</a></li>
 </ul>
 </li>
-<li><a href="#_migrating_cljsjs">11.3. Migrating cljsjs.*</a>
+<li><a href="#cljsjs">11.3. Migrating cljsjs.*</a>
 <ul class="sectlevel3">
 <li><a href="#_why_not_use_cljsjs">11.3.1. Why not use CLJSJS?</a></li>
 </ul>
@@ -1022,10 +1023,7 @@ It is absolutely recommended to use the standalone <code>shadow-cljs</code> vers
 <div class="sect3">
 <h4 id="Leiningen"><a class="anchor" href="#Leiningen"></a><a class="link" href="#Leiningen">3.2.1. Leiningen</a></h4>
 <div class="paragraph">
-<p>If you&#8217;d like to use Leiningen for your build system (particularly if you use Cursive) then there is a simple option in your <code>shadow-cljs.edn</code> file that causes it to derive <code>:source-paths</code> and <code>:dependencies</code> from <code>project.clj</code>:</p>
-</div>
-<div class="paragraph">
-<p>The <code>shadow-cljs</code> command-line utility can also use <code>lein</code> to run your commands. You can enable this by adding a <code>:lein</code> entry to your <code>shadow-cljs.edn</code> config. With <code>:lein</code> set the <code>shadow-cljs</code> command will use <code>lein</code> to launch the JVM.</p>
+<p>If you&#8217;d like to use <a href="https://leiningen.org/">Leiningen</a> for your build system (particularly if you use Cursive), the <code>shadow-cljs</code> command-line utility can be configured to use <code>lein</code> to run your commands. Enable this by adding a <code>:lein</code> entry to your <code>shadow-cljs.edn</code> config. With this setting, the <code>shadow-cljs</code> command will use <code>lein</code> to launch the JVM, ignoring any <code>:source-paths</code> and <code>:dependencies</code> in <code>shadow-cljs.edn</code>; relying instead on <code>lein</code> to set them from <code>project.clj</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1087,7 +1085,50 @@ $ lein run -m shadow.cljs.devtools.cli watch build-id</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_boot"><a class="anchor" href="#_boot"></a><a class="link" href="#_boot">3.2.2. Boot</a></h4>
+<h4 id="deps-edn"><a class="anchor" href="#deps-edn"></a><a class="link" href="#deps-edn">3.2.2. tools.deps / deps.edn</a></h4>
+<div class="paragraph">
+<p>The new <a href="https://clojure.org/guides/deps_and_cli">deps.edn</a> can also be used to manage your <code>:dependencies</code> and <code>:source-paths</code> instead of using the built-in methods or <code>lein</code>. All <code>shadow-cljs</code> commands will then be launched via the new <code>clojure</code> utility instead.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+<code>tools.deps</code> is still changing quite frequently. Make sure you are using the latest version.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To use this set the <code>:deps true</code> property in your config. It is also possible to configure which <code>deps.edn</code> aliases should be used.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example with :cljs alias</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:deps</span> {<span class="symbol">:aliases</span> [<span class="symbol">:cljs</span>]}
+ <span class="symbol">:builds</span> <span class="keyword">..</span><span class="keyword">.</span>}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You may also specify <code>shadow-cljs -A:cljs &#8230;&#8203;</code> in the command line instead.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Aliases are only applied when a new instance/server is started. They do not apply when connecting to a running server.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_boot"><a class="anchor" href="#_boot"></a><a class="link" href="#_boot">3.2.3. Boot</a></h4>
 <div class="paragraph">
 <p>The authors have little Boot experience, so this chapter is in need of contributions. We understand
 that Boot allows you to build your tool chain out of functions. Since <code>shadow-cljs</code> is a normal
@@ -1433,7 +1474,7 @@ configuration and a <code>:builds</code> entry for all your builds.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_javascript"><a class="anchor" href="#_javascript"></a><a class="link" href="#_javascript">4.2.2. JavaScript</a></h4>
+<h4 id="npm-install"><a class="anchor" href="#npm-install"></a><a class="link" href="#npm-install">4.2.2. JavaScript</a></h4>
 <div class="paragraph">
 <p><code>shadow-cljs</code> integrates fully with the <a href="https://www.npmjs.com/"><code>npm</code></a> ecosystem to manage JavaScript dependencies.</p>
 </div>
@@ -1461,7 +1502,7 @@ yarn
 </table>
 </div>
 <div class="paragraph">
-<p>Almost every package available via <code>npm</code> will explain how to install it. Those instructions now apply to shadow-cljs as well.</p>
+<p>Both manage your dependencies via a <code>package.json</code> file in your project directory.  Almost every package available via <code>npm</code> will explain how to install it. Those instructions now apply to <code>shadow-cljs</code> as well.</p>
 </div>
 <div class="listingblock">
 <div class="title">Installing a JavaScript package</div>
@@ -1476,8 +1517,43 @@ $ yarn add the-thing</code></pre>
 <div class="paragraph">
 <p>Nothing more is required. Dependencies will be added to the <code>package.json</code> file and this will be used to manage them.</p>
 </div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+If you don’t have a <code>package.json</code> yet run <code>npm init</code> from a command line.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_missing_js_dependency"><a class="anchor" href="#_missing_js_dependency"></a><a class="link" href="#_missing_js_dependency">Missing JS Dependency?</a></h5>
 <div class="paragraph">
-<p>If you don’t have a <code>package.json</code> yet run <code>npm init</code> from a command line.</p>
+<p>You might run into errors related to missing JS dependencies. Most ClojureScript libraries do not yet declare the <code>npm</code> packages they use since they still expect to use <a href="#cljsjs">CLJSJS</a>. We want to use <code>npm</code> directly which means you must manually install the <code>npm</code> packages until libraries properly declare the <code>:npm-deps</code> themselves.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="text">The required JS dependency &quot;react&quot; is not available, it was required by ...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This means that you should <code>npm install react</code>.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+In the case of <code>react</code> you probably need these 3 packages: <code>npm install react react-dom create-react-class</code>.
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 </div>
@@ -4187,7 +4263,7 @@ The <code>goog:</code> prefix currently only works for ES6 file. <code>require("
 </div>
 </div>
 <div class="sect2">
-<h3 id="_migrating_cljsjs"><a class="anchor" href="#_migrating_cljsjs"></a><a class="link" href="#_migrating_cljsjs">11.3. Migrating cljsjs.*</a></h3>
+<h3 id="cljsjs"><a class="anchor" href="#cljsjs"></a><a class="link" href="#cljsjs">11.3. Migrating cljsjs.*</a></h3>
 <div class="quoteblock">
 <blockquote>
 <div class="paragraph">
@@ -4642,7 +4718,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-02-10 13:23:14 STD
+Last updated 2018-02-20 16:08:36 STD
 </div>
 </div>
 </body>

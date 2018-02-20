@@ -316,7 +316,7 @@ cljs.array_map(keyword("foo"), "hello world");
 
 TIP: The `goog:` prefix currently only works for ES6 file. `require("goog:cljs.core")` does not work.
 
-== Migrating cljsjs.*
+== Migrating cljsjs.* [[cljsjs]]
 
 > CLJSJS is an effort to package Javascript libraries to be able to use them from within ClojureScript.
 

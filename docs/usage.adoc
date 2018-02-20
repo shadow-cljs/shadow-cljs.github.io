@@ -89,9 +89,7 @@ CAUTION: It is absolutely recommended to use the standalone `shadow-cljs` versio
 
 === Leiningen [[Leiningen]]
 
-If you'd like to use Leiningen for your build system (particularly if you use Cursive) then there is a simple option in your `shadow-cljs.edn` file that causes it to derive `:source-paths` and `:dependencies` from `project.clj`:
-
-The `shadow-cljs` command-line utility can also use `lein` to run your commands. You can enable this by adding a `:lein` entry to your `shadow-cljs.edn` config. With `:lein` set the `shadow-cljs` command will use `lein` to launch the JVM.
+If you'd like to use https://leiningen.org/[Leiningen] for your build system (particularly if you use Cursive), the `shadow-cljs` command-line utility can be configured to use `lein` to run your commands. Enable this by adding a `:lein` entry to your `shadow-cljs.edn` config. With this setting, the `shadow-cljs` command will use `lein` to launch the JVM, ignoring any `:source-paths` and `:dependencies` in `shadow-cljs.edn`; relying instead on `lein` to set them from `project.clj`.
 
 ```
 {:lein true
@@ -140,6 +138,24 @@ $ lein run -m shadow.cljs.devtools.cli compile build-id
 ```bash
 $ lein run -m shadow.cljs.devtools.cli release build-id
 ```
+
+=== tools.deps / deps.edn [[deps-edn]]
+
+The new https://clojure.org/guides/deps_and_cli[deps.edn] can also be used to manage your `:dependencies` and `:source-paths` instead of using the built-in methods or `lein`. All `shadow-cljs` commands will then be launched via the new `clojure` utility instead.
+
+IMPORTANT: `tools.deps` is still changing quite frequently. Make sure you are using the latest version.
+
+To use this set the `:deps true` property in your config. It is also possible to configure which `deps.edn` aliases should be used.
+
+.Example with :cljs alias
+```clojure
+{:deps {:aliases [:cljs]}
+ :builds ...}
+```
+
+You may also specify `shadow-cljs -A:cljs ...` in the command line instead.
+
+IMPORTANT: Aliases are only applied when a new instance/server is started. They do not apply when connecting to a running server.
 
 === Boot
 
