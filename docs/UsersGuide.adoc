@@ -105,7 +105,7 @@ interest:
                      :output-dir "resources/public/js"}}}
 ```
 
-Code examples may are similarly shortened.
+Code examples may be similarly shortened.
 
 
 = Installation

@@ -7,7 +7,7 @@ When it is time to get serious you create a <<release, `release`>> build which c
 
 == Command Line
 
-Once <<Installation, installed>> you can use the `shadow-cljs` command directly if installed globally.
+If <<Installation, installed>> globally, you can use the `shadow-cljs` command directly.
 
 ```bash
 $ shadow-cljs help
@@ -57,12 +57,12 @@ $ shadow-cljs release app --debug
 
 === Server Mode [[server-mode]]
 
-Starting a `shadow-cljs` command can be fairly slow to start. To improve this `shadow-cljs` can run in "server mode" which means that a dedicated process is started which all other commands can use to execute a lot faster since they won't have to start a new JVM/Clojure instance.
+A `shadow-cljs` command can be fairly slow to start. To improve this `shadow-cljs` can run in "server mode" which means that a dedicated process is started which all other commands can use to execute a lot faster since they won't have to start a new JVM/Clojure instance.
 
-Commands that do long running things implicitly start a server instance (eg. `watch`) but it is often advisable to have
+Commands that do long-running things implicitly start a server instance (eg. `watch`) but it is often advisable to have
 a dedicated server process running.
 
-You can either run the process in the foreground in a dedicated terminal. Use `CTRL+C` to terminate the server.
+You can run the process in the foreground in a dedicated terminal. Use `CTRL+C` to terminate the server.
 
 ```bash
 $ shadow-cljs server
@@ -85,13 +85,11 @@ Once any server is running every other command will use that and run much faster
 
 `shadow-cljs` can integrate with other Clojure tools since the primary distribution is just a `.jar` file available via https://clojars.org/thheller/shadow-cljs[Clojars].
 
-CAUTION: It is absolutely recommended to use the standalone `shadow-cljs` version. The command does a lot of things to optimize the user experience (eg. faster startup) which are not done by other tools. You'll also save yourself a lot of headaches dealing with dependency conflicts and other related errors.
+CAUTION: It is strongly recommended to use the standalone `shadow-cljs` version. The command does a lot of things to optimize the user experience (e.g. faster startup) which are not done by other tools. You'll also save yourself a lot of headaches dealing with dependency conflicts and other related errors.
 
 === Leiningen [[Leiningen]]
 
-If you'd like to use Leiningen for your build system (particularly if you use Cursive) then there is a simple option in your `shadow-cljs.edn` file that causes it to derive `:source-paths` and `:dependencies` from `project.clj`:
-
-The `shadow-cljs` command-line utility can also use `lein` to run your commands. You can enable this by adding a `:lein` entry to your `shadow-cljs.edn` config. With `:lein` set the `shadow-cljs` command will use `lein` to launch the JVM.
+If you'd like to use Leiningen for your build system (particularly if you use Cursive), the `shadow-cljs` command-line utility can be configured to use `lein` to run your commands. Enable this by adding a `:lein` entry to your `shadow-cljs.edn` config. With this setting, the `shadow-cljs` command will use `lein` to launch the JVM, ignoring any `:source-paths` and `:dependencies` in `shadow-cljs.edn`; relying instead on `lein` to set them from `project.clj`.
 
 ```
 {:lein true
@@ -145,7 +143,7 @@ $ lein run -m shadow.cljs.devtools.cli release build-id
 
 The authors have little Boot experience, so this chapter is in need of contributions. We understand
 that Boot allows you to build your tool chain out of functions. Since `shadow-cljs` is a normal
-JVM library with functions that you can call to invoke tasks.
+JVM library, you can call functions within it to invoke tasks.
 
 Some boot tasks are available here:
 https://github.com/jgdavey/boot-shadow-cljs
