@@ -105,7 +105,7 @@ interest:
                      :output-dir "resources/public/js"}}}
 ```
 
-Code examples may are similarly shortened.
+Code examples may be similarly shortened.
 
 
 = Installation
@@ -334,7 +334,7 @@ The above are the defaults so if you want to use those it is fine to just set `:
 
 You can create a Keystore using the java `keytool` command. Creating a trusted self-signed certificate is also possible but somewhat complicated.
 
-I used https://certsimple.com/blog/localhost-ssl-fix[this guide] to create a self-signed certificate using macOS. Importing the created `.p12` file can be turned into the required `keystore.jks` via the `keytool` utility.
+I used https://certsimple.com/blog/localhost-ssl-fix[this guide] to create a self-signed certificate using macOS. The created `.p12` file can be turned into the required `keystore.jks` via the `keytool` utility.
 
 ```bash
 $ keytool -importkeystore -destkeystore keystore.jks -srcstoretype PKCS12 -srckeystore <the-cert>.p12
