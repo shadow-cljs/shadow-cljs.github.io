@@ -539,7 +539,7 @@ include::target-browser.adoc[]
 
 = Targeting node.js [[target-node]]
 
-There is built-in support for generating code that is intended to be use as a stand-alone
+There is built-in support for generating code that is intended to be used as a stand-alone
 script, and also for code that is intended to be used as a library. See the
 section on <<CommonConfig,common configuration>> for the base settings needed in
 a configuration file.
@@ -568,7 +568,7 @@ include::target-npm-module.adoc[]
 
 `shadow-cljs` provides a few ultility targets to make building tests a little easier.
 
-All test targets generate a test runner and automatically add all namespaces given the configurable `:ns-regexp`. The default test runners were built for `cljs.test` but you can create custom runners if you prefer to use other test frameworks.
+All test targets generate a test runner and automatically add all namespaces matching the configurable `:ns-regexp`. The default test runners were built for `cljs.test` but you can create custom runners if you prefer to use other test frameworks.
 
 The default `:ns-regexp` is `"-test$"`, so your first test could look like:
 
@@ -624,7 +624,7 @@ https://clojurians.slack.com/messages/C6N245JGG[`#shadow-cljs` Slack channel].
 
 == Patching Libraries
 
-The `shadow-cljs` compiler ensure that things on your source paths are compiled first, overriding files from JARs. This means that you can copy a source file from a library, patch it, and include it in your own source directory.
+The `shadow-cljs` compiler ensures that things on your source paths are compiled first, overriding files from JARs. This means that you can copy a source file from a library, patch it, and include it in your own source directory.
 
 This is a convenient way to test out fixes (even to `shadow-cljs` itself!) without having to clone
 that project and understand its setup, build, etc.

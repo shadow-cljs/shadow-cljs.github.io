@@ -512,7 +512,7 @@ By default the devtools client will attempt to connect to the `shadow-cljs` proc
                    ...}}}}
 ```
 
-`shadow-cljs` will then use the `:devtools-url` as the base when making requests. It is not the final URL so you must ensure that all request starting with the path you configured (eg. `/shadow-cljs/*`) are forwarded to the host `shadow-cljs` is running on.
+`shadow-cljs` will then use the `:devtools-url` as the base when making requests. It is not the final URL so you must ensure that all requests starting with the path you configured (eg. `/shadow-cljs/*`) are forwarded to the host `shadow-cljs` is running on.
 
 
 .Incoming Request to Proxy

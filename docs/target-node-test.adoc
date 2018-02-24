@@ -27,5 +27,5 @@ $ shadow-cljs release test
 $ node out/node-tests.js
 ```
 
-The `node` process will exit code will be set top `0` when successful and `1` with any failures.
+The `node` process exit code will be set to `0` when successful and `1` on any failures.
 

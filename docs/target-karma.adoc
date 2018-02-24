@@ -1,7 +1,7 @@
 When you want to run your CLJS tests against a browser on some kind of CI server you'll need to
 be able to run the tests from a command line and get back a status code. Karma is a well-known
 and supported test runner that can do this for you, and `shadow-cljs` includes a target that
-can add the appropriate wrappers around your tests so the will work in it.
+can add the appropriate wrappers around your tests so they will work in it.
 
 === Installing Karma
 
