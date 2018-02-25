@@ -440,9 +440,9 @@ preloads option is simply a list of namespaces in the `:devtools`/`:preloads` se
                    ...}}}}
 ```
 
-NOTE: Since version 2.0.130 shadow-cljs automatically adds "binaryage/cljs-devtools" to the preloads in
-`watch` and `compile` if they are on the classpath. All you need to do is make sure it is in your
-`dependencies` list.
+NOTE: Since version 2.0.130 shadow-cljs automatically adds `cljs-devtools` to the preloads in
+`watch` and `compile` if they are on the classpath. All you need to do is make sure `binaryage/devtools` is in your
+`dependencies` list. (Note, *not* binaryage/**cljs-**devtools.)
 
 === Hot Code Reload
 
