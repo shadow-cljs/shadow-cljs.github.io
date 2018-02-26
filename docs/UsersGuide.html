@@ -840,7 +840,7 @@ interest:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Code examples may are similarly shortened.</p>
+<p>Code examples may be similarly shortened.</p>
 </div>
 </div>
 </div>
@@ -913,7 +913,7 @@ $ yarn global add shadow-cljs</code></pre>
 <div class="sect2">
 <h3 id="_command_line"><a class="anchor" href="#_command_line"></a><a class="link" href="#_command_line">3.1. Command Line</a></h3>
 <div class="paragraph">
-<p>Once <a href="#_installation">installed</a> you can use the <code>shadow-cljs</code> command directly if installed globally.</p>
+<p>If <a href="#_installation">installed</a> globally, you can use the <code>shadow-cljs</code> command directly.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -971,14 +971,14 @@ $ shadow-cljs release app --debug</code></pre>
 <div class="sect3">
 <h4 id="server-mode"><a class="anchor" href="#server-mode"></a><a class="link" href="#server-mode">3.1.1. Server Mode</a></h4>
 <div class="paragraph">
-<p>Starting a <code>shadow-cljs</code> command can be fairly slow to start. To improve this <code>shadow-cljs</code> can run in "server mode" which means that a dedicated process is started which all other commands can use to execute a lot faster since they won&#8217;t have to start a new JVM/Clojure instance.</p>
+<p>A <code>shadow-cljs</code> command can be fairly slow to start. To improve this <code>shadow-cljs</code> can run in "server mode" which means that a dedicated process is started which all other commands can use to execute a lot faster since they won&#8217;t have to start a new JVM/Clojure instance.</p>
 </div>
 <div class="paragraph">
-<p>Commands that do long running things implicitly start a server instance (eg. <code>watch</code>) but it is often advisable to have
+<p>Commands that do long-running things implicitly start a server instance (eg. <code>watch</code>) but it is often advisable to have
 a dedicated server process running.</p>
 </div>
 <div class="paragraph">
-<p>You can either run the process in the foreground in a dedicated terminal. Use <code>CTRL+C</code> to terminate the server.</p>
+<p>You can run the process in the foreground in a dedicated terminal. Use <code>CTRL+C</code> to terminate the server.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1015,7 +1015,7 @@ $ shadow-cljs restart</code></pre>
 <div class="title">Caution</div>
 </td>
 <td class="content">
-It is absolutely recommended to use the standalone <code>shadow-cljs</code> version. The command does a lot of things to optimize the user experience (eg. faster startup) which are not done by other tools. You&#8217;ll also save yourself a lot of headaches dealing with dependency conflicts and other related errors.
+It is strongly recommended to use the standalone <code>shadow-cljs</code> version. The command does a lot of things to optimize the user experience (e.g. faster startup) which are not done by other tools. You&#8217;ll also save yourself a lot of headaches dealing with dependency conflicts and other related errors.
 </td>
 </tr>
 </table>
@@ -1135,7 +1135,7 @@ Aliases are only applied when a new instance/server is started. They do not appl
 <div class="paragraph">
 <p>The authors have little Boot experience, so this chapter is in need of contributions. We understand
 that Boot allows you to build your tool chain out of functions. Since <code>shadow-cljs</code> is a normal
-JVM library with functions that you can call to invoke tasks.</p>
+JVM library, you can call functions within it to invoke tasks.</p>
 </div>
 <div class="paragraph">
 <p>Some boot tasks are available here:
@@ -1676,7 +1676,7 @@ You still need to start the <a href="#embedded">embedded server</a> manually bef
 <p>You can create a Keystore using the java <code>keytool</code> command. Creating a trusted self-signed certificate is also possible but somewhat complicated.</p>
 </div>
 <div class="paragraph">
-<p>I used <a href="https://certsimple.com/blog/localhost-ssl-fix">this guide</a> to create a self-signed certificate using macOS. Importing the created <code>.p12</code> file can be turned into the required <code>keystore.jks</code> via the <code>keytool</code> utility.</p>
+<p>I used <a href="https://certsimple.com/blog/localhost-ssl-fix">this guide</a> to create a self-signed certificate using macOS. The created <code>.p12</code> file can be turned into the required <code>keystore.jks</code> via the <code>keytool</code> utility.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1855,9 +1855,9 @@ preloads option is simply a list of namespaces in the <code>:devtools</code>/<co
 <div class="title">Note</div>
 </td>
 <td class="content">
-Since version 2.0.130 shadow-cljs automatically adds "binaryage/cljs-devtools" to the preloads in
-<code>watch</code> and <code>compile</code> if they are on the classpath. All you need to do is make sure it is in your
-<code>dependencies</code> list.
+Since version 2.0.130 shadow-cljs automatically adds <code>cljs-devtools</code> to the preloads in
+<code>watch</code> and <code>compile</code> if they are on the classpath. All you need to do is make sure <code>binaryage/devtools</code> is in your
+<code>dependencies</code> list. (Note, <strong>not</strong> binaryage/<strong>cljs-</strong>devtools.)
 </td>
 </tr>
 </table>
@@ -2789,7 +2789,7 @@ document root used to serve your content.</p>
 </div>
 </div>
 <div class="paragraph">
-<p><code>shadow-cljs</code> will then use the <code>:devtools-url</code> as the base when making requests. It is not the final URL so you must ensure that all request starting with the path you configured (eg. <code>/shadow-cljs/*</code>) are forwarded to the host <code>shadow-cljs</code> is running on.</p>
+<p><code>shadow-cljs</code> will then use the <code>:devtools-url</code> as the base when making requests. It is not the final URL so you must ensure that all requests starting with the path you configured (eg. <code>/shadow-cljs/*</code>) are forwarded to the host <code>shadow-cljs</code> is running on.</p>
 </div>
 <div class="listingblock">
 <div class="title">Incoming Request to Proxy</div>
@@ -2826,7 +2826,7 @@ The requests must be forwarded to the main <a href="#http">HTTP server</a>, not 
 <h2 id="target-node"><a class="anchor" href="#target-node"></a><a class="link" href="#target-node">7. Targeting node.js</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>There is built-in support for generating code that is intended to be use as a stand-alone
+<p>There is built-in support for generating code that is intended to be used as a stand-alone
 script, and also for code that is intended to be used as a library. See the
 section on <a href="#CommonConfig">common configuration</a> for the base settings needed in
 a configuration file.</p>
@@ -3278,7 +3278,7 @@ options are:</p>
 <code>:entries</code>
 </td>
 <td class="hdlist2">
-<p>(optinal) A vector of namespaces to include. Everything from these will be included.
+<p>(optional) A vector of namespaces to include. Everything from these will be included.
 Defaults to everything it can find.</p>
 </td>
 </tr>
@@ -3340,7 +3340,7 @@ renaming an artifact.</p>
 <p><code>shadow-cljs</code> provides a few ultility targets to make building tests a little easier.</p>
 </div>
 <div class="paragraph">
-<p>All test targets generate a test runner and automatically add all namespaces given the configurable <code>:ns-regexp</code>. The default test runners were built for <code>cljs.test</code> but you can create custom runners if you prefer to use other test frameworks.</p>
+<p>All test targets generate a test runner and automatically add all namespaces matching the configurable <code>:ns-regexp</code>. The default test runners were built for <code>cljs.test</code> but you can create custom runners if you prefer to use other test frameworks.</p>
 </div>
 <div class="paragraph">
 <p>The default <code>:ns-regexp</code> is <code>"-test$"</code>, so your first test could look like:</p>
@@ -3418,7 +3418,7 @@ $ node out/node-tests.js</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The <code>node</code> process will exit code will be set top <code>0</code> when successful and <code>1</code> with any failures.</p>
+<p>The <code>node</code> process exit code will be set to <code>0</code> when successful and <code>1</code> on any failures.</p>
 </div>
 </div>
 <div class="sect2">
@@ -3506,7 +3506,7 @@ In general you will need a config that looks like this:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>It just have <code>init</code>, <code>start</code>, <code>stop</code> methods. <code>init</code> will be called once on startup, <code>stop</code> will be called before any code is reloaded and <code>start</code> will be called after all code was reloaded.</p>
+<p>It just has <code>init</code>, <code>start</code>, <code>stop</code> methods. <code>init</code> will be called once on startup, <code>stop</code> will be called before any code is reloaded and <code>start</code> will be called after all code was reloaded.</p>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -3546,7 +3546,7 @@ auto-generated.</p>
 <p>When you want to run your CLJS tests against a browser on some kind of CI server you&#8217;ll need to
 be able to run the tests from a command line and get back a status code. Karma is a well-known
 and supported test runner that can do this for you, and <code>shadow-cljs</code> includes a target that
-can add the appropriate wrappers around your tests so the will work in it.</p>
+can add the appropriate wrappers around your tests so they will work in it.</p>
 </div>
 <div class="sect3">
 <h4 id="_installing_karma"><a class="anchor" href="#_installing_karma"></a><a class="link" href="#_installing_karma">9.3.1. Installing Karma</a></h4>
@@ -3777,7 +3777,7 @@ again (in order) when autobuild is active and files are re-compiled on change.</
 <div class="sect3">
 <h4 id="_using_npm_packages"><a class="anchor" href="#_using_npm_packages"></a><a class="link" href="#_using_npm_packages">11.1.1. Using npm packages</a></h4>
 <div class="paragraph">
-<p>Most npm packages will also include some instructions on how to use the actual code. The “old” CommonJS style just has require calls which translates directly:</p>
+<p>Most npm packages will also include some instructions on how to use the actual code. The “old” CommonJS style just has require calls which translate directly:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -3902,7 +3902,7 @@ Some libraries are also packaged in ways  ways that allow you to include only th
 <div class="sect3">
 <h4 id="_package_provider"><a class="anchor" href="#_package_provider"></a><a class="link" href="#_package_provider">11.1.2. Package Provider</a></h4>
 <div class="paragraph">
-<p><code>shadow-cljs</code> supports several different ways to include <code>npm</code> packages into your build. They are configurable via the <code>:js-options :js-provider</code> setting. Each <code>:target</code> usually sets the on appropriate for your build most often you won&#8217;t need to touch this setting.</p>
+<p><code>shadow-cljs</code> supports several different ways to include <code>npm</code> packages into your build. They are configurable via the <code>:js-options :js-provider</code> setting. Each <code>:target</code> usually sets the one appropriate for your build most often you won&#8217;t need to touch this setting.</p>
 </div>
 <div class="paragraph">
 <p>Currently there are 3 supported JS Providers:</p>
@@ -3915,7 +3915,7 @@ Some libraries are also packaged in ways  ways that allow you to include only th
 </dd>
 <dt><code>:shadow</code></dt>
 <dd>
-<p>Resolves the JS via <code>node_modules</code> and includes a minified version version of each referenced file in the build. It is the default for the <code>:browser</code> target. <code>node_modules</code> sources do not go through <code>:advanced</code> compilation.</p>
+<p>Resolves the JS via <code>node_modules</code> and includes a minified version of each referenced file in the build. It is the default for the <code>:browser</code> target. <code>node_modules</code> sources do not go through <code>:advanced</code> compilation.</p>
 </dd>
 <dt><code>:closure</code></dt>
 <dd>
@@ -4096,10 +4096,10 @@ For string requires the extension <code>.js</code> will be added automatically b
 </table>
 </div>
 <div class="paragraph">
-<p>Absolute requires like <code>/some-library/components/foo</code> mean that the compiler will look for a <code>some-library/components/foo.js</code> on the classpath. Unlike <code>node</code> which would attempt to load the file from the local filesystem. The same classpath rules apply so the file may either be in your <code>:source-paths</code> or in some third-party <code>.jar</code> library you are using.</p>
+<p>Absolute requires like <code>/some-library/components/foo</code> mean that the compiler will look for a <code>some-library/components/foo.js</code> on the classpath; unlike <code>node</code> which would attempt to load the file from the local filesystem. The same classpath rules apply so the file may either be in your <code>:source-paths</code> or in some third-party <code>.jar</code> library you are using.</p>
 </div>
 <div class="paragraph">
-<p>Relative requires are resolved by first looking at the current namespace and then resolving a relative path from that name. In the above example we are in <code>demo/app.cljs</code> to the <code>./bar</code> require resolve to <code>demo/bar.js</code>, so it is identical to <code>(:require ["/demo/bar"])</code>.</p>
+<p>Relative requires are resolved by first looking at the current namespace and then resolving a relative path from that name. In the above example we are in <code>demo/app.cljs</code> to the <code>./bar</code> require resolves to <code>demo/bar.js</code>, so it is identical to <code>(:require ["/demo/bar"])</code>.</p>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -4438,7 +4438,7 @@ can override settings by including a <code>:dev</code> and/or <code>:release</co
 <div class="sect2">
 <h3 id="externs"><a class="anchor" href="#externs"></a><a class="link" href="#externs">12.2. Externs</a></h3>
 <div class="paragraph">
-<p>Since we want builds to be fully optimized by the Closure Compiler <code>:advanced</code> compilation we need to deal with <a href="https://developers.google.com/closure/compiler/docs/api-tutorial3">Externs</a>. Externs represent pieces of code that are not included when doing <code>:advanced</code> compilation. <code>:advanced</code> works by doing whole program optimizations but some code we just won&#8217;t be able to include so Externs inform the Compiler about this code. Without Externs the Compiler may rename of remove some code that it shouldn&#8217;t.</p>
+<p>Since we want builds to be fully optimized by the Closure Compiler <code>:advanced</code> compilation we need to deal with <a href="https://developers.google.com/closure/compiler/docs/api-tutorial3">Externs</a>. Externs represent pieces of code that are not included when doing <code>:advanced</code> compilation. <code>:advanced</code> works by doing whole program optimizations but some code we just won&#8217;t be able to include so Externs inform the Compiler about this code. Without Externs the Compiler may rename or remove some code that it shouldn&#8217;t.</p>
 </div>
 <div class="paragraph">
 <p>Typically all JS Dependencies are foreign and won&#8217;t be passed through <code>:advanced</code> and thus require Externs.</p>
@@ -4503,7 +4503,7 @@ Externs are only required for <code>:advanced</code>, they are not required in <
 <p>In <code>:advanced</code> the compiler will be renaming <code>.baz</code> to something "shorter" and Externs inform the Compiler that this is an external property that should not be renamed.</p>
 </div>
 <div class="paragraph">
-<p><code>shadow-cljs</code> can generate the appropriate externs if you add a small typehint to the object you are performing native interop on.</p>
+<p><code>shadow-cljs</code> can generate the appropriate externs if you add a typehint to the object you are performing native interop on.</p>
 </div>
 <div class="listingblock">
 <div class="title">Type-hint to help externs generation</div>
@@ -4594,7 +4594,7 @@ Don&#8217;t annotate everything with <code>^js</code>. Sometimes you may be doin
 <div class="title">Tip</div>
 </td>
 <td class="content">
-The compiler look for files relative to the project root first. It will also attempt to load them from the classpath if no file is found.
+The compiler looks for files relative to the project root first. It will also attempt to load them from the classpath if no file is found.
 </td>
 </tr>
 </table>
@@ -4708,7 +4708,7 @@ can usually be solved with custom <code>:resolve</code> configs, but there may a
 <div class="sect2">
 <h3 id="_patching_libraries"><a class="anchor" href="#_patching_libraries"></a><a class="link" href="#_patching_libraries">15.1. Patching Libraries</a></h3>
 <div class="paragraph">
-<p>The <code>shadow-cljs</code> compiler ensure that things on your source paths are compiled first, overriding files from JARs. This means that you can copy a source file from a library, patch it, and include it in your own source directory.</p>
+<p>The <code>shadow-cljs</code> compiler ensures that things on your source paths are compiled first, overriding files from JARs. This means that you can copy a source file from a library, patch it, and include it in your own source directory.</p>
 </div>
 <div class="paragraph">
 <p>This is a convenient way to test out fixes (even to <code>shadow-cljs</code> itself!) without having to clone
@@ -4721,7 +4721,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-02-20 16:08:36 STD
+Last updated 2018-02-26 12:29:15 STD
 </div>
 </div>
 </body>
