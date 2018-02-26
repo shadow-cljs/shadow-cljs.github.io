@@ -52,7 +52,7 @@ options are:
 
 [horizontal]
 `:target`:: Use :npm-module
-`:entries`:: (optinal) A vector of namespaces to include. Everything from these will be included.
+`:entries`:: (optional) A vector of namespaces to include. Everything from these will be included.
 Defaults to everything it can find.
 `:output-dir`:: (optional). The path for supporting files in development mode. Defaults to
 `node_modules/shadow-cljs`.

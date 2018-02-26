@@ -44,7 +44,7 @@ If you choose to supply a custom `:runner-ns`, it might look like this:
   (start))
 ```
 
-It just have `init`, `start`, `stop` methods. `init` will be called once on startup, `stop` will be called before any code is reloaded and `start` will be called after all code was reloaded.
+It just has `init`, `start`, `stop` methods. `init` will be called once on startup, `stop` will be called before any code is reloaded and `start` will be called after all code was reloaded.
 
 TIP: `:runner-ns` is optional, just leave it out to use the default.
 

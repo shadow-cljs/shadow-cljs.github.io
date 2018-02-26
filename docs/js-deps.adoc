@@ -4,7 +4,7 @@ https://www.npmjs.com/[npm] has come the de-facto standard package manager for J
 
 === Using npm packages
 
-Most npm packages will also include some instructions on how to use the actual code. The “old” CommonJS style just has require calls which translates directly:
+Most npm packages will also include some instructions on how to use the actual code. The “old” CommonJS style just has require calls which translate directly:
 
 ```js
 var react = require("react");
@@ -94,13 +94,13 @@ With our improved support we we can easily translate this to:
 
 === Package Provider
 
-`shadow-cljs` supports several different ways to include `npm` packages into your build. They are configurable via the `:js-options :js-provider` setting. Each `:target` usually sets the on appropriate for your build most often you won't need to touch this setting.
+`shadow-cljs` supports several different ways to include `npm` packages into your build. They are configurable via the `:js-options :js-provider` setting. Each `:target` usually sets the one appropriate for your build most often you won't need to touch this setting.
 
 Currently there are 3 supported JS Providers:
 
 [Horizontal]
 `:require`:: Maps directly to the JS `require("thing")` function call. It is the default for all `node.js` targets since it can resolve `require` natively at runtime. The included JS is not processed in any way.
-`:shadow`:: Resolves the JS via `node_modules` and includes a minified version version of each referenced file in the build. It is the default for the `:browser` target. `node_modules` sources do not go through `:advanced` compilation.
+`:shadow`:: Resolves the JS via `node_modules` and includes a minified version of each referenced file in the build. It is the default for the `:browser` target. `node_modules` sources do not go through `:advanced` compilation.
 `:closure`:: Resolves similarly to `:shadow` but attempts to process all included files via the Closure Compiler CommonJS/ES6 rewrite facilities. They will also be processed via `:advanced` compilation.
 
 .`:shadow` vs `:closure`
@@ -216,9 +216,9 @@ We already covered how `npm` packages are accessed by their name but on the clas
 
 TIP: For string requires the extension `.js` will be added automatically but you can specify the extension if you prefer. Note that currently only `.js` is supported though.
 
-Absolute requires like `/some-library/components/foo` mean that the compiler will look for a `some-library/components/foo.js` on the classpath. Unlike `node` which would attempt to load the file from the local filesystem. The same classpath rules apply so the file may either be in your `:source-paths` or in some third-party `.jar` library you are using.
+Absolute requires like `/some-library/components/foo` mean that the compiler will look for a `some-library/components/foo.js` on the classpath; unlike `node` which would attempt to load the file from the local filesystem. The same classpath rules apply so the file may either be in your `:source-paths` or in some third-party `.jar` library you are using.
 
-Relative requires are resolved by first looking at the current namespace and then resolving a relative path from that name. In the above example we are in `demo/app.cljs` to the `./bar` require resolve to `demo/bar.js`, so it is identical to `(:require ["/demo/bar"])`.
+Relative requires are resolved by first looking at the current namespace and then resolving a relative path from that name. In the above example we are in `demo/app.cljs` to the `./bar` require resolves to `demo/bar.js`, so it is identical to `(:require ["/demo/bar"])`.
 
 IMPORTANT: The files must not be physically located in the same directory. The lookup for the file appears on the classpath instead. This is unlike node which expects relative requires to always resolve to physical files.
 

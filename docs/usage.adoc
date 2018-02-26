@@ -89,7 +89,6 @@ CAUTION: It is strongly recommended to use the standalone `shadow-cljs` version.
 
 === Leiningen [[Leiningen]]
 
-
 If you'd like to use https://leiningen.org/[Leiningen] for your build system (particularly if you use Cursive), the `shadow-cljs` command-line utility can be configured to use `lein` to run your commands. Enable this by adding a `:lein` entry to your `shadow-cljs.edn` config. With this setting, the `shadow-cljs` command will use `lein` to launch the JVM, ignoring any `:source-paths` and `:dependencies` in `shadow-cljs.edn`; relying instead on `lein` to set them from `project.clj`.
 
 ```
