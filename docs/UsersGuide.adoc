@@ -466,6 +466,7 @@ files that have been recompiled.  This function *must* by synchronous in nature.
 `:before-load-async`:: A symbol (with namespace) of a function `(fn [done] )` to run just before refreshing. This function
 can do async processing, but *must* call `(done)` to indicate it is complete.
 `:after-load`:: A symbol (with namespace) of a function to run after hot code reload is complete.
+`:autoload`:: A boolean controlling whether code should be hot loaded. Implicitly set to `true` if either of the callbacks is set. Always enabled for the `:browser` target by default, set to `false` to disable.
 
 .A sample of lifecycle hooks.
 ```
@@ -477,7 +478,7 @@ can do async processing, but *must* call `(done)` to indicate it is complete.
                    ...}}}}
 ```
 
-TIP: If neither `:after-load` nor `:before-load` are set the compiler will not attempt to hot reload the code. If you still want hot reloading but don't need any of the callbacks you can set `:autoload true` instead.
+TIP: If neither `:after-load` nor `:before-load` are set the compiler will only attempt to hot reload the code in the `:browser` target. If you still want hot reloading but don't need any of the callbacks you can set `:autoload true` instead.
 
 == Compiler Cache
 

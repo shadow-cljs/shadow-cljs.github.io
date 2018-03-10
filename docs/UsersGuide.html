@@ -1900,6 +1900,10 @@ can do async processing, but <strong>must</strong> call <code>(done)</code> to i
 <dd>
 <p>A symbol (with namespace) of a function to run after hot code reload is complete.</p>
 </dd>
+<dt><code>:autoload</code></dt>
+<dd>
+<p>A boolean controlling whether code should be hot loaded. Implicitly set to <code>true</code> if either of the callbacks is set. Always enabled for the <code>:browser</code> target by default, set to <code>false</code> to disable.</p>
+</dd>
 </dl>
 </div>
 <div class="listingblock">
@@ -1920,7 +1924,7 @@ can do async processing, but <strong>must</strong> call <code>(done)</code> to i
 <div class="title">Tip</div>
 </td>
 <td class="content">
-If neither <code>:after-load</code> nor <code>:before-load</code> are set the compiler will not attempt to hot reload the code. If you still want hot reloading but don&#8217;t need any of the callbacks you can set <code>:autoload true</code> instead.
+If neither <code>:after-load</code> nor <code>:before-load</code> are set the compiler will only attempt to hot reload the code in the <code>:browser</code> target. If you still want hot reloading but don&#8217;t need any of the callbacks you can set <code>:autoload true</code> instead.
 </td>
 </tr>
 </table>
@@ -3392,6 +3396,14 @@ renaming an artifact.</p>
 <p>(optional) A regular expression matching namespaces against project files. This only scans files, and will not scan jars. Defaults to <code>"-test$"</code>.</p>
 </td>
 </tr>
+<tr>
+<td class="hdlist1">
+<code>:autorun</code>
+</td>
+<td class="hdlist2">
+<p>(boolean, optional) Run the tests via <code>node</code> when a build completes</p>
+</td>
+</tr>
 </table>
 </div>
 <div class="listingblock">
@@ -3402,7 +3414,8 @@ renaming an artifact.</p>
  {<span class="symbol">:test</span>
   {<span class="symbol">:target</span>    <span class="symbol">:node-test</span>
    <span class="symbol">:output-to</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">out/node-tests.js</span><span class="delimiter">&quot;</span></span>
-   <span class="symbol">:ns-regexp</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">-spec$</span><span class="delimiter">&quot;</span></span>}}}</code></pre>
+   <span class="symbol">:ns-regexp</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">-spec$</span><span class="delimiter">&quot;</span></span>
+   <span class="symbol">:autorun</span>   <span class="predefined-constant">true</span>}}}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3414,6 +3427,7 @@ renaming an artifact.</p>
 # or
 $ shadow-cljs release test
 
+# run tests manually, :autorun will do this automatically
 $ node out/node-tests.js</code></pre>
 </div>
 </div>
@@ -4721,7 +4735,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-02-26 12:29:15 STD
+Last updated 2018-03-10 23:33:11 STD
 </div>
 </div>
 </body>

@@ -6,6 +6,7 @@ The relevant configuration options are:
 `:target`::    `:node-test`
 `:output-to`:: The final output file that will be used to run tests.
 `:ns-regexp`:: (optional) A regular expression matching namespaces against project files. This only scans files, and will not scan jars. Defaults to `"-test$"`.
+`:autorun`:: (boolean, optional) Run the tests via `node` when a build completes
 
 .Test config matching all `*-spec` namespaces
 ```
@@ -14,7 +15,8 @@ The relevant configuration options are:
  {:test
   {:target    :node-test
    :output-to "out/node-tests.js"
-   :ns-regexp "-spec$"}}}
+   :ns-regexp "-spec$"
+   :autorun   true}}}
 ```
 
 The `:node-test` target only generates the test file. You can run it via `node`.
@@ -24,6 +26,7 @@ $ shadow-cljs compile test
 # or
 $ shadow-cljs release test
 
+# run tests manually, :autorun will do this automatically
 $ node out/node-tests.js
 ```
 
