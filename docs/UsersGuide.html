@@ -621,6 +621,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#browser-http-server">6.7.2. HTTP Server</a></li>
 <li><a href="#_css_reloading">6.7.3. CSS Reloading</a></li>
 <li><a href="#_proxy_support">6.7.4. Proxy Support</a></li>
+<li><a href="#_async_loading">6.7.5. Async Loading</a></li>
 </ul>
 </li>
 </ul>
@@ -2818,6 +2819,102 @@ document root used to serve your content.</p>
 </td>
 <td class="content">
 The requests must be forwarded to the main <a href="#http">HTTP server</a>, not the one configured in the build itself.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_async_loading"><a class="anchor" href="#_async_loading"></a><a class="link" href="#_async_loading">6.7.5. Async Loading</a></h4>
+<div class="paragraph">
+<p>During development the Closure Library method of loading code is used by default. This uses <code>document.write</code> to load scripts. This works fine but prohibits the use or <code>&lt;script async &#8230;&#8203;&gt;</code> or <code>&lt;script defer &#8230;&#8203;&gt;</code> and will complain with a warning when trying to load it.</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Failed to execute 'write' on 'Document': It isn&#8217;t possible to write into a document from an asynchronously-loaded external script unless it is explicitly opened.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>You can enable <code>:async-require</code> to replace the default loading method with one that uses <code>fetch</code> to load scripts.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span> {<span class="keyword">..</span><span class="keyword">.</span>
+        <span class="symbol">:devtools</span> {<span class="symbol">:async-require</span> <span class="predefined-constant">true</span>
+                   <span class="keyword">..</span><span class="keyword">.</span>}}}}</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+<code>fetch</code> has better performance when loading lots of files which is quite common in development builds. Give it a try if dev builds feel slow to load.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>You do have to be careful with <code>&lt;script async &#8230;&#8203;&gt;</code> however since the browser will continue loading the rest of your page without waiting for your JS to finish first.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">&lt;script async src<span class="keyword">=</span><span class="string"><span class="delimiter">&quot;</span><span class="content">/js/main.js</span><span class="delimiter">&quot;</span></span>&gt;&lt;/script&gt;
+&lt;script&gt;my.app.init()<span class="comment">;&lt;/script&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This does not work when using the <code>async</code> attribute and you need a different way of calling code. <code>onload</code> is one option.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">&lt;script&gt;window.onload <span class="keyword">=</span> function() { my.app.init()<span class="comment">; }&lt;/script&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Another slightly more involved option is to use the <code>shadow.api</code> helper.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/my/app.cljs</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">my.app</span>
+  (<span class="symbol">:require</span> [shadow.api <span class="symbol">:refer</span> (ns-ready)]))
+
+(<span class="keyword">defn</span> ^<span class="symbol">:export</span> init [data]
+  (js/console.log <span class="string"><span class="delimiter">&quot;</span><span class="content">init</span><span class="delimiter">&quot;</span></span> data))
+
+(ns-ready)</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">index.html</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="html"><span class="tag">&lt;script</span> <span class="attribute-name">type</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">shadow/run</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">data-fn</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">my.app.init</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+<span class="inline">[{:hello <span class="string"><span class="delimiter">&quot;</span><span class="content">world</span><span class="delimiter">&quot;</span></span>}] ;; any EDN will <span class="keyword">do</span>
+&lt;script&gt;
+&lt;script async src=<span class="string"><span class="delimiter">&quot;</span><span class="content">js/main.js</span><span class="delimiter">&quot;</span></span>&gt;</span><span class="tag">&lt;/script&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>(ns-ready)</code> helper will traverse the DOM looking for <code>script[type="shadow/run"]</code> elements and call the <code>data-fn</code> via <code>cljs.core/apply</code>. So this example will basically <code>(apply my.app/init [{:hello "world"}])</code> which in turn is just <code>(my.app/init {:hello "world"})</code>.</p>
+</div>
+<div class="paragraph">
+<p>The benefit of this method is that you can pass EDN data directly to the function via HTML. I use this method in all projects during dev and in production.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+Don&#8217;t forget the <code>^:export</code> on the <code>defn</code> you want to call otherwise <code>:advanced</code> will rename or even remove it.
 </td>
 </tr>
 </table>

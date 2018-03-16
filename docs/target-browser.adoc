@@ -527,3 +527,62 @@ http://localhost:9630/foo/bar?asdf
 The client will make WebSocket request as well as normal XHR requests to load files. Ensure that your proxy properly upgrades WebSockets.
 
 IMPORTANT: The requests must be forwarded to the main <<http, HTTP server>>, not the one configured in the build itself.
+
+
+=== Async Loading
+
+During development the Closure Library method of loading code is used by default. This uses `document.write` to load scripts. This works fine but prohibits the use or `<script async ...>` or `<script defer ...>` and will complain with a warning when trying to load it.
+
+> Failed to execute 'write' on 'Document': It isn't possible to write into a document from an asynchronously-loaded external script unless it is explicitly opened.
+
+You can enable `:async-require` to replace the default loading method with one that uses `fetch` to load scripts.
+
+```clojure
+{...
+ :builds
+ {:app {...
+        :devtools {:async-require true
+                   ...}}}}
+```
+
+TIP: `fetch` has better performance when loading lots of files which is quite common in development builds. Give it a try if dev builds feel slow to load.
+
+You do have to be careful with `<script async ...>` however since the browser will continue loading the rest of your page without waiting for your JS to finish first.
+
+```
+<script async src="/js/main.js"></script>
+<script>my.app.init();</script>
+```
+
+This does not work when using the `async` attribute and you need a different way of calling code. `onload` is one option.
+
+```
+<script>window.onload = function() { my.app.init(); }</script>
+```
+
+Another slightly more involved option is to use the `shadow.api` helper.
+
+.src/my/app.cljs
+```clojure
+(ns my.app
+  (:require [shadow.api :refer (ns-ready)]))
+
+(defn ^:export init [data]
+  (js/console.log "init" data))
+
+(ns-ready)
+```
+
+.index.html
+```html
+<script type="shadow/run" data-fn="my.app.init">
+[{:hello "world"}] ;; any EDN will do
+<script>
+<script async src="js/main.js"></script>
+```
+
+The `(ns-ready)` helper will traverse the DOM looking for `script[type="shadow/run"]` elements and call the `data-fn` via `cljs.core/apply`. So this example will basically `(apply my.app/init [{:hello "world"}])` which in turn is just `(my.app/init {:hello "world"})`.
+
+The benefit of this method is that you can pass EDN data directly to the function via HTML. I use this method in all projects during dev and in production.
+
+TIP: Don't forget the `^:export` on the `defn` you want to call otherwise `:advanced` will rename or even remove it.
