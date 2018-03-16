@@ -574,7 +574,7 @@ Another slightly more involved option is to use the `shadow.api` helper.
 ```
 
 .index.html
-```html
+```text
 <script type="shadow/run" data-fn="my.app.init">
 [{:hello "world"}] ;; any EDN will do
 <script>

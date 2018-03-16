@@ -2895,10 +2895,10 @@ The requests must be forwarded to the main <a href="#http">HTTP server</a>, not 
 <div class="listingblock">
 <div class="title">index.html</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="html"><span class="tag">&lt;script</span> <span class="attribute-name">type</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">shadow/run</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">data-fn</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">my.app.init</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
-<span class="inline">[{:hello <span class="string"><span class="delimiter">&quot;</span><span class="content">world</span><span class="delimiter">&quot;</span></span>}] ;; any EDN will <span class="keyword">do</span>
+<pre class="CodeRay highlight"><code data-lang="text">&lt;script type=&quot;shadow/run&quot; data-fn=&quot;my.app.init&quot;&gt;
+[{:hello &quot;world&quot;}] ;; any EDN will do
 &lt;script&gt;
-&lt;script async src=<span class="string"><span class="delimiter">&quot;</span><span class="content">js/main.js</span><span class="delimiter">&quot;</span></span>&gt;</span><span class="tag">&lt;/script&gt;</span></code></pre>
+&lt;script async src=&quot;js/main.js&quot;&gt;&lt;/script&gt;</code></pre>
 </div>
 </div>
 <div class="paragraph">
