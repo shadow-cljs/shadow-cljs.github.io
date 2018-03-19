@@ -1882,8 +1882,82 @@ system includes everything you need to do your hot code reload, without needing 
 <div class="sect3">
 <h4 id="_lifecycle_hooks"><a class="anchor" href="#_lifecycle_hooks"></a><a class="link" href="#_lifecycle_hooks">5.2.3. Lifecycle Hooks</a></h4>
 <div class="paragraph">
-<p>The build configuration supports hooks that allow you to run functions just before hot code reload
-brings in updated code, and just after. These are useful for stopping/starting things that would otherwise close over old code. The options go in the <code>:devtools</code> section of the build config and are:</p>
+<p>You can configure the compiler to run functions just before hot code reload brings in updated code, and just after. These are useful for stopping/starting things that would otherwise close over old code.</p>
+</div>
+<div class="paragraph">
+<p>These can be configured via the <code>:devtools</code> section in your build config or directly in your code via metadata tags.</p>
+</div>
+<div class="sect4">
+<h5 id="_metadata"><a class="anchor" href="#_metadata"></a><a class="link" href="#_metadata">Metadata</a></h5>
+<div class="paragraph">
+<p>You can set certain metadata on normal CLJS <code>defn</code> vars to inform the compiler that these functions should be called at a certain time when live reloading.</p>
+</div>
+<div class="listingblock">
+<div class="title">hook config via metadata</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">my.app</span>)
+
+(<span class="keyword">defn</span> ^<span class="symbol">:dev/before-load</span> stop []
+  (js/console.log <span class="string"><span class="delimiter">&quot;</span><span class="content">stop</span><span class="delimiter">&quot;</span></span>))
+
+(<span class="keyword">defn</span> ^<span class="symbol">:dev/after-load</span> start []
+  (js/console.log <span class="string"><span class="delimiter">&quot;</span><span class="content">start</span><span class="delimiter">&quot;</span></span>))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This would call <code>my.app/stop</code> before loading any new code and <code>my.app/start</code> when all new code was loaded. You can tag multiple functions like this and they will be called in dependency order of their namespaces.</p>
+</div>
+<div class="paragraph">
+<p>There are also async variants of these in case you need to do some async work that should complete before proceeding with the reload process.</p>
+</div>
+<div class="listingblock">
+<div class="title">async hooks example</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">my.app</span>)
+
+(<span class="keyword">defn</span> ^<span class="symbol">:dev/before-load-async</span> stop [done]
+  (js/console.log <span class="string"><span class="delimiter">&quot;</span><span class="content">stop</span><span class="delimiter">&quot;</span></span>)
+  (js/setTimeout
+    (<span class="keyword">fn</span> []
+      (js/console.log <span class="string"><span class="delimiter">&quot;</span><span class="content">stop complete</span><span class="delimiter">&quot;</span></span>)
+      (done)))
+
+(<span class="keyword">defn</span> ^<span class="symbol">:dev/after-load-async</span> start [done]
+  (js/console.log <span class="string"><span class="delimiter">&quot;</span><span class="content">start</span><span class="delimiter">&quot;</span></span>)
+  (js/setTimeout
+    (<span class="keyword">fn</span> []
+      (js/console.log <span class="string"><span class="delimiter">&quot;</span><span class="content">start complete</span><span class="delimiter">&quot;</span></span>)
+      (done)))</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+The functions will receive one callback function that must be called when their work is completed. If the callback function is not called the reload process will not proceed.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>It is possible to tag namespaces with metadata so they will never be reloaded even if they are recompiled.</p>
+</div>
+<div class="listingblock">
+<div class="title">non-reloadable ns</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> ^<span class="symbol">:dev/once</span> my.thing)
+
+(js/console.warn <span class="string"><span class="delimiter">&quot;</span><span class="content">will only execute once</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_config"><a class="anchor" href="#_config"></a><a class="link" href="#_config">Config</a></h5>
+<div class="paragraph">
+<p>In addition to the metadata you can configure the lifecycle hooks via <code>shadow-cljs.edn</code>.</p>
 </div>
 <div class="dlist Horizontal">
 <dl>
@@ -1894,12 +1968,15 @@ files that have been recompiled.  This function <strong>must</strong> by synchro
 </dd>
 <dt><code>:before-load-async</code></dt>
 <dd>
-<p>A symbol (with namespace) of a function <code>(fn [done] )</code> to run just before refreshing. This function
-can do async processing, but <strong>must</strong> call <code>(done)</code> to indicate it is complete.</p>
+<p>A symbol (with namespace) of a function <code>(fn [done])</code> to run just before refreshing. This function can do async processing, but <strong>must</strong> call <code>(done)</code> to indicate it is complete.</p>
 </dd>
 <dt><code>:after-load</code></dt>
 <dd>
 <p>A symbol (with namespace) of a function to run after hot code reload is complete.</p>
+</dd>
+<dt><code>:after-load-async</code></dt>
+<dd>
+<p>A symbol (with namespace) of a function <code>(fn [done])</code> to run after hot code reload is complete. This function can do async processing, but <strong>must</strong> call <code>(done)</code> to indicate it is complete.</p>
 </dd>
 <dt><code>:autoload</code></dt>
 <dd>
@@ -1929,6 +2006,7 @@ If neither <code>:after-load</code> nor <code>:before-load</code> are set the co
 </td>
 </tr>
 </table>
+</div>
 </div>
 </div>
 </div>
@@ -4832,7 +4910,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-03-10 23:33:11 STD
+Last updated 2018-03-19 21:11:32 STD
 </div>
 </div>
 </body>

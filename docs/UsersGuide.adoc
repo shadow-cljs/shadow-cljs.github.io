@@ -457,15 +457,69 @@ shadow-cljs watch build-id
 
 === Lifecycle Hooks
 
-The build configuration supports hooks that allow you to run functions just before hot code reload
-brings in updated code, and just after. These are useful for stopping/starting things that would otherwise close over old code. The options go in the `:devtools` section of the build config and are:
+You can configure the compiler to run functions just before hot code reload brings in updated code, and just after. These are useful for stopping/starting things that would otherwise close over old code.
+
+These can be configured via the `:devtools` section in your build config or directly in your code via metadata tags.
+
+==== Metadata
+
+You can set certain metadata on normal CLJS `defn` vars to inform the compiler that these functions should be called at a certain time when live reloading.
+
+.hook config via metadata
+```clojure
+(ns my.app)
+
+(defn ^:dev/before-load stop []
+  (js/console.log "stop"))
+
+(defn ^:dev/after-load start []
+  (js/console.log "start"))
+```
+
+This would call `my.app/stop` before loading any new code and `my.app/start` when all new code was loaded. You can tag multiple functions like this and they will be called in dependency order of their namespaces.
+
+There are also async variants of these in case you need to do some async work that should complete before proceeding with the reload process.
+
+.async hooks example
+```clojure
+(ns my.app)
+
+(defn ^:dev/before-load-async stop [done]
+  (js/console.log "stop")
+  (js/setTimeout
+    (fn []
+      (js/console.log "stop complete")
+      (done)))
+
+(defn ^:dev/after-load-async start [done]
+  (js/console.log "start")
+  (js/setTimeout
+    (fn []
+      (js/console.log "start complete")
+      (done)))
+```
+
+IMPORTANT: The functions will receive one callback function that must be called when their work is completed. If the callback function is not called the reload process will not proceed.
+
+It is possible to tag namespaces with metadata so they will never be reloaded even if they are recompiled.
+
+.non-reloadable ns
+```
+(ns ^:dev/once my.thing)
+
+(js/console.warn "will only execute once")
+```
+
+==== Config
+
+In addition to the metadata you can configure the lifecycle hooks via `shadow-cljs.edn`.
 
 [Horizontal]
 `:before-load`:: A symbol (with namespace) of a function to run just before refreshing
 files that have been recompiled.  This function *must* by synchronous in nature.
-`:before-load-async`:: A symbol (with namespace) of a function `(fn [done] )` to run just before refreshing. This function
-can do async processing, but *must* call `(done)` to indicate it is complete.
+`:before-load-async`:: A symbol (with namespace) of a function `(fn [done])` to run just before refreshing. This function can do async processing, but *must* call `(done)` to indicate it is complete.
 `:after-load`:: A symbol (with namespace) of a function to run after hot code reload is complete.
+`:after-load-async`:: A symbol (with namespace) of a function `(fn [done])` to run after hot code reload is complete. This function can do async processing, but *must* call `(done)` to indicate it is complete.
 `:autoload`:: A boolean controlling whether code should be hot loaded. Implicitly set to `true` if either of the callbacks is set. Always enabled for the `:browser` target by default, set to `false` to disable.
 
 .A sample of lifecycle hooks.
