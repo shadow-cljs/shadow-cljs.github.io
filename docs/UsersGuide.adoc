@@ -136,7 +136,7 @@ Although it is recommended to run the standalone version via `npm` you can also 
 
 The artifact can be found at:
 [link=https://clojars.org/thheller/shadow-cljs]
-image::https://camo.githubusercontent.com/f91298f67b2b1c7a75124738f669be1f6928e976/68747470733a2f2f696d672e736869656c64732e696f2f636c6f6a6172732f762f746868656c6c65722f736861646f772d636c6a732e737667[]
+image::https://img.shields.io/npm/v/shadow-cljs.svg
 
 = Usage
 
