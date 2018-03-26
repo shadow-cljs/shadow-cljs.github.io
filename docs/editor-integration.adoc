@@ -24,6 +24,12 @@ https://github.com/shadow-cljs/shadow-cljs.github.io[HELP WANTED!]
 
 The generic <<nrepl, nREPL>> instructions should provide everything required but additional config might be required.
 
+1) Load your project in emacs.
+2) Issue a `M-x cider-connect` command.
+3) Change to the `cider-repl` buffer that should be created after a successful connection.
+4) Check for any warning messages. If needed, update config and re-connect.
+5) At the prompt in the `cider-repl` buffer: `(shadow.cljs.devtools.api/nrepl-select :<your-build-here>)`
+6) Change to a buffer with cljs source code, and verify that `jump-to-var` and other eval commands work.
 
 == Proto REPL (Atom)
 
