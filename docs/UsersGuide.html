@@ -569,7 +569,11 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_node_repl">3.4.1. Node REPL</a></li>
 </ul>
 </li>
-<li><a href="#clj-run">3.5. Running Clojure Code</a></li>
+<li><a href="#clj-run">3.5. Running Clojure Code</a>
+<ul class="sectlevel3">
+<li><a href="#_calling_watch_via_clj_run">3.5.1. Calling watch via clj-run</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#_configuration">4. Configuration</a>
@@ -1380,6 +1384,32 @@ When the <a href="#server-mode">server</a> is running the namespace will not be 
 </td>
 </tr>
 </table>
+</div>
+<div class="sect3">
+<h4 id="_calling_watch_via_clj_run"><a class="anchor" href="#_calling_watch_via_clj_run"></a><a class="link" href="#_calling_watch_via_clj_run">3.5.1. Calling watch via clj-run</a></h4>
+<div class="paragraph">
+<p>By default the functions called by <code>clj-run</code> only have access to a minimal <code>shadow-cljs</code> runtime which is enough to run <code>compile</code>, <code>release</code> and any other Clojure functionality. The JVM will terminate when your function completes.</p>
+</div>
+<div class="paragraph">
+<p>If you want to start a <code>watch</code> for a given build you need to declare that the function you are calling requires a full server. This will cause the process to stay alive until you explicitly call <code>(shadow.cljs.devtools.server/stop!)</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">demo.run</span>
+  (<span class="symbol">:require</span> [shadow.cljs.devtools.api <span class="symbol">:as</span> shadow))
+
+<span class="comment">;; this fails because a full server instance is missing</span>
+(<span class="keyword">defn</span> <span class="function">foo</span>
+  [&amp; args]
+  (shadow/watch <span class="symbol">:my-build</span>))
+
+<span class="comment">;; this metadata will ensure that the server is started so watch works</span>
+(<span class="keyword">defn</span> <span class="function">foo</span>
+  {<span class="symbol">:shadow/requires-server</span> <span class="predefined-constant">true</span>}
+  [&amp; args]
+  (shadow/watch <span class="symbol">:my-build</span>))</code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>

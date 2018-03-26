@@ -324,3 +324,26 @@ TIP: The usual `(defn release [& args])` structure also works if you want to par
 You have access to the full power of Clojure here. You can build entire tools on top of this if you like. As a bonus everything you write this way is also directly available via the Clojure REPL.
 
 IMPORTANT: When the <<server-mode, server>> is running the namespace will not be reloaded automatically, it will only be loaded once. It is recommended to do the development using a REPL and reload the file as usual (eg. `(require 'my.build :reload)`). You may also run `shadow-cljs clj-eval "(require 'my.build :reload)"` to reload manually from the command line.
+
+
+=== Calling watch via clj-run
+
+By default the functions called by `clj-run` only have access to a minimal `shadow-cljs` runtime which is enough to run `compile`, `release` and any other Clojure functionality. The JVM will terminate when your function completes.
+
+If you want to start a `watch` for a given build you need to declare that the function you are calling requires a full server. This will cause the process to stay alive until you explicitly call `(shadow.cljs.devtools.server/stop!)`
+
+```clojure
+(ns demo.run
+  (:require [shadow.cljs.devtools.api :as shadow))
+
+;; this fails because a full server instance is missing
+(defn foo
+  [& args]
+  (shadow/watch :my-build))
+
+;; this metadata will ensure that the server is started so watch works
+(defn foo
+  {:shadow/requires-server true}
+  [& args]
+  (shadow/watch :my-build))
+```
