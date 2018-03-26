@@ -1391,7 +1391,7 @@ When the <a href="#server-mode">server</a> is running the namespace will not be 
 <p>By default the functions called by <code>clj-run</code> only have access to a minimal <code>shadow-cljs</code> runtime which is enough to run <code>compile</code>, <code>release</code> and any other Clojure functionality. The JVM will terminate when your function completes.</p>
 </div>
 <div class="paragraph">
-<p>If you want to start a <code>watch</code> for a given build you need to declare that the function you are calling requires a full server. This will cause the process to stay alive until you explicitly call <code>(shadow.cljs.devtools.server/stop!)</code></p>
+<p>If you want to start a <code>watch</code> for a given build you need to declare that the function you are calling requires a full server. This will cause the process to stay alive until you explicitly call <code>(shadow.cljs.devtools.server/stop!)</code> or <code>CTRL+C</code> the process.</p>
 </div>
 <div class="listingblock">
 <div class="content">
