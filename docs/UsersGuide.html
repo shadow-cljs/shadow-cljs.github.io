@@ -3482,6 +3482,14 @@ options are:</p>
 </tr>
 <tr>
 <td class="hdlist1">
+<code>:output-dir</code>
+</td>
+<td class="hdlist2">
+<p>The path for supporting files in development mode.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
 <code>:entries</code>
 </td>
 <td class="hdlist2">
@@ -3489,32 +3497,13 @@ options are:</p>
 Defaults to everything it can find.</p>
 </td>
 </tr>
-<tr>
-<td class="hdlist1">
-<code>:output-dir</code>
-</td>
-<td class="hdlist2">
-<p>(optional). The path for supporting files in development mode. Defaults to
-<code>node_modules/shadow-cljs</code>.</p>
-</td>
-</tr>
 </table>
 </div>
 <div class="paragraph">
-<p>The <code>:entries</code> setting can be used to limit what things get included, and the <code>:output-dir</code> is
-particularly useful for naming the directory in <code>node_modules</code> so that you can
-customize what name you use with <code>require</code>.</p>
+<p>If you use an <code>:output-dir</code> like <code>"node_modules/shadow-cljs"</code> you can access them by using <code>require("shadow-cljs/demo.foo")</code>. When using something not in <code>node_modules</code> you must include them using a relative path. With <code>:output-dir "out"</code> that would be <code>require("./out/demo.foo")</code> from your project root.</p>
 </div>
 <div class="paragraph">
-<p>Each entry will still result in a file with that namespace name in the specified output directory.</p>
-</div>
-<div class="paragraph">
-<p>Of course all of this is generated with standard Node conventions.</p>
-</div>
-<div class="paragraph">
-<p>If you plan to distribute code on NPM, then you may want to use the
-<a href="#NodeLibrary"><code>:node-library</code> target</a> instead since it allows for a finer level of control
-over exports and optimization.</p>
+<p>If you plan to distribute code on NPM, then you may want to use the <a href="#NodeLibrary"><code>:node-library</code> target</a> instead since it allows for a finer level of control over exports and optimization.</p>
 </div>
 </div>
 <div class="sect2">

@@ -52,22 +52,14 @@ options are:
 
 [horizontal]
 `:target`:: Use :npm-module
+`:output-dir`:: The path for supporting files in development mode.
 `:entries`:: (optional) A vector of namespaces to include. Everything from these will be included.
 Defaults to everything it can find.
-`:output-dir`:: (optional). The path for supporting files in development mode. Defaults to
-`node_modules/shadow-cljs`.
 
-The `:entries` setting can be used to limit what things get included, and the `:output-dir` is
-particularly useful for naming the directory in `node_modules` so that you can
-customize what name you use with `require`.
 
-Each entry will still result in a file with that namespace name in the specified output directory.
+If you use an `:output-dir` like `"node_modules/shadow-cljs"` you can access them by using `require("shadow-cljs/demo.foo")`. When using something not in `node_modules` you must include them using a relative path. With `:output-dir "out"` that would be `require("./out/demo.foo")` from your project root.
 
-Of course all of this is generated with standard Node conventions.
-
-If you plan to distribute code on NPM, then you may want to use the
-<<NodeLibrary, `:node-library` target>> instead since it allows for a finer level of control
-over exports and optimization.
+If you plan to distribute code on NPM, then you may want to use the <<NodeLibrary, `:node-library` target>> instead since it allows for a finer level of control over exports and optimization.
 
 == Working with Optimizations
 
