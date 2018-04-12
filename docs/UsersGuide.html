@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.6.1">
+<meta name="generator" content="Asciidoctor 1.5.6.2">
 <meta name="author" content="Thomas Heller and Tony Kay">
 <title>Shadow CLJS User&#8217;s Guide</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
@@ -4020,50 +4020,61 @@ using <code>(:require ["thing" :as thing])</code> and then <code>(thing)</code>.
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Table 1. ES6 Import to CLJS Require</caption>
 <colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
 </colgroup>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">ES6 Import</th>
+<th class="tableblock halign-left valign-top">CommonJS Require</th>
 <th class="tableblock halign-left valign-top">CLJS Require</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>import defaultExport from "module-name";</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>const defaultExport = require("module-name").default;</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>(:require ["module-name" :default defaultExport])</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>import * as name from "module-name";</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>const name = require("module-name");</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>(:require ["module-name" :as name])</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>import { export } from "module-name";</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>const { export } = require("module-name");</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>(:require ["module-name" :refer (export)])</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>import { export as alias } from "module-name";</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>const { export : alias } = require("module-name");</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>(:require ["module-name" :rename {export alias}])</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>import { export1 , export2 } from "module-name";</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>const { export1 , export2 } = require("module-name");</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>(:require ["module-name" :refer (export1 export2)])</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>import { export1 , export2 as alias2 , [&#8230;&#8203;] } from "module-name";</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>const { export1 , export2 : alias2 , [&#8230;&#8203;] } = require("module-name");</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>(:require ["module-name" :refer (export1) :rename {export2 alias2}])</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>import defaultExport, { export [ , [&#8230;&#8203;] ] } from "module-name";</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>const { default : defaultExport , export2 [ , [&#8230;&#8203;] ] } = require("module-name");</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>(:require ["module-name" :refer (export) :default defaultExport])</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>import defaultExport, * as name from "module-name";</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>const name = require("module-name"), defaultExport = name.default;</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>(:require ["module-name" :as name :default defaultExport])</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>import "module-name";</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>require("module-name");</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>(:require ["module-name"])</code></p></td>
 </tr>
 </tbody>
@@ -4927,7 +4938,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-03-22 15:31:17 STD
+Last updated 2018-04-11 23:13:16 EDT
 </div>
 </div>
 </body>
