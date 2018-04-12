@@ -32,33 +32,42 @@ The following table can be used for translation:
 
 .ES6 Import to CLJS Require
 |===
-|ES6 Import|CLJS Require
+|ES6 Import|CommonJS Require|CLJS Require
 
 |`import defaultExport from "module-name";`
+|`const defaultExport = require("module-name").default;`
 |`(:require ["module-name" :default defaultExport])`
 
 |`import * as name from "module-name";`
+|`const name = require("module-name");`
 |`(:require ["module-name" :as name])`
 
 |`import { export } from "module-name";`
+|`const { export } = require("module-name");`
 |`(:require ["module-name" :refer (export)])`
 
 |`import { export as alias } from "module-name";`
+|`const { export : alias } = require("module-name");`
 |`(:require ["module-name" :rename {export alias}])`
 
 |`import { export1 , export2 } from "module-name";`
+|`const { export1 , export2 } = require("module-name");`
 |`(:require ["module-name" :refer (export1 export2)])`
 
 |`import { export1 , export2 as alias2 , [...] } from "module-name";`
+|`const { export1 , export2 : alias2 , [...] } = require("module-name");`
 |`(:require ["module-name" :refer (export1) :rename {export2 alias2}])`
 
 |`import defaultExport, { export [ , [...] ] } from "module-name";`
+|`const { default : defaultExport , export2 [ , [...] ] } = require("module-name");`
 |`(:require ["module-name" :refer (export) :default defaultExport])`
 
 |`import defaultExport, * as name from "module-name";`
+|`const name = require("module-name"), defaultExport = name.default;`
 |`(:require ["module-name" :as name :default defaultExport])`
 
 |`import "module-name";`
+|`require("module-name");`
 |`(:require ["module-name"])`
 |===
 
