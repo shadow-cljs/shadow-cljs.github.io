@@ -722,6 +722,13 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_cursive">13.1. Cursive</a></li>
 <li><a href="#cider">13.2. emacs / cider</a></li>
 <li><a href="#_proto_repl_atom">13.3. Proto REPL (Atom)</a></li>
+<li><a href="#_calva_vs_code">13.4. Calva (VS Code)</a>
+<ul class="sectlevel3">
+<li><a href="#_dependencies_2">13.4.1. Dependencies</a></li>
+<li><a href="#_connecting_calva_to_the_repls">13.4.2. Connecting Calva to the REPLs</a></li>
+<li><a href="#_features">13.4.3. Features</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#_what_to_do_when_things_don_t_work">14. What to do when things don’t work?</a></li>
@@ -4892,6 +4899,135 @@ The compiler looks for files relative to the project root first. It will also at
 <p>9) Eval some JS, eg. <code>(js/alert "foo")</code>. If you get <code>There is no connected JS runtime</code> the client is not connected properly. Otherwise the Browser should show an alert.</p>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_calva_vs_code"><a class="anchor" href="#_calva_vs_code"></a><a class="link" href="#_calva_vs_code">13.4. Calva (VS Code)</a></h3>
+<div class="paragraph">
+<p>(Only tested with <code>browser</code> targets so far. Probably works with other targets too.)</p>
+</div>
+<div class="sect3">
+<h4 id="_dependencies_2"><a class="anchor" href="#_dependencies_2"></a><a class="link" href="#_dependencies_2">13.4.1. Dependencies</a></h4>
+<div class="paragraph">
+<p>You need VS Code and install the <a href="https://marketplace.visualstudio.com/items?itemName=cospaia.clojure4vscode#overview">Calva</a> extension.</p>
+</div>
+<div class="paragraph">
+<p>Since Calva uses nRepl and Cider you need to include this dependency in <code>shadow-cljs.edn</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">[cider/cider-nrepl <span class="string"><span class="delimiter">&quot;</span><span class="content">0.16.0</span><span class="delimiter">&quot;</span></span>]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>shadow-cljs</code> will inject the required <code>cider-nrepl</code> middleware once it sees this dependency.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_connecting_calva_to_the_repls"><a class="anchor" href="#_connecting_calva_to_the_repls"></a><a class="link" href="#_connecting_calva_to_the_repls">13.4.2. Connecting Calva to the REPLs</a></h4>
+<div class="paragraph">
+<p>Once that is done start your shadow app. (Using whatever build instead of <code>app</code>.):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">$ shadow-cljs watch app</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once the app is loaded in the browser, and you see <code>JS runime connected</code> in the terminal where you started the app, Calva can connect to its repl. Open the project in VS Code and Calva will by default try to auto connect and prompt you with a list of builds read from <code>shadow-cljs.edn</code>. Select the right one (<code>:app</code> in this example) and Calva&#8217;s Clojure and Clojurescript support is activated.</p>
+</div>
+<div class="paragraph">
+<p>(If you already have the project open in VS Code when you start the app, issue the <code>clojure4vscode: connect</code> command.)</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_features"><a class="anchor" href="#_features"></a><a class="link" href="#_features">13.4.3. Features</a></h4>
+<div class="paragraph">
+<p>Some of the things you can now do:</p>
+</div>
+<div class="sect4">
+<h5 id="_intellisence_and_stuff"><a class="anchor" href="#_intellisence_and_stuff"></a><a class="link" href="#_intellisence_and_stuff">Intellisence and stuff</a></h5>
+<div class="ulist">
+<ul>
+<li>
+<p>Peek at definitions on hover.</p>
+</li>
+<li>
+<p>Get auto completion help.</p>
+</li>
+<li>
+<p>Navigate to definitions (<code>cmd-click</code> on Mac, might be <code>ctrl-click</code> on Windows and Linux).</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_evaluation_of_the_file_forms_and_selection"><a class="anchor" href="#_evaluation_of_the_file_forms_and_selection"></a><a class="link" href="#_evaluation_of_the_file_forms_and_selection">Evaluation of the file, forms and selection</a></h5>
+<div class="ulist">
+<ul>
+<li>
+<p>Evaluate the file: <code>ctrl+alt+v enter</code> (This is done automatically one opening files.)</p>
+</li>
+<li>
+<p>Evaluate inline: <code>ctrl+alt+v e</code></p>
+</li>
+<li>
+<p>Evaluate and replace them in the editor: <code>ctrl+alt+v r</code></p>
+</li>
+<li>
+<p>Pretty print evaluation resuls: <code>ctrl+alt+v p</code></p>
+</li>
+<li>
+<p>Send forms to the integrated terminal repls for evaluation: <code>ctrl+alt+v alt+e</code></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_run_tests"><a class="anchor" href="#_run_tests"></a><a class="link" href="#_run_tests">Run tests</a></h5>
+<div class="ulist">
+<ul>
+<li>
+<p>Run namespace tests: <code>ctrl+alt+v t</code></p>
+</li>
+<li>
+<p>Run all tests: <code>ctrl+alt+v shift+t</code> (Really clunky in large projects so far.)</p>
+</li>
+<li>
+<p>Rerun previously failing tests: <code>ctrl+alt+v ctrl+t</code></p>
+</li>
+<li>
+<p>Test failures are marked in the explorer and editors and listed in the Problem tab for easy access.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_terminal_repls"><a class="anchor" href="#_terminal_repls"></a><a class="link" href="#_terminal_repls">Terminal repls</a></h5>
+<div class="ulist">
+<ul>
+<li>
+<p>Show repl terminal: <code>ctrl+alt+v z</code></p>
+</li>
+<li>
+<p>Switch namespace in terminal repl to that of the currently open file: <code>ctrl+alt+v n</code></p>
+</li>
+<li>
+<p>Load current file and switch namespace in: <code>ctrl+alt+v alt+n</code></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_cljc_files"><a class="anchor" href="#_cljc_files"></a><a class="link" href="#_cljc_files">Cljc files</a></h5>
+<div class="ulist">
+<ul>
+<li>
+<p>Switch between Clojure and Clojurescript repl <code>ctrl+alt+v alt+c</code> (or click the green <code>cljc/clj</code> button in the status bar). This determines both which repl is backing the editor and what terminal repl is being accessed, see above.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -4927,7 +5063,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-03-22 15:31:17 STD
+Last updated 2018-04-17 11:40:30 CEST
 </div>
 </div>
 </body>
