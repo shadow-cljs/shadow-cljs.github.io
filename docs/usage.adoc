@@ -316,7 +316,7 @@ You can pass arguments to the invoked functions via the command line.
 
 .Passing the server from the command line
 ```bash
-$ shadow-cljs cljs-run my.build/release my@server.com:some/path
+$ shadow-cljs clj-run my.build/release my@server.com:some/path
 ```
 
 TIP: The usual `(defn release [& args])` structure also works if you want to parse the args with something like https://github.com/clojure/tools.cli[tools.cli].
