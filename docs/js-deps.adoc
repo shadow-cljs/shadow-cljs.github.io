@@ -124,7 +124,7 @@ Until support in Closure gets more reliable `:shadow` is the recommend JS Provid
    }}}
 ```
 
-=== Resolving Packages
+=== Resolving Packages [[js-resolve]]
 
 By default `shadow-cljs` will resolve all `(:require ["thing" :as x])` requires following the `npm` convention.
 This means it will look at `<project>/node_modules/thing/package.json` and follow the code from there. To

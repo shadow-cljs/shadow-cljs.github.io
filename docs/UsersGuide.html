@@ -605,6 +605,8 @@ table.CodeRay td.code>pre{padding:0}
 </ul>
 </li>
 <li><a href="#_compiler_cache">5.3. Compiler Cache</a></li>
+<li><a href="#closure-defines">5.4. Closure Defines</a></li>
+<li><a href="#compiler-options">5.5. Compiler Options</a></li>
 </ul>
 </li>
 <li><a href="#target-browser">6. Targeting the Browser</a>
@@ -616,16 +618,17 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_loading_code_dynamically">6.3.1. Loading code dynamically</a></li>
 </ul>
 </li>
-<li><a href="#_web_workers">6.4. Web Workers</a></li>
-<li><a href="#NameHashing">6.5. Cacheable Output</a></li>
-<li><a href="#BrowserManifest">6.6. Output Manifest</a></li>
-<li><a href="#_development_support">6.7. Development Support</a>
+<li><a href="#output-wrapper">6.4. Output Wrapper</a></li>
+<li><a href="#_web_workers">6.5. Web Workers</a></li>
+<li><a href="#NameHashing">6.6. Cacheable Output</a></li>
+<li><a href="#BrowserManifest">6.7. Output Manifest</a></li>
+<li><a href="#_development_support">6.8. Development Support</a>
 <ul class="sectlevel3">
-<li><a href="#hud">6.7.1. Heads-Up Display (HUD)</a></li>
-<li><a href="#browser-http-server">6.7.2. HTTP Server</a></li>
-<li><a href="#_css_reloading">6.7.3. CSS Reloading</a></li>
-<li><a href="#_proxy_support">6.7.4. Proxy Support</a></li>
-<li><a href="#_async_loading">6.7.5. Async Loading</a></li>
+<li><a href="#hud">6.8.1. Heads-Up Display (HUD)</a></li>
+<li><a href="#browser-http-server">6.8.2. HTTP Server</a></li>
+<li><a href="#_css_reloading">6.8.3. CSS Reloading</a></li>
+<li><a href="#_proxy_support">6.8.4. Proxy Support</a></li>
+<li><a href="#_async_loading">6.8.5. Async Loading</a></li>
 </ul>
 </li>
 </ul>
@@ -682,7 +685,7 @@ table.CodeRay td.code>pre{padding:0}
 <ul class="sectlevel3">
 <li><a href="#_using_npm_packages">11.1.1. Using npm packages</a></li>
 <li><a href="#_package_provider">11.1.2. Package Provider</a></li>
-<li><a href="#_resolving_packages">11.1.3. Resolving Packages</a></li>
+<li><a href="#js-resolve">11.1.3. Resolving Packages</a></li>
 </ul>
 </li>
 <li><a href="#_dealing_with_js_files">11.2. Dealing with .js Files</a>
@@ -2024,6 +2027,10 @@ files that have been recompiled.  This function <strong>must</strong> by synchro
 <dd>
 <p>A boolean controlling whether code should be hot loaded. Implicitly set to <code>true</code> if either of the callbacks is set. Always enabled for the <code>:browser</code> target by default, set to <code>false</code> to disable.</p>
 </dd>
+<dt><code>:ignore-warnings</code></dt>
+<dd>
+<p>A boolean controlling whether code with warnings should be reloaded. Defaults to <code>false</code>.</p>
+</dd>
 </dl>
 </div>
 <div class="listingblock">
@@ -2139,6 +2146,193 @@ If neither <code>:after-load</code> nor <code>:before-load</code> are set the co
 </div>
 <div class="paragraph">
 <p>The <code>:cache-root</code> is always resolved relative to the project directory. You can also specify absolute paths (eg. <code>/tmp/shadow-cljs</code>).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="closure-defines"><a class="anchor" href="#closure-defines"></a><a class="link" href="#closure-defines">5.4. Closure Defines</a></h3>
+<div class="paragraph">
+<p>The Closure Library &amp; Compiler allow you to define variables that are essentially compile time constants. You can use these to configure certain features of your build. Since the Closure compiler treats these as constants when running <code>:advanced</code> optimizations they are fully supported in the Dead-Code-Elimination passes and can be used to remove certain parts of the code that should not be included in <code>release</code> builds.</p>
+</div>
+<div class="paragraph">
+<p>You can define them in your code</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">your.app</span>)
+
+(goog-define VERBOSE <span class="predefined-constant">false</span>)
+
+(<span class="keyword">when</span> VERBOSE
+  (<span class="keyword">println</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Hello World</span><span class="delimiter">&quot;</span></span>))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This defines the <code>your.app/VERBOSE</code> variable as <code>false</code> by default. This will cause the <code>println</code> to be removed in <code>:advanced</code> compilation. You can toggle this to <code>true</code> via the <code>:closure-defines</code> options which will enable the <code>println</code>. This can either be done for development only or always.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span>
+  {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+   <span class="keyword">..</span><span class="keyword">.</span>
+   <span class="symbol">:modules</span> {<span class="symbol">:app</span> {<span class="symbol">:entries</span> [your.app]}}
+   <span class="comment">;; to enable in development only</span>
+   <span class="symbol">:dev</span> {<span class="symbol">:closure-defines</span> {your.app/VERBOSE <span class="predefined-constant">true</span>}}
+   <span class="comment">;; to enable always</span>
+   <span class="symbol">:closure-defines</span> {your.app/VERBOSE <span class="predefined-constant">true</span>}
+   <span class="comment">;; you may also enable it for release as well</span>
+   <span class="symbol">:release</span> {<span class="symbol">:closure-defines</span> {your.app/VERBOSE <span class="predefined-constant">true</span>}}
+   }}</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+It is generally safer to use the "disabled" variant as the default since it makes things less likely to be included in a <code>release</code> build when they shouldn&#8217;t be. Forgetting to set a <code>:closure-defines</code> variable should almost always result in less code being used not more.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Closure Defines from the Closure Library</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>goog.DEBUG</code>: The Closure Library uses this for many development features. <code>shadow-cljs</code> automatically sets this to <code>false</code> for <code>release</code> builds.</p>
+</li>
+<li>
+<p><code>goog.LOCALE</code> can be used to configure certain localization features like <code>goog.i18n.DateTimeFormat</code>. It accepts a standard locale string and defaults to <code>en</code>. Pretty much all locales are supported, see <a href="https://github.com/google/closure-library/blob/master/closure/goog/i18n/datetimesymbols.js">here</a> and <a href="https://github.com/google/closure-library/blob/master/closure/goog/i18n/datetimesymbolsext.js">here</a>.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="compiler-options"><a class="anchor" href="#compiler-options"></a><a class="link" href="#compiler-options">5.5. Compiler Options</a></h3>
+<div class="paragraph">
+<p>The CLJS compiler supports several options to influence how some code is generated. For the most part <code>shadow-cljs</code> will pick some good defaults for each <code>:target</code> but you might occasionally want to change some of them.</p>
+</div>
+<div class="paragraph">
+<p>These are all grouped under the <code>:compiler-options</code> key in your build config.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:dependencies</span> [<span class="keyword">..</span><span class="keyword">.</span>]
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span>
+  {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+   <span class="keyword">..</span><span class="keyword">.</span>
+   <span class="symbol">:compiler-options</span> {<span class="symbol">:fn-invoke-direct</span> <span class="predefined-constant">true</span>}}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Most of the standard ClojureScript <a href="https://clojurescript.org/reference/compiler-options">Compiler Options</a> are either enabled by default or do not apply. So very few of them actually have an effect. A lot of them are also specific to certain <code>:target</code> types and do not apply universally (e.g. <code>:compiler-options {:output-wrapper true}</code> is only relevant for <code>:target :browser</code>).</p>
+</div>
+<div class="paragraph">
+<p>Currently supported options include</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>:optimizations</code> supports <code>:advanced</code>, <code>:simple</code> or <code>:whitespace</code>, defaults to <code>:advanced</code>. <code>:none</code> is the default for development and cannot be set manually. <code>release</code> with <code>:none</code> won&#8217;t work.</p>
+</li>
+<li>
+<p><code>:infer-externs</code> <code>:all</code>, <code>:auto</code>, <code>true</code> or <code>false</code>, defaults to <code>true</code></p>
+</li>
+<li>
+<p><code>:static-fns</code> (Boolean) defaults to <code>true</code></p>
+</li>
+<li>
+<p><code>:fn-invoke-direct</code> (Boolean) defaults to <code>false</code></p>
+</li>
+<li>
+<p><code>:elide-asserts</code> (Boolean) default to <code>false</code> in development and <code>true</code> in <code>release</code> builds</p>
+</li>
+<li>
+<p><code>:pretty-print</code> and <code>:pseudo-names</code> default to <code>false</code>. You can use <code>shadow-cljs release app --debug</code> to enable both temporarily without touching your config. This is very useful when running into problem with <code>release</code> builds</p>
+</li>
+<li>
+<p><code>:source-map</code> (Boolean) defaults to <code>true</code> during development, <code>false</code> for <code>release</code>.</p>
+</li>
+<li>
+<p><code>:externs</code> vector of paths, defaults to <code>[]</code></p>
+</li>
+<li>
+<p><code>:checked-arrays</code> (Boolean), defaults to <code>false</code></p>
+</li>
+<li>
+<p><code>:language-in</code> and <code>:language-out</code></p>
+</li>
+<li>
+<p><code>:anon-fn-naming-policy</code></p>
+</li>
+<li>
+<p><code>:rename-prefix</code> and <code>:rename-prefix-namespace</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Unsupported or non-applicable Options</strong></p>
+</div>
+<div class="paragraph">
+<p>Options that don&#8217;t have any effect at all include</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>:verbose</code> is controlled by running <code>shadow-cljs compile app --verbose</code> not in the build config.</p>
+</li>
+<li>
+<p><code>:foreign-libs</code> and <code>:libs</code></p>
+</li>
+<li>
+<p><code>:stable-names</code> always enabled, cannot be disabled</p>
+</li>
+<li>
+<p><code>:install-deps</code></p>
+</li>
+<li>
+<p><code>:source-map-path</code>, <code>:source-asset-path</code> and <code>:source-map-timestamp</code></p>
+</li>
+<li>
+<p><code>:cache-analysis</code> always enabled, cannot be disabled.</p>
+</li>
+<li>
+<p><code>:recompile-dependents</code></p>
+</li>
+<li>
+<p><code>:preamble</code></p>
+</li>
+<li>
+<p><code>:hashbang</code> (the <code>:node-script</code> target supports this, others don&#8217;t)</p>
+</li>
+<li>
+<p><code>:compiler-stats</code> use <code>--verbose</code> to get detailed information instead</p>
+</li>
+<li>
+<p><code>:optimize-constants</code> always done for <code>release</code> builds, cannot be disabled</p>
+</li>
+<li>
+<p><code>:parallel-build</code> always enabled</p>
+</li>
+<li>
+<p><code>:aot-cache</code></p>
+</li>
+<li>
+<p><code>:package-json-resolution</code> see <a href="#js-resolve">:js-options :resolve</a> instead</p>
+</li>
+<li>
+<p><code>:watch-fn</code></p>
+</li>
+<li>
+<p><code>:process-shim</code></p>
+</li>
+</ul>
 </div>
 </div>
 </div>
@@ -2503,7 +2697,45 @@ support in <code>shadow-cljs</code>.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_web_workers"><a class="anchor" href="#_web_workers"></a><a class="link" href="#_web_workers">6.4. Web Workers</a></h3>
+<h3 id="output-wrapper"><a class="anchor" href="#output-wrapper"></a><a class="link" href="#output-wrapper">6.4. Output Wrapper</a></h3>
+<div class="paragraph">
+<p><strong>Release builds only</strong>: The code generated by the Closure Compiler <code>:advanced</code> compilation will create a lot of global variables which has the potential to create conflicts with other JS running in your page. To isolate the created variables the code can be wrapped in an anonymous function to the variables only apply in that scope.</p>
+</div>
+<div class="paragraph">
+<p><code>release</code> builds for <code>:browser</code> with only one <code>:modules</code> are wrapped in <code>(function(){&lt;the-code&gt;}).call(this);</code> by default. So no global variables are created.</p>
+</div>
+<div class="paragraph">
+<p>When using multiple <code>:modules</code> (a.k.a <a href="#CodeSplitting">code splitting</a>) this is not enabled by default since each module must be able to access the variables created by the modules it depends on. The Closure Compiler supports an additional option to enable the use of an output wrapper in combination with multiple <code>:modules</code> named <code>:rename-prefix-namespace</code>. This will cause the Compiler to scope all "global" variables used by the build into one actual global variable. By default this is set to <code>:rename-prefix-namespace "$APP"</code> when <code>:output-wrapper</code> is set to <code>true</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+  <span class="keyword">..</span><span class="keyword">.</span>
+  <span class="symbol">:compiler-options</span>
+  {<span class="symbol">:output-wrapper</span> <span class="predefined-constant">true</span>
+   <span class="symbol">:rename-prefix-namespace</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">MY_APP</span><span class="delimiter">&quot;</span></span>}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will only create the <code>MY_APP</code> global variable. Since every "global" variable will now be prefixed by <code>MY_APP.</code> (e.g. <code>MY_APP.a</code> instead of just <code>a</code>) the code size can go up substantially. It is important to keep this short. Browser compression (e.g. <code>gzip</code>) helps reduce the overhead of the extra code but depending on the amount of global variables in your build this can still produce a noticeable increase.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Note that the created variable isn&#8217;t actually useful directly. It will contain a lot of munged/minified properties. All exported (eg. <code>^:export</code>) variables will still be exported into the global scope and are not affect by this setting. The setting only serves to limit the amount of global variables created, nothing else. Do not use it directly.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_web_workers"><a class="anchor" href="#_web_workers"></a><a class="link" href="#_web_workers">6.5. Web Workers</a></h3>
 <div class="paragraph">
 <p>The <code>:modules</code> configuration may also be used to generate files intended to be used as a Web Workers.
 You may declare any module (except the default) as a Web Worker by setting <code>:web-worker true</code>. The
@@ -2571,7 +2803,7 @@ in the <code>:after-load</code>.
 </div>
 </div>
 <div class="sect2">
-<h3 id="NameHashing"><a class="anchor" href="#NameHashing"></a><a class="link" href="#NameHashing">6.5. Cacheable Output</a></h3>
+<h3 id="NameHashing"><a class="anchor" href="#NameHashing"></a><a class="link" href="#NameHashing">6.6. Cacheable Output</a></h3>
 <div class="paragraph">
 <p>In a web setting it is desirable to cache <code>.js</code> files for a very long time to avoid extra request. It is common
 practice the generate a unique name for the <code>.js</code> file for every released version. This changes the URL used to
@@ -2612,7 +2844,7 @@ in your HTML. The <a href="#BrowserManifest">Output Manifest</a> can help with t
 </div>
 </div>
 <div class="sect2">
-<h3 id="BrowserManifest"><a class="anchor" href="#BrowserManifest"></a><a class="link" href="#BrowserManifest">6.6. Output Manifest</a></h3>
+<h3 id="BrowserManifest"><a class="anchor" href="#BrowserManifest"></a><a class="link" href="#BrowserManifest">6.7. Output Manifest</a></h3>
 <div class="paragraph">
 <p><code>shadow-cljs</code> generates a <code>manifest.edn</code> file in the configured <code>:output-dir</code>.
 This file contains a description of the module config together with an extra <code>:output-name</code> property which
@@ -2666,13 +2898,13 @@ be relative to the configured <code>:output-dir</code>.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_development_support"><a class="anchor" href="#_development_support"></a><a class="link" href="#_development_support">6.7. Development Support</a></h3>
+<h3 id="_development_support"><a class="anchor" href="#_development_support"></a><a class="link" href="#_development_support">6.8. Development Support</a></h3>
 <div class="paragraph">
 <p>The <code>:devtools</code> section of the configuration for <code>:browser</code> supports a few additional
 options for configuring an optional dev-time HTTP server for a build and CSS reloading.</p>
 </div>
 <div class="sect3">
-<h4 id="hud"><a class="anchor" href="#hud"></a><a class="link" href="#hud">6.7.1. Heads-Up Display (HUD)</a></h4>
+<h4 id="hud"><a class="anchor" href="#hud"></a><a class="link" href="#hud">6.8.1. Heads-Up Display (HUD)</a></h4>
 <div class="paragraph">
 <p>The <code>:browser</code> target now uses a HUD to display a loading indicator when a build is started. It will also display warnings and errors if there are any.</p>
 </div>
@@ -2751,7 +2983,7 @@ options for configuring an optional dev-time HTTP server for a build and CSS rel
 </div>
 </div>
 <div class="sect3">
-<h4 id="browser-http-server"><a class="anchor" href="#browser-http-server"></a><a class="link" href="#browser-http-server">6.7.2. HTTP Server</a></h4>
+<h4 id="browser-http-server"><a class="anchor" href="#browser-http-server"></a><a class="link" href="#browser-http-server">6.8.2. HTTP Server</a></h4>
 <div class="paragraph">
 <p><code>shadow-cljs</code> can provide a basic HTTP server for your build. By default it will serve all static files from the configured <code>:http-root</code> directory.</p>
 </div>
@@ -2855,7 +3087,7 @@ real resource (so you can just hit browser reload on your SPA even on odd URIs).
 </div>
 </div>
 <div class="sect3">
-<h4 id="_css_reloading"><a class="anchor" href="#_css_reloading"></a><a class="link" href="#_css_reloading">6.7.3. CSS Reloading</a></h4>
+<h4 id="_css_reloading"><a class="anchor" href="#_css_reloading"></a><a class="link" href="#_css_reloading">6.8.3. CSS Reloading</a></h4>
 <div class="paragraph">
 <p>The Browser devtools can also reload CSS for you. This is enabled by default and in most cases requires no additional
 configuration when you are using the built-in HTTP dev server.</p>
@@ -2898,7 +3130,7 @@ document root used to serve your content.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_proxy_support"><a class="anchor" href="#_proxy_support"></a><a class="link" href="#_proxy_support">6.7.4. Proxy Support</a></h4>
+<h4 id="_proxy_support"><a class="anchor" href="#_proxy_support"></a><a class="link" href="#_proxy_support">6.8.4. Proxy Support</a></h4>
 <div class="paragraph">
 <p>By default the devtools client will attempt to connect to the <code>shadow-cljs</code> process via the configured <a href="#http">HTTP server</a> (usually <code>localhost</code>). If you are using a reverse proxy to serve your HTML that might not be possible. You can set <code>:devtools-url</code> to configure which URL to use.</p>
 </div>
@@ -2945,7 +3177,7 @@ The requests must be forwarded to the main <a href="#http">HTTP server</a>, not 
 </div>
 </div>
 <div class="sect3">
-<h4 id="_async_loading"><a class="anchor" href="#_async_loading"></a><a class="link" href="#_async_loading">6.7.5. Async Loading</a></h4>
+<h4 id="_async_loading"><a class="anchor" href="#_async_loading"></a><a class="link" href="#_async_loading">6.8.5. Async Loading</a></h4>
 <div class="paragraph">
 <p>During development the Closure Library method of loading code is used by default. This uses <code>document.write</code> to load scripts. This works fine but prohibits the use or <code>&lt;script async &#8230;&#8203;&gt;</code> or <code>&lt;script defer &#8230;&#8203;&gt;</code> and will complain with a warning when trying to load it.</p>
 </div>
@@ -4171,7 +4403,7 @@ Some libraries are also packaged in ways  ways that allow you to include only th
 </div>
 </div>
 <div class="sect3">
-<h4 id="_resolving_packages"><a class="anchor" href="#_resolving_packages"></a><a class="link" href="#_resolving_packages">11.1.3. Resolving Packages</a></h4>
+<h4 id="js-resolve"><a class="anchor" href="#js-resolve"></a><a class="link" href="#js-resolve">11.1.3. Resolving Packages</a></h4>
 <div class="paragraph">
 <p>By default <code>shadow-cljs</code> will resolve all <code>(:require ["thing" :as x])</code> requires following the <code>npm</code> convention.
 This means it will look at <code>&lt;project&gt;/node_modules/thing/package.json</code> and follow the code from there. To
@@ -5070,7 +5302,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-04-25 11:49:20 DST
+Last updated 2018-04-26 22:35:17 DST
 </div>
 </div>
 </body>
