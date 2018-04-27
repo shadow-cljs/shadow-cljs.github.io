@@ -607,6 +607,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_compiler_cache">5.3. Compiler Cache</a></li>
 <li><a href="#closure-defines">5.4. Closure Defines</a></li>
 <li><a href="#compiler-options">5.5. Compiler Options</a></li>
+<li><a href="#_conditional_reading">5.6. Conditional Reading</a></li>
 </ul>
 </li>
 <li><a href="#target-browser">6. Targeting the Browser</a>
@@ -2333,6 +2334,106 @@ It is generally safer to use the "disabled" variant as the default since it make
 <p><code>:process-shim</code></p>
 </li>
 </ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_conditional_reading"><a class="anchor" href="#_conditional_reading"></a><a class="link" href="#_conditional_reading">5.6. Conditional Reading</a></h3>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Caution</div>
+</td>
+<td class="content">
+This feature only works in <code>shadow-cljs</code>. It was officially <a href="https://dev.clojure.org/jira/browse/CLJS-2396">rejected</a> by the ClojureScript project. It will still compile fine in CLJS but only the official branches work (e.g. <code>:cljs</code>). It might still be <a href="https://groups.google.com/d/msg/clojure-dev/8YJJM8lJuQs/hR5_vUZPCQAJ">supported</a> one day but as of now it is not.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>shadow-cljs</code> lets you configure additional reader features in <code>.cljc</code> files. By default you can only use reader conditionals to generate separate code for <code>:clj</code>, <code>:cljs</code> or <code>:cljr</code>. In many CLJS builds however it is also desirable to select which code is generated based on your <code>:target</code>.</p>
+</div>
+<div class="paragraph">
+<p>Example: Some <code>npm</code> packages only work when targeting the <code>:browser</code>, but you may have a <code>ns</code> that you also want to use in a <code>:node-script</code> build. This might happen frequently when trying to use Server-Side Rendering (SSR) with your React App. <code>codemirror</code> is one such package.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">my.awesome.component</span>
+  (<span class="symbol">:require</span>
+    [<span class="string"><span class="delimiter">&quot;</span><span class="content">react</span><span class="delimiter">&quot;</span></span> <span class="symbol">:as</span> react]
+    [<span class="string"><span class="delimiter">&quot;</span><span class="content">codemirror</span><span class="delimiter">&quot;</span></span> <span class="symbol">:as</span> CodeMirror]))
+
+<span class="comment">;; suppose you create a CodeMirror instance on some React :ref</span>
+(<span class="keyword">defn</span> <span class="function">init-cm</span> [dom-node]
+  (<span class="keyword">let</span> [cm (CodeMirror/fromTextArea dom-node <span class="error">#</span>js {<span class="keyword">..</span><span class="keyword">.</span>})]
+    <span class="keyword">..</span><span class="keyword">.</span>))
+
+<span class="keyword">..</span><span class="keyword">.</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This namespace will compile fine for both builds (<code>:node-script</code> and <code>:browser</code>) but when trying to run the <code>:node-script</code> it will fail since the <code>codemirror</code> package tries to access the DOM. Since <code>react-dom/server</code> does not use refs the <code>init-cm</code> function will never be called anyways.</p>
+</div>
+<div class="paragraph">
+<p>While you can use <a href="#closure-defines">:closure-defines</a> to conditionally compile away the <code>init-cm</code> fn you can not use it to get rid of the extra <code>:require</code>. Reader conditionals let you do this easily.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">my.awesome.component</span>
+ (<span class="symbol">:require</span>
+   [<span class="string"><span class="delimiter">&quot;</span><span class="content">react</span><span class="delimiter">&quot;</span></span> <span class="symbol">:as</span> react]
+   <span class="comment">;; NOTE: The order here matters. Only the first applicable</span>
+   <span class="comment">;; branch is used. If :cljs is used first it will still be</span>
+   <span class="comment">;; taken by the :server build</span>
+   <span class="error">#</span>?@(<span class="symbol">:node</span> [[]]
+       <span class="symbol">:cljs</span> [[<span class="string"><span class="delimiter">&quot;</span><span class="content">codemirror</span><span class="delimiter">&quot;</span></span> <span class="symbol">:as</span> CodeMirror]])))
+
+<span class="error">#</span>?(<span class="symbol">:node</span>
+   (<span class="keyword">defn</span> <span class="function">init-cm</span> [dom-node] <span class="keyword">..</span><span class="keyword">.</span>))
+
+<span class="keyword">..</span><span class="keyword">.</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title"><code>:reader-features</code> config examples</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ <span class="comment">;; app build configured normally, no adjustments required</span>
+ {<span class="symbol">:app</span>
+  {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+   <span class="keyword">..</span><span class="keyword">.</span>}
+  <span class="comment">;; for the server we add the :node reader feature</span>
+  <span class="comment">;; it will then be used instead of the default :cljs</span>
+  <span class="symbol">:server</span>
+  {<span class="symbol">:target</span> <span class="symbol">:node-script</span>
+   <span class="symbol">:compiler-options</span>
+   {<span class="symbol">:reader-features</span> #{<span class="symbol">:node</span>}}}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>:server</code> build will then no longer have the <code>codemirror</code> require and the <code>init-cm</code> function is removed. Becoming only</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">my.awesome.component</span>
+  (<span class="symbol">:require</span>
+    [<span class="string"><span class="delimiter">&quot;</span><span class="content">react</span><span class="delimiter">&quot;</span></span> <span class="symbol">:as</span> react]))
+
+<span class="keyword">..</span><span class="keyword">.</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+This feature is only available in <code>.cljc</code> files and will fail in <code>.cljs</code> files.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>

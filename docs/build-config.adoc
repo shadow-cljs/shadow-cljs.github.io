@@ -297,3 +297,74 @@ Options that don't have any effect at all include
 - `:package-json-resolution` see <<js-resolve, :js-options :resolve>> instead
 - `:watch-fn`
 - `:process-shim`
+
+
+== Conditional Reading
+
+CAUTION: This feature only works in `shadow-cljs`. It was officially https://dev.clojure.org/jira/browse/CLJS-2396[rejected] by the ClojureScript project. It will still compile fine in CLJS but only the official branches work (e.g. `:cljs`). It might still be https://groups.google.com/d/msg/clojure-dev/8YJJM8lJuQs/hR5_vUZPCQAJ[supported] one day but as of now it is not.
+
+`shadow-cljs` lets you configure additional reader features in `.cljc` files. By default you can only use reader conditionals to generate separate code for `:clj`, `:cljs` or `:cljr`. In many CLJS builds however it is also desirable to select which code is generated based on your `:target`.
+
+Example: Some `npm` packages only work when targeting the `:browser`, but you may have a `ns` that you also want to use in a `:node-script` build. This might happen frequently when trying to use Server-Side Rendering (SSR) with your React App. `codemirror` is one such package.
+
+```clojure
+(ns my.awesome.component
+  (:require
+    ["react" :as react]
+    ["codemirror" :as CodeMirror]))
+
+;; suppose you create a CodeMirror instance on some React :ref
+(defn init-cm [dom-node]
+  (let [cm (CodeMirror/fromTextArea dom-node #js {...})]
+    ...))
+
+...
+```
+
+This namespace will compile fine for both builds (`:node-script` and `:browser`) but when trying to run the `:node-script` it will fail since the `codemirror` package tries to access the DOM. Since `react-dom/server` does not use refs the `init-cm` function will never be called anyways.
+
+While you can use <<closure-defines, :closure-defines>> to conditionally compile away the `init-cm` fn you can not use it to get rid of the extra `:require`. Reader conditionals let you do this easily.
+
+```clojure
+(ns my.awesome.component
+ (:require
+   ["react" :as react]
+   ;; NOTE: The order here matters. Only the first applicable
+   ;; branch is used. If :cljs is used first it will still be
+   ;; taken by the :server build
+   #?@(:node [[]]
+       :cljs [["codemirror" :as CodeMirror]])))
+
+#?(:node
+   (defn init-cm [dom-node] ...))
+
+...
+```
+
+.`:reader-features` config examples
+```clojure
+{...
+ :builds
+ ;; app build configured normally, no adjustments required
+ {:app
+  {:target :browser
+   ...}
+  ;; for the server we add the :node reader feature
+  ;; it will then be used instead of the default :cljs
+  :server
+  {:target :node-script
+   :compiler-options
+   {:reader-features #{:node}}}}}
+```
+
+The `:server` build will then no longer have the `codemirror` require and the `init-cm` function is removed. Becoming only
+
+```clojure
+(ns my.awesome.component
+  (:require
+    ["react" :as react]))
+
+...
+```
+
+IMPORTANT: This feature is only available in `.cljc` files and will fail in `.cljs` files.
