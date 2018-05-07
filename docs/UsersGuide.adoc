@@ -331,14 +331,18 @@ The `shadow-cljs` HTTP servers support SSL. It requires a Java Keystore that pro
  ...}
 ```
 
-The above are the defaults so if you want to use those it is fine to just set `:ssl {}` to use those.
+The above are the defaults so if you want to use those it is fine to just set `:ssl {}`.
+
 
 You can create a Keystore using the java `keytool` command. Creating a trusted self-signed certificate is also possible but somewhat complicated.
 
-I used https://certsimple.com/blog/localhost-ssl-fix[this guide] to create a self-signed certificate using macOS. The created `.p12` file can be turned into the required `keystore.jks` via the `keytool` utility.
+- https://gist.github.com/jchandra74/36d5f8d0e11960dd8f80260801109ab0[OpenSSL] instructions for Linux and Windows (via WSL)
+- https://certsimple.com/blog/localhost-ssl-fix[macOS] instructions
+
+The created `Certificates.p12` (macOS) or `localhost.pfx` (Linux, Windows) file can be turned into the required `keystore.jks` via the `keytool` utility.
 
 ```bash
-$ keytool -importkeystore -destkeystore keystore.jks -srcstoretype PKCS12 -srckeystore <the-cert>.p12
+$ keytool -importkeystore -destkeystore keystore.jks -srcstoretype PKCS12 -srckeystore localhost.pfx
 ```
 
 IMPORTANT: You must generate the Certificate with a SAN (Subject Alternative Name) for "localhost" (or whichever host you want to use). SAN is required to get Chrome to trust the Certificate and now show warnings. The password used when exporting must match the password assigned to the Keystore.

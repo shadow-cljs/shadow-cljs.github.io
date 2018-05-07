@@ -1716,17 +1716,27 @@ You still need to start the <a href="#embedded">embedded server</a> manually bef
 </div>
 </div>
 <div class="paragraph">
-<p>The above are the defaults so if you want to use those it is fine to just set <code>:ssl {}</code> to use those.</p>
+<p>The above are the defaults so if you want to use those it is fine to just set <code>:ssl {}</code>.</p>
 </div>
 <div class="paragraph">
 <p>You can create a Keystore using the java <code>keytool</code> command. Creating a trusted self-signed certificate is also possible but somewhat complicated.</p>
 </div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://gist.github.com/jchandra74/36d5f8d0e11960dd8f80260801109ab0">OpenSSL</a> instructions for Linux and Windows (via WSL)</p>
+</li>
+<li>
+<p><a href="https://certsimple.com/blog/localhost-ssl-fix">macOS</a> instructions</p>
+</li>
+</ul>
+</div>
 <div class="paragraph">
-<p>I used <a href="https://certsimple.com/blog/localhost-ssl-fix">this guide</a> to create a self-signed certificate using macOS. The created <code>.p12</code> file can be turned into the required <code>keystore.jks</code> via the <code>keytool</code> utility.</p>
+<p>The created <code>Certificates.p12</code> (macOS) or <code>localhost.pfx</code> (Linux, Windows) file can be turned into the required <code>keystore.jks</code> via the <code>keytool</code> utility.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">$ keytool -importkeystore -destkeystore keystore.jks -srcstoretype PKCS12 -srckeystore &lt;the-cert&gt;.p12</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">$ keytool -importkeystore -destkeystore keystore.jks -srcstoretype PKCS12 -srckeystore localhost.pfx</code></pre>
 </div>
 </div>
 <div class="admonitionblock important">
@@ -5306,7 +5316,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-04-26 22:35:17 DST
+Last updated 2018-05-07 17:17:48 DST
 </div>
 </div>
 </body>
