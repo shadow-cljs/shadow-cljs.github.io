@@ -4196,13 +4196,14 @@ In this case :target <code>build/custom</code>. The namespace is up to you.</p>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">build</span>
-  (<span class="symbol">:require</span> [shadow.build <span class="symbol">:as</span> build]
-            [shadow.build.targets.browser <span class="symbol">:as</span> browser]))
+  (<span class="symbol">:require</span>
+    [shadow.build <span class="symbol">:as</span> build]
+    [shadow.build.targets.browser <span class="symbol">:as</span> browser]))
 
 (<span class="keyword">defn</span> <span class="function">custom</span> [{<span class="symbol">::build/keys</span> [stage mode config] <span class="symbol">:as</span> state}]
-  (<span class="keyword">let</span> [state (browser/process state]
+  (<span class="keyword">let</span> [state (browser/process state)]
     (<span class="keyword">when</span> (<span class="keyword">and</span> (<span class="keyword">=</span> <span class="symbol">:flush</span> stage) (<span class="keyword">=</span> <span class="symbol">:dev</span> mode))
-      (call-rsync)
+      (call-rsync))
     state))</code></pre>
 </div>
 </div>
@@ -5332,7 +5333,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-05-07 17:17:48 DST
+Last updated 2018-05-09 22:32:23 DST
 </div>
 </div>
 </body>
