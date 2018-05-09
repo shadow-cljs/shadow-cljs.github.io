@@ -4097,9 +4097,11 @@ something like this is your <code>package.json</code>:</p>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
- <span class="symbol">:builds</span> {<span class="symbol">:ci-tests</span> {<span class="symbol">:target</span>     <span class="symbol">:karma</span>
-                     <span class="symbol">:output-to</span>  <span class="string"><span class="delimiter">&quot;</span><span class="content">target/ci.js</span><span class="delimiter">&quot;</span></span>
-                     <span class="symbol">:ns-regexp</span>  <span class="string"><span class="delimiter">&quot;</span><span class="content">-spec$</span><span class="delimiter">&quot;</span></span>}</code></pre>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:ci</span>
+  {<span class="symbol">:target</span> <span class="symbol">:karma</span>
+   <span class="symbol">:output-to</span>  <span class="string"><span class="delimiter">&quot;</span><span class="content">target/ci.js</span><span class="delimiter">&quot;</span></span>
+   <span class="symbol">:ns-regexp</span>  <span class="string"><span class="delimiter">&quot;</span><span class="content">-spec$</span><span class="delimiter">&quot;</span></span>}}}</code></pre>
 </div>
 </div>
 <div class="paragraph">

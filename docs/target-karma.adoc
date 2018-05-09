@@ -40,9 +40,11 @@ So you might have something like this:
 
 ```
 {...
- :builds {:ci-tests {:target     :karma
-                     :output-to  "target/ci.js"
-                     :ns-regexp  "-spec$"}
+ :builds
+ {:ci
+  {:target :karma
+   :output-to  "target/ci.js"
+   :ns-regexp  "-spec$"}}}
 ```
 
 You also need a `karma.conf.js`:
