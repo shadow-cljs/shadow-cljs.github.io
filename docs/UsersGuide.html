@@ -599,9 +599,10 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_build_target">5.1. Build Target</a></li>
 <li><a href="#devtools">5.2. Development Options</a>
 <ul class="sectlevel3">
-<li><a href="#_preloads">5.2.1. Preloads</a></li>
-<li><a href="#_hot_code_reload">5.2.2. Hot Code Reload</a></li>
-<li><a href="#_lifecycle_hooks">5.2.3. Lifecycle Hooks</a></li>
+<li><a href="#_repl">5.2.1. REPL</a></li>
+<li><a href="#_preloads">5.2.2. Preloads</a></li>
+<li><a href="#_hot_code_reload">5.2.3. Hot Code Reload</a></li>
+<li><a href="#_lifecycle_hooks">5.2.4. Lifecycle Hooks</a></li>
 </ul>
 </li>
 <li><a href="#_compiler_cache">5.3. Compiler Cache</a></li>
@@ -1884,7 +1885,22 @@ the target you select.</p>
 <p>Each build <code>:target</code> typically provides some development support. They are grouped under the <code>:devtools</code> key for each <code>:build</code>.</p>
 </div>
 <div class="sect3">
-<h4 id="_preloads"><a class="anchor" href="#_preloads"></a><a class="link" href="#_preloads">5.2.1. Preloads</a></h4>
+<h4 id="_repl"><a class="anchor" href="#_repl"></a><a class="link" href="#_repl">5.2.1. REPL</a></h4>
+<div class="paragraph">
+<p>When running <code>watch</code> code for the REPL is injected automatically and usually does not require additional configuration. Currently there is one config option that allows configuring which namespace the REPL will start in. It defaults to <code>cljs.user</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span> {<span class="keyword">..</span><span class="keyword">.</span>
+        <span class="symbol">:devtools</span> {<span class="symbol">:repl-init-ns</span> my.app
+                   <span class="keyword">..</span><span class="keyword">.</span>}}}}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_preloads"><a class="anchor" href="#_preloads"></a><a class="link" href="#_preloads">5.2.2. Preloads</a></h4>
 <div class="paragraph">
 <p>As a developer most of your time is spent in development mode. You&#8217;re probably familiar with tools like <code>figwheel</code>,
 <code>boot-reload</code>, and <code>devtools</code>. It&#8217;s almost certain that you want one or more of these in your builds.</p>
@@ -1920,7 +1936,7 @@ Since version 2.0.130 shadow-cljs automatically adds <code>cljs-devtools</code> 
 </div>
 </div>
 <div class="sect3">
-<h4 id="_hot_code_reload"><a class="anchor" href="#_hot_code_reload"></a><a class="link" href="#_hot_code_reload">5.2.2. Hot Code Reload</a></h4>
+<h4 id="_hot_code_reload"><a class="anchor" href="#_hot_code_reload"></a><a class="link" href="#_hot_code_reload">5.2.3. Hot Code Reload</a></h4>
 <div class="paragraph">
 <p>The React and ClojureScript ecosystems combine to make this kind of thing super useful. The <code>shadow-cljs</code>
 system includes everything you need to do your hot code reload, without needing to resort to external tools.</p>
@@ -1935,7 +1951,7 @@ system includes everything you need to do your hot code reload, without needing 
 </div>
 </div>
 <div class="sect3">
-<h4 id="_lifecycle_hooks"><a class="anchor" href="#_lifecycle_hooks"></a><a class="link" href="#_lifecycle_hooks">5.2.3. Lifecycle Hooks</a></h4>
+<h4 id="_lifecycle_hooks"><a class="anchor" href="#_lifecycle_hooks"></a><a class="link" href="#_lifecycle_hooks">5.2.4. Lifecycle Hooks</a></h4>
 <div class="paragraph">
 <p>You can configure the compiler to run functions just before hot code reload brings in updated code, and just after. These are useful for stopping/starting things that would otherwise close over old code.</p>
 </div>

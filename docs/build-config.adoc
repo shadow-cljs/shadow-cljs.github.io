@@ -38,6 +38,19 @@ the target you select.
 
 Each build `:target` typically provides some development support. They are grouped under the `:devtools` key for each `:build`.
 
+=== REPL
+
+When running `watch` code for the REPL is injected automatically and usually does not require additional configuration. Currently there is one config option that allows configuring which namespace the REPL will start in. It defaults to `cljs.user`.
+
+```
+{...
+ :builds
+ {:app {...
+        :devtools {:repl-init-ns my.app
+                   ...}}}}
+```
+
+
 === Preloads
 
 As a developer most of your time is spent in development mode. You're probably familiar with tools like `figwheel`,
