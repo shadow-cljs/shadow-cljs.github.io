@@ -92,7 +92,7 @@ With our improved support we we can easily translate this to:
             ["react-virtualized/dist/commonjs/List" :default virtual-list]))
 ```
 
-=== Package Provider
+=== Package Provider [[js-provider]]
 
 `shadow-cljs` supports several different ways to include `npm` packages into your build. They are configurable via the `:js-options :js-provider` setting. Each `:target` usually sets the one appropriate for your build most often you won't need to touch this setting.
 
@@ -168,7 +168,7 @@ Some packages provide multiple “dist” files and sometimes the default one de
 
 You can also just `(:require ["d3/build/d3.js" :as d3])` as well if you only care about the Browser.
 
-==== Limitations
+==== Limitations [[js-resolve-limitations]]
 
 The `:shadow-js` and `:closure` have full control over `:resolve` and everything mentioned above works without any downsides. The `:js-provider :require` however is more limited. Only the initial require can be influenced since the standard `require` is in control after that. This means it is not possible to influence what a package might `require` internally. It is therefore not recommended to be used with targets that use `require` directly (eg. `:node-script`).
 
@@ -192,7 +192,7 @@ The `:shadow-js` and `:closure` have full control over `:resolve` and everything
 
 The above works fine in the Browser since every `"react"` require will be replaced, including the `"react"` require `"react-table"` has internally. For `:js-provider :require` however a `require("react-table")` will be emitted and `node` will be in control how that is resolved. Meaning that it will resolve it to the standard `"react"` and not the `"preact"` we had configured.
 
-== Dealing with .js Files
+== Dealing with .js Files [[classpath-js]]
 
 ****
 *DANGER: This feature is an experiment!* It is currently only supported in `shadow-cljs` and other CLJS tools will yell at you if you attempt to use it. Use at your own risk. The feature was initially rejected from CLJS core but I think it is useful and should not have been https://dev.clojure.org/jira/browse/CLJS-2061?focusedCommentId=46191&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-46191[dismissed] without further discussion.
