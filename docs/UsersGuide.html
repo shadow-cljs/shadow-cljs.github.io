@@ -4438,29 +4438,12 @@ Some libraries are also packaged in ways  ways that allow you to include only th
 <div class="sect3">
 <h4 id="js-resolve"><a class="anchor" href="#js-resolve"></a><a class="link" href="#js-resolve">11.1.3. Resolving Packages</a></h4>
 <div class="paragraph">
-<p>By default <code>shadow-cljs</code> will resolve all <code>(:require ["thing" :as x])</code> requires following the <code>npm</code> convention.
-This means it will look at <code>&lt;project&gt;/node_modules/thing/package.json</code> and follow the code from there. To
-customize how this works <code>shadow-cljs</code> exposes a <code>:resolve</code> config option that lets you override how
-things are resolved.</p>
-</div>
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Important</div>
-</td>
-<td class="content">
-Currently only the <code>:shadow</code> and <code>:closure</code> JS Providers support custom resolving configuration. Since <code>:require</code> maps directly to JS <code>require</code> we can&#8217;t influence what that does.
-</td>
-</tr>
-</table>
+<p>By default <code>shadow-cljs</code> will resolve all <code>(:require ["thing" :as x])</code> requires following the <code>npm</code> convention. This means it will look at <code>&lt;project&gt;/node_modules/thing/package.json</code> and follow the code from there. To customize how this works <code>shadow-cljs</code> exposes a <code>:resolve</code> config option that lets you override how things are resolved.</p>
 </div>
 <div class="sect4">
-<h5 id="_using_a_cdn"><a class="anchor" href="#_using_a_cdn"></a><a class="link" href="#_using_a_cdn">Using a CDN</a></h5>
+<h5 id="js-resolve-global"><a class="anchor" href="#js-resolve-global"></a><a class="link" href="#js-resolve-global">Using a CDN</a></h5>
 <div class="paragraph">
-<p>Say you already have React included in your page via a CDN. You could just start using <code>js/React</code> again
-but we stopped doing that for a good reason. Instead you can continue to use <code>(:require ["react" :as react])</code>
-but configure how "react" resolves!</p>
+<p>Say you already have React included in your page via a CDN. You could just start using <code>js/React</code> again but we stopped doing that for a good reason. Instead you can continue to use <code>(:require ["react" :as react])</code> but configure how "react" resolves!</p>
 </div>
 <div class="paragraph">
 <p>Here is a sample <code>shadow-cljs.edn</code> config for such a build:</p>
@@ -4482,17 +4465,13 @@ but configure how "react" resolves!</p>
 </div>
 </div>
 <div class="paragraph">
-<p>The <code>:app</code> build will now use the global <code>React</code> instance while the <code>:server</code> build continues using
-the "react" npm package! No need to fiddle with the code to make this work.</p>
+<p>The <code>:app</code> build will now use the global <code>React</code> instance while the <code>:server</code> build continues using the "react" npm package! No need to fiddle with the code to make this work.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_redirecting_require"><a class="anchor" href="#_redirecting_require"></a><a class="link" href="#_redirecting_require">Redirecting “require”</a></h5>
+<h5 id="js-resolve-npm"><a class="anchor" href="#js-resolve-npm"></a><a class="link" href="#js-resolve-npm">Redirecting “require”</a></h5>
 <div class="paragraph">
-<p>Some packages provide multiple “dist” files and sometimes the default one described doesn’t quite work
-in <code>shadow-cljs</code>. One good example for this is "d3". Their default "main" points to "build/d3.node.js" but
-that is not what we want when working with the browser. Their ES6 code runs into a bug in the Closure Compiler,
-so we can’t use that. Instead we just redirect the require to some other file:</p>
+<p>Some packages provide multiple “dist” files and sometimes the default one described doesn’t quite work in <code>shadow-cljs</code>. One good example for this is "d3". Their default "main" points to "build/d3.node.js" but that is not what we want when working with the browser. Their ES6 code runs into a bug in the Closure Compiler, so we can’t use that. Instead we just redirect the require to some other file:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -4508,6 +4487,36 @@ so we can’t use that. Instead we just redirect the require to some other file:
 </div>
 <div class="paragraph">
 <p>You can also just <code>(:require ["d3/build/d3.js" :as d3])</code> as well if you only care about the Browser.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_limitations"><a class="anchor" href="#_limitations"></a><a class="link" href="#_limitations">Limitations</a></h5>
+<div class="paragraph">
+<p>The <code>:shadow-js</code> and <code>:closure</code> have full control over <code>:resolve</code> and everything mentioned above works without any downsides. The <code>:js-provider :require</code> however is more limited. Only the initial require can be influenced since the standard <code>require</code> is in control after that. This means it is not possible to influence what a package might <code>require</code> internally. It is therefore not recommended to be used with targets that use <code>require</code> directly (eg. <code>:node-script</code>).</p>
+</div>
+<div class="listingblock">
+<div class="title">Redirecting "react" to "preact"</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span>
+  {<span class="symbol">:target</span> <span class="symbol">:node-script</span>
+   <span class="keyword">..</span><span class="keyword">.</span>
+   <span class="symbol">:js-options</span>
+   {<span class="symbol">:resolve</span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">react</span><span class="delimiter">&quot;</span></span> {<span class="symbol">:target</span> <span class="symbol">:npm</span>
+                       <span class="symbol">:require</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">preact</span><span class="delimiter">&quot;</span></span>}}}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Example use of react-table</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">my.app</span>
+  (<span class="symbol">:require</span>
+    [<span class="string"><span class="delimiter">&quot;</span><span class="content">react-table</span><span class="delimiter">&quot;</span></span> <span class="symbol">:as</span> rt]))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The above works fine in the Browser since every <code>"react"</code> require will be replaced, including the <code>"react"</code> require <code>"react-table"</code> has internally. For <code>:js-provider :require</code> however a <code>require("react-table")</code> will be emitted and <code>node</code> will be in control how that is resolved. Meaning that it will resolve it to the standard <code>"react"</code> and not the <code>"preact"</code> we had configured.</p>
 </div>
 </div>
 </div>

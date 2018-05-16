@@ -126,18 +126,11 @@ Until support in Closure gets more reliable `:shadow` is the recommend JS Provid
 
 === Resolving Packages [[js-resolve]]
 
-By default `shadow-cljs` will resolve all `(:require ["thing" :as x])` requires following the `npm` convention.
-This means it will look at `<project>/node_modules/thing/package.json` and follow the code from there. To
-customize how this works `shadow-cljs` exposes a `:resolve` config option that lets you override how
-things are resolved.
+By default `shadow-cljs` will resolve all `(:require ["thing" :as x])` requires following the `npm` convention. This means it will look at `<project>/node_modules/thing/package.json` and follow the code from there. To customize how this works `shadow-cljs` exposes a `:resolve` config option that lets you override how things are resolved.
 
-IMPORTANT: Currently only the `:shadow` and `:closure` JS Providers support custom resolving configuration. Since `:require` maps directly to JS `require` we can't influence what that does.
+==== Using a CDN [[js-resolve-global]]
 
-==== Using a CDN
-
-Say you already have React included in your page via a CDN. You could just start using `js/React` again
-but we stopped doing that for a good reason. Instead you can continue to use `(:require ["react" :as react])`
-but configure how "react" resolves!
+Say you already have React included in your page via a CDN. You could just start using `js/React` again but we stopped doing that for a good reason. Instead you can continue to use `(:require ["react" :as react])` but configure how "react" resolves!
 
 Here is a sample `shadow-cljs.edn` config for such a build:
 
@@ -156,15 +149,11 @@ Here is a sample `shadow-cljs.edn` config for such a build:
    ...}}}
 ```
 
-The `:app` build will now use the global `React` instance while the `:server` build continues using
-the "react" npm package! No need to fiddle with the code to make this work.
+The `:app` build will now use the global `React` instance while the `:server` build continues using the "react" npm package! No need to fiddle with the code to make this work.
 
-==== Redirecting “require”
+==== Redirecting “require” [[js-resolve-npm]]
 
-Some packages provide multiple “dist” files and sometimes the default one described doesn’t quite work
-in `shadow-cljs`. One good example for this is "d3". Their default "main" points to "build/d3.node.js" but
-that is not what we want when working with the browser. Their ES6 code runs into a bug in the Closure Compiler,
-so we can’t use that. Instead we just redirect the require to some other file:
+Some packages provide multiple “dist” files and sometimes the default one described doesn’t quite work in `shadow-cljs`. One good example for this is "d3". Their default "main" points to "build/d3.node.js" but that is not what we want when working with the browser. Their ES6 code runs into a bug in the Closure Compiler, so we can’t use that. Instead we just redirect the require to some other file:
 
 ```
 {...
@@ -178,6 +167,30 @@ so we can’t use that. Instead we just redirect the require to some other file:
 ```
 
 You can also just `(:require ["d3/build/d3.js" :as d3])` as well if you only care about the Browser.
+
+==== Limitations
+
+The `:shadow-js` and `:closure` have full control over `:resolve` and everything mentioned above works without any downsides. The `:js-provider :require` however is more limited. Only the initial require can be influenced since the standard `require` is in control after that. This means it is not possible to influence what a package might `require` internally. It is therefore not recommended to be used with targets that use `require` directly (eg. `:node-script`).
+
+.Redirecting "react" to "preact"
+```
+{...
+ :builds
+ {:app
+  {:target :node-script
+   ...
+   :js-options
+   {:resolve {"react" {:target :npm
+                       :require "preact"}}}
+```
+.Example use of react-table
+```
+(ns my.app
+  (:require
+    ["react-table" :as rt]))
+```
+
+The above works fine in the Browser since every `"react"` require will be replaced, including the `"react"` require `"react-table"` has internally. For `:js-provider :require` however a `require("react-table")` will be emitted and `node` will be in control how that is resolved. Meaning that it will resolve it to the standard `"react"` and not the `"preact"` we had configured.
 
 == Dealing with .js Files
 
