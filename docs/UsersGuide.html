@@ -3111,7 +3111,7 @@ options for configuring an optional dev-time HTTP server for a build and CSS rel
 <div class="sect3">
 <h4 id="browser-http-server"><a class="anchor" href="#browser-http-server"></a><a class="link" href="#browser-http-server">6.8.2. HTTP Server</a></h4>
 <div class="paragraph">
-<p><code>shadow-cljs</code> can provide a basic HTTP server for your build. By default it will serve all static files from the configured <code>:http-root</code> directory.</p>
+<p><code>shadow-cljs</code> can provide a basic HTTP server for your build. By default it will serve all static files from the configured <code>:http-root</code> directory, and fall back to <code>index.html</code> when a resource is not found (this is what you typically want when developing an application which uses browser push state).</p>
 </div>
 <div class="paragraph">
 <p>The server supports the following options:</p>
@@ -3139,7 +3139,22 @@ If not supplied, no resources are served.</p>
 <dt><code>:http-handler</code></dt>
 <dd>
 <p>Optional. A namespace (as a symbol). A <code>(fn [req] resp)</code> that is used
-if a resource is not found for the given request. Defaults to a not-found handler.</p>
+if a resource is not found for the given request. Defaults to <code>shadow.http.push-state/handle</code>.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>The following two options only apply when using the default, built-in handler:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>:push-state/headers</code></dt>
+<dd>
+<p>(optional) A map of HTTP headers to respond with. Defaults to <code>text/html</code> standard headers.</p>
+</dd>
+<dt class="hdlist1"><code>:push-state/index</code></dt>
+<dd>
+<p>(optional) The file to serve. Defaults to <code>index.html</code>.</p>
 </dd>
 </dl>
 </div>
@@ -3167,48 +3182,6 @@ if a resource is not found for the given request. Defaults to a not-found handle
 <span class="tag">&lt;script</span> <span class="attribute-name">src</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">/js/main.js</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span><span class="tag">&lt;/script&gt;</span>
 <span class="tag">&lt;/body&gt;</span>
 <span class="tag">&lt;/html&gt;</span></code></pre>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_http_and_uri_based_routing_push_state"><a class="anchor" href="#_http_and_uri_based_routing_push_state"></a><a class="link" href="#_http_and_uri_based_routing_push_state">HTTP and URI-based Routing (Push state)</a></h5>
-<div class="paragraph">
-<p>If your browser application uses browser push state then you will typically want
-the server to respond with <code>index.html</code> instead of "Not Found" on URIs that have no
-real resource (so you can just hit browser reload on your SPA even on odd URIs).</p>
-</div>
-<div class="paragraph">
-<p>There is a built-in handler that you can add for this:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
-    {<span class="symbol">:builds</span>
-      {<span class="symbol">:app</span> { <span class="keyword">..</span><span class="keyword">.</span>
-              <span class="symbol">:devtools</span> { <span class="symbol">:http-handler</span> shadow.http.push-state/handle }}}}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>It supports two additional options (in the <code>devtools</code> section):</p>
-</div>
-<div class="hdlist">
-<table>
-<tr>
-<td class="hdlist1">
-<code>:push-state/headers</code>
-</td>
-<td class="hdlist2">
-<p>(optional) A map of HTTP headers to respond with. Defaults to <code>text/html</code> standard headers.</p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
-<code>:push-state/index</code>
-</td>
-<td class="hdlist2">
-<p>(optional) The file to serve. Defaults to <code>index.html</code>.</p>
-</td>
-</tr>
-</table>
 </div>
 </div>
 </div>
