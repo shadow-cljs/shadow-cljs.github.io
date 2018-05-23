@@ -427,7 +427,7 @@ Translated `:pwd`
 
 === HTTP Server [[browser-http-server]]
 
-`shadow-cljs` can provide a basic HTTP server for your build. By default it will serve all static files from the configured `:http-root` directory.
+`shadow-cljs` can provide a basic HTTP server for your build. By default it will serve all static files from the configured `:http-root` directory, and fall back to `index.html` when a resource is not found (this is what you typically want when developing an application which uses browser push state).
 
 The server supports the following options:
 
@@ -439,7 +439,12 @@ no disk files are served.
 `:http-resource-root`:: Optional. A path relative to classpath from which resources can be served.
 If not supplied, no resources are served.
 `:http-handler`:: Optional. A namespace (as a symbol). A `(fn [req] resp)` that is used
-if a resource is not found for the given request. Defaults to a not-found handler.
+if a resource is not found for the given request. Defaults to `shadow.http.push-state/handle`.
+
+The following two options only apply when using the default, built-in handler:
+
+`:push-state/headers`:: (optional) A map of HTTP headers to respond with. Defaults to `text/html` standard headers.
+`:push-state/index`:: (optional) The file to serve. Defaults to `index.html`.
 
 .Typical HTTP config serving the "public" directory under http://localhost:8080
 
@@ -465,27 +470,6 @@ if a resource is not found for the given request. Defaults to a not-found handle
 </body>
 </html>
 ```
-
-==== HTTP and URI-based Routing (Push state)
-
-If your browser application uses browser push state then you will typically want
-the server to respond with `index.html` instead of "Not Found" on URIs that have no
-real resource (so you can just hit browser reload on your SPA even on odd URIs).
-
-There is a built-in handler that you can add for this:
-
-```
-{...
-    {:builds
-      {:app { ...
-              :devtools { :http-handler shadow.http.push-state/handle }}}}
-```
-
-It supports two additional options (in the `devtools` section):
-
-[horizontal]
-`:push-state/headers`:: (optional) A map of HTTP headers to respond with. Defaults to `text/html` standard headers.
-`:push-state/index`:: (optional) The file to serve. Defaults to `index.html`.
 
 === CSS Reloading
 
