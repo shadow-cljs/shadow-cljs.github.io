@@ -165,7 +165,7 @@ files that have been recompiled.  This function *must* by synchronous in nature.
 TIP: If neither `:after-load` nor `:before-load` are set the compiler will only attempt to hot reload the code in the `:browser` target. If you still want hot reloading but don't need any of the callbacks you can set `:autoload true` instead.
 
 
-== Build Hooks
+== Build Hooks [[build-hooks]]
 
 It is sometimes desirable to execute some custom code at a specific stage in the compilation pipeline. `:build-hooks` let you declare which functions should be called and they have full access to the build state at that time. This is quite powerful and opens up many possible tool options.
 
