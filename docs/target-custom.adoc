@@ -16,25 +16,20 @@ In this case :target `build/custom`. The namespace is up to you.
 
 == Example
 
-If your `:source-path` is `["src"]` then create a `src/build.clj`:
+If your `:source-path` is `["src"]` then create a `src/your/build.clj`:
 
 ```
-(ns build
+(ns your.build
   (:require
     [shadow.build :as build]
     [shadow.build.targets.browser :as browser]))
 
-(defn custom [{::build/keys [stage mode config] :as state}]
-  (let [state (browser/process state)]
-    (when (and (= :flush stage) (= :dev mode))
-      (call-rsync))
-    state))
+(defn custom [{::build/keys [build-id stage mode config] :as state}]
+  (prn [:custom build-id mode stage])
+  (browser/process state))
 ```
 
-This would call a call-rsync (undefined here, can do pretty much everything you want here) after every successful
-dev build.
-
-The state is a clojure map representing the full `shadow-build` compiler state.
+This would just print some additional info and otherwise act like a `:browser` build.
 
 // TODO: describe the basics at least...
 
@@ -42,12 +37,12 @@ The state is a clojure map representing the full `shadow-build` compiler state.
 
 The stages are:
 
-- `:init`
+- `:configure`
 - `:compile-prepare`
 - `:compile-finish`
 - `:optimize-prepare` (`:release` only)
 - `:optimize-finish` (`:release` only)
 - `:flush`
 
-When mode is `:dev` the `:init` is only called once. Any of the others may be called
+When mode is `:dev` the `:configure` is only called once. Any of the others may be called
 again (in order) when autobuild is active and files are re-compiled on change.

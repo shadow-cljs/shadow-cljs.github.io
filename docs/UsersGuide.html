@@ -605,10 +605,11 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_lifecycle_hooks">5.2.4. Lifecycle Hooks</a></li>
 </ul>
 </li>
-<li><a href="#_compiler_cache">5.3. Compiler Cache</a></li>
-<li><a href="#closure-defines">5.4. Closure Defines</a></li>
-<li><a href="#compiler-options">5.5. Compiler Options</a></li>
-<li><a href="#_conditional_reading">5.6. Conditional Reading</a></li>
+<li><a href="#_build_hooks">5.3. Build Hooks</a></li>
+<li><a href="#_compiler_cache">5.4. Compiler Cache</a></li>
+<li><a href="#closure-defines">5.5. Closure Defines</a></li>
+<li><a href="#compiler-options">5.6. Compiler Options</a></li>
+<li><a href="#_conditional_reading">5.7. Conditional Reading</a></li>
 </ul>
 </li>
 <li><a href="#target-browser">6. Targeting the Browser</a>
@@ -2086,7 +2087,79 @@ If neither <code>:after-load</code> nor <code>:before-load</code> are set the co
 </div>
 </div>
 <div class="sect2">
-<h3 id="_compiler_cache"><a class="anchor" href="#_compiler_cache"></a><a class="link" href="#_compiler_cache">5.3. Compiler Cache</a></h3>
+<h3 id="_build_hooks"><a class="anchor" href="#_build_hooks"></a><a class="link" href="#_build_hooks">5.3. Build Hooks</a></h3>
+<div class="paragraph">
+<p>It is sometimes desirable to execute some custom code at a specific stage in the compilation pipeline. <code>:build-hooks</code> let you declare which functions should be called and they have full access to the build state at that time. This is quite powerful and opens up many possible tool options.</p>
+</div>
+<div class="paragraph">
+<p>They are configured per build under the <code>:build-hooks</code> key</p>
+</div>
+<div class="listingblock">
+<div class="title">Exampe :build-hooks</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span> {<span class="symbol">:target</span> <span class="keyword">..</span><span class="keyword">.</span>
+        <span class="symbol">:build-hooks</span>
+        [(my.util/hook <span class="integer">1</span> <span class="integer">2</span> <span class="integer">3</span>]
+        <span class="keyword">..</span><span class="keyword">.</span>}}}}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Example hook code</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">my.util</span>)
+
+(<span class="keyword">defn</span> <span class="function">hook</span>
+  {<span class="symbol">:shadow.build/stage</span> <span class="symbol">:flush</span>}
+  [build-state &amp; args]
+  (<span class="keyword">prn</span> [<span class="symbol">:hello-world</span> args])
+  build-state)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This example would call <code>(my.util/hook build-state 1 2 3)</code> after the build completed the <code>:flush</code> stage (ie. written to disk). The example would print <code>[:hello-world (1 2 3)]</code> but please do something more useful in actual hooks.</p>
+</div>
+<div class="paragraph">
+<p>The hook is a just a normal <strong>Clojure</strong> function with some additional metadata. The <code>{:shadow.build/stage :flush}</code> metadata informs the compiler to call this hook for <code>:flush</code> only. You may instead configure <code>{:shadow.build/stages #{:configure :flush}}</code> if the hook should be called in multiple stages. At least one configured stage is required since the hook otherwise would never do anything.</p>
+</div>
+<div class="paragraph">
+<p>All build hooks will the called after the <code>:target</code> work is done. They will receive the <code>build-state</code> (a clojure map with all the current build data) as their first argument and <strong>must</strong> return this <code>build-state</code> modified or unmodified. When using multiple stages you can add additional data to the <code>build-state</code> that later stages can see. It is strongly advised to use namespaced keys only to ensure not accidentally breaking the entire build.</p>
+</div>
+<div class="paragraph">
+<p>The <code>build-state</code> has some important entries which might be useful for your hooks:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>:shadow.build/build-id</code> - the id of the current build (eg. <code>:app</code>)</p>
+</li>
+<li>
+<p><code>:shadow.build/mode</code> - <code>:dev</code> or <code>:release</code></p>
+</li>
+<li>
+<p><code>:shadow.build/stage</code> - the current stage</p>
+</li>
+<li>
+<p><code>:shadow.build/config</code> - the build config. You can either store config data for the hook in the build config directly or pass it as arguments in the hook itself</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+With a running <code>watch</code> all hooks will be called repeatedly for each build. Avoid doing too much work as they can considerably impact your build performance.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_compiler_cache"><a class="anchor" href="#_compiler_cache"></a><a class="link" href="#_compiler_cache">5.4. Compiler Cache</a></h3>
 <div class="paragraph">
 <p><code>shadow-cljs</code> will cache all compilation results by default. The cache is invalidated whenever anything relevant to the individual source files changes (eg. changed compiler setting, changed dependencies, etc.). This greatly improves the developer experience since incremental compilation will be <strong>much</strong> faster than starting from scratch.</p>
 </div>
@@ -2175,7 +2248,7 @@ If neither <code>:after-load</code> nor <code>:before-load</code> are set the co
 </div>
 </div>
 <div class="sect2">
-<h3 id="closure-defines"><a class="anchor" href="#closure-defines"></a><a class="link" href="#closure-defines">5.4. Closure Defines</a></h3>
+<h3 id="closure-defines"><a class="anchor" href="#closure-defines"></a><a class="link" href="#closure-defines">5.5. Closure Defines</a></h3>
 <div class="paragraph">
 <p>The Closure Library &amp; Compiler allow you to define variables that are essentially compile time constants. You can use these to configure certain features of your build. Since the Closure compiler treats these as constants when running <code>:advanced</code> optimizations they are fully supported in the Dead-Code-Elimination passes and can be used to remove certain parts of the code that should not be included in <code>release</code> builds.</p>
 </div>
@@ -2239,7 +2312,7 @@ It is generally safer to use the "disabled" variant as the default since it make
 </div>
 </div>
 <div class="sect2">
-<h3 id="compiler-options"><a class="anchor" href="#compiler-options"></a><a class="link" href="#compiler-options">5.5. Compiler Options</a></h3>
+<h3 id="compiler-options"><a class="anchor" href="#compiler-options"></a><a class="link" href="#compiler-options">5.6. Compiler Options</a></h3>
 <div class="paragraph">
 <p>The CLJS compiler supports several options to influence how some code is generated. For the most part <code>shadow-cljs</code> will pick some good defaults for each <code>:target</code> but you might occasionally want to change some of them.</p>
 </div>
@@ -2362,7 +2435,7 @@ It is generally safer to use the "disabled" variant as the default since it make
 </div>
 </div>
 <div class="sect2">
-<h3 id="_conditional_reading"><a class="anchor" href="#_conditional_reading"></a><a class="link" href="#_conditional_reading">5.6. Conditional Reading</a></h3>
+<h3 id="_conditional_reading"><a class="anchor" href="#_conditional_reading"></a><a class="link" href="#_conditional_reading">5.7. Conditional Reading</a></h3>
 <div class="admonitionblock caution">
 <table>
 <tr>
@@ -4166,28 +4239,22 @@ In this case :target <code>build/custom</code>. The namespace is up to you.</p>
 <div class="sect2">
 <h3 id="_example"><a class="anchor" href="#_example"></a><a class="link" href="#_example">10.1. Example</a></h3>
 <div class="paragraph">
-<p>If your <code>:source-path</code> is <code>["src"]</code> then create a <code>src/build.clj</code>:</p>
+<p>If your <code>:source-path</code> is <code>["src"]</code> then create a <code>src/your/build.clj</code>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">build</span>
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">your.build</span>
   (<span class="symbol">:require</span>
     [shadow.build <span class="symbol">:as</span> build]
     [shadow.build.targets.browser <span class="symbol">:as</span> browser]))
 
-(<span class="keyword">defn</span> <span class="function">custom</span> [{<span class="symbol">::build/keys</span> [stage mode config] <span class="symbol">:as</span> state}]
-  (<span class="keyword">let</span> [state (browser/process state)]
-    (<span class="keyword">when</span> (<span class="keyword">and</span> (<span class="keyword">=</span> <span class="symbol">:flush</span> stage) (<span class="keyword">=</span> <span class="symbol">:dev</span> mode))
-      (call-rsync))
-    state))</code></pre>
+(<span class="keyword">defn</span> <span class="function">custom</span> [{<span class="symbol">::build/keys</span> [build-id stage mode config] <span class="symbol">:as</span> state}]
+  (<span class="keyword">prn</span> [<span class="symbol">:custom</span> build-id mode stage])
+  (browser/process state))</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>This would call a call-rsync (undefined here, can do pretty much everything you want here) after every successful
-dev build.</p>
-</div>
-<div class="paragraph">
-<p>The state is a clojure map representing the full <code>shadow-build</code> compiler state.</p>
+<p>This would just print some additional info and otherwise act like a <code>:browser</code> build.</p>
 </div>
 </div>
 <div class="sect2">
@@ -4198,7 +4265,7 @@ dev build.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><code>:init</code></p>
+<p><code>:configure</code></p>
 </li>
 <li>
 <p><code>:compile-prepare</code></p>
@@ -4218,7 +4285,7 @@ dev build.</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>When mode is <code>:dev</code> the <code>:init</code> is only called once. Any of the others may be called
+<p>When mode is <code>:dev</code> the <code>:configure</code> is only called once. Any of the others may be called
 again (in order) when autobuild is active and files are re-compiled on change.</p>
 </div>
 </div>

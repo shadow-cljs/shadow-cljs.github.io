@@ -164,6 +164,49 @@ files that have been recompiled.  This function *must* by synchronous in nature.
 
 TIP: If neither `:after-load` nor `:before-load` are set the compiler will only attempt to hot reload the code in the `:browser` target. If you still want hot reloading but don't need any of the callbacks you can set `:autoload true` instead.
 
+
+== Build Hooks
+
+It is sometimes desirable to execute some custom code at a specific stage in the compilation pipeline. `:build-hooks` let you declare which functions should be called and they have full access to the build state at that time. This is quite powerful and opens up many possible tool options.
+
+They are configured per build under the `:build-hooks` key
+
+.Exampe :build-hooks
+```clojure
+{...
+ :builds
+ {:app {:target ...
+        :build-hooks
+        [(my.util/hook 1 2 3]
+        ...}}}}
+```
+
+.Example hook code
+```clojure
+(ns my.util)
+
+(defn hook
+  {:shadow.build/stage :flush}
+  [build-state & args]
+  (prn [:hello-world args])
+  build-state)
+```
+
+This example would call `(my.util/hook build-state 1 2 3)` after the build completed the `:flush` stage (ie. written to disk). The example would print `[:hello-world (1 2 3)]` but please do something more useful in actual hooks.
+
+The hook is a just a normal *Clojure* function with some additional metadata. The `{:shadow.build/stage :flush}` metadata informs the compiler to call this hook for `:flush` only. You may instead configure `{:shadow.build/stages #{:configure :flush}}` if the hook should be called in multiple stages. At least one configured stage is required since the hook otherwise would never do anything.
+
+All build hooks will the called after the `:target` work is done. They will receive the `build-state` (a clojure map with all the current build data) as their first argument and *must* return this `build-state` modified or unmodified. When using multiple stages you can add additional data to the `build-state` that later stages can see. It is strongly advised to use namespaced keys only to ensure not accidentally breaking the entire build.
+
+The `build-state` has some important entries which might be useful for your hooks:
+
+- `:shadow.build/build-id` - the id of the current build (eg. `:app`)
+- `:shadow.build/mode` - `:dev` or `:release`
+- `:shadow.build/stage` - the current stage
+- `:shadow.build/config` - the build config. You can either store config data for the hook in the build config directly or pass it as arguments in the hook itself
+
+IMPORTANT: With a running `watch` all hooks will be called repeatedly for each build. Avoid doing too much work as they can considerably impact your build performance.
+
 == Compiler Cache
 
 `shadow-cljs` will cache all compilation results by default. The cache is invalidated whenever anything relevant to the individual source files changes (eg. changed compiler setting, changed dependencies, etc.). This greatly improves the developer experience since incremental compilation will be **much** faster than starting from scratch.
