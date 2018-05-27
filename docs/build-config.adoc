@@ -177,7 +177,7 @@ They are configured per build under the `:build-hooks` key
  :builds
  {:app {:target ...
         :build-hooks
-        [(my.util/hook 1 2 3]
+        [(my.util/hook 1 2 3)]
         ...}}}}
 ```
 
