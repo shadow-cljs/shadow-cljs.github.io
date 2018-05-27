@@ -192,9 +192,9 @@ They are configured per build under the `:build-hooks` key
   build-state)
 ```
 
-This example would call `(my.util/hook build-state 1 2 3)` after the build completed the `:flush` stage (ie. written to disk). The example would print `[:hello-world (1 2 3)]` but please do something more useful in actual hooks.
+This example would call `(my.util/hook build-state 1 2 3)` after the build completed the `:flush` <<compilation-stages, stage>> (ie. written to disk). The example would print `[:hello-world (1 2 3)]` but please do something more useful in actual hooks.
 
-The hook is a just a normal *Clojure* function with some additional metadata. The `{:shadow.build/stage :flush}` metadata informs the compiler to call this hook for `:flush` only. You may instead configure `{:shadow.build/stages #{:configure :flush}}` if the hook should be called in multiple stages. At least one configured stage is required since the hook otherwise would never do anything.
+The hook is a just a normal *Clojure* function with some additional metadata. The `{:shadow.build/stage :flush}` metadata informs the compiler to call this hook for `:flush` only. You may instead configure `{:shadow.build/stages #{:configure :flush}}` if the hook should be called after multiple stages. At least one configured stage is required since the hook otherwise would never do anything.
 
 All build hooks will the called after the `:target` work is done. They will receive the `build-state` (a clojure map with all the current build data) as their first argument and *must* return this `build-state` modified or unmodified. When using multiple stages you can add additional data to the `build-state` that later stages can see. It is strongly advised to use namespaced keys only to ensure not accidentally breaking the entire build.
 
@@ -206,6 +206,20 @@ The `build-state` has some important entries which might be useful for your hook
 - `:shadow.build/config` - the build config. You can either store config data for the hook in the build config directly or pass it as arguments in the hook itself
 
 IMPORTANT: With a running `watch` all hooks will be called repeatedly for each build. Avoid doing too much work as they can considerably impact your build performance.
+
+=== Compilation Stages [[compile-stages]]
+
+The possible stages the `:build-hooks` can use are:
+
+- `:configure` - initial `:target` specific configuration
+- `:compile-prepare` - called before any compilation is done
+- `:compile-finish` - called after all compilation finishes
+- `:optimize-prepare` - called before running the Closure Compiler optimization phase (`:release` only)
+- `:optimize-finish` - called after Closure is done (`:release` only)
+- `:flush` - called after everything was flushed to disk
+
+With a running `watch` the `:configure` is only called once. Any of the others may be called
+again (in order) for each re-compile. The `build-state` will be re-used until the build config changes at which point it will be thrown away and a fresh one will be created.
 
 == Compiler Cache
 

@@ -605,7 +605,11 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_lifecycle_hooks">5.2.4. Lifecycle Hooks</a></li>
 </ul>
 </li>
-<li><a href="#build-hooks">5.3. Build Hooks</a></li>
+<li><a href="#build-hooks">5.3. Build Hooks</a>
+<ul class="sectlevel3">
+<li><a href="#compile-stages">5.3.1. Compilation Stages</a></li>
+</ul>
+</li>
 <li><a href="#_compiler_cache">5.4. Compiler Cache</a></li>
 <li><a href="#closure-defines">5.5. Closure Defines</a></li>
 <li><a href="#compiler-options">5.6. Compiler Options</a></li>
@@ -675,71 +679,65 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 </ul>
 </li>
-<li><a href="#_custom_targets">10. Custom Targets</a>
+<li><a href="#js-deps">10. JavaScript Integration</a>
 <ul class="sectlevel2">
-<li><a href="#_example">10.1. Example</a></li>
-<li><a href="#_compilation_stages">10.2. Compilation Stages</a></li>
+<li><a href="#npm">10.1. NPM</a>
+<ul class="sectlevel3">
+<li><a href="#_using_npm_packages">10.1.1. Using npm packages</a></li>
+<li><a href="#js-provider">10.1.2. Package Provider</a></li>
+<li><a href="#js-resolve">10.1.3. Resolving Packages</a></li>
 </ul>
 </li>
-<li><a href="#js-deps">11. JavaScript Integration</a>
+<li><a href="#classpath-js">10.2. Dealing with .js Files</a>
+<ul class="sectlevel3">
+<li><a href="#_the_classpath">10.2.1. The Classpath</a></li>
+<li><a href="#_requiring_js">10.2.2. Requiring JS</a></li>
+<li><a href="#_language_support">10.2.3. Language Support</a></li>
+<li><a href="#_javascript_dialects">10.2.4. JavaScript Dialects</a></li>
+<li><a href="#_access_cljs_from_js">10.2.5. Access CLJS from JS</a></li>
+</ul>
+</li>
+<li><a href="#cljsjs">10.3. Migrating cljsjs.*</a>
+<ul class="sectlevel3">
+<li><a href="#_why_not_use_cljsjs">10.3.1. Why not use CLJSJS?</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#release">11. Generating Production Code&#8201;&#8212;&#8201;All Targets</a>
 <ul class="sectlevel2">
-<li><a href="#npm">11.1. NPM</a>
+<li><a href="#_release_configuration">11.1. Release Configuration</a>
 <ul class="sectlevel3">
-<li><a href="#_using_npm_packages">11.1.1. Using npm packages</a></li>
-<li><a href="#js-provider">11.1.2. Package Provider</a></li>
-<li><a href="#js-resolve">11.1.3. Resolving Packages</a></li>
+<li><a href="#Optimization">11.1.1. Optimizations</a></li>
+<li><a href="#_release_specific_vs_development_configuration">11.1.2. Release-Specific vs. Development Configuration</a></li>
 </ul>
 </li>
-<li><a href="#classpath-js">11.2. Dealing with .js Files</a>
+<li><a href="#externs">11.2. Externs</a>
 <ul class="sectlevel3">
-<li><a href="#_the_classpath">11.2.1. The Classpath</a></li>
-<li><a href="#_requiring_js">11.2.2. Requiring JS</a></li>
-<li><a href="#_language_support">11.2.3. Language Support</a></li>
-<li><a href="#_javascript_dialects">11.2.4. JavaScript Dialects</a></li>
-<li><a href="#_access_cljs_from_js">11.2.5. Access CLJS from JS</a></li>
-</ul>
-</li>
-<li><a href="#cljsjs">11.3. Migrating cljsjs.*</a>
-<ul class="sectlevel3">
-<li><a href="#_why_not_use_cljsjs">11.3.1. Why not use CLJSJS?</a></li>
+<li><a href="#infer-externs">11.2.1. Externs Inference</a></li>
+<li><a href="#_manual_externs">11.2.2. Manual Externs</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#release">12. Generating Production Code&#8201;&#8212;&#8201;All Targets</a>
+<li><a href="#_editor_integration">12. Editor Integration</a>
 <ul class="sectlevel2">
-<li><a href="#_release_configuration">12.1. Release Configuration</a>
+<li><a href="#_cursive">12.1. Cursive</a></li>
+<li><a href="#cider">12.2. emacs / cider</a></li>
+<li><a href="#_proto_repl_atom">12.3. Proto REPL (Atom)</a></li>
+<li><a href="#_calva_vs_code">12.4. Calva (VS Code)</a>
 <ul class="sectlevel3">
-<li><a href="#Optimization">12.1.1. Optimizations</a></li>
-<li><a href="#_release_specific_vs_development_configuration">12.1.2. Release-Specific vs. Development Configuration</a></li>
-</ul>
-</li>
-<li><a href="#externs">12.2. Externs</a>
-<ul class="sectlevel3">
-<li><a href="#infer-externs">12.2.1. Externs Inference</a></li>
-<li><a href="#_manual_externs">12.2.2. Manual Externs</a></li>
+<li><a href="#_dependencies_2">12.4.1. Dependencies</a></li>
+<li><a href="#_connecting_calva_to_the_repls">12.4.2. Connecting Calva to the REPLs</a></li>
+<li><a href="#_features">12.4.3. Features</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#_editor_integration">13. Editor Integration</a>
+<li><a href="#_what_to_do_when_things_don_t_work">13. What to do when things don’t work?</a></li>
+<li><a href="#_hacking">14. Hacking</a>
 <ul class="sectlevel2">
-<li><a href="#_cursive">13.1. Cursive</a></li>
-<li><a href="#cider">13.2. emacs / cider</a></li>
-<li><a href="#_proto_repl_atom">13.3. Proto REPL (Atom)</a></li>
-<li><a href="#_calva_vs_code">13.4. Calva (VS Code)</a>
-<ul class="sectlevel3">
-<li><a href="#_dependencies_2">13.4.1. Dependencies</a></li>
-<li><a href="#_connecting_calva_to_the_repls">13.4.2. Connecting Calva to the REPLs</a></li>
-<li><a href="#_features">13.4.3. Features</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#_what_to_do_when_things_don_t_work">14. What to do when things don’t work?</a></li>
-<li><a href="#_hacking">15. Hacking</a>
-<ul class="sectlevel2">
-<li><a href="#_patching_libraries">15.1. Patching Libraries</a></li>
+<li><a href="#_patching_libraries">14.1. Patching Libraries</a></li>
 </ul>
 </li>
 </ul>
@@ -2118,10 +2116,10 @@ If neither <code>:after-load</code> nor <code>:before-load</code> are set the co
 </div>
 </div>
 <div class="paragraph">
-<p>This example would call <code>(my.util/hook build-state 1 2 3)</code> after the build completed the <code>:flush</code> stage (ie. written to disk). The example would print <code>[:hello-world (1 2 3)]</code> but please do something more useful in actual hooks.</p>
+<p>This example would call <code>(my.util/hook build-state 1 2 3)</code> after the build completed the <code>:flush</code> <a href="#compilation-stages">stage</a> (ie. written to disk). The example would print <code>[:hello-world (1 2 3)]</code> but please do something more useful in actual hooks.</p>
 </div>
 <div class="paragraph">
-<p>The hook is a just a normal <strong>Clojure</strong> function with some additional metadata. The <code>{:shadow.build/stage :flush}</code> metadata informs the compiler to call this hook for <code>:flush</code> only. You may instead configure <code>{:shadow.build/stages #{:configure :flush}}</code> if the hook should be called in multiple stages. At least one configured stage is required since the hook otherwise would never do anything.</p>
+<p>The hook is a just a normal <strong>Clojure</strong> function with some additional metadata. The <code>{:shadow.build/stage :flush}</code> metadata informs the compiler to call this hook for <code>:flush</code> only. You may instead configure <code>{:shadow.build/stages #{:configure :flush}}</code> if the hook should be called after multiple stages. At least one configured stage is required since the hook otherwise would never do anything.</p>
 </div>
 <div class="paragraph">
 <p>All build hooks will the called after the <code>:target</code> work is done. They will receive the <code>build-state</code> (a clojure map with all the current build data) as their first argument and <strong>must</strong> return this <code>build-state</code> modified or unmodified. When using multiple stages you can add additional data to the <code>build-state</code> that later stages can see. It is strongly advised to use namespaced keys only to ensure not accidentally breaking the entire build.</p>
@@ -2156,6 +2154,38 @@ With a running <code>watch</code> all hooks will be called repeatedly for each b
 </td>
 </tr>
 </table>
+</div>
+<div class="sect3">
+<h4 id="compile-stages"><a class="anchor" href="#compile-stages"></a><a class="link" href="#compile-stages">5.3.1. Compilation Stages</a></h4>
+<div class="paragraph">
+<p>The possible stages the <code>:build-hooks</code> can use are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>:configure</code> - initial <code>:target</code> specific configuration</p>
+</li>
+<li>
+<p><code>:compile-prepare</code> - called before any compilation is done</p>
+</li>
+<li>
+<p><code>:compile-finish</code> - called after all compilation finishes</p>
+</li>
+<li>
+<p><code>:optimize-prepare</code> - called before running the Closure Compiler optimization phase (<code>:release</code> only)</p>
+</li>
+<li>
+<p><code>:optimize-finish</code> - called after Closure is done (<code>:release</code> only)</p>
+</li>
+<li>
+<p><code>:flush</code> - called after everything was flushed to disk</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>With a running <code>watch</code> the <code>:configure</code> is only called once. Any of the others may be called
+again (in order) for each re-compile. The <code>build-state</code> will be re-used until the build config changes at which point it will be thrown away and a fresh one will be created.</p>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -4194,113 +4224,15 @@ HeadlessChrome 0.0.0 (Mac OS X 10.12.6): Executed 1 of 1 SUCCESS (0.007 secs / 0
 </div>
 </div>
 <div class="sect1">
-<h2 id="_custom_targets"><a class="anchor" href="#_custom_targets"></a><a class="link" href="#_custom_targets">10. Custom Targets</a></h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>You might have guess that with so many targets the ecosystem probably allows easy extension.
-Creating custom targets just requires one function. This function receives one argument (the compiler
-state) and must return it after doing its work. This function is called once for each stage of the compilation.</p>
-</div>
-<div class="paragraph">
-<p>The compiler provides three special keys from the <code>shadow.cljs.devtools.compiler</code> namespace:</p>
-</div>
-<div class="hdlist">
-<table>
-<tr>
-<td class="hdlist1">
-<code>shadow.build/config</code>
-</td>
-<td class="hdlist2">
-<p>The build config map from your <code>shadow-cljs.edn</code> file.</p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
-<code>shadow.build/mode</code>
-</td>
-<td class="hdlist2">
-<p>Either <code>:dev</code> or <code>:release</code></p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
-<code>shadow.build/stage</code>
-</td>
-<td class="hdlist2">
-<p>A keyword. See below.</p>
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>To use it, you simply specify the fully qualified name of the function as the :target for your build.
-In this case :target <code>build/custom</code>. The namespace is up to you.</p>
-</div>
-<div class="sect2">
-<h3 id="_example"><a class="anchor" href="#_example"></a><a class="link" href="#_example">10.1. Example</a></h3>
-<div class="paragraph">
-<p>If your <code>:source-path</code> is <code>["src"]</code> then create a <code>src/your/build.clj</code>:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">your.build</span>
-  (<span class="symbol">:require</span>
-    [shadow.build <span class="symbol">:as</span> build]
-    [shadow.build.targets.browser <span class="symbol">:as</span> browser]))
-
-(<span class="keyword">defn</span> <span class="function">custom</span> [{<span class="symbol">::build/keys</span> [build-id stage mode config] <span class="symbol">:as</span> state}]
-  (<span class="keyword">prn</span> [<span class="symbol">:custom</span> build-id mode stage])
-  (browser/process state))</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This would just print some additional info and otherwise act like a <code>:browser</code> build.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_compilation_stages"><a class="anchor" href="#_compilation_stages"></a><a class="link" href="#_compilation_stages">10.2. Compilation Stages</a></h3>
-<div class="paragraph">
-<p>The stages are:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>:configure</code></p>
-</li>
-<li>
-<p><code>:compile-prepare</code></p>
-</li>
-<li>
-<p><code>:compile-finish</code></p>
-</li>
-<li>
-<p><code>:optimize-prepare</code> (<code>:release</code> only)</p>
-</li>
-<li>
-<p><code>:optimize-finish</code> (<code>:release</code> only)</p>
-</li>
-<li>
-<p><code>:flush</code></p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>When mode is <code>:dev</code> the <code>:configure</code> is only called once. Any of the others may be called
-again (in order) when autobuild is active and files are re-compiled on change.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="js-deps"><a class="anchor" href="#js-deps"></a><a class="link" href="#js-deps">11. JavaScript Integration</a></h2>
+<h2 id="js-deps"><a class="anchor" href="#js-deps"></a><a class="link" href="#js-deps">10. JavaScript Integration</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="npm"><a class="anchor" href="#npm"></a><a class="link" href="#npm">11.1. NPM</a></h3>
+<h3 id="npm"><a class="anchor" href="#npm"></a><a class="link" href="#npm">10.1. NPM</a></h3>
 <div class="paragraph">
 <p><a href="https://www.npmjs.com/">npm</a> has come the de-facto standard package manager for JavaScript. Almost all JS libraries can be found there and shadow-cljs provides seamless integration for accessing those packages.</p>
 </div>
 <div class="sect3">
-<h4 id="_using_npm_packages"><a class="anchor" href="#_using_npm_packages"></a><a class="link" href="#_using_npm_packages">11.1.1. Using npm packages</a></h4>
+<h4 id="_using_npm_packages"><a class="anchor" href="#_using_npm_packages"></a><a class="link" href="#_using_npm_packages">10.1.1. Using npm packages</a></h4>
 <div class="paragraph">
 <p>Most npm packages will also include some instructions on how to use the actual code. The “old” CommonJS style just has require calls which translate directly:</p>
 </div>
@@ -4425,7 +4357,7 @@ Some libraries are also packaged in ways  ways that allow you to include only th
 </div>
 </div>
 <div class="sect3">
-<h4 id="js-provider"><a class="anchor" href="#js-provider"></a><a class="link" href="#js-provider">11.1.2. Package Provider</a></h4>
+<h4 id="js-provider"><a class="anchor" href="#js-provider"></a><a class="link" href="#js-provider">10.1.2. Package Provider</a></h4>
 <div class="paragraph">
 <p><code>shadow-cljs</code> supports several different ways to include <code>npm</code> packages into your build. They are configurable via the <code>:js-options :js-provider</code> setting. Each <code>:target</code> usually sets the one appropriate for your build most often you won&#8217;t need to touch this setting.</p>
 </div>
@@ -4476,7 +4408,7 @@ Some libraries are also packaged in ways  ways that allow you to include only th
 </div>
 </div>
 <div class="sect3">
-<h4 id="js-resolve"><a class="anchor" href="#js-resolve"></a><a class="link" href="#js-resolve">11.1.3. Resolving Packages</a></h4>
+<h4 id="js-resolve"><a class="anchor" href="#js-resolve"></a><a class="link" href="#js-resolve">10.1.3. Resolving Packages</a></h4>
 <div class="paragraph">
 <p>By default <code>shadow-cljs</code> will resolve all <code>(:require ["thing" :as x])</code> requires following the <code>npm</code> convention. This means it will look at <code>&lt;project&gt;/node_modules/thing/package.json</code> and follow the code from there. To customize how this works <code>shadow-cljs</code> exposes a <code>:resolve</code> config option that lets you override how things are resolved.</p>
 </div>
@@ -4562,7 +4494,7 @@ Some libraries are also packaged in ways  ways that allow you to include only th
 </div>
 </div>
 <div class="sect2">
-<h3 id="classpath-js"><a class="anchor" href="#classpath-js"></a><a class="link" href="#classpath-js">11.2. Dealing with .js Files</a></h3>
+<h3 id="classpath-js"><a class="anchor" href="#classpath-js"></a><a class="link" href="#classpath-js">10.2. Dealing with .js Files</a></h3>
 <div class="sidebarblock">
 <div class="content">
 <div class="paragraph">
@@ -4580,7 +4512,7 @@ Some libraries are also packaged in ways  ways that allow you to include only th
 <p>There are only a few conventions you need to follow in order for this to work reliably but chances are that you are already doing that anyways.</p>
 </div>
 <div class="sect3">
-<h4 id="_the_classpath"><a class="anchor" href="#_the_classpath"></a><a class="link" href="#_the_classpath">11.2.1. The Classpath</a></h4>
+<h4 id="_the_classpath"><a class="anchor" href="#_the_classpath"></a><a class="link" href="#_the_classpath">10.2.1. The Classpath</a></h4>
 <div class="paragraph">
 <p><code>shadow-cljs</code> uses the Java Virtual Machine (JVM) and its "classpath" when resolving files. This is sort of a virtual filesystem composed of either filesystem directories or <code>.jar</code> files (which basically are just <code>.zip</code> files). This is slightly different from <code>npm</code> where you are always dealing with files.</p>
 </div>
@@ -4604,7 +4536,7 @@ You can not escape this classpath, meaning that if you configured <code>src/main
 </div>
 </div>
 <div class="sect3">
-<h4 id="_requiring_js"><a class="anchor" href="#_requiring_js"></a><a class="link" href="#_requiring_js">11.2.2. Requiring JS</a></h4>
+<h4 id="_requiring_js"><a class="anchor" href="#_requiring_js"></a><a class="link" href="#_requiring_js">10.2.2. Requiring JS</a></h4>
 <div class="paragraph">
 <p>We already covered how <code>npm</code> packages are accessed by their name but on the classpath we access <code>.js</code> files by either a full path or relative to the current namespace.</p>
 </div>
@@ -4664,7 +4596,7 @@ The files must not be physically located in the same directory. The lookup for t
 </div>
 </div>
 <div class="sect3">
-<h4 id="_language_support"><a class="anchor" href="#_language_support"></a><a class="link" href="#_language_support">11.2.3. Language Support</a></h4>
+<h4 id="_language_support"><a class="anchor" href="#_language_support"></a><a class="link" href="#_language_support">10.2.3. Language Support</a></h4>
 <div class="admonitionblock important">
 <table>
 <tr>
@@ -4682,7 +4614,7 @@ It is expected that the classpath only contains JavaScript that can be consumed 
 </div>
 </div>
 <div class="sect3">
-<h4 id="_javascript_dialects"><a class="anchor" href="#_javascript_dialects"></a><a class="link" href="#_javascript_dialects">11.2.4. JavaScript Dialects</a></h4>
+<h4 id="_javascript_dialects"><a class="anchor" href="#_javascript_dialects"></a><a class="link" href="#_javascript_dialects">10.2.4. JavaScript Dialects</a></h4>
 <div class="paragraph">
 <p>Since there are many popular JavaScript dialects (JSX, CoffeeScript, etc) that are not directly parsable by the Closure Compiler we need to pre-process them before putting them onto the classpath. <a href="https://babeljs.io/">babel</a> is commonly used in the JavaScript world so we are going to use <code>babel</code> to process <code>.jsx</code> files as an example here.</p>
 </div>
@@ -4773,7 +4705,7 @@ $ babel src/js --out-dir src/gen --watch</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_access_cljs_from_js"><a class="anchor" href="#_access_cljs_from_js"></a><a class="link" href="#_access_cljs_from_js">11.2.5. Access CLJS from JS</a></h4>
+<h4 id="_access_cljs_from_js"><a class="anchor" href="#_access_cljs_from_js"></a><a class="link" href="#_access_cljs_from_js">10.2.5. Access CLJS from JS</a></h4>
 <div class="paragraph">
 <p>The JS sources can access all your ClojureScript (and the Closure Library) directly by importing their namespaces with a <code>goog:</code> prefix which the Compiler will rewrite to expose the namespace as the default ES6 export.</p>
 </div>
@@ -4800,7 +4732,7 @@ The <code>goog:</code> prefix currently only works for ES6 file. <code>require("
 </div>
 </div>
 <div class="sect2">
-<h3 id="cljsjs"><a class="anchor" href="#cljsjs"></a><a class="link" href="#cljsjs">11.3. Migrating cljsjs.*</a></h3>
+<h3 id="cljsjs"><a class="anchor" href="#cljsjs"></a><a class="link" href="#cljsjs">10.3. Migrating cljsjs.*</a></h3>
 <div class="quoteblock">
 <blockquote>
 <div class="paragraph">
@@ -4849,7 +4781,7 @@ The <code>shadow-cljsjs</code> library only provides the shim files. You’ll st
 </table>
 </div>
 <div class="sect3">
-<h4 id="_why_not_use_cljsjs"><a class="anchor" href="#_why_not_use_cljsjs"></a><a class="link" href="#_why_not_use_cljsjs">11.3.1. Why not use CLJSJS?</a></h4>
+<h4 id="_why_not_use_cljsjs"><a class="anchor" href="#_why_not_use_cljsjs"></a><a class="link" href="#_why_not_use_cljsjs">10.3.1. Why not use CLJSJS?</a></h4>
 <div class="paragraph">
 <p>CLJSJS packages basically just take the package from <code>npm</code> and put them into a <code>.jar</code> and re-publish them via <a href="https://clojars.org">clojars</a>. As a bonus they often bundle Externs. The compiler otherwise does nothing with these files and only prepends them to the generated output.</p>
 </div>
@@ -4873,7 +4805,7 @@ The <code>shadow-cljsjs</code> library only provides the shim files. You’ll st
 </div>
 </div>
 <div class="sect1">
-<h2 id="release"><a class="anchor" href="#release"></a><a class="link" href="#release">12. Generating Production Code&#8201;&#8212;&#8201;All Targets</a></h2>
+<h2 id="release"><a class="anchor" href="#release"></a><a class="link" href="#release">11. Generating Production Code&#8201;&#8212;&#8201;All Targets</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Development mode always outputs individual files for each namespace so that they can be hot loaded
@@ -4892,7 +4824,7 @@ may use <a href="#NameHashing">filename hashing</a> to improve caching character
 </div>
 </div>
 <div class="sect2">
-<h3 id="_release_configuration"><a class="anchor" href="#_release_configuration"></a><a class="link" href="#_release_configuration">12.1. Release Configuration</a></h3>
+<h3 id="_release_configuration"><a class="anchor" href="#_release_configuration"></a><a class="link" href="#_release_configuration">11.1. Release Configuration</a></h3>
 <div class="paragraph">
 <p>Usually you won&#8217;t need to add any extra configuration to create a release version for your build. The default config already captures everything necessary and should only require extra configuration if you want to override the defaults.</p>
 </div>
@@ -4900,7 +4832,7 @@ may use <a href="#NameHashing">filename hashing</a> to improve caching character
 <p>Each <code>:target</code> already provides good defaults optimized for each platform so you&#8217;ll have less to worry about.</p>
 </div>
 <div class="sect3">
-<h4 id="Optimization"><a class="anchor" href="#Optimization"></a><a class="link" href="#Optimization">12.1.1. Optimizations</a></h4>
+<h4 id="Optimization"><a class="anchor" href="#Optimization"></a><a class="link" href="#Optimization">11.1.1. Optimizations</a></h4>
 <div class="paragraph">
 <p>You can choose the optimization level using the <code>:compiler-options</code> section of the configuration:</p>
 </div>
@@ -4943,7 +4875,7 @@ for more information on available optimization levels.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_release_specific_vs_development_configuration"><a class="anchor" href="#_release_specific_vs_development_configuration"></a><a class="link" href="#_release_specific_vs_development_configuration">12.1.2. Release-Specific vs. Development Configuration</a></h4>
+<h4 id="_release_specific_vs_development_configuration"><a class="anchor" href="#_release_specific_vs_development_configuration"></a><a class="link" href="#_release_specific_vs_development_configuration">11.1.2. Release-Specific vs. Development Configuration</a></h4>
 <div class="paragraph">
 <p>If you wish to have separate configuration values in a build when running a release build then you
 can override settings by including a <code>:dev</code> and/or <code>:release</code> section in the build section:</p>
@@ -4970,7 +4902,7 @@ can override settings by including a <code>:dev</code> and/or <code>:release</co
 </div>
 </div>
 <div class="sect2">
-<h3 id="externs"><a class="anchor" href="#externs"></a><a class="link" href="#externs">12.2. Externs</a></h3>
+<h3 id="externs"><a class="anchor" href="#externs"></a><a class="link" href="#externs">11.2. Externs</a></h3>
 <div class="paragraph">
 <p>Since we want builds to be fully optimized by the Closure Compiler <code>:advanced</code> compilation we need to deal with <a href="https://developers.google.com/closure/compiler/docs/api-tutorial3">Externs</a>. Externs represent pieces of code that are not included when doing <code>:advanced</code> compilation. <code>:advanced</code> works by doing whole program optimizations but some code we just won&#8217;t be able to include so Externs inform the Compiler about this code. Without Externs the Compiler may rename or remove some code that it shouldn&#8217;t.</p>
 </div>
@@ -4990,7 +4922,7 @@ Externs are only required for <code>:advanced</code>, they are not required in <
 </table>
 </div>
 <div class="sect3">
-<h4 id="infer-externs"><a class="anchor" href="#infer-externs"></a><a class="link" href="#infer-externs">12.2.1. Externs Inference</a></h4>
+<h4 id="infer-externs"><a class="anchor" href="#infer-externs"></a><a class="link" href="#infer-externs">11.2.1. Externs Inference</a></h4>
 <div class="paragraph">
 <p>To help deal with Externs the <code>shadow-cljs</code> compiler provides enhanced externs inference which can be enabled by setting <code>:infer-externs :auto</code> for your build.</p>
 </div>
@@ -5105,7 +5037,7 @@ Don&#8217;t annotate everything with <code>^js</code>. Sometimes you may be doin
 </div>
 </div>
 <div class="sect3">
-<h4 id="_manual_externs"><a class="anchor" href="#_manual_externs"></a><a class="link" href="#_manual_externs">12.2.2. Manual Externs</a></h4>
+<h4 id="_manual_externs"><a class="anchor" href="#_manual_externs"></a><a class="link" href="#_manual_externs">11.2.2. Manual Externs</a></h4>
 <div class="paragraph">
 <p>Some libraries provide Externs as separate <code>.js</code> files. You can include them into your build via the <code>:externs</code> compiler options.</p>
 </div>
@@ -5138,13 +5070,13 @@ The compiler looks for files relative to the project root first. It will also at
 </div>
 </div>
 <div class="sect1">
-<h2 id="_editor_integration"><a class="anchor" href="#_editor_integration"></a><a class="link" href="#_editor_integration">13. Editor Integration</a></h2>
+<h2 id="_editor_integration"><a class="anchor" href="#_editor_integration"></a><a class="link" href="#_editor_integration">12. Editor Integration</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Unfortunately most editors these days expect you to work with the Leiningen <code>project.clj</code> setup so you might need to use the <a href="#Leiningen">Leiningen integration</a> for them to work properly.</p>
 </div>
 <div class="sect2">
-<h3 id="_cursive"><a class="anchor" href="#_cursive"></a><a class="link" href="#_cursive">13.1. Cursive</a></h3>
+<h3 id="_cursive"><a class="anchor" href="#_cursive"></a><a class="link" href="#_cursive">12.1. Cursive</a></h3>
 <div class="paragraph">
 <p>Cursive does not currently support resolving dependencies via <code>shadow-cljs.edn</code>. You can run <code>shadow-cljs pom</code> to generate a <code>pom.xml</code> and import that using the IntelliJ.</p>
 </div>
@@ -5166,7 +5098,7 @@ The compiler looks for files relative to the project root first. It will also at
 </div>
 </div>
 <div class="sect2">
-<h3 id="cider"><a class="anchor" href="#cider"></a><a class="link" href="#cider">13.2. emacs / cider</a></h3>
+<h3 id="cider"><a class="anchor" href="#cider"></a><a class="link" href="#cider">12.2. emacs / cider</a></h3>
 <div class="paragraph">
 <p><a href="https://github.com/shadow-cljs/shadow-cljs.github.io">HELP WANTED!</a></p>
 </div>
@@ -5175,7 +5107,7 @@ The compiler looks for files relative to the project root first. It will also at
 </div>
 </div>
 <div class="sect2">
-<h3 id="_proto_repl_atom"><a class="anchor" href="#_proto_repl_atom"></a><a class="link" href="#_proto_repl_atom">13.3. Proto REPL (Atom)</a></h3>
+<h3 id="_proto_repl_atom"><a class="anchor" href="#_proto_repl_atom"></a><a class="link" href="#_proto_repl_atom">12.3. Proto REPL (Atom)</a></h3>
 <div class="paragraph">
 <p>Proto REPL is mostly intended for Clojure development so most features do not work for ClojureScript. It is however possible to use it for simple evals.</p>
 </div>
@@ -5221,12 +5153,12 @@ The compiler looks for files relative to the project root first. It will also at
 </div>
 </div>
 <div class="sect2">
-<h3 id="_calva_vs_code"><a class="anchor" href="#_calva_vs_code"></a><a class="link" href="#_calva_vs_code">13.4. Calva (VS Code)</a></h3>
+<h3 id="_calva_vs_code"><a class="anchor" href="#_calva_vs_code"></a><a class="link" href="#_calva_vs_code">12.4. Calva (VS Code)</a></h3>
 <div class="paragraph">
 <p>(Only tested with <code>browser</code> targets so far. Probably works with other targets too.)</p>
 </div>
 <div class="sect3">
-<h4 id="_dependencies_2"><a class="anchor" href="#_dependencies_2"></a><a class="link" href="#_dependencies_2">13.4.1. Dependencies</a></h4>
+<h4 id="_dependencies_2"><a class="anchor" href="#_dependencies_2"></a><a class="link" href="#_dependencies_2">12.4.1. Dependencies</a></h4>
 <div class="paragraph">
 <p>You need VS Code and install the <a href="https://marketplace.visualstudio.com/items?itemName=cospaia.clojure4vscode#overview">Calva</a> extension.</p>
 </div>
@@ -5243,7 +5175,7 @@ The compiler looks for files relative to the project root first. It will also at
 </div>
 </div>
 <div class="sect3">
-<h4 id="_connecting_calva_to_the_repls"><a class="anchor" href="#_connecting_calva_to_the_repls"></a><a class="link" href="#_connecting_calva_to_the_repls">13.4.2. Connecting Calva to the REPLs</a></h4>
+<h4 id="_connecting_calva_to_the_repls"><a class="anchor" href="#_connecting_calva_to_the_repls"></a><a class="link" href="#_connecting_calva_to_the_repls">12.4.2. Connecting Calva to the REPLs</a></h4>
 <div class="paragraph">
 <p>Once that is done start your shadow app. (Using whatever build instead of <code>app</code>.):</p>
 </div>
@@ -5260,7 +5192,7 @@ The compiler looks for files relative to the project root first. It will also at
 </div>
 </div>
 <div class="sect3">
-<h4 id="_features"><a class="anchor" href="#_features"></a><a class="link" href="#_features">13.4.3. Features</a></h4>
+<h4 id="_features"><a class="anchor" href="#_features"></a><a class="link" href="#_features">12.4.3. Features</a></h4>
 <div class="paragraph">
 <p>Some of the things you can now do:</p>
 </div>
@@ -5352,7 +5284,7 @@ The compiler looks for files relative to the project root first. It will also at
 </div>
 </div>
 <div class="sect1">
-<h2 id="_what_to_do_when_things_don_t_work"><a class="anchor" href="#_what_to_do_when_things_don_t_work"></a><a class="link" href="#_what_to_do_when_things_don_t_work">14. What to do when things don’t work?</a></h2>
+<h2 id="_what_to_do_when_things_don_t_work"><a class="anchor" href="#_what_to_do_when_things_don_t_work"></a><a class="link" href="#_what_to_do_when_things_don_t_work">13. What to do when things don’t work?</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Since the JS world is still evolving rapidly and not everyone is using the same way to write and
@@ -5366,10 +5298,10 @@ can usually be solved with custom <code>:resolve</code> configs, but there may a
 </div>
 </div>
 <div class="sect1">
-<h2 id="_hacking"><a class="anchor" href="#_hacking"></a><a class="link" href="#_hacking">15. Hacking</a></h2>
+<h2 id="_hacking"><a class="anchor" href="#_hacking"></a><a class="link" href="#_hacking">14. Hacking</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_patching_libraries"><a class="anchor" href="#_patching_libraries"></a><a class="link" href="#_patching_libraries">15.1. Patching Libraries</a></h3>
+<h3 id="_patching_libraries"><a class="anchor" href="#_patching_libraries"></a><a class="link" href="#_patching_libraries">14.1. Patching Libraries</a></h3>
 <div class="paragraph">
 <p>The <code>shadow-cljs</code> compiler ensures that things on your source paths are compiled first, overriding files from JARs. This means that you can copy a source file from a library, patch it, and include it in your own source directory.</p>
 </div>
@@ -5384,7 +5316,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-05-09 22:32:23 DST
+Last updated 2018-05-27 15:12:37 DST
 </div>
 </div>
 </body>

@@ -449,10 +449,6 @@ include::target-browser-test.adoc[]
 
 include::target-karma.adoc[]
 
-= Custom Targets
-
-include::target-custom.adoc[]
-
 = JavaScript Integration [[js-deps]]
 
 include::js-deps.adoc[]
