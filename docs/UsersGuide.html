@@ -1635,12 +1635,22 @@ shadow-cljs - watching build :app
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
  <span class="symbol">:nrepl</span> {<span class="symbol">:port</span> <span class="integer">9000</span>
-         <span class="symbol">:middleware</span> []} <span class="comment">; list of namespace-qualified symbols</span>
-}</code></pre>
+         <span class="symbol">:middleware</span> []} <span class="comment">; optional list of namespace-qualified symbols</span>
+ <span class="keyword">..</span><span class="keyword">.</span>}</code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>If the popular <a href="https://github.com/clojure-emacs/cider-nrepl">cider-nrepl</a> is found on the classpath it will be added automatically. No additional configuration required.</p>
+</div>
+<div class="paragraph">
+<p>You may configure the namespace you start in when connecting by setting <code>:init-ns</code> in the <code>:nrepl</code> options. It defaults to <code>shadow.user</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:nrepl</span> {<span class="symbol">:init-ns</span> my.repl}
+ <span class="keyword">..</span><span class="keyword">.</span>}</code></pre>
+</div>
 </div>
 <div class="sect4">
 <h5 id="_nrepl_usage"><a class="anchor" href="#_nrepl_usage"></a><a class="link" href="#_nrepl_usage">nREPL Usage</a></h5>
@@ -1649,8 +1659,7 @@ shadow-cljs - watching build :app
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="repl">(require '[shadow.cljs.devtools.api :as shadow])
-(shadow/watch :the-build)
+<pre class="CodeRay highlight"><code data-lang="repl">(shadow/watch :the-build)
 (shadow/nrepl-select :the-build)</code></pre>
 </div>
 </div>
@@ -1661,7 +1670,7 @@ shadow-cljs - watching build :app
 <div class="title">Tip</div>
 </td>
 <td class="content">
-Use <code>:repl/quit</code> to return to Clojure.
+Use <code>:cljs/quit</code> to return to Clojure.
 </td>
 </tr>
 </table>
@@ -5338,7 +5347,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-05-27 15:12:37 DST
+Last updated 2018-05-31 19:11:03 DST
 </div>
 </div>
 </body>

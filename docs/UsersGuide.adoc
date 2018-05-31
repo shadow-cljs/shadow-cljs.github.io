@@ -275,14 +275,23 @@ shadow-cljs - watching build :app
 
 You can configure the port and additional middleware with `shadow-cljs.edn`:
 
-```
+```clojure
 {...
  :nrepl {:port 9000
-         :middleware []} ; list of namespace-qualified symbols
-}
+         :middleware []} ; optional list of namespace-qualified symbols
+ ...}
 ```
 
 If the popular https://github.com/clojure-emacs/cider-nrepl[cider-nrepl] is found on the classpath it will be added automatically. No additional configuration required.
+
+
+You may configure the namespace you start in when connecting by setting `:init-ns` in the `:nrepl` options. It defaults to `shadow.user`.
+
+```clojure
+{...
+ :nrepl {:init-ns my.repl}
+ ...}
+```
 
 ==== nREPL Usage
 
@@ -290,13 +299,11 @@ When connecting to the nREPL server the connection always starts out as a Clojur
 
 
 ```repl
-(require '[shadow.cljs.devtools.api :as shadow])
 (shadow/watch :the-build)
 (shadow/nrepl-select :the-build)
 ```
 
-TIP: Use `:repl/quit` to return to Clojure.
-
+TIP: Use `:cljs/quit` to return to Clojure.
 
 ==== Embedded nREPL Server
 
