@@ -649,8 +649,10 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 <li><a href="#target-node-library">7.2. node.js Libraries</a>
 <ul class="sectlevel3">
-<li><a href="#_exports">7.2.1. Exports</a></li>
-<li><a href="#_full_example">7.2.2. Full Example</a></li>
+<li><a href="#_single_static_default_export">7.2.1. Single static "default" export</a></li>
+<li><a href="#_multiple_static_named_exports">7.2.2. Multiple static named exports</a></li>
+<li><a href="#_dynamic_exports">7.2.3. "Dynamic" exports</a></li>
+<li><a href="#_full_example">7.2.4. Full Example</a></li>
 </ul>
 </li>
 <li><a href="#_creating_code_npm_code_packages">7.3. Creating <code>npm</code> packages</a></li>
@@ -3606,14 +3608,6 @@ The target-specific options are:</p>
 </tr>
 <tr>
 <td class="hdlist1">
-<code>:exports</code>
-</td>
-<td class="hdlist2">
-<p>(required) Either a single namespace-qualified symbol or a map from keywords to namespace-qualified symbols.</p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
 <code>:output-dir</code>
 </td>
 <td class="hdlist2">
@@ -3626,45 +3620,60 @@ The target-specific options are:</p>
 <p>The hot code reload story is similar to <a href="#NodeHotCodeReload">the script target</a>, but may not work as well
 since it cannot as easily control all of the code that is loaded.</p>
 </div>
+<div class="paragraph">
+<p>Controlling what code is actually exported is done via one of the following options:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>:exports</code> -  a map of keyword to fully qualified symbols</p>
+</li>
+<li>
+<p><code>:exports-var</code> - a fully qualified symbol</p>
+</li>
+<li>
+<p><code>:exports-fn</code> - a fully qualified symbol</p>
+</li>
+</ul>
+</div>
 <div class="sect3">
-<h4 id="_exports"><a class="anchor" href="#_exports"></a><a class="link" href="#_exports">7.2.1. Exports</a></h4>
+<h4 id="_single_static_default_export"><a class="anchor" href="#_single_static_default_export"></a><a class="link" href="#_single_static_default_export">7.2.1. Single static "default" export</a></h4>
 <div class="paragraph">
-<p>The <code>:exports</code> option deserves some specific examples. There are two possible ways to specify what should be exported:</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Export a single artifact</p>
-</li>
-<li>
-<p>Export any number of artifacts</p>
-</li>
-</ol>
-</div>
-<div class="paragraph">
-<p>In the first case, you can use a single symbol:</p>
+<p><code>:exports-var</code> will just return whatever is declared under that var. It can point to a <code>defn</code> or normal <code>def</code>.</p>
 </div>
 <div class="listingblock">
-<div class="title">Build configuration with a single export</div>
+<div class="title">Build config using <code>:exports-var</code></div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
- <span class="symbol">:builds</span> {<span class="symbol">:lib</span> {<span class="symbol">:exports</span> demo.ns/f
+ <span class="symbol">:builds</span> {<span class="symbol">:lib</span> {<span class="symbol">:output-to</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">lib.js</span><span class="delimiter">&quot;</span></span>
+                <span class="symbol">:exports-var</span> demo.ns/f
                 <span class="keyword">..</span><span class="keyword">.</span>}}}</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>and the resulting <code>require</code> in Node will give you <strong>that</strong> artifact:</p>
+<div class="listingblock">
+<div class="title">Example CLJS</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">demo.ns</span>)
+
+(<span class="keyword">defn</span> <span class="function">f</span> [<span class="keyword">..</span><span class="keyword">.</span>] <span class="keyword">..</span><span class="keyword">.</span>)
+<span class="comment">;; OR</span>
+(<span class="keyword">def</span> <span class="function">f</span> <span class="error">#</span>js {<span class="symbol">:foo</span> <span class="keyword">..</span><span class="keyword">.</span>})</code></pre>
+</div>
 </div>
 <div class="listingblock">
+<div class="title">Consuming the generated code</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">$ node
-&gt; var f = require('./lib.js');
-f(); // the object I get is exactly what I exported</code></pre>
+&gt; var f = require(2'./lib.js');
+f(); // the actual demo.ns/f function</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>In the second case you supply a map from keyword names to artifacts:</p>
+<p>It is effectively generating <code>module.exports = demo.ns.f;</code></p>
 </div>
+</div>
+<div class="sect3">
+<h4 id="_multiple_static_named_exports"><a class="anchor" href="#_multiple_static_named_exports"></a><a class="link" href="#_multiple_static_named_exports">7.2.2. Multiple static named exports</a></h4>
 <div class="listingblock">
 <div class="title">Build configuration with multiple exports</div>
 <div class="content">
@@ -3687,6 +3696,38 @@ lib.g(); // call demo-ns/f
 lib[&quot;ok?&quot;](); // call another-ns/ok?</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>You can achieve the exact same thing by using <code>:exports-var</code> pointing to a <code>def</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">def</span> <span class="function">exports</span> <span class="error">#</span>js {<span class="symbol">:g</span> f
+                  <span class="keyword">..</span><span class="keyword">.</span>})</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_dynamic_exports"><a class="anchor" href="#_dynamic_exports"></a><a class="link" href="#_dynamic_exports">7.2.3. "Dynamic" exports</a></h4>
+<div class="paragraph">
+<p>In addition you may specify <code>:exports-fn</code> as a fully qualified symbol. This should point to a function with no arguments which should return a JS object (or function). This function will only ever be called ONCE as <code>node</code> caches the return value.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">demo.ns</span>
+  (<span class="symbol">:require</span> [demo.other <span class="symbol">:as</span> other]))
+
+(<span class="keyword">defn</span> <span class="function">generate-exports</span> []
+  <span class="error">#</span>js {<span class="symbol">:hello</span> hello
+       <span class="symbol">:foo</span> other/foo})</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span> {<span class="symbol">:lib</span> {<span class="symbol">:exports-fn</span> demo.ns/generate-exports
+                <span class="keyword">..</span><span class="keyword">.</span>}}}</code></pre>
+</div>
+</div>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -3694,15 +3735,14 @@ lib[&quot;ok?&quot;](); // call another-ns/ok?</code></pre>
 <div class="title">Note</div>
 </td>
 <td class="content">
-The exports config automatically tracks exported symbols and passes them on to the optimization
-stage. This means that anything listed in <code>:exports</code> will not be renamed by Google Closure optimizations.
+The exports config automatically tracks exported symbols and passes them on to the optimization stage. This means that anything listed in <code>:exports</code> will not be renamed by Google Closure optimizations.
 </td>
 </tr>
 </table>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_full_example"><a class="anchor" href="#_full_example"></a><a class="link" href="#_full_example">7.2.2. Full Example</a></h4>
+<h4 id="_full_example"><a class="anchor" href="#_full_example"></a><a class="link" href="#_full_example">7.2.4. Full Example</a></h4>
 <div class="paragraph">
 <p>The example below creates a <code>lib.js</code> file intended to be consumed via the normal Node <code>require</code> mechanism.</p>
 </div>
@@ -3741,8 +3781,7 @@ hello
 </div>
 </div>
 <div class="paragraph">
-<p>As :node-script this will only create the file specified in :output-to. The :exports map maps CLJS vars
-to the name they should be exported to.</p>
+<p>As <code>:node-script</code> this will only create the file specified in <code>:output-to</code>. The <code>:exports</code> map maps CLJS vars to the name they should be exported to.</p>
 </div>
 <div class="admonitionblock note">
 <table>

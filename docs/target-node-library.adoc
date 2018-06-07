@@ -7,37 +7,49 @@ The target-specific options are:
 [horizontal]
 `:target`:: Use :node-library
 `:output-to`:: (required). The path and filename for the generated library.
-`:exports`:: (required) Either a single namespace-qualified symbol or a map from keywords to namespace-qualified symbols.
 `:output-dir`:: (optional). The path for supporting files in development mode. Defaults to a cache directory.
 
 The hot code reload story is similar to <<NodeHotCodeReload, the script target>>, but may not work as well
 since it cannot as easily control all of the code that is loaded.
 
-=== Exports
+Controlling what code is actually exported is done via one of the following options:
 
-The `:exports` option deserves some specific examples. There are two possible ways to specify what should be exported:
+- `:exports` -  a map of keyword to fully qualified symbols
+- `:exports-var` - a fully qualified symbol
+- `:exports-fn` - a fully qualified symbol
 
-. Export a single artifact
-. Export any number of artifacts
+=== Single static "default" export
 
-In the first case, you can use a single symbol:
+`:exports-var` will just return whatever is declared under that var. It can point to a `defn` or normal `def`.
 
-.Build configuration with a single export
+
+
+.Build config using `:exports-var`
 ```
 {...
- :builds {:lib {:exports demo.ns/f
+ :builds {:lib {:output-to "lib.js"
+                :exports-var demo.ns/f
                 ...}}}
 ```
+.Example CLJS
+```
+(ns demo.ns)
 
-and the resulting `require` in Node will give you *that* artifact:
-
-```bash
-$ node
-> var f = require('./lib.js');
-f(); // the object I get is exactly what I exported
+(defn f [...] ...)
+;; OR
+(def f #js {:foo ...})
 ```
 
-In the second case you supply a map from keyword names to artifacts:
+.Consuming the generated code
+```bash
+$ node
+> var f = require(2'./lib.js');
+f(); // the actual demo.ns/f function
+```
+
+It is effectively generating `module.exports = demo.ns.f;`
+
+=== Multiple static named exports
 
 .Build configuration with multiple exports
 ```
@@ -58,8 +70,34 @@ lib.g(); // call demo-ns/f
 lib["ok?"](); // call another-ns/ok?
 ```
 
-NOTE: The exports config automatically tracks exported symbols and passes them on to the optimization
-stage. This means that anything listed in `:exports` will not be renamed by Google Closure optimizations.
+You can achieve the exact same thing by using `:exports-var` pointing to a `def`
+
+```
+(def exports #js {:g f
+                  ...})
+```
+
+=== "Dynamic" exports
+
+In addition you may specify `:exports-fn` as a fully qualified symbol. This should point to a function with no arguments which should return a JS object (or function). This function will only ever be called ONCE as `node` caches the return value.
+
+```clojure
+(ns demo.ns
+  (:require [demo.other :as other]))
+
+(defn generate-exports []
+  #js {:hello hello
+       :foo other/foo})
+```
+
+
+```clojure
+{...
+ :builds {:lib {:exports-fn demo.ns/generate-exports
+                ...}}}
+```
+
+NOTE: The exports config automatically tracks exported symbols and passes them on to the optimization stage. This means that anything listed in `:exports` will not be renamed by Google Closure optimizations.
 
 === Full Example
 
@@ -94,7 +132,6 @@ hello
 'hello'
 ```
 
-As :node-script this will only create the file specified in :output-to. The :exports map maps CLJS vars
-to the name they should be exported to.
+As `:node-script` this will only create the file specified in `:output-to`. The `:exports` map maps CLJS vars to the name they should be exported to.
 
 NOTE: Development mode has the <<NodeModes,same setup>> as for node scripts (extra dependencies).
