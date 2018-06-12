@@ -4369,10 +4369,6 @@ using <code>(:require ["thing" :as thing])</code> and then <code>(thing)</code>.
 </tbody>
 </table>
 <div class="paragraph">
-<p>The <code>:default</code> option is currently only available in <code>shadow-cljs</code>, you can
-<a href="https://dev.clojure.org/jira/browse/CLJS-2376">vote here</a> to hopefully make it standard. You can always use <code>:as alias</code> and then call <code>alias/default</code> if you prefer to stay compatible with standard CLJS in the meantime.</p>
-</div>
-<div class="paragraph">
 <p>Notice that previously we were stuck using bundled code which included a lot of code we didn’t actually need. Now we&#8217;re in a better situation:
 Some libraries are also packaged in ways  ways that allow you to include only the parts you need, leading to much less code in your final build.</p>
 </div>
@@ -4402,6 +4398,36 @@ Some libraries are also packaged in ways  ways that allow you to include only th
   <span class="comment">;; OR one by one</span>
   (<span class="symbol">:require</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">react-virtualized/dist/commonjs/AutoSizer</span><span class="delimiter">&quot;</span></span> <span class="symbol">:default</span> virtual-auto-sizer]
             [<span class="string"><span class="delimiter">&quot;</span><span class="content">react-virtualized/dist/commonjs/List</span><span class="delimiter">&quot;</span></span> <span class="symbol">:default</span> virtual-list]))</code></pre>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_about_default_exports"><a class="anchor" href="#_about_default_exports"></a><a class="link" href="#_about_default_exports">About :default Exports</a></h5>
+<div class="paragraph">
+<p>The <code>:default</code> option is currently only available in <code>shadow-cljs</code>, you can
+<a href="https://dev.clojure.org/jira/browse/CLJS-2376">vote here</a> to hopefully make it standard. You can always use <code>:as alias</code> and then call <code>alias/default</code> if you prefer to stay compatible with standard CLJS in the meantime.</p>
+</div>
+<div class="paragraph">
+<p>Default exports are a new addition in ECMAScript Modules and do not exist in CommonJS code. Sometimes you will see examples of <code>import Foo from "something"</code> when the code is actually CommonJS code. In theses cases <code>(:require ["something" :default Foo])</code> will not work and <code>(:require ["something" :as Foo])</code> must be used instead.</p>
+</div>
+<div class="paragraph">
+<p>If a <code>:require</code> does not seem to work properly it is recommended to try looking at it in the REPL.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">$ shadow-cljs browser-repl (<span class="keyword">or</span> node-repl)
+<span class="keyword">..</span><span class="keyword">.</span>
+[<span class="integer">1</span><span class="error">:</span><span class="integer">1</span>]~cljs.user=&gt; (<span class="keyword">require</span> '[<span class="string"><span class="delimiter">&quot;</span><span class="content">react-tooltip</span><span class="delimiter">&quot;</span></span> <span class="symbol">:as</span> x])
+<span class="predefined-constant">nil</span>
+[<span class="integer">1</span><span class="error">:</span><span class="integer">1</span>]~cljs.user=&gt; x
+<span class="error">#</span>object[e]
+[<span class="integer">1</span><span class="error">:</span><span class="integer">1</span>]~cljs.user=&gt; (goog/typeOf x)
+<span class="string"><span class="delimiter">&quot;</span><span class="content">function</span><span class="delimiter">&quot;</span></span>
+[<span class="integer">1</span><span class="error">:</span><span class="integer">1</span>]~cljs.user=&gt; (js/console.dir x)
+<span class="predefined-constant">nil</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Since printing arbitrary JS objects is not always useful (as seen above) you can use <code>(js/console.dir x)</code> instead to get a more useful reprensentation in the browser console. <code>goog/typeOf</code> may also be useful at times. Since the above example shows <code>"function"</code> using <code>:default</code> would not work since <code>:default</code> basically is just syntax sugar for <code>x/default</code>.</p>
 </div>
 </div>
 </div>

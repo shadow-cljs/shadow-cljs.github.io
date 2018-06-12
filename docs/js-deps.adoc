@@ -62,9 +62,6 @@ The following table can be used for translation:
 |`(:require ["module-name"])`
 |===
 
-The `:default` option is currently only available in `shadow-cljs`, you can
-https://dev.clojure.org/jira/browse/CLJS-2376[vote here] to hopefully make it standard. You can always use `:as alias` and then call `alias/default` if you prefer to stay compatible with standard CLJS in the meantime.
-
 Notice that previously we were stuck using bundled code which included a lot of code we didn’t actually need. Now we're in a better situation:
 Some libraries are also packaged in ways  ways that allow you to include only the parts you need, leading to much less code in your final build.
 
@@ -91,6 +88,30 @@ With our improved support we we can easily translate this to:
   (:require ["react-virtualized/dist/commonjs/AutoSizer" :default virtual-auto-sizer]
             ["react-virtualized/dist/commonjs/List" :default virtual-list]))
 ```
+
+==== About :default Exports
+
+The `:default` option is currently only available in `shadow-cljs`, you can
+https://dev.clojure.org/jira/browse/CLJS-2376[vote here] to hopefully make it standard. You can always use `:as alias` and then call `alias/default` if you prefer to stay compatible with standard CLJS in the meantime.
+
+Default exports are a new addition in ECMAScript Modules and do not exist in CommonJS code. Sometimes you will see examples of `import Foo from "something"` when the code is actually CommonJS code. In theses cases `(:require ["something" :default Foo])` will not work and `(:require ["something" :as Foo])` must be used instead.
+
+If a `:require` does not seem to work properly it is recommended to try looking at it in the REPL.
+
+```
+$ shadow-cljs browser-repl (or node-repl)
+...
+[1:1]~cljs.user=> (require '["react-tooltip" :as x])
+nil
+[1:1]~cljs.user=> x
+#object[e]
+[1:1]~cljs.user=> (goog/typeOf x)
+"function"
+[1:1]~cljs.user=> (js/console.dir x)
+nil
+```
+
+Since printing arbitrary JS objects is not always useful (as seen above) you can use `(js/console.dir x)` instead to get a more useful reprensentation in the browser console. `goog/typeOf` may also be useful at times. Since the above example shows `"function"` using `:default` would not work since `:default` basically is just syntax sugar for `x/default`.
 
 === Package Provider [[js-provider]]
 
