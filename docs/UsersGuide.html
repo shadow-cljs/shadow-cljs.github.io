@@ -726,11 +726,19 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_editor_integration">12. Editor Integration</a>
 <ul class="sectlevel2">
 <li><a href="#_cursive">12.1. Cursive</a></li>
-<li><a href="#cider">12.2. emacs / cider</a></li>
+<li><a href="#cider">12.2. Emacs / CIDER</a>
+<ul class="sectlevel3">
+<li><a href="#_dependencies_2">12.2.1. Dependencies</a></li>
+<li><a href="#_launch_the_server">12.2.2. Launch the server</a></li>
+<li><a href="#_connect_to_cider_for_a_clojure_repl">12.2.3. Connect to CIDER for a Clojure REPL</a></li>
+<li><a href="#_connect_the_javascript_environment">12.2.4. Connect the JavaScript environment</a></li>
+<li><a href="#_launch_the_clojurescript_repl">12.2.5. Launch the ClojureScript REPL</a></li>
+</ul>
+</li>
 <li><a href="#_proto_repl_atom">12.3. Proto REPL (Atom)</a></li>
 <li><a href="#_calva_vs_code">12.4. Calva (VS Code)</a>
 <ul class="sectlevel3">
-<li><a href="#_dependencies_2">12.4.1. Dependencies</a></li>
+<li><a href="#_dependencies_3">12.4.1. Dependencies</a></li>
 <li><a href="#_connecting_calva_to_the_repls">12.4.2. Connecting Calva to the REPLs</a></li>
 <li><a href="#_features">12.4.3. Features</a></li>
 </ul>
@@ -5194,12 +5202,157 @@ global<span class="symbol">:SomeGlobalVariable</span></code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="cider"><a class="anchor" href="#cider"></a><a class="link" href="#cider">12.2. emacs / cider</a></h3>
+<h3 id="cider"><a class="anchor" href="#cider"></a><a class="link" href="#cider">12.2. Emacs / CIDER</a></h3>
 <div class="paragraph">
-<p><a href="https://github.com/shadow-cljs/shadow-cljs.github.io">HELP WANTED!</a></p>
+<p>This section is written for CIDER version 0.17.0 and above. Ensure your Emacs environment has this version of the <code>cider</code> package or later. Refer to the <a href="http://cider.readthedocs.io/en/latest/">CIDER documentation</a> for full installation details.</p>
+</div>
+<div class="sect3">
+<h4 id="_dependencies_2"><a class="anchor" href="#_dependencies_2"></a><a class="link" href="#_dependencies_2">12.2.1. Dependencies</a></h4>
+<div class="paragraph">
+<p>Many of CIDER&#8217;s features require corresponding middleware running in the server. Add CIDER&#8217;s nREPL middleware to the <code>:dependencies</code> entry of <code>shadow-cljs.edn</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">[cider/cider-nrepl <span class="string"><span class="delimiter">&quot;</span><span class="content">0.17.0</span><span class="delimiter">&quot;</span></span>]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_launch_the_server"><a class="anchor" href="#_launch_the_server"></a><a class="link" href="#_launch_the_server">12.2.2. Launch the server</a></h4>
+<div class="paragraph">
+<p>Launch the <code>shadow-cljs</code> server with a build target.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>Launching with the <code>app</code> build target:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ shadow-cljs watch app</code></pre>
+</div>
+</div>
+</div>
 </div>
 <div class="paragraph">
-<p>The generic <a href="#nrepl">nREPL</a> instructions should provide everything required but additional config might be required.</p>
+<p>Look at the startup message for the nREPL port (or see <a href="#nREPL">nREPL</a> for further details):</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>The message to look for will be similar to this one, the port in this case is <code>9462</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">shadow-cljs <span class="keyword">-</span> nrepl running at /0.<span class="float">0.0</span><span class="keyword">.</span><span class="integer">0</span><span class="error">:</span><span class="integer">9462</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_connect_to_cider_for_a_clojure_repl"><a class="anchor" href="#_connect_to_cider_for_a_clojure_repl"></a><a class="link" href="#_connect_to_cider_for_a_clojure_repl">12.2.3. Connect to CIDER for a Clojure REPL</a></h4>
+<div class="paragraph">
+<p>In Emacs, connect to the running nREPL server:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">M-x cider-connect</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Enter the connection details:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="console">Host:</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Enter <code>localhost</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="console">Port for localhost:</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Enter the nREPL port of the shadow-cljs and CIDER will connect to it, displaying a new <code>cider-repl</code> buffer:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="console">shadow.user&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_connect_the_javascript_environment"><a class="anchor" href="#_connect_the_javascript_environment"></a><a class="link" href="#_connect_the_javascript_environment">12.2.4. Connect the JavaScript environment</a></h4>
+<div class="paragraph">
+<p>If you haven&#8217;t already done so, connect a JavaScript runtime to the shadow-cljs server. For example, for browser development, browse to <code><a href="http://localhost:8080" class="bare">http://localhost:8080</a></code>.</p>
+</div>
+<div class="paragraph">
+<p>In the <code>cider-repl</code> buffer, you should see a message:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">JS runtime connected.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_launch_the_clojurescript_repl"><a class="anchor" href="#_launch_the_clojurescript_repl"></a><a class="link" href="#_launch_the_clojurescript_repl">12.2.5. Launch the ClojureScript REPL</a></h4>
+<div class="paragraph">
+<p>Launch the ClojureScript REPL alongside the Clojure REPL connection. Make sure you are in the <code>cider-repl</code> buffer so that Emacs knows which connection to use.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="console">M-x cider-create-sibling-cljs-repl</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>CIDER will prompt you for the type of ClojureScript REPL:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="console">Select ClojureScript REPL type:</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Enter <code>shadow</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="console">Select shadow-cljs build:</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Enter the name of your build target, for example, <code>app</code>.</p>
+</div>
+<div class="paragraph">
+<p>Emacs should now open a new nREPL connection to the <code>shadow-cljs</code> server of its sibling, bootstrapping into a ClojureScript REPL environment:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="console">shadow.user&gt; To quit, type: :cljs/quit
+[:selected :app]
+cljs.repl&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should now be able to eval ClojureScript, jump to the definitions of vars (with <code>cider-find-var</code>) and much more.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>For example, to display an alert in the browser:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="console">cljs.repl&gt; (js/alert &quot;Jurassic Park!&quot;)</code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -5254,7 +5407,7 @@ global<span class="symbol">:SomeGlobalVariable</span></code></pre>
 <p>(Only tested with <code>browser</code> targets so far. Probably works with other targets too.)</p>
 </div>
 <div class="sect3">
-<h4 id="_dependencies_2"><a class="anchor" href="#_dependencies_2"></a><a class="link" href="#_dependencies_2">12.4.1. Dependencies</a></h4>
+<h4 id="_dependencies_3"><a class="anchor" href="#_dependencies_3"></a><a class="link" href="#_dependencies_3">12.4.1. Dependencies</a></h4>
 <div class="paragraph">
 <p>You need VS Code and install the <a href="https://marketplace.visualstudio.com/items?itemName=cospaia.clojure4vscode#overview">Calva</a> extension.</p>
 </div>
@@ -5412,7 +5565,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-05-31 19:11:03 DST
+Last updated 2018-06-13 08:05:38 BST
 </div>
 </div>
 </body>
