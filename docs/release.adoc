@@ -187,3 +187,20 @@ global:SomeGlobalVariable
 ```
 
 In this example the compiler will stop renaming `something.foo()`, `something.bar()`.
+
+
+== Build Report
+
+`shadow-cljs` can generate a detailed report for your `release` builds which includes a detailed breakdown of the included sources and how much they each contributed to the overall size.
+
+A sample report can be found https://code.thheller.com/demos/build-report/huge.html[here].
+
+```bash
+$ npx shadow-cljs run shadow.cljs.build-report <build-id> <path/to/output.html>
+# example
+$ npx shadow-cljs run shadow.cljs.build-report app report.html
+```
+
+The above example will generate a `report.html` in the project directory for the `:app` build.
+
+TIP: The generated `report.html` is entirely self-contained and includes all the required data/js/css. No other external sources are required.
