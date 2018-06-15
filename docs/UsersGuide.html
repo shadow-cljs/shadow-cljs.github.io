@@ -721,6 +721,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_simplified_externs">11.2.3. Simplified Externs</a></li>
 </ul>
 </li>
+<li><a href="#_build_report">11.3. Build Report</a></li>
 </ul>
 </li>
 <li><a href="#_editor_integration">12. Editor Integration</a>
@@ -5171,6 +5172,37 @@ global<span class="symbol">:SomeGlobalVariable</span></code></pre>
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_build_report"><a class="anchor" href="#_build_report"></a><a class="link" href="#_build_report">11.3. Build Report</a></h3>
+<div class="paragraph">
+<p><code>shadow-cljs</code> can generate a detailed report for your <code>release</code> builds which includes a detailed breakdown of the included sources and how much they each contributed to the overall size.</p>
+</div>
+<div class="paragraph">
+<p>A sample report can be found <a href="https://code.thheller.com/demos/build-report/huge.html">here</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ npx shadow-cljs run shadow.cljs.build-report &lt;build-id&gt; &lt;path/to/output.html&gt;
+# example
+$ npx shadow-cljs run shadow.cljs.build-report app report.html</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The above example will generate a <code>report.html</code> in the project directory for the <code>:app</code> build.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+The generated <code>report.html</code> is entirely self-contained and includes all the required data/js/css. No other external sources are required.
+</td>
+</tr>
+</table>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -5565,7 +5597,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-06-13 08:05:38 BST
+Last updated 2018-05-31 19:11:03 DST
 </div>
 </div>
 </body>
