@@ -1366,7 +1366,9 @@ If you exit the Node REPL the <code>node</code> process is also killed!
 <div class="listingblock">
 <div class="title">Running the <code>release</code> function</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">$ shadow-cljs clj-run my.build/release</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">$ shadow-cljs clj-run my.build/release
+# or
+$ shadow-cljs run my.build/release</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1378,7 +1380,7 @@ If you exit the Node REPL the <code>node</code> process is also killed!
 <pre class="CodeRay highlight"><code data-lang="clojure"><span class="keyword">..</span><span class="keyword">.</span>
 (<span class="keyword">defn</span> <span class="function">release</span> [server]
   (shadow/release <span class="symbol">:my-build</span>)
-  (sh <span class="string"><span class="delimiter">&quot;</span><span class="content">rsync</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">-arzt</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">path/to/output-dir</span><span class="delimiter">&quot;</span></span> server)</code></pre>
+  (sh <span class="string"><span class="delimiter">&quot;</span><span class="content">rsync</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">-arzt</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">path/to/output-dir</span><span class="delimiter">&quot;</span></span> server))</code></pre>
 </div>
 </div>
 <div class="listingblock">
@@ -1425,7 +1427,7 @@ When the <a href="#server-mode">server</a> is running the namespace will not be 
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">demo.run</span>
-  (<span class="symbol">:require</span> [shadow.cljs.devtools.api <span class="symbol">:as</span> shadow))
+  (<span class="symbol">:require</span> [shadow.cljs.devtools.api <span class="symbol">:as</span> shadow]))
 
 <span class="comment">;; this fails because a full server instance is missing</span>
 (<span class="keyword">defn</span> <span class="function">foo</span>

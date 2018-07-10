@@ -302,6 +302,8 @@ You can use the `shadow-cljs` CLI to call specific Clojure functions from the co
 .Running the `release` function
 ```bash
 $ shadow-cljs clj-run my.build/release
+# or
+$ shadow-cljs run my.build/release
 ```
 
 You can pass arguments to the invoked functions via the command line.
@@ -311,7 +313,7 @@ You can pass arguments to the invoked functions via the command line.
 ...
 (defn release [server]
   (shadow/release :my-build)
-  (sh "rsync" "-arzt" "path/to/output-dir" server)
+  (sh "rsync" "-arzt" "path/to/output-dir" server))
 ```
 
 .Passing the server from the command line
@@ -334,7 +336,7 @@ If you want to start a `watch` for a given build you need to declare that the fu
 
 ```clojure
 (ns demo.run
-  (:require [shadow.cljs.devtools.api :as shadow))
+  (:require [shadow.cljs.devtools.api :as shadow]))
 
 ;; this fails because a full server instance is missing
 (defn foo
