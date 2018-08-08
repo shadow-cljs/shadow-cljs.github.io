@@ -8,7 +8,7 @@
 :source-highlighter: coderay
 :source-language: clojure
 :toc: left
-:toclevels: 1
+:toclevels: 3
 :sectlinks:
 :sectanchors:
 :leveloffset: 1

@@ -528,20 +528,243 @@ table.CodeRay td.code>pre{padding:0}
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_introduction">1. Introduction</a></li>
-<li><a href="#_installation">2. Installation</a></li>
-<li><a href="#_usage">3. Usage</a></li>
-<li><a href="#_configuration">4. Configuration</a></li>
-<li><a href="#_build_configuration">5. Build Configuration</a></li>
-<li><a href="#target-browser">6. Targeting the Browser</a></li>
-<li><a href="#target-node">7. Targeting node.js</a></li>
-<li><a href="#target-npm-module">8. Embedding in the JS Ecosystem&#8201;&#8212;&#8201;The <code>:npm-module</code> Target</a></li>
-<li><a href="#_testing">9. Testing</a></li>
-<li><a href="#js-deps">10. JavaScript Integration</a></li>
-<li><a href="#release">11. Generating Production Code&#8201;&#8212;&#8201;All Targets</a></li>
-<li><a href="#_editor_integration">12. Editor Integration</a></li>
+<li><a href="#_introduction">1. Introduction</a>
+<ul class="sectlevel2">
+<li><a href="#_high_level_overview">1.1. High-Level Overview</a></li>
+<li><a href="#_basic_workflow">1.2. Basic Workflow</a>
+<ul class="sectlevel3">
+<li><a href="#_development_mode">1.2.1. Development Mode</a></li>
+<li><a href="#_release_mode">1.2.2. Release Mode</a></li>
+</ul>
+</li>
+<li><a href="#_important_concepts">1.3. Important Concepts</a>
+<ul class="sectlevel3">
+<li><a href="#_the_classpath">1.3.1. The Classpath</a></li>
+<li><a href="#_server_mode">1.3.2. Server Mode</a></li>
+<li><a href="#_repl">1.3.3. REPL</a></li>
+</ul>
+</li>
+<li><a href="#_about_this_book">1.4. About this Book</a>
+<ul class="sectlevel3">
+<li><a href="#_work_in_progress">1.4.1. Work in Progress</a></li>
+<li><a href="#_contributing">1.4.2. Contributing</a></li>
+<li><a href="#_conventions_used">1.4.3. Conventions Used</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_installation">2. Installation</a>
+<ul class="sectlevel2">
+<li><a href="#_standalone_via_code_npm_code">2.1. Standalone via <code>npm</code></a></li>
+<li><a href="#_library">2.2. Library</a></li>
+</ul>
+</li>
+<li><a href="#_usage">3. Usage</a>
+<ul class="sectlevel2">
+<li><a href="#_command_line">3.1. Command Line</a>
+<ul class="sectlevel3">
+<li><a href="#server-mode">3.1.1. Server Mode</a></li>
+</ul>
+</li>
+<li><a href="#_build_tool_integration">3.2. Build Tool Integration</a>
+<ul class="sectlevel3">
+<li><a href="#Leiningen">3.2.1. Leiningen</a></li>
+<li><a href="#deps-edn">3.2.2. tools.deps / deps.edn</a></li>
+<li><a href="#_boot">3.2.3. Boot</a></li>
+</ul>
+</li>
+<li><a href="#_clojure_repl">3.3. Clojure REPL</a>
+<ul class="sectlevel3">
+<li><a href="#embedded">3.3.1. Embedded</a></li>
+</ul>
+</li>
+<li><a href="#cljs-repl">3.4. ClojureScript REPL</a>
+<ul class="sectlevel3">
+<li><a href="#_node_repl">3.4.1. Node REPL</a></li>
+</ul>
+</li>
+<li><a href="#clj-run">3.5. Running Clojure Code</a>
+<ul class="sectlevel3">
+<li><a href="#_calling_watch_via_clj_run">3.5.1. Calling watch via clj-run</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_configuration">4. Configuration</a>
+<ul class="sectlevel2">
+<li><a href="#_source_paths">4.1. Source Paths</a></li>
+<li><a href="#_dependencies">4.2. Dependencies</a>
+<ul class="sectlevel3">
+<li><a href="#_clojure_script">4.2.1. Clojure(Script)</a></li>
+<li><a href="#npm-install">4.2.2. JavaScript</a></li>
+</ul>
+</li>
+<li><a href="#_server_options">4.3. Server Options</a>
+<ul class="sectlevel3">
+<li><a href="#nREPL">4.3.1. nREPL</a></li>
+<li><a href="#_ssl">4.3.2. SSL</a></li>
+<li><a href="#http">4.3.3. HTTP(S)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_build_configuration">5. Build Configuration</a>
+<ul class="sectlevel2">
+<li><a href="#_build_target">5.1. Build Target</a></li>
+<li><a href="#devtools">5.2. Development Options</a>
+<ul class="sectlevel3">
+<li><a href="#_repl_2">5.2.1. REPL</a></li>
+<li><a href="#_preloads">5.2.2. Preloads</a></li>
+<li><a href="#_hot_code_reload">5.2.3. Hot Code Reload</a></li>
+<li><a href="#_lifecycle_hooks">5.2.4. Lifecycle Hooks</a></li>
+</ul>
+</li>
+<li><a href="#build-hooks">5.3. Build Hooks</a>
+<ul class="sectlevel3">
+<li><a href="#compile-stages">5.3.1. Compilation Stages</a></li>
+</ul>
+</li>
+<li><a href="#_compiler_cache">5.4. Compiler Cache</a></li>
+<li><a href="#closure-defines">5.5. Closure Defines</a></li>
+<li><a href="#compiler-options">5.6. Compiler Options</a></li>
+<li><a href="#_conditional_reading">5.7. Conditional Reading</a></li>
+</ul>
+</li>
+<li><a href="#target-browser">6. Targeting the Browser</a>
+<ul class="sectlevel2">
+<li><a href="#_output_settings">6.1. Output Settings</a></li>
+<li><a href="#_modules">6.2. Modules</a></li>
+<li><a href="#CodeSplitting">6.3. Code Splitting</a>
+<ul class="sectlevel3">
+<li><a href="#_loading_code_dynamically">6.3.1. Loading code dynamically</a></li>
+</ul>
+</li>
+<li><a href="#output-wrapper">6.4. Output Wrapper</a></li>
+<li><a href="#_web_workers">6.5. Web Workers</a></li>
+<li><a href="#NameHashing">6.6. Cacheable Output</a></li>
+<li><a href="#BrowserManifest">6.7. Output Manifest</a></li>
+<li><a href="#_development_support">6.8. Development Support</a>
+<ul class="sectlevel3">
+<li><a href="#hud">6.8.1. Heads-Up Display (HUD)</a></li>
+<li><a href="#browser-http-server">6.8.2. HTTP Server</a></li>
+<li><a href="#_css_reloading">6.8.3. CSS Reloading</a></li>
+<li><a href="#_proxy_support">6.8.4. Proxy Support</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#target-node">7. Targeting node.js</a>
+<ul class="sectlevel2">
+<li><a href="#target-node-script">7.1. node.js Scripts</a>
+<ul class="sectlevel3">
+<li><a href="#_build_options">7.1.1. Build Options</a></li>
+<li><a href="#NodeHotCodeReload">7.1.2. Hot Code Reload</a></li>
+</ul>
+</li>
+<li><a href="#target-node-library">7.2. node.js Libraries</a>
+<ul class="sectlevel3">
+<li><a href="#_single_static_default_export">7.2.1. Single static "default" export</a></li>
+<li><a href="#_multiple_static_named_exports">7.2.2. Multiple static named exports</a></li>
+<li><a href="#_dynamic_exports">7.2.3. "Dynamic" exports</a></li>
+<li><a href="#_full_example">7.2.4. Full Example</a></li>
+</ul>
+</li>
+<li><a href="#_creating_code_npm_code_packages">7.3. Creating <code>npm</code> packages</a></li>
+</ul>
+</li>
+<li><a href="#target-npm-module">8. Embedding in the JS Ecosystem&#8201;&#8212;&#8201;The <code>:npm-module</code> Target</a>
+<ul class="sectlevel2">
+<li><a href="#_convenience_mode">8.1. Convenience Mode</a></li>
+<li><a href="#_explicit_configuration">8.2. Explicit Configuration</a></li>
+<li><a href="#_working_with_optimizations">8.3. Working with Optimizations</a></li>
+</ul>
+</li>
+<li><a href="#_testing">9. Testing</a>
+<ul class="sectlevel2">
+<li><a href="#target-node-test">9.1. Testing in node.js</a></li>
+<li><a href="#target-browser-test">9.2. Testing in the Browser</a>
+<ul class="sectlevel3">
+<li><a href="#_generated_output_in_code_test_dir_code">9.2.1. Generated output in <code>:test-dir</code></a></li>
+</ul>
+</li>
+<li><a href="#target-karma">9.3. Targeting Tests to Karma for Continuous Integration</a>
+<ul class="sectlevel3">
+<li><a href="#_installing_karma">9.3.1. Installing Karma</a></li>
+<li><a href="#_the_build">9.3.2. The Build</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#js-deps">10. JavaScript Integration</a>
+<ul class="sectlevel2">
+<li><a href="#npm">10.1. NPM</a>
+<ul class="sectlevel3">
+<li><a href="#_using_npm_packages">10.1.1. Using npm packages</a></li>
+<li><a href="#js-provider">10.1.2. Package Provider</a></li>
+<li><a href="#js-resolve">10.1.3. Resolving Packages</a></li>
+</ul>
+</li>
+<li><a href="#classpath-js">10.2. Dealing with .js Files</a>
+<ul class="sectlevel3">
+<li><a href="#_requiring_js">10.2.1. Requiring JS</a></li>
+<li><a href="#_language_support">10.2.2. Language Support</a></li>
+<li><a href="#_javascript_dialects">10.2.3. JavaScript Dialects</a></li>
+<li><a href="#_access_cljs_from_js">10.2.4. Access CLJS from JS</a></li>
+</ul>
+</li>
+<li><a href="#cljsjs">10.3. Migrating cljsjs.*</a>
+<ul class="sectlevel3">
+<li><a href="#_why_not_use_cljsjs">10.3.1. Why not use CLJSJS?</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#release">11. Generating Production Code&#8201;&#8212;&#8201;All Targets</a>
+<ul class="sectlevel2">
+<li><a href="#_release_configuration">11.1. Release Configuration</a>
+<ul class="sectlevel3">
+<li><a href="#Optimization">11.1.1. Optimizations</a></li>
+<li><a href="#_release_specific_vs_development_configuration">11.1.2. Release-Specific vs. Development Configuration</a></li>
+</ul>
+</li>
+<li><a href="#externs">11.2. Externs</a>
+<ul class="sectlevel3">
+<li><a href="#infer-externs">11.2.1. Externs Inference</a></li>
+<li><a href="#_manual_externs">11.2.2. Manual Externs</a></li>
+<li><a href="#_simplified_externs">11.2.3. Simplified Externs</a></li>
+</ul>
+</li>
+<li><a href="#_build_report">11.3. Build Report</a></li>
+</ul>
+</li>
+<li><a href="#_editor_integration">12. Editor Integration</a>
+<ul class="sectlevel2">
+<li><a href="#_cursive">12.1. Cursive</a></li>
+<li><a href="#cider">12.2. Emacs / CIDER</a>
+<ul class="sectlevel3">
+<li><a href="#_dependencies_2">12.2.1. Dependencies</a></li>
+<li><a href="#_launch_the_server">12.2.2. Launch the server</a></li>
+<li><a href="#_connect_to_cider_for_a_clojure_repl">12.2.3. Connect to CIDER for a Clojure REPL</a></li>
+<li><a href="#_connect_the_javascript_environment">12.2.4. Connect the JavaScript environment</a></li>
+<li><a href="#_launch_the_clojurescript_repl">12.2.5. Launch the ClojureScript REPL</a></li>
+</ul>
+</li>
+<li><a href="#_proto_repl_atom">12.3. Proto REPL (Atom)</a></li>
+<li><a href="#_calva_vs_code">12.4. Calva (VS Code)</a>
+<ul class="sectlevel3">
+<li><a href="#_dependencies_3">12.4.1. Dependencies</a></li>
+<li><a href="#_connecting_calva_to_the_repls">12.4.2. Connecting Calva to the REPLs</a></li>
+<li><a href="#_features">12.4.3. Features</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a href="#_what_to_do_when_things_don_t_work">13. What to do when things don’t work?</a></li>
-<li><a href="#_hacking">14. Hacking</a></li>
+<li><a href="#_hacking">14. Hacking</a>
+<ul class="sectlevel2">
+<li><a href="#_patching_libraries">14.1. Patching Libraries</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -5439,7 +5662,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-08-04 15:07:45 DST
+Last updated 2018-08-08 09:58:39 DST
 </div>
 </div>
 </body>
