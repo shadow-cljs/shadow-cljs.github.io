@@ -174,7 +174,7 @@ The `:app` build will now use the global `React` instance while the `:server` bu
 
 ==== Redirecting “require” [[js-resolve-npm]]
 
-Some packages provide multiple “dist” files and sometimes the default one described doesn’t quite work in `shadow-cljs`. One good example for this is "d3". Their default "main" points to "build/d3.node.js" but that is not what we want when working with the browser. Their ES6 code runs into a bug in the Closure Compiler, so we can’t use that. Instead we just redirect the require to some other file:
+Sometimes you wan't more control over which `npm` package is actually used depending on your build. You can "redirect" certain requires from your build config without changing the code. This is often useful if you either don't have access to the sources using such packages or you just want to change it for one build.
 
 ```
 {...
@@ -183,11 +183,9 @@ Some packages provide multiple “dist” files and sometimes the default one de
   {:target :browser
    ...
    :js-options
-   {:resolve {"d3" {:target :npm
-                    :require "d3/build/d3.js"}}}
+   {:resolve {"react" {:target :npm
+                       :require "preact-compat"}}}
 ```
-
-You can also just `(:require ["d3/build/d3.js" :as d3])` as well if you only care about the Browser.
 
 ==== Limitations [[js-resolve-limitations]]
 
@@ -202,7 +200,7 @@ The `:shadow-js` and `:closure` have full control over `:resolve` and everything
    ...
    :js-options
    {:resolve {"react" {:target :npm
-                       :require "preact"}}}
+                       :require "preact-compat"}}}
 ```
 .Example use of react-table
 ```
@@ -226,15 +224,6 @@ We covered how <<npm, npm>> packages are used but you may be working on a codeba
 There are only a few conventions you need to follow in order for this to work reliably but chances are that you are already doing that anyways.
 
 
-=== The Classpath
-
-`shadow-cljs` uses the Java Virtual Machine (JVM) and its "classpath" when resolving files. This is sort of a virtual filesystem composed of either filesystem directories or `.jar` files (which basically are just `.zip` files). This is slightly different from `npm` where you are always dealing with files.
-
-In ClojureScript everything is namespaced and each name is expected to resolve to a file. If you have a `(ns demo.app)` namespace the compiler expects to find a `demo/app.cljs` (or `.cljc`) on the classpath. The classpath will be searched in order until it is found. Suppose you configured the `:source-paths ["src/main" "src/test"]` the compiler will first look in `src/main/demo/app.cljs` and then `src/test/demo/app.cljs`. When the file is not found the JVM will begin looking into the `.jar` files on the classpath. So if there is a `demo/app.cljs` at the root of that "zip" file it will be used instead.
-
-IMPORTANT: You can not escape this classpath, meaning that if you configured `src/main` you cannot get to `src`.
-
-If multiple paths contain the same file only the "first" one is used. Everything in Java and Clojure(Script) is namespaced to avoid such conflicts. Very similar to `npm` where each package must have a unique name.
 
 === Requiring JS
 

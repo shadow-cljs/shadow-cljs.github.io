@@ -1,0 +1,66 @@
+= Introduction
+
+`shadow-cljs` provides everything you need to compile your ClojureScript projects with a focus on simplicity and ease of use. The provided build targets abstract away most of the manual configuration so that you only have to configure the essentials for your build. Each target provides optimal defaults for each environment and get an optimized experience during development and in release builds.
+
+== High-Level Overview
+
+`shadow-cljs` is composed of 2 parts:
+
+- The https://clojars.org/thheller/shadow-cljs[shadow-cljs] Clojure library which handles all the actual work.
+- The https://www.npmjs.com/package/shadow-cljs[shadow-cljs] `npm` package which provides a convenient interface for running most of the build functionality directly from command line.
+
+If desired you can easily integrate the `shadow-cljs` Clojure library into any other Clojure/JVM build tool (eg. https://leiningen.org/[leiningen] or the https://clojure.org/guides/deps_and_cli[Clojure CLI] tools).
+
+It is recommended to use the `npm` package as that provides a more optimized development experience tailored towards CLJS development.
+
+
+== Basic Workflow
+
+When working with `shadow-cljs` you will be defining one or more builds in the `shadow-cljs.edn` configuration file. Each build will have a `:target` property which represents a configuration preset optimized for the target environment (eg. the Browser, a `node.js` application or a Chrome Extension).
+
+Each build can either produce development or release output depending on the command used to trigger the compilation. The standard build commands are: `compile`, `watch` and `release`.
+
+=== Development Mode
+
+You can either `compile` a development build once or run a `watch` process which will monitor your source files and re-compile them automatically (and live-reload the code if desired).
+
+All development builds are optimized for the developer experience with fast feedback cycles and other features like a REPL to directly interact with your running code.
+
+A development build should never be shipped publicly since they can become quite large and may only work on the machine they were compiled on depending on the `:target`.
+
+=== Release Mode
+
+Creating a `release` build will strip out all the development related code and finally run the code through the Closure Compiler. This is an optimizing Compiler for JavaScript which will significantly reduce the overall size of the code.
+
+
+== Important Concepts
+
+There are several important concepts that you should familiarize yourself with when using `shadow-cljs`. They are integral to understanding how everything fits together and how the tool works with your code.
+
+=== The Classpath
+
+`shadow-cljs` uses the Java Virtual Machine (JVM) and its "classpath" when working with files. This is a virtual filesystem composed of many classpath entries. Each entry is either
+
+- A local filesystem directory, managed by `:source-paths` entry in the configuration.
+- Or a `.jar` file, representing Clojure(Script) or JVM libraries. These are compressed archives containing many files (basically just a `.zip` file). These are added by your `:dependencies`.
+
+In the Clojure(Script) everything is namespaced and each name is expected to resolve to a file. If you have a `(ns demo.app)` namespace the compiler expects to find a `demo/app.cljs` (or `.cljc`) on the classpath. The classpath will be searched in order until it is found. Suppose you configured the `:source-paths ["src/main" "src/test"]` the compiler will first look for a `src/main/demo/app.cljs` and then `src/test/demo/app.cljs`. When the file is not found on any source path the JVM will begin looking into the `.jar` files on the classpath. When it finds a `demo/app.cljs` at the root of any of the libraries that file it will be used.
+
+IMPORTANT: When a filename exists multiple times on the classpath then only the first one is used. Everything on the JVM and Clojure(Script) is namespaced to avoid such conflicts. Very similar to `npm` where each package must have a unique name.
+
+It is therefore recommended to be very disciplined about the names you choose and properly namespacing everything. It may seem repetitive to always use `(ns your-company.components.foo)` over `(ns components.foo)` but it will save you from lot of headaches later on.
+
+This is unlike `npm` where the package name itself is never used inside the package itself and only relative paths are used.
+
+
+=== Server Mode
+
+`shadow-cljs` can be started in "server" mode which is required for long-running tasks such as `watch`. A `watch` will implicitly start the server instance if it is not already running. The server will provide the Websocket endpoint that builds will connect to as well as all the other endpoints for nREPL, Socket REPL and the development HTTP servers.
+
+When using the `shadow-cljs` CLI interface all commands will re-use a running server instance JVM instead of starting a new JVM. This is substantially faster since start-up time can be quite slow.
+
+Once the server is running however you only have to restart it whenever your `:dependencies` change and everything else can be done via the REPL.
+
+=== REPL
+
+The REPL is at the heart of all Clojure(Script) development and every CLI command can also be used directly from the REPL as well. It is absolutely worth getting comfortable with the REPL even if the command line may seem more familiar.

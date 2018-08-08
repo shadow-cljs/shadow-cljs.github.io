@@ -528,230 +528,20 @@ table.CodeRay td.code>pre{padding:0}
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_introduction">1. Introduction</a>
-<ul class="sectlevel2">
-<li><a href="#_about_this_book">1.1. About this Book</a>
-<ul class="sectlevel3">
-<li><a href="#_work_in_progress">1.1.1. Work in Progress</a></li>
-<li><a href="#_contributing">1.1.2. Contributing</a></li>
-<li><a href="#_conventions_used">1.1.3. Conventions Used</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#_installation">2. Installation</a>
-<ul class="sectlevel2">
-<li><a href="#_standalone_via_code_npm_code">2.1. Standalone via <code>npm</code></a></li>
-<li><a href="#_library">2.2. Library</a></li>
-</ul>
-</li>
-<li><a href="#_usage">3. Usage</a>
-<ul class="sectlevel2">
-<li><a href="#_command_line">3.1. Command Line</a>
-<ul class="sectlevel3">
-<li><a href="#server-mode">3.1.1. Server Mode</a></li>
-</ul>
-</li>
-<li><a href="#_build_tool_integration">3.2. Build Tool Integration</a>
-<ul class="sectlevel3">
-<li><a href="#Leiningen">3.2.1. Leiningen</a></li>
-<li><a href="#deps-edn">3.2.2. tools.deps / deps.edn</a></li>
-<li><a href="#_boot">3.2.3. Boot</a></li>
-</ul>
-</li>
-<li><a href="#_clojure_repl">3.3. Clojure REPL</a>
-<ul class="sectlevel3">
-<li><a href="#embedded">3.3.1. Embedded</a></li>
-</ul>
-</li>
-<li><a href="#cljs-repl">3.4. ClojureScript REPL</a>
-<ul class="sectlevel3">
-<li><a href="#_node_repl">3.4.1. Node REPL</a></li>
-</ul>
-</li>
-<li><a href="#clj-run">3.5. Running Clojure Code</a>
-<ul class="sectlevel3">
-<li><a href="#_calling_watch_via_clj_run">3.5.1. Calling watch via clj-run</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#_configuration">4. Configuration</a>
-<ul class="sectlevel2">
-<li><a href="#_source_paths">4.1. Source Paths</a></li>
-<li><a href="#_dependencies">4.2. Dependencies</a>
-<ul class="sectlevel3">
-<li><a href="#_clojure_script">4.2.1. Clojure(Script)</a></li>
-<li><a href="#npm-install">4.2.2. JavaScript</a></li>
-</ul>
-</li>
-<li><a href="#_server_options">4.3. Server Options</a>
-<ul class="sectlevel3">
-<li><a href="#nREPL">4.3.1. nREPL</a></li>
-<li><a href="#_ssl">4.3.2. SSL</a></li>
-<li><a href="#http">4.3.3. HTTP(S)</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#_build_configuration">5. Build Configuration</a>
-<ul class="sectlevel2">
-<li><a href="#_build_target">5.1. Build Target</a></li>
-<li><a href="#devtools">5.2. Development Options</a>
-<ul class="sectlevel3">
-<li><a href="#_repl">5.2.1. REPL</a></li>
-<li><a href="#_preloads">5.2.2. Preloads</a></li>
-<li><a href="#_hot_code_reload">5.2.3. Hot Code Reload</a></li>
-<li><a href="#_lifecycle_hooks">5.2.4. Lifecycle Hooks</a></li>
-</ul>
-</li>
-<li><a href="#build-hooks">5.3. Build Hooks</a>
-<ul class="sectlevel3">
-<li><a href="#compile-stages">5.3.1. Compilation Stages</a></li>
-</ul>
-</li>
-<li><a href="#_compiler_cache">5.4. Compiler Cache</a></li>
-<li><a href="#closure-defines">5.5. Closure Defines</a></li>
-<li><a href="#compiler-options">5.6. Compiler Options</a></li>
-<li><a href="#_conditional_reading">5.7. Conditional Reading</a></li>
-</ul>
-</li>
-<li><a href="#target-browser">6. Targeting the Browser</a>
-<ul class="sectlevel2">
-<li><a href="#_output_settings">6.1. Output Settings</a></li>
-<li><a href="#_modules">6.2. Modules</a></li>
-<li><a href="#CodeSplitting">6.3. Code Splitting</a>
-<ul class="sectlevel3">
-<li><a href="#_loading_code_dynamically">6.3.1. Loading code dynamically</a></li>
-</ul>
-</li>
-<li><a href="#output-wrapper">6.4. Output Wrapper</a></li>
-<li><a href="#_web_workers">6.5. Web Workers</a></li>
-<li><a href="#NameHashing">6.6. Cacheable Output</a></li>
-<li><a href="#BrowserManifest">6.7. Output Manifest</a></li>
-<li><a href="#_development_support">6.8. Development Support</a>
-<ul class="sectlevel3">
-<li><a href="#hud">6.8.1. Heads-Up Display (HUD)</a></li>
-<li><a href="#browser-http-server">6.8.2. HTTP Server</a></li>
-<li><a href="#_css_reloading">6.8.3. CSS Reloading</a></li>
-<li><a href="#_proxy_support">6.8.4. Proxy Support</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#target-node">7. Targeting node.js</a>
-<ul class="sectlevel2">
-<li><a href="#target-node-script">7.1. node.js Scripts</a>
-<ul class="sectlevel3">
-<li><a href="#_build_options">7.1.1. Build Options</a></li>
-<li><a href="#NodeHotCodeReload">7.1.2. Hot Code Reload</a></li>
-</ul>
-</li>
-<li><a href="#target-node-library">7.2. node.js Libraries</a>
-<ul class="sectlevel3">
-<li><a href="#_single_static_default_export">7.2.1. Single static "default" export</a></li>
-<li><a href="#_multiple_static_named_exports">7.2.2. Multiple static named exports</a></li>
-<li><a href="#_dynamic_exports">7.2.3. "Dynamic" exports</a></li>
-<li><a href="#_full_example">7.2.4. Full Example</a></li>
-</ul>
-</li>
-<li><a href="#_creating_code_npm_code_packages">7.3. Creating <code>npm</code> packages</a></li>
-</ul>
-</li>
-<li><a href="#target-npm-module">8. Embedding in the JS Ecosystem&#8201;&#8212;&#8201;The <code>:npm-module</code> Target</a>
-<ul class="sectlevel2">
-<li><a href="#_convenience_mode">8.1. Convenience Mode</a></li>
-<li><a href="#_explicit_configuration">8.2. Explicit Configuration</a></li>
-<li><a href="#_working_with_optimizations">8.3. Working with Optimizations</a></li>
-</ul>
-</li>
-<li><a href="#_testing">9. Testing</a>
-<ul class="sectlevel2">
-<li><a href="#target-node-test">9.1. Testing in node.js</a></li>
-<li><a href="#target-browser-test">9.2. Testing in the Browser</a>
-<ul class="sectlevel3">
-<li><a href="#_generated_output_in_code_test_dir_code">9.2.1. Generated output in <code>:test-dir</code></a></li>
-</ul>
-</li>
-<li><a href="#target-karma">9.3. Targeting Tests to Karma for Continuous Integration</a>
-<ul class="sectlevel3">
-<li><a href="#_installing_karma">9.3.1. Installing Karma</a></li>
-<li><a href="#_the_build">9.3.2. The Build</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#js-deps">10. JavaScript Integration</a>
-<ul class="sectlevel2">
-<li><a href="#npm">10.1. NPM</a>
-<ul class="sectlevel3">
-<li><a href="#_using_npm_packages">10.1.1. Using npm packages</a></li>
-<li><a href="#js-provider">10.1.2. Package Provider</a></li>
-<li><a href="#js-resolve">10.1.3. Resolving Packages</a></li>
-</ul>
-</li>
-<li><a href="#classpath-js">10.2. Dealing with .js Files</a>
-<ul class="sectlevel3">
-<li><a href="#_the_classpath">10.2.1. The Classpath</a></li>
-<li><a href="#_requiring_js">10.2.2. Requiring JS</a></li>
-<li><a href="#_language_support">10.2.3. Language Support</a></li>
-<li><a href="#_javascript_dialects">10.2.4. JavaScript Dialects</a></li>
-<li><a href="#_access_cljs_from_js">10.2.5. Access CLJS from JS</a></li>
-</ul>
-</li>
-<li><a href="#cljsjs">10.3. Migrating cljsjs.*</a>
-<ul class="sectlevel3">
-<li><a href="#_why_not_use_cljsjs">10.3.1. Why not use CLJSJS?</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#release">11. Generating Production Code&#8201;&#8212;&#8201;All Targets</a>
-<ul class="sectlevel2">
-<li><a href="#_release_configuration">11.1. Release Configuration</a>
-<ul class="sectlevel3">
-<li><a href="#Optimization">11.1.1. Optimizations</a></li>
-<li><a href="#_release_specific_vs_development_configuration">11.1.2. Release-Specific vs. Development Configuration</a></li>
-</ul>
-</li>
-<li><a href="#externs">11.2. Externs</a>
-<ul class="sectlevel3">
-<li><a href="#infer-externs">11.2.1. Externs Inference</a></li>
-<li><a href="#_manual_externs">11.2.2. Manual Externs</a></li>
-<li><a href="#_simplified_externs">11.2.3. Simplified Externs</a></li>
-</ul>
-</li>
-<li><a href="#_build_report">11.3. Build Report</a></li>
-</ul>
-</li>
-<li><a href="#_editor_integration">12. Editor Integration</a>
-<ul class="sectlevel2">
-<li><a href="#_cursive">12.1. Cursive</a></li>
-<li><a href="#cider">12.2. Emacs / CIDER</a>
-<ul class="sectlevel3">
-<li><a href="#_dependencies_2">12.2.1. Dependencies</a></li>
-<li><a href="#_launch_the_server">12.2.2. Launch the server</a></li>
-<li><a href="#_connect_to_cider_for_a_clojure_repl">12.2.3. Connect to CIDER for a Clojure REPL</a></li>
-<li><a href="#_connect_the_javascript_environment">12.2.4. Connect the JavaScript environment</a></li>
-<li><a href="#_launch_the_clojurescript_repl">12.2.5. Launch the ClojureScript REPL</a></li>
-</ul>
-</li>
-<li><a href="#_proto_repl_atom">12.3. Proto REPL (Atom)</a></li>
-<li><a href="#_calva_vs_code">12.4. Calva (VS Code)</a>
-<ul class="sectlevel3">
-<li><a href="#_dependencies_3">12.4.1. Dependencies</a></li>
-<li><a href="#_connecting_calva_to_the_repls">12.4.2. Connecting Calva to the REPLs</a></li>
-<li><a href="#_features">12.4.3. Features</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><a href="#_introduction">1. Introduction</a></li>
+<li><a href="#_installation">2. Installation</a></li>
+<li><a href="#_usage">3. Usage</a></li>
+<li><a href="#_configuration">4. Configuration</a></li>
+<li><a href="#_build_configuration">5. Build Configuration</a></li>
+<li><a href="#target-browser">6. Targeting the Browser</a></li>
+<li><a href="#target-node">7. Targeting node.js</a></li>
+<li><a href="#target-npm-module">8. Embedding in the JS Ecosystem&#8201;&#8212;&#8201;The <code>:npm-module</code> Target</a></li>
+<li><a href="#_testing">9. Testing</a></li>
+<li><a href="#js-deps">10. JavaScript Integration</a></li>
+<li><a href="#release">11. Generating Production Code&#8201;&#8212;&#8201;All Targets</a></li>
+<li><a href="#_editor_integration">12. Editor Integration</a></li>
 <li><a href="#_what_to_do_when_things_don_t_work">13. What to do when things don’t work?</a></li>
-<li><a href="#_hacking">14. Hacking</a>
-<ul class="sectlevel2">
-<li><a href="#_patching_libraries">14.1. Patching Libraries</a></li>
-</ul>
-</li>
+<li><a href="#_hacking">14. Hacking</a></li>
 </ul>
 </div>
 </div>
@@ -760,65 +550,134 @@ table.CodeRay td.code>pre{padding:0}
 <h2 id="_introduction"><a class="anchor" href="#_introduction"></a><a class="link" href="#_introduction">1. Introduction</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The <code>shadow-cljs</code> compiler provides everything you need to compile your ClojureScript code with a focus on simplicity and ease of use. It augments the official ClojureScript compiler with a number of additional features and enhancements:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Less configuration</p>
-</li>
-<li>
-<p>Deterministic build order</p>
-</li>
-<li>
-<p>More reliable NPM integration</p>
-<div class="ulist">
-<ul>
-<li>
-<p>More likely your favorite JS library will work</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>No need for build-specific source directories</p>
-</li>
-<li>
-<p>Better externs checker</p>
-</li>
-<li>
-<p>Better warning tracker</p>
-</li>
-<li>
-<p>Easier use with js projects</p>
-</li>
-<li>
-<p>Includes hot code reload</p>
-</li>
-<li>
-<p>Smart integration with <code>cljs.test</code> for the browser and CI</p>
-</li>
-<li>
-<p>The built-in development server aggressively fixes browser caching issues</p>
-</li>
-</ul>
+<p><code>shadow-cljs</code> provides everything you need to compile your ClojureScript projects with a focus on simplicity and ease of use. The provided build targets abstract away most of the manual configuration so that you only have to configure the essentials for your build. Each target provides optimal defaults for each environment and get an optimized experience during development and in release builds.</p>
 </div>
 <div class="sect2">
-<h3 id="_about_this_book"><a class="anchor" href="#_about_this_book"></a><a class="link" href="#_about_this_book">1.1. About this Book</a></h3>
+<h3 id="_high_level_overview"><a class="anchor" href="#_high_level_overview"></a><a class="link" href="#_high_level_overview">1.1. High-Level Overview</a></h3>
+<div class="paragraph">
+<p><code>shadow-cljs</code> is composed of 2 parts:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The <a href="https://clojars.org/thheller/shadow-cljs">shadow-cljs</a> Clojure library which handles all the actual work.</p>
+</li>
+<li>
+<p>The <a href="https://www.npmjs.com/package/shadow-cljs">shadow-cljs</a> <code>npm</code> package which provides a convenient interface for running most of the build functionality directly from command line.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>If desired you can easily integrate the <code>shadow-cljs</code> Clojure library into any other Clojure/JVM build tool (eg. <a href="https://leiningen.org/">leiningen</a> or the <a href="https://clojure.org/guides/deps_and_cli">Clojure CLI</a> tools).</p>
+</div>
+<div class="paragraph">
+<p>It is recommended to use the <code>npm</code> package as that provides a more optimized development experience tailored towards CLJS development.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_basic_workflow"><a class="anchor" href="#_basic_workflow"></a><a class="link" href="#_basic_workflow">1.2. Basic Workflow</a></h3>
+<div class="paragraph">
+<p>When working with <code>shadow-cljs</code> you will be defining one or more builds in the <code>shadow-cljs.edn</code> configuration file. Each build will have a <code>:target</code> property which represents a configuration preset optimized for the target environment (eg. the Browser, a <code>node.js</code> application or a Chrome Extension).</p>
+</div>
+<div class="paragraph">
+<p>Each build can either produce development or release output depending on the command used to trigger the compilation. The standard build commands are: <code>compile</code>, <code>watch</code> and <code>release</code>.</p>
+</div>
 <div class="sect3">
-<h4 id="_work_in_progress"><a class="anchor" href="#_work_in_progress"></a><a class="link" href="#_work_in_progress">1.1.1. Work in Progress</a></h4>
+<h4 id="_development_mode"><a class="anchor" href="#_development_mode"></a><a class="link" href="#_development_mode">1.2.1. Development Mode</a></h4>
+<div class="paragraph">
+<p>You can either <code>compile</code> a development build once or run a <code>watch</code> process which will monitor your source files and re-compile them automatically (and live-reload the code if desired).</p>
+</div>
+<div class="paragraph">
+<p>All development builds are optimized for the developer experience with fast feedback cycles and other features like a REPL to directly interact with your running code.</p>
+</div>
+<div class="paragraph">
+<p>A development build should never be shipped publicly since they can become quite large and may only work on the machine they were compiled on depending on the <code>:target</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_release_mode"><a class="anchor" href="#_release_mode"></a><a class="link" href="#_release_mode">1.2.2. Release Mode</a></h4>
+<div class="paragraph">
+<p>Creating a <code>release</code> build will strip out all the development related code and finally run the code through the Closure Compiler. This is an optimizing Compiler for JavaScript which will significantly reduce the overall size of the code.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_important_concepts"><a class="anchor" href="#_important_concepts"></a><a class="link" href="#_important_concepts">1.3. Important Concepts</a></h3>
+<div class="paragraph">
+<p>There are several important concepts that you should familiarize yourself with when using <code>shadow-cljs</code>. They are integral to understanding how everything fits together and how the tool works with your code.</p>
+</div>
+<div class="sect3">
+<h4 id="_the_classpath"><a class="anchor" href="#_the_classpath"></a><a class="link" href="#_the_classpath">1.3.1. The Classpath</a></h4>
+<div class="paragraph">
+<p><code>shadow-cljs</code> uses the Java Virtual Machine (JVM) and its "classpath" when working with files. This is a virtual filesystem composed of many classpath entries. Each entry is either</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A local filesystem directory, managed by <code>:source-paths</code> entry in the configuration.</p>
+</li>
+<li>
+<p>Or a <code>.jar</code> file, representing Clojure(Script) or JVM libraries. These are compressed archives containing many files (basically just a <code>.zip</code> file). These are added by your <code>:dependencies</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In the Clojure(Script) everything is namespaced and each name is expected to resolve to a file. If you have a <code>(ns demo.app)</code> namespace the compiler expects to find a <code>demo/app.cljs</code> (or <code>.cljc</code>) on the classpath. The classpath will be searched in order until it is found. Suppose you configured the <code>:source-paths ["src/main" "src/test"]</code> the compiler will first look for a <code>src/main/demo/app.cljs</code> and then <code>src/test/demo/app.cljs</code>. When the file is not found on any source path the JVM will begin looking into the <code>.jar</code> files on the classpath. When it finds a <code>demo/app.cljs</code> at the root of any of the libraries that file it will be used.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+When a filename exists multiple times on the classpath then only the first one is used. Everything on the JVM and Clojure(Script) is namespaced to avoid such conflicts. Very similar to <code>npm</code> where each package must have a unique name.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>It is therefore recommended to be very disciplined about the names you choose and properly namespacing everything. It may seem repetitive to always use <code>(ns your-company.components.foo)</code> over <code>(ns components.foo)</code> but it will save you from lot of headaches later on.</p>
+</div>
+<div class="paragraph">
+<p>This is unlike <code>npm</code> where the package name itself is never used inside the package itself and only relative paths are used.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_server_mode"><a class="anchor" href="#_server_mode"></a><a class="link" href="#_server_mode">1.3.2. Server Mode</a></h4>
+<div class="paragraph">
+<p><code>shadow-cljs</code> can be started in "server" mode which is required for long-running tasks such as <code>watch</code>. A <code>watch</code> will implicitly start the server instance if it is not already running. The server will provide the Websocket endpoint that builds will connect to as well as all the other endpoints for nREPL, Socket REPL and the development HTTP servers.</p>
+</div>
+<div class="paragraph">
+<p>When using the <code>shadow-cljs</code> CLI interface all commands will re-use a running server instance JVM instead of starting a new JVM. This is substantially faster since start-up time can be quite slow.</p>
+</div>
+<div class="paragraph">
+<p>Once the server is running however you only have to restart it whenever your <code>:dependencies</code> change and everything else can be done via the REPL.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_repl"><a class="anchor" href="#_repl"></a><a class="link" href="#_repl">1.3.3. REPL</a></h4>
+<div class="paragraph">
+<p>The REPL is at the heart of all Clojure(Script) development and every CLI command can also be used directly from the REPL as well. It is absolutely worth getting comfortable with the REPL even if the command line may seem more familiar.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_about_this_book"><a class="anchor" href="#_about_this_book"></a><a class="link" href="#_about_this_book">1.4. About this Book</a></h3>
+<div class="sect3">
+<h4 id="_work_in_progress"><a class="anchor" href="#_work_in_progress"></a><a class="link" href="#_work_in_progress">1.4.1. Work in Progress</a></h4>
 <div class="paragraph">
 <p>This is a work in progress. If you find an error, please submit a PR to fix it, or an issue with details of the problem.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_contributing"><a class="anchor" href="#_contributing"></a><a class="link" href="#_contributing">1.1.2. Contributing</a></h4>
+<h4 id="_contributing"><a class="anchor" href="#_contributing"></a><a class="link" href="#_contributing">1.4.2. Contributing</a></h4>
 <div class="paragraph">
 <p>This source for this book is hosted on <a href="https://github.com/shadow-cljs/shadow-cljs.github.io">Github</a>.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_conventions_used"><a class="anchor" href="#_conventions_used"></a><a class="link" href="#_conventions_used">1.1.3. Conventions Used</a></h4>
+<h4 id="_conventions_used"><a class="anchor" href="#_conventions_used"></a><a class="link" href="#_conventions_used">1.4.3. Conventions Used</a></h4>
 <div class="paragraph">
 <p>There are many examples in this book. Most things used in these should be obvious from their context,
 but to prevent misunderstanding it is important to know the author&#8217;s intentions.</p>
@@ -1907,7 +1766,7 @@ the target you select.</p>
 <p>Each build <code>:target</code> typically provides some development support. They are grouped under the <code>:devtools</code> key for each <code>:build</code>.</p>
 </div>
 <div class="sect3">
-<h4 id="_repl"><a class="anchor" href="#_repl"></a><a class="link" href="#_repl">5.2.1. REPL</a></h4>
+<h4 id="_repl_2"><a class="anchor" href="#_repl_2"></a><a class="link" href="#_repl_2">5.2.1. REPL</a></h4>
 <div class="paragraph">
 <p>When running <code>watch</code> code for the REPL is injected automatically and usually does not require additional configuration. Currently there is one config option that allows configuring which namespace the REPL will start in. It defaults to <code>cljs.user</code>.</p>
 </div>
@@ -4537,7 +4396,7 @@ Some libraries are also packaged in ways  ways that allow you to include only th
 <div class="sect4">
 <h5 id="js-resolve-npm"><a class="anchor" href="#js-resolve-npm"></a><a class="link" href="#js-resolve-npm">Redirecting “require”</a></h5>
 <div class="paragraph">
-<p>Some packages provide multiple “dist” files and sometimes the default one described doesn’t quite work in <code>shadow-cljs</code>. One good example for this is "d3". Their default "main" points to "build/d3.node.js" but that is not what we want when working with the browser. Their ES6 code runs into a bug in the Closure Compiler, so we can’t use that. Instead we just redirect the require to some other file:</p>
+<p>Sometimes you wan&#8217;t more control over which <code>npm</code> package is actually used depending on your build. You can "redirect" certain requires from your build config without changing the code. This is often useful if you either don&#8217;t have access to the sources using such packages or you just want to change it for one build.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -4547,12 +4406,9 @@ Some libraries are also packaged in ways  ways that allow you to include only th
   {<span class="symbol">:target</span> <span class="symbol">:browser</span>
    <span class="keyword">..</span><span class="keyword">.</span>
    <span class="symbol">:js-options</span>
-   {<span class="symbol">:resolve</span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">d3</span><span class="delimiter">&quot;</span></span> {<span class="symbol">:target</span> <span class="symbol">:npm</span>
-                    <span class="symbol">:require</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">d3/build/d3.js</span><span class="delimiter">&quot;</span></span>}}}</code></pre>
+   {<span class="symbol">:resolve</span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">react</span><span class="delimiter">&quot;</span></span> {<span class="symbol">:target</span> <span class="symbol">:npm</span>
+                       <span class="symbol">:require</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">preact-compat</span><span class="delimiter">&quot;</span></span>}}}</code></pre>
 </div>
-</div>
-<div class="paragraph">
-<p>You can also just <code>(:require ["d3/build/d3.js" :as d3])</code> as well if you only care about the Browser.</p>
 </div>
 </div>
 <div class="sect4">
@@ -4570,7 +4426,7 @@ Some libraries are also packaged in ways  ways that allow you to include only th
    <span class="keyword">..</span><span class="keyword">.</span>
    <span class="symbol">:js-options</span>
    {<span class="symbol">:resolve</span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">react</span><span class="delimiter">&quot;</span></span> {<span class="symbol">:target</span> <span class="symbol">:npm</span>
-                       <span class="symbol">:require</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">preact</span><span class="delimiter">&quot;</span></span>}}}</code></pre>
+                       <span class="symbol">:require</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">preact-compat</span><span class="delimiter">&quot;</span></span>}}}</code></pre>
 </div>
 </div>
 <div class="listingblock">
@@ -4606,31 +4462,7 @@ Some libraries are also packaged in ways  ways that allow you to include only th
 <p>There are only a few conventions you need to follow in order for this to work reliably but chances are that you are already doing that anyways.</p>
 </div>
 <div class="sect3">
-<h4 id="_the_classpath"><a class="anchor" href="#_the_classpath"></a><a class="link" href="#_the_classpath">10.2.1. The Classpath</a></h4>
-<div class="paragraph">
-<p><code>shadow-cljs</code> uses the Java Virtual Machine (JVM) and its "classpath" when resolving files. This is sort of a virtual filesystem composed of either filesystem directories or <code>.jar</code> files (which basically are just <code>.zip</code> files). This is slightly different from <code>npm</code> where you are always dealing with files.</p>
-</div>
-<div class="paragraph">
-<p>In ClojureScript everything is namespaced and each name is expected to resolve to a file. If you have a <code>(ns demo.app)</code> namespace the compiler expects to find a <code>demo/app.cljs</code> (or <code>.cljc</code>) on the classpath. The classpath will be searched in order until it is found. Suppose you configured the <code>:source-paths ["src/main" "src/test"]</code> the compiler will first look in <code>src/main/demo/app.cljs</code> and then <code>src/test/demo/app.cljs</code>. When the file is not found the JVM will begin looking into the <code>.jar</code> files on the classpath. So if there is a <code>demo/app.cljs</code> at the root of that "zip" file it will be used instead.</p>
-</div>
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Important</div>
-</td>
-<td class="content">
-You can not escape this classpath, meaning that if you configured <code>src/main</code> you cannot get to <code>src</code>.
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>If multiple paths contain the same file only the "first" one is used. Everything in Java and Clojure(Script) is namespaced to avoid such conflicts. Very similar to <code>npm</code> where each package must have a unique name.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_requiring_js"><a class="anchor" href="#_requiring_js"></a><a class="link" href="#_requiring_js">10.2.2. Requiring JS</a></h4>
+<h4 id="_requiring_js"><a class="anchor" href="#_requiring_js"></a><a class="link" href="#_requiring_js">10.2.1. Requiring JS</a></h4>
 <div class="paragraph">
 <p>We already covered how <code>npm</code> packages are accessed by their name but on the classpath we access <code>.js</code> files by either a full path or relative to the current namespace.</p>
 </div>
@@ -4690,7 +4522,7 @@ The files must not be physically located in the same directory. The lookup for t
 </div>
 </div>
 <div class="sect3">
-<h4 id="_language_support"><a class="anchor" href="#_language_support"></a><a class="link" href="#_language_support">10.2.3. Language Support</a></h4>
+<h4 id="_language_support"><a class="anchor" href="#_language_support"></a><a class="link" href="#_language_support">10.2.2. Language Support</a></h4>
 <div class="admonitionblock important">
 <table>
 <tr>
@@ -4708,7 +4540,7 @@ It is expected that the classpath only contains JavaScript that can be consumed 
 </div>
 </div>
 <div class="sect3">
-<h4 id="_javascript_dialects"><a class="anchor" href="#_javascript_dialects"></a><a class="link" href="#_javascript_dialects">10.2.4. JavaScript Dialects</a></h4>
+<h4 id="_javascript_dialects"><a class="anchor" href="#_javascript_dialects"></a><a class="link" href="#_javascript_dialects">10.2.3. JavaScript Dialects</a></h4>
 <div class="paragraph">
 <p>Since there are many popular JavaScript dialects (JSX, CoffeeScript, etc) that are not directly parsable by the Closure Compiler we need to pre-process them before putting them onto the classpath. <a href="https://babeljs.io/">babel</a> is commonly used in the JavaScript world so we are going to use <code>babel</code> to process <code>.jsx</code> files as an example here.</p>
 </div>
@@ -4799,7 +4631,7 @@ $ babel src/js --out-dir src/gen --watch</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_access_cljs_from_js"><a class="anchor" href="#_access_cljs_from_js"></a><a class="link" href="#_access_cljs_from_js">10.2.5. Access CLJS from JS</a></h4>
+<h4 id="_access_cljs_from_js"><a class="anchor" href="#_access_cljs_from_js"></a><a class="link" href="#_access_cljs_from_js">10.2.4. Access CLJS from JS</a></h4>
 <div class="paragraph">
 <p>The JS sources can access all your ClojureScript (and the Closure Library) directly by importing their namespaces with a <code>goog:</code> prefix which the Compiler will rewrite to expose the namespace as the default ES6 export.</p>
 </div>
@@ -5607,7 +5439,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-05-31 19:11:03 DST
+Last updated 2018-08-04 15:07:45 DST
 </div>
 </div>
 </body>
