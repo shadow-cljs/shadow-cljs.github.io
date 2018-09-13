@@ -103,6 +103,7 @@ You will need:
 - https://nodejs.org[`node.js`] (v6.0.0+, most recent version preferred)
 - https://www.npmjs.com[`npm`] or https://www.yarnpkg.com[`yarn`]
 - Java SDK (Version 8). http://openjdk.java.net/install/[OpenJDK] or http://www.oracle.com/technetwork/java/javase/downloads/index.html[Oracle]
+- On GNU/Linux, you may also need to install JavaFX/OpenJFX and Java ATK Wrapper as those may not be included by default
 
 .NPM
 ```bash
