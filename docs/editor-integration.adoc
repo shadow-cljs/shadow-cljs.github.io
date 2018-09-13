@@ -9,7 +9,7 @@ Alternatively you can create a dummy `project.clj` or use the full <<Leiningen, 
 ```
 (defproject your/project "0.0.0"
   :dependencies
-  [[thheller/shadow-cljs "2.0.150"]]
+  [[thheller/shadow-cljs "X.Y.Z"]]
 
   :source-paths
   ["src"])
@@ -19,14 +19,22 @@ You can run `npx shadow-cljs server` inside the Terminal provided by IntelliJ an
 
 == Emacs / CIDER [[cider]]
 
-This section is written for CIDER version 0.17.0 and above. Ensure your Emacs environment has this version of the `cider` package or later. Refer to the link:http://cider.readthedocs.io/en/latest/[CIDER documentation] for full installation details.
+This section is written for CIDER version 0.18.0 and above. Ensure your Emacs environment has this version of the `cider` package or later. Refer to the link:http://cider.readthedocs.io/en/latest/[CIDER documentation] for full installation details.
 
 === Dependencies
 
 Many of CIDER's features require corresponding middleware running in the server. Add CIDER's nREPL middleware to the `:dependencies` entry of `shadow-cljs.edn`:
 
 ```clojure
-[cider/cider-nrepl "0.17.0"]
+[cider/cider-nrepl "0.18.0"]
+```
+
+If you instead don't want to pollute your project files, you can add an alias to the global `$HOME/.clojure/deps.edn`:
+
+```clojure
+...
+:aliases {:nrepl {:extra-deps {cider/cider-nrepl {:mvn/version "0.18.0"}}}
+...
 ```
 
 === Launch the server
@@ -48,6 +56,14 @@ The message to look for will be similar to this one, the port in this case is `9
 
 ```
 shadow-cljs - nrepl running at /0.0.0.0:9462
+```
+====
+
+====
+You can include `deps.edn` aliases with the -A command line parameter
+
+```bash
+$ shadow-cljs watch app -A:nrepl
 ```
 ====
 
