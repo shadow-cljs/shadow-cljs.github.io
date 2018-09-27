@@ -4087,7 +4087,7 @@ renaming an artifact.</p>
 <code>:autorun</code>
 </td>
 <td class="hdlist2">
-<p>(boolean, optional) Run the tests via <code>node</code> when a build completes</p>
+<p>(boolean, optional) Run the tests via <code>node</code> when a build completes. This is mostly meant to be used in combination with <code>watch</code>. The <code>node</code> process exit code will not be returned and that would have to forcefully kill the running JVM.</p>
 </td>
 </tr>
 <tr>
@@ -4122,7 +4122,10 @@ renaming an artifact.</p>
 $ shadow-cljs release test
 
 # run tests manually, :autorun will do this automatically
-$ node out/node-tests.js</code></pre>
+$ node out/node-tests.js
+
+# compile &amp; test combined
+$ shadow-cljs compile test &amp;&amp; node out/node-tests.js</code></pre>
 </div>
 </div>
 <div class="paragraph">
