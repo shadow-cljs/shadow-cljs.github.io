@@ -6,7 +6,7 @@ The relevant configuration options are:
 `:target`::    `:node-test`
 `:output-to`:: The final output file that will be used to run tests.
 `:ns-regexp`:: (optional) A regular expression matching namespaces against project files. This only scans files, and will not scan jars. Defaults to `"-test$"`.
-`:autorun`:: (boolean, optional) Run the tests via `node` when a build completes
+`:autorun`:: (boolean, optional) Run the tests via `node` when a build completes. Note that the exit code is zero even if some tests failed.
 `:main`:: (qualified symbol, optional) Function called on startup to run the tests, defaults to `shadow.test.node/main` which runs tests using `cljs.test`.
 
 .Test config matching all `*-spec` namespaces
