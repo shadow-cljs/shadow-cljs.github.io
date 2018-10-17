@@ -268,7 +268,7 @@ You can configure the port and additional middleware with `shadow-cljs.edn`:
  ...}
 ```
 
-If the popular https://github.com/clojure-emacs/cider-nrepl[cider-nrepl] is found on the classpath it will be added automatically. No additional configuration required.
+If the popular middleware https://github.com/clojure-emacs/cider-nrepl[cider-nrepl] is found on the classpath (e.g. it's included in `:dependencies`), it will be used automatically. No additional configuration required.
 
 
 You may configure the namespace you start in when connecting by setting `:init-ns` in the `:nrepl` options. It defaults to `shadow.user`.
