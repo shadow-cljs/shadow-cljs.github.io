@@ -29,14 +29,6 @@ Many of CIDER's features require corresponding middleware running in the server.
 [cider/cider-nrepl "0.18.0"]
 ```
 
-If you instead don't want to pollute your project files, you can add an alias to the global `$HOME/.clojure/deps.edn`:
-
-```clojure
-...
-:aliases {:nrepl {:extra-deps {cider/cider-nrepl {:mvn/version "0.18.0"}}}
-...
-```
-
 === Launch the server
 
 Launch the `shadow-cljs` server with a build target.
@@ -186,7 +178,7 @@ You need VS Code and install the https://marketplace.visualstudio.com/items?item
 Since Calva uses nRepl and Cider you need to include this dependency in `shadow-cljs.edn`:
 
 ```clojure
-[cider/cider-nrepl "0.16.0"]
+[cider/cider-nrepl "0.18.0"]
 ```
 
 `shadow-cljs` will inject the required `cider-nrepl` middleware once it sees this dependency.
