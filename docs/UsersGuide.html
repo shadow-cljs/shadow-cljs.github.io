@@ -649,6 +649,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#browser-http-server">6.8.2. HTTP Server</a></li>
 <li><a href="#_css_reloading">6.8.3. CSS Reloading</a></li>
 <li><a href="#_proxy_support">6.8.4. Proxy Support</a></li>
+<li><a href="#_reverse_proxy_support">6.8.5. Reverse Proxy Support</a></li>
 </ul>
 </li>
 </ul>
@@ -2782,6 +2783,14 @@ to generate the Javascript filename. Module <code>:main</code> will generate <co
 </tr>
 <tr>
 <td class="hdlist1">
+<code>:init-fn</code>
+</td>
+<td class="hdlist2">
+<p>Fully qualified symbol pointing to a function that should be called when the module is loaded initially.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
 <code>:depends-on</code>
 </td>
 <td class="hdlist2">
@@ -2833,7 +2842,18 @@ to generate the Javascript filename. Module <code>:main</code> will generate <co
  {<span class="symbol">:app</span> {<span class="symbol">:target</span> <span class="symbol">:browser</span>
         <span class="symbol">:output-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public/js</span><span class="delimiter">&quot;</span></span>
         <span class="keyword">..</span><span class="keyword">.</span>
-        <span class="symbol">:modules</span> {<span class="symbol">:main</span> {<span class="symbol">:entries</span> [my.app.main]}}}}}</code></pre>
+        <span class="symbol">:modules</span> {<span class="symbol">:main</span> {<span class="symbol">:entries</span> [my.app]}}}}}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Example :browser config with :init-fn</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span> {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+        <span class="symbol">:output-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public/js</span><span class="delimiter">&quot;</span></span>
+        <span class="keyword">..</span><span class="keyword">.</span>
+        <span class="symbol">:modules</span> {<span class="symbol">:main</span> {<span class="symbol">:init-fn</span> my.app/init}}}}}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3481,6 +3501,49 @@ The requests must be forwarded to the main <a href="#http">HTTP server</a>, not 
 </td>
 </tr>
 </table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_reverse_proxy_support"><a class="anchor" href="#_reverse_proxy_support"></a><a class="link" href="#_reverse_proxy_support">6.8.5. Reverse Proxy Support</a></h4>
+<div class="paragraph">
+<p>By default the dev server will attempt to serve requests locally but sometimes you want to use an external web server to serve requests (eg. API request). This can be configured via <code>:proxy-url</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span> {<span class="keyword">..</span><span class="keyword">.</span>
+        <span class="symbol">:devtools</span> {<span class="symbol">:proxy-url</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">https://some.host</span><span class="delimiter">&quot;</span></span>
+                   <span class="symbol">:http-root</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public</span><span class="delimiter">&quot;</span></span>
+                   <span class="symbol">:http-port</span> <span class="integer">8000</span>
+                   <span class="keyword">..</span><span class="keyword">.</span>}}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A request going to <code><a href="http://localhost:8000/api/foo" class="bare">http://localhost:8000/api/foo</a></code> will serve the content returned by <code><a href="https://some.host/api/foo" class="bare">https://some.host/api/foo</a></code> instead. All request that do not have a local file will be served by the proxied server.</p>
+</div>
+<div class="paragraph">
+<p>Additional optional Options to configure the connection handling are:</p>
+</div>
+<div class="dlist Horizontal">
+<dl>
+<dt><code>:proxy-rewrite-host-header</code></dt>
+<dd>
+<p>boolean, defaults to true. Determines whether the original Host header will be used or the one from the <code>:proxy-url</code>. <code>localhost</code> vs <code>some.host</code> using the example above.</p>
+</dd>
+<dt><code>:proxy-reuse-x-forwarded</code></dt>
+<dd>
+<p>boolean, defaults to false. Configures if the proxy should add itself to <code>X-Forwarded-For</code> list or start a new one.</p>
+</dd>
+<dt><code>:proxy-max-connection-retries</code></dt>
+<dd>
+<p>int, defaults to 1.</p>
+</dd>
+<dt><code>:proxy-max-request-time</code></dt>
+<dd>
+<p>ms as int, defaults to 30000. 30sec request timeout.</p>
+</dd>
+</dl>
 </div>
 </div>
 </div>

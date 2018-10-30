@@ -56,6 +56,7 @@ The available options in a module are:
 
 [horizontal]
 `:entries`:: The namespaces that serve as the root nodes of the dependency graph for the output code of this module.
+`:init-fn`:: Fully qualified symbol pointing to a function that should be called when the module is loaded initially.
 `:depends-on`:: The names of other modules that must be loaded in order for this one to have everything it needs.
 `:prepend`:: String content that will be prepended to the js output. Useful for comments, copyright notice, etc.
 `:append`:: String content that will be appended to the js output. Useful for comments, copyright notice, etc.
@@ -71,7 +72,17 @@ The following example shows a minimum module configuration:
  {:app {:target :browser
         :output-dir "public/js"
         ...
-        :modules {:main {:entries [my.app.main]}}}}}
+        :modules {:main {:entries [my.app]}}}}}
+```
+
+.Example :browser config with :init-fn
+```
+{...
+ :builds
+ {:app {:target :browser
+        :output-dir "public/js"
+        ...
+        :modules {:main {:init-fn my.app/init}}}}}
 ```
 
 `shadow-cljs` will follow the dependency graph from the root set of code entry points in the `:entries`
@@ -534,3 +545,27 @@ http://localhost:9630/foo/bar?asdf
 The client will make WebSocket request as well as normal XHR requests to load files. Ensure that your proxy properly upgrades WebSockets.
 
 IMPORTANT: The requests must be forwarded to the main <<http, HTTP server>>, not the one configured in the build itself.
+
+=== Reverse Proxy Support
+
+By default the dev server will attempt to serve requests locally but sometimes you want to use an external web server to serve requests (eg. API request). This can be configured via `:proxy-url`.
+
+```
+{...
+ :builds
+ {:app {...
+        :devtools {:proxy-url "https://some.host"
+                   :http-root "public"
+                   :http-port 8000
+                   ...}}}}
+```
+
+A request going to `http://localhost:8000/api/foo` will serve the content returned by `https://some.host/api/foo` instead. All request that do not have a local file will be served by the proxied server.
+
+
+Additional optional Options to configure the connection handling are:
+[Horizontal]
+`:proxy-rewrite-host-header`:: boolean, defaults to true. Determines whether the original Host header will be used or the one from the `:proxy-url`. `localhost` vs `some.host` using the example above.
+`:proxy-reuse-x-forwarded`:: boolean, defaults to false. Configures if the proxy should add itself to `X-Forwarded-For` list or start a new one.
+`:proxy-max-connection-retries`:: int, defaults to 1.
+`:proxy-max-request-time`:: ms as int, defaults to 30000. 30sec request timeout.
