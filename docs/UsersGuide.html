@@ -4150,7 +4150,7 @@ renaming an artifact.</p>
 <code>:autorun</code>
 </td>
 <td class="hdlist2">
-<p>(boolean, optional) Run the tests via <code>node</code> when a build completes. This is mostly meant to be used in combination with <code>watch</code>. The <code>node</code> process exit code will not be returned and that would have to forcefully kill the running JVM.</p>
+<p>(boolean, optional) Run the tests via <code>node</code> when a build completes. This is mostly meant to be used in combination with <code>watch</code>. The <code>node</code> process exit code will not be returned as that would have to forcefully kill the running JVM.</p>
 </td>
 </tr>
 <tr>
@@ -4192,7 +4192,7 @@ $ shadow-cljs compile test &amp;&amp; node out/node-tests.js</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The <code>node</code> process exit code will be set to <code>0</code> when successful and <code>1</code> on any failures.</p>
+<p>The <code>node</code> process exit code will be set to <code>0</code> when successful and <code>1</code> on any failures. (The <code>node</code> process exit code will not be returned when using <code>:autorun</code>.)</p>
 </div>
 </div>
 <div class="sect2">
