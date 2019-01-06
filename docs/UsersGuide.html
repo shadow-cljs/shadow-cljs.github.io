@@ -735,7 +735,8 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_simplified_externs">11.2.3. Simplified Externs</a></li>
 </ul>
 </li>
-<li><a href="#_build_report">11.3. Build Report</a></li>
+<li><a href="#_code_stripping">11.3. Code Stripping</a></li>
+<li><a href="#_build_report">11.4. Build Report</a></li>
 </ul>
 </li>
 <li><a href="#_editor_integration">12. Editor Integration</a>
@@ -5304,7 +5305,55 @@ global<span class="symbol">:SomeGlobalVariable</span></code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_build_report"><a class="anchor" href="#_build_report"></a><a class="link" href="#_build_report">11.3. Build Report</a></h3>
+<h3 id="_code_stripping"><a class="anchor" href="#_code_stripping"></a><a class="link" href="#_code_stripping">11.3. Code Stripping</a></h3>
+<div class="paragraph">
+<p>The Closure Compiler supports removing unwanted code by name. This allows removing code that normal dead-code removal can&#8217;t or won&#8217;t remove. This is quite dangerous as it can remove code you actually care about but it can remove a lot of dev only code easily. It is grouped into 4 separate options of which pretty much only <code>:strip-type-prefixes</code> is relevant to ClojureScript but other may be useful as well.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example removing all uses of <code>cljs.pprint</code></div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span>
+  {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+   <span class="keyword">..</span><span class="keyword">.</span>
+   <span class="symbol">:compiler-options</span> {<span class="symbol">:strip-type-prefixes</span> #{<span class="string"><span class="delimiter">&quot;</span><span class="content">cljs.pprint</span><span class="delimiter">&quot;</span></span>}
+   }}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Each of these options is specified as a Set of Strings. Please note that all the names specified here are JS names so certain CLJS names must be munged. <code>my-lib.core</code> becomes <code>my_lib.core</code>.</p>
+</div>
+<div class="dlist Horizontal">
+<dl>
+<dt><code>:strip-types</code></dt>
+<dd>
+<p>Allows removing deftype/defrecord declarations or uses. <code>#{"my.ns.FooBar}</code> removes <code>(defrecord FooBar [])</code>.</p>
+</dd>
+<dt><code>:strip-type-prefixes</code></dt>
+<dd>
+<p>Removes everything starting with any of the given Prefixes. Allows removing entire CLJS namespaces.</p>
+</dd>
+<dt><code>:strip-name-prefixes</code></dt>
+<dd>
+<p>Allows removing properties by prefix. <code>#{"log"}</code> removes <code>this.logX</code> or <code>(defn log-me [&#8230;&#8203;])</code></p>
+</dd>
+<dt><code>:strip-name-suffixes</code></dt>
+<dd>
+<p>Allows removing properties by suffix. <code>#{"log"}</code> removes <code>this.myLog</code> or <code>(defn my-log [&#8230;&#8203;])</code></p>
+</dd>
+</dl>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p><strong>DANGER: Be careful with these options. They apply to your entire build and may remove code you actually need. You may accidentally remove code in libraries not written by you. Always consider other options before using this.</strong></p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_build_report"><a class="anchor" href="#_build_report"></a><a class="link" href="#_build_report">11.4. Build Report</a></h3>
 <div class="paragraph">
 <p><code>shadow-cljs</code> can generate a detailed report for your <code>release</code> builds which includes a detailed breakdown of the included sources and how much they each contributed to the overall size.</p>
 </div>
