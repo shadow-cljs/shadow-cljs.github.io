@@ -384,7 +384,9 @@ options for configuring an optional dev-time HTTP server for a build and CSS rel
 
 The `:browser` target now uses a HUD to display a loading indicator when a build is started. It will also display warnings and errors if there are any.
 
-You can disable this by setting `:hud false` in the `:devtools` section.
+You can disable it completely by setting `:hud false` in the `:devtools` section.
+
+You may also toggle certain features by specifying which features you care about via setting `:hud #{:errors :warnings}`. This will show errors/warnings but no progress indicator. Available options are `:errors`, `:warnings`, `:progress`. Only options included will be enabled, all other will be disabled.
 
 ==== Opening Files
 

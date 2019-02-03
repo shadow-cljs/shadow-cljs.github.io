@@ -3264,7 +3264,10 @@ options for configuring an optional dev-time HTTP server for a build and CSS rel
 <p>The <code>:browser</code> target now uses a HUD to display a loading indicator when a build is started. It will also display warnings and errors if there are any.</p>
 </div>
 <div class="paragraph">
-<p>You can disable this by setting <code>:hud false</code> in the <code>:devtools</code> section.</p>
+<p>You can disable it completely by setting <code>:hud false</code> in the <code>:devtools</code> section.</p>
+</div>
+<div class="paragraph">
+<p>You may also toggle certain features by specifying which features you care about via setting <code>:hud #{:errors :warnings}</code>. This will show errors/warnings but no progress indicator. Available options are <code>:errors</code>, <code>:warnings</code>, <code>:progress</code>. Only options included will be enabled, all other will be disabled.</p>
 </div>
 <div class="sect4">
 <h5 id="_opening_files"><a class="anchor" href="#_opening_files"></a><a class="link" href="#_opening_files">Opening Files</a></h5>
