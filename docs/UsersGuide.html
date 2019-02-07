@@ -2496,6 +2496,12 @@ It is generally safer to use the "disabled" variant as the default since it make
 <p><code>:source-map</code> (Boolean) defaults to <code>true</code> during development, <code>false</code> for <code>release</code>.</p>
 </li>
 <li>
+<p><code>:source-map-include-sources-content</code> (Boolean) defaults to <code>true</code> and decides whether source maps should contains their sources in the <code>.map</code> files directly.</p>
+</li>
+<li>
+<p><code>:source-map-detail-level</code> <code>:all</code> or <code>:symbols</code> (<code>:symbols</code> reduces overall size a bit but also a bit less accurate)</p>
+</li>
+<li>
 <p><code>:externs</code> vector of paths, defaults to <code>[]</code></p>
 </li>
 <li>
