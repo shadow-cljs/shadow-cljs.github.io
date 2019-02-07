@@ -440,3 +440,50 @@ The `:server` build will then no longer have the `codemirror` require and the `i
 ```
 
 IMPORTANT: This feature is only available in `.cljc` files and will fail in `.cljs` files.
+
+== Overriding from the CLI [[config-merge]]
+
+It is sometimes desirable to make small adjustments to the build configuration from the command line with values that can't be added statically to the `shadow-cljs.edn` config or may change depending on the environment you are in.
+
+You can pass additional config data via the `--config-merge {:some "data"}` command line option which will be merged into the build config. Data added from the CLI will override data from the `shadow-cljs.edn` file.
+
+.Example `shadow-cljs.edn` config
+```
+{...
+ :builds
+ {:app
+  {:target :browser
+   :output-dir "public/js"
+   ...}}}
+```
+
+.Overriding the `:output-dir` from the CLI
+```bash
+$ shadow-cljs release app --config-merge '{:output-dir "somewhere/else"}'
+```
+
+.Overriding the `:closure-defines` from the CLI
+```bash
+$ shadow-cljs release app --config-merge '{:closure-defines {your.app/DEBUG true}}'
+```
+
+`--config-merge` expects one EDN map and can be used multiple times, they will be merged left to right. The data added is also visible to build-hooks.
+
+IMPORTANT: If you specify multiple build ids the data will be merged into all specified builds. `shadow-cljs release frontend backend --config-merge '{:hello "world"}'` will be applied to both.
+
+== Using Environment Variables [[shadow-env]]
+
+It is possible to use environment variables to set configuration values in `shadow-cljs.edn` but you should consider using `--config-merge` instead. If you really must use an environment variable you can do so via the `#shadow/env "FOO"` reader tag.
+
+.Example `shadow-cljs.edn` config
+```
+{...
+ :builds
+ {:app
+  {:target :browser
+   :output-dir "public/js"
+   :closure-defines {your.app/URL #shadow/env "APP_URL"}
+   ...}}}
+```
+
+IMPORTANT: The environment variables used when the `shadow-cljs` process was started are used. If a server process is used its environment variables will be used over those potentially set by other commands. This is mostly relevant during development but may be confusing. `--config-merge` does not have this limitation.
