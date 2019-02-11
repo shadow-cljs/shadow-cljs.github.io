@@ -602,8 +602,9 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_server_options">4.3. Server Options</a>
 <ul class="sectlevel3">
 <li><a href="#nREPL">4.3.1. nREPL</a></li>
-<li><a href="#_ssl">4.3.2. SSL</a></li>
-<li><a href="#http">4.3.3. HTTP(S)</a></li>
+<li><a href="#socket-repl">4.3.2. Socket REPL</a></li>
+<li><a href="#_ssl">4.3.3. SSL</a></li>
+<li><a href="#http">4.3.4. HTTP(S)</a></li>
 </ul>
 </li>
 </ul>
@@ -1751,6 +1752,9 @@ shadow-cljs - watching build :app
  <span class="keyword">..</span><span class="keyword">.</span>}</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>The nREPL server can be disabled by setting <code>:nrepl false</code>.</p>
+</div>
 <div class="sect4">
 <h5 id="_nrepl_usage"><a class="anchor" href="#_nrepl_usage"></a><a class="link" href="#_nrepl_usage">nREPL Usage</a></h5>
 <div class="paragraph">
@@ -1811,7 +1815,27 @@ You still need to start the <a href="#embedded">embedded server</a> manually bef
 </div>
 </div>
 <div class="sect3">
-<h4 id="_ssl"><a class="anchor" href="#_ssl"></a><a class="link" href="#_ssl">4.3.2. SSL</a></h4>
+<h4 id="socket-repl"><a class="anchor" href="#socket-repl"></a><a class="link" href="#socket-repl">4.3.2. Socket REPL</a></h4>
+<div class="paragraph">
+<p>A Clojure Socket REPL is started automatically in server-mode and uses a random port by default. Tools can find the port it was started under by checking <code>.shadow-cljs/socket-repl.port</code> which will contain the port number.</p>
+</div>
+<div class="paragraph">
+<p>You can also set a fixed port by via <code>shadow-cljs.edn</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:socket-repl</span>
+ {<span class="symbol">:port</span> <span class="integer">9000</span>}
+ <span class="keyword">..</span><span class="keyword">.</span>}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The Socket REPL can be disabled by setting <code>:socket-repl false</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_ssl"><a class="anchor" href="#_ssl"></a><a class="link" href="#_ssl">4.3.3. SSL</a></h4>
 <div class="paragraph">
 <p>The <code>shadow-cljs</code> HTTP servers support SSL. It requires a Java Keystore that provides a matching private key and certificate.</p>
 </div>
@@ -1862,7 +1886,7 @@ You must generate the Certificate with a SAN (Subject Alternative Name) for "loc
 </div>
 </div>
 <div class="sect3">
-<h4 id="http"><a class="anchor" href="#http"></a><a class="link" href="#http">4.3.3. HTTP(S)</a></h4>
+<h4 id="http"><a class="anchor" href="#http"></a><a class="link" href="#http">4.3.4. HTTP(S)</a></h4>
 <div class="paragraph">
 <p>The <code>shadow-cljs</code> server starts one primary HTTP server. It is used by the builds to connect the Hot Reload and REPL clients via websocket. By default it listens on Port 9630. If that Port is in use it will increment by one and attempt again until an open Port is found.</p>
 </div>
@@ -5877,7 +5901,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-10-17 12:32:38 DST
+Last updated 2019-02-11 14:03:49 STD
 </div>
 </div>
 </body>

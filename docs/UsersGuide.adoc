@@ -279,6 +279,8 @@ You may configure the namespace you start in when connecting by setting `:init-n
  ...}
 ```
 
+The nREPL server can be disabled by setting `:nrepl false`.
+
 ==== nREPL Usage
 
 When connecting to the nREPL server the connection always starts out as a Clojure REPL. Switching to a CLJS REPL works similarly to the <<cljs-repl, non-nREPL version>>. First the `watch` for the given build needs to be started and then we need to select this build to switch the current nREPL session to that build. After selecting the build everything will be eval'd in ClojureScript instead of Clojure.
@@ -311,6 +313,22 @@ When you use `shadow-cljs` embedded in other tools that provide their own nREPL 
 ```
 
 TIP: You still need to start the <<embedded, embedded server>> manually before using the CLJS REPL.
+
+
+=== Socket REPL [[socket-repl]]
+
+A Clojure Socket REPL is started automatically in server-mode and uses a random port by default. Tools can find the port it was started under by checking `.shadow-cljs/socket-repl.port` which will contain the port number.
+
+You can also set a fixed port by via `shadow-cljs.edn`.
+
+```clojure
+{...
+ :socket-repl
+ {:port 9000}
+ ...}
+```
+
+The Socket REPL can be disabled by setting `:socket-repl false`.
 
 === SSL
 
