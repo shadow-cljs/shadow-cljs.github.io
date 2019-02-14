@@ -604,7 +604,8 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#nREPL">4.3.1. nREPL</a></li>
 <li><a href="#socket-repl">4.3.2. Socket REPL</a></li>
 <li><a href="#_ssl">4.3.3. SSL</a></li>
-<li><a href="#http">4.3.4. HTTP(S)</a></li>
+<li><a href="#http">4.3.4. Primary HTTP(S)</a></li>
+<li><a href="#dev-http">4.3.5. Development HTTP(S)</a></li>
 </ul>
 </li>
 </ul>
@@ -649,10 +650,8 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_development_support">6.8. Development Support</a>
 <ul class="sectlevel3">
 <li><a href="#hud">6.8.1. Heads-Up Display (HUD)</a></li>
-<li><a href="#browser-http-server">6.8.2. HTTP Server</a></li>
-<li><a href="#_css_reloading">6.8.3. CSS Reloading</a></li>
-<li><a href="#_proxy_support">6.8.4. Proxy Support</a></li>
-<li><a href="#_reverse_proxy_support">6.8.5. Reverse Proxy Support</a></li>
+<li><a href="#_css_reloading">6.8.2. CSS Reloading</a></li>
+<li><a href="#_proxy_support">6.8.3. Proxy Support</a></li>
 </ul>
 </li>
 </ul>
@@ -1886,9 +1885,9 @@ You must generate the Certificate with a SAN (Subject Alternative Name) for "loc
 </div>
 </div>
 <div class="sect3">
-<h4 id="http"><a class="anchor" href="#http"></a><a class="link" href="#http">4.3.4. HTTP(S)</a></h4>
+<h4 id="http"><a class="anchor" href="#http"></a><a class="link" href="#http">4.3.4. Primary HTTP(S)</a></h4>
 <div class="paragraph">
-<p>The <code>shadow-cljs</code> server starts one primary HTTP server. It is used by the builds to connect the Hot Reload and REPL clients via websocket. By default it listens on Port 9630. If that Port is in use it will increment by one and attempt again until an open Port is found.</p>
+<p>The <code>shadow-cljs</code> server starts one primary HTTP server. It is used to serve the UI and websockets used for Hot Reload and REPL clients. By default it listens on Port 9630. If that Port is in use it will increment by one and attempt again until an open Port is found.</p>
 </div>
 <div class="listingblock">
 <div class="title">Startup message indicating the Port used</div>
@@ -1912,9 +1911,6 @@ The server automatically supports HTTP/2 when using <code>:ssl</code>.
 </table>
 </div>
 <div class="paragraph">
-<p>The UI served by this server is still in development so the main purpose of this HTTP server currently is serving the websockets.</p>
-</div>
-<div class="paragraph">
 <p>If you prefer to set your own port instead you can do this via the <code>:http</code> config.</p>
 </div>
 <div class="listingblock">
@@ -1936,6 +1932,150 @@ The server automatically supports HTTP/2 when using <code>:ssl</code>.
         <span class="symbol">:ssl-port</span> <span class="integer">23456</span>
         <span class="symbol">:host</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">localhost</span><span class="delimiter">&quot;</span></span>}
  <span class="keyword">..</span><span class="keyword">.</span>}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="dev-http"><a class="anchor" href="#dev-http"></a><a class="link" href="#dev-http">4.3.5. Development HTTP(S)</a></h4>
+<div class="paragraph">
+<p><code>shadow-cljs</code> can provide additional basic HTTP servers via the <code>:dev-http</code> config entry. By default these will serve all static files from the configured paths, and fall back to <code>index.html</code> when a resource is not found (this is what you typically want when developing an application which uses browser push state).</p>
+</div>
+<div class="paragraph">
+<p>These servers are started automatically when <code>shadow-cljs</code> is running in server mode. They are not specific to any build and can be used to serve files for multiple builds as long as a unique <code>:output-dir</code> is used for each.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">IMPORTANT</dt>
+<dd>
+<p>These are just generic web servers that server static files. They are not required for any live-reload or REPL logic. Any webserver will do, these are just provided for convenience.</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock">
+<div class="title">Basic example serving the <code>public</code> directory via <code><a href="http://localhost:8000" class="bare">http://localhost:8000</a></code></div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:dev-http</span> {<span class="integer">8000</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public</span><span class="delimiter">&quot;</span></span>}
+ <span class="symbol">:builds</span> {<span class="keyword">..</span><span class="keyword">.</span>}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>:dev-http</code> expects a map of <code>port-number</code> to <code>config</code>. The <code>config</code> supports several shortcuts for the most common scenarios.</p>
+</div>
+<div class="listingblock">
+<div class="title">Serve directory from filesystem root</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="symbol">:dev-http</span> {<span class="integer">8000</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public</span><span class="delimiter">&quot;</span></span>}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Serve from classpath root</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="symbol">:dev-http</span> {<span class="integer">8000</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">classpath:public</span><span class="delimiter">&quot;</span></span>}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This would attempt to find a request to <code>/index.html</code> via <code>public/index.html</code> on the classpath. Which may include files in <code>.jar</code> files.</p>
+</div>
+<div class="listingblock">
+<div class="title">Serve from multiple roots</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="symbol">:dev-http</span> {<span class="integer">8000</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">a</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">b</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">classpath:c</span><span class="delimiter">&quot;</span></span>]}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This would first attempt to find <code>&lt;project-root&gt;/a/index.html</code> then <code>&lt;project-root&gt;/b/index.html</code> then <code>c/index.html</code> on the classpath. If nothing is found the default handler will be called.</p>
+</div>
+<div class="paragraph">
+<p>The longer config version expects a map and the supported options are:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>:root</code></dt>
+<dd>
+<p>(String) The path from which to serve requests. Paths starting with <code>classpath:</code> will serve from the classpath instead of the filesystem. All filesystem paths are relative to the project root.</p>
+</dd>
+<dt class="hdlist1"><code>:roots</code></dt>
+<dd>
+<p>(Vector of Strings) If you need multiple root paths, use instead of <code>:root</code>.</p>
+</dd>
+<dt class="hdlist1"><code>:ssl-port</code></dt>
+<dd>
+<p>When <code>:ssl</code> is configured use this port for ssl connections and server normal HTTP on the regular port. If <code>:ssl-port</code> is not set but <code>:ssl</code> is configured the default port will only server SSL requests.</p>
+</dd>
+<dt class="hdlist1"><code>:host</code></dt>
+<dd>
+<p>Optional. The hostname to listen on. Defaults to localhost.</p>
+</dd>
+<dt class="hdlist1"><code>:handler</code></dt>
+<dd>
+<p>Optional. A fully qualified symbol. A <code>(defn handler [req] resp)</code> that is used
+if a resource is not found for the given request. Defaults to <code>shadow.http.push-state/handle</code>.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>The following two options only apply when using the default, built-in handler and typically do not need to be changed:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>:push-state/headers</code></dt>
+<dd>
+<p>(optional) A map of HTTP headers to respond with. Defaults to <code>text/html</code> standard headers.</p>
+</dd>
+<dt class="hdlist1"><code>:push-state/index</code></dt>
+<dd>
+<p>(optional) The file to serve. Defaults to <code>index.html</code>.</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:dev-http</span>
+ {<span class="integer">8080</span> {<span class="symbol">:root</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public</span><span class="delimiter">&quot;</span></span>
+        <span class="symbol">:handler</span> my.app/handler}}}</code></pre>
+</div>
+</div>
+<div class="sect4">
+<h5 id="dev-http-proxy"><a class="anchor" href="#dev-http-proxy"></a><a class="link" href="#dev-http-proxy">Reverse Proxy Support</a></h5>
+<div class="paragraph">
+<p>By default the dev server will attempt to serve requests locally but sometimes you may want to use an external web server to serve requests (eg. API request). This can be configured via <code>:proxy-url</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:dev-http</span>
+ {<span class="integer">8000</span>
+  {<span class="symbol">:root</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public</span><span class="delimiter">&quot;</span></span>
+   <span class="symbol">:proxy-url</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">https://some.host</span><span class="delimiter">&quot;</span></span>}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A request going to <code><a href="http://localhost:8000/api/foo" class="bare">http://localhost:8000/api/foo</a></code> will serve the content returned by <code><a href="https://some.host/api/foo" class="bare">https://some.host/api/foo</a></code> instead. All request that do not have a local file will be served by the proxied server.</p>
+</div>
+<div class="paragraph">
+<p>Additional optional Options to configure the connection handling are:</p>
+</div>
+<div class="dlist Horizontal">
+<dl>
+<dt><code>:proxy-rewrite-host-header</code></dt>
+<dd>
+<p>boolean, defaults to true. Determines whether the original Host header will be used or the one from the <code>:proxy-url</code>. <code>localhost</code> vs <code>some.host</code> using the example above.</p>
+</dd>
+<dt><code>:proxy-reuse-x-forwarded</code></dt>
+<dd>
+<p>boolean, defaults to false. Configures if the proxy should add itself to <code>X-Forwarded-For</code> list or start a new one.</p>
+</dd>
+<dt><code>:proxy-max-connection-retries</code></dt>
+<dd>
+<p>int, defaults to 1.</p>
+</dd>
+<dt><code>:proxy-max-request-time</code></dt>
+<dd>
+<p>ms as int, defaults to 30000. 30sec request timeout.</p>
+</dd>
+</dl>
 </div>
 </div>
 </div>
@@ -3450,91 +3590,13 @@ options for configuring an optional dev-time HTTP server for a build and CSS rel
 </div>
 </div>
 <div class="sect3">
-<h4 id="browser-http-server"><a class="anchor" href="#browser-http-server"></a><a class="link" href="#browser-http-server">6.8.2. HTTP Server</a></h4>
-<div class="paragraph">
-<p><code>shadow-cljs</code> can provide a basic HTTP server for your build. By default it will serve all static files from the configured <code>:http-root</code> directory, and fall back to <code>index.html</code> when a resource is not found (this is what you typically want when developing an application which uses browser push state).</p>
-</div>
-<div class="paragraph">
-<p>The server supports the following options:</p>
-</div>
-<div class="dlist Horizontal">
-<dl>
-<dt><code>:http-root</code></dt>
-<dd>
-<p>The disk path from which to serve root filesystem requests. If not supplied,
-no disk files are served.</p>
-</dd>
-<dt><code>:http-port</code></dt>
-<dd>
-<p>The port to serve from.</p>
-</dd>
-<dt><code>:http-host</code></dt>
-<dd>
-<p>Optional. The hostname to listen on. Defaults to localhost.</p>
-</dd>
-<dt><code>:http-resource-root</code></dt>
-<dd>
-<p>Optional. A path relative to classpath from which resources can be served.
-If not supplied, no resources are served.</p>
-</dd>
-<dt><code>:http-handler</code></dt>
-<dd>
-<p>Optional. A namespace (as a symbol). A <code>(fn [req] resp)</code> that is used
-if a resource is not found for the given request. Defaults to <code>shadow.http.push-state/handle</code>.</p>
-</dd>
-</dl>
-</div>
-<div class="paragraph">
-<p>The following two options only apply when using the default, built-in handler:</p>
-</div>
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><code>:push-state/headers</code></dt>
-<dd>
-<p>(optional) A map of HTTP headers to respond with. Defaults to <code>text/html</code> standard headers.</p>
-</dd>
-<dt class="hdlist1"><code>:push-state/index</code></dt>
-<dd>
-<p>(optional) The file to serve. Defaults to <code>index.html</code>.</p>
-</dd>
-</dl>
-</div>
-<div class="listingblock">
-<div class="title">Typical HTTP config serving the "public" directory under <a href="http://localhost:8080" class="bare">http://localhost:8080</a></div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
- {<span class="symbol">:builds</span>
-  {<span class="symbol">:app</span> {<span class="symbol">:target</span> <span class="symbol">:browser</span>
-         <span class="symbol">:output-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public/js</span><span class="delimiter">&quot;</span></span>
-         <span class="symbol">:asset-path</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">/js</span><span class="delimiter">&quot;</span></span>
-         <span class="symbol">:modules</span> {<span class="symbol">:main</span> {<span class="symbol">:entries</span> [my.app]}}
-         <span class="keyword">..</span><span class="keyword">.</span>
-         <span class="symbol">:devtools</span> {<span class="symbol">:http-root</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public</span><span class="delimiter">&quot;</span></span>
-                    <span class="symbol">:http-port</span> <span class="integer">8080</span>}}}}</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Example <code>public/index.html</code></div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="html"><span class="doctype">&lt;!doctype html&gt;</span>
-<span class="tag">&lt;html&gt;</span>
-<span class="tag">&lt;body&gt;</span>
-<span class="tag">&lt;h1&gt;</span>Hello World<span class="tag">&lt;/h1&gt;</span>
-<span class="tag">&lt;script</span> <span class="attribute-name">src</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">/js/main.js</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span><span class="tag">&lt;/script&gt;</span>
-<span class="tag">&lt;/body&gt;</span>
-<span class="tag">&lt;/html&gt;</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_css_reloading"><a class="anchor" href="#_css_reloading"></a><a class="link" href="#_css_reloading">6.8.3. CSS Reloading</a></h4>
+<h4 id="_css_reloading"><a class="anchor" href="#_css_reloading"></a><a class="link" href="#_css_reloading">6.8.2. CSS Reloading</a></h4>
 <div class="paragraph">
 <p>The Browser devtools can also reload CSS for you. This is enabled by default and in most cases requires no additional
-configuration when you are using the built-in HTTP dev server.</p>
+configuration when you are using the built-in <a href="#dev-http">development HTTP servers</a>.</p>
 </div>
 <div class="paragraph">
-<p>The server will watch the configured <code>:http-root</code> and notify the client about file updates. If a <code>.css</code> file is linked
-with an absolute path it will be reloaded on change. Relative paths are currently not supported.</p>
+<p>Any stylesheet included in a page will be reloaded if modified on the filesystem. Prefer using absolute paths but relative paths should work as well.</p>
 </div>
 <div class="listingblock">
 <div class="title">Example HTML snippet</div>
@@ -3548,8 +3610,14 @@ with an absolute path it will be reloaded on change. Relative paths are currentl
 <pre class="CodeRay highlight"><code data-lang="clojure">[<span class="symbol">:link</span> {<span class="symbol">:rel</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">stylesheet</span><span class="delimiter">&quot;</span></span> <span class="symbol">:href</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">/css/main.css</span><span class="delimiter">&quot;</span></span>}]</code></pre>
 </div>
 </div>
+<div class="listingblock">
+<div class="title">Using the built-in dev HTTP server</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="symbol">:dev-http</span> {<span class="integer">8000</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public</span><span class="delimiter">&quot;</span></span>}</code></pre>
+</div>
+</div>
 <div class="paragraph">
-<p>This will cause an update if the file <code>&lt;:http-root&gt;/css/main.css</code> is changed.</p>
+<p>This will cause the browser to reload <code>/css/main.css</code> when <code>public/css/main.css</code> is changed.</p>
 </div>
 <div class="paragraph">
 <p><code>shadow-cljs</code> currently provides no support for directly compiling CSS but the usual tools will work and should
@@ -3570,7 +3638,7 @@ document root used to serve your content.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_proxy_support"><a class="anchor" href="#_proxy_support"></a><a class="link" href="#_proxy_support">6.8.4. Proxy Support</a></h4>
+<h4 id="_proxy_support"><a class="anchor" href="#_proxy_support"></a><a class="link" href="#_proxy_support">6.8.3. Proxy Support</a></h4>
 <div class="paragraph">
 <p>By default the devtools client will attempt to connect to the <code>shadow-cljs</code> process via the configured <a href="#http">HTTP server</a> (usually <code>localhost</code>). If you are using a reverse proxy to serve your HTML that might not be possible. You can set <code>:devtools-url</code> to configure which URL to use.</p>
 </div>
@@ -3614,49 +3682,6 @@ The requests must be forwarded to the main <a href="#http">HTTP server</a>, not 
 </td>
 </tr>
 </table>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_reverse_proxy_support"><a class="anchor" href="#_reverse_proxy_support"></a><a class="link" href="#_reverse_proxy_support">6.8.5. Reverse Proxy Support</a></h4>
-<div class="paragraph">
-<p>By default the dev server will attempt to serve requests locally but sometimes you want to use an external web server to serve requests (eg. API request). This can be configured via <code>:proxy-url</code>.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
- <span class="symbol">:builds</span>
- {<span class="symbol">:app</span> {<span class="keyword">..</span><span class="keyword">.</span>
-        <span class="symbol">:devtools</span> {<span class="symbol">:proxy-url</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">https://some.host</span><span class="delimiter">&quot;</span></span>
-                   <span class="symbol">:http-root</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public</span><span class="delimiter">&quot;</span></span>
-                   <span class="symbol">:http-port</span> <span class="integer">8000</span>
-                   <span class="keyword">..</span><span class="keyword">.</span>}}}}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>A request going to <code><a href="http://localhost:8000/api/foo" class="bare">http://localhost:8000/api/foo</a></code> will serve the content returned by <code><a href="https://some.host/api/foo" class="bare">https://some.host/api/foo</a></code> instead. All request that do not have a local file will be served by the proxied server.</p>
-</div>
-<div class="paragraph">
-<p>Additional optional Options to configure the connection handling are:</p>
-</div>
-<div class="dlist Horizontal">
-<dl>
-<dt><code>:proxy-rewrite-host-header</code></dt>
-<dd>
-<p>boolean, defaults to true. Determines whether the original Host header will be used or the one from the <code>:proxy-url</code>. <code>localhost</code> vs <code>some.host</code> using the example above.</p>
-</dd>
-<dt><code>:proxy-reuse-x-forwarded</code></dt>
-<dd>
-<p>boolean, defaults to false. Configures if the proxy should add itself to <code>X-Forwarded-For</code> list or start a new one.</p>
-</dd>
-<dt><code>:proxy-max-connection-retries</code></dt>
-<dd>
-<p>int, defaults to 1.</p>
-</dd>
-<dt><code>:proxy-max-request-time</code></dt>
-<dd>
-<p>ms as int, defaults to 30000. 30sec request timeout.</p>
-</dd>
-</dl>
 </div>
 </div>
 </div>
@@ -5901,7 +5926,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2019-02-11 14:03:49 STD
+Last updated 2019-02-14 14:09:04 STD
 </div>
 </div>
 </body>

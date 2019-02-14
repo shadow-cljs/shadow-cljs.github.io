@@ -438,59 +438,14 @@ Translated WSL file path. Useful when running `shadow-cljs` via WSL Bash. Transl
 `:wsl-pwd`::
 Translated `:pwd`
 
-=== HTTP Server [[browser-http-server]]
 
-`shadow-cljs` can provide a basic HTTP server for your build. By default it will serve all static files from the configured `:http-root` directory, and fall back to `index.html` when a resource is not found (this is what you typically want when developing an application which uses browser push state).
-
-The server supports the following options:
-
-[Horizontal]
-`:http-root`:: The disk path from which to serve root filesystem requests. If not supplied,
-no disk files are served.
-`:http-port`:: The port to serve from.
-`:http-host`:: Optional. The hostname to listen on. Defaults to localhost.
-`:http-resource-root`:: Optional. A path relative to classpath from which resources can be served.
-If not supplied, no resources are served.
-`:http-handler`:: Optional. A namespace (as a symbol). A `(fn [req] resp)` that is used
-if a resource is not found for the given request. Defaults to `shadow.http.push-state/handle`.
-
-The following two options only apply when using the default, built-in handler:
-
-`:push-state/headers`:: (optional) A map of HTTP headers to respond with. Defaults to `text/html` standard headers.
-`:push-state/index`:: (optional) The file to serve. Defaults to `index.html`.
-
-.Typical HTTP config serving the "public" directory under http://localhost:8080
-
-```clojure
-{...
- {:builds
-  {:app {:target :browser
-         :output-dir "public/js"
-         :asset-path "/js"
-         :modules {:main {:entries [my.app]}}
-         ...
-         :devtools {:http-root "public"
-                    :http-port 8080}}}}
-```
-
-.Example `public/index.html`
-```html
-<!doctype html>
-<html>
-<body>
-<h1>Hello World</h1>
-<script src="/js/main.js"></script>
-</body>
-</html>
-```
 
 === CSS Reloading
 
 The Browser devtools can also reload CSS for you. This is enabled by default and in most cases requires no additional
-configuration when you are using the built-in HTTP dev server.
+configuration when you are using the built-in <<dev-http, development HTTP servers>>.
 
-The server will watch the configured `:http-root` and notify the client about file updates. If a `.css` file is linked
-with an absolute path it will be reloaded on change. Relative paths are currently not supported.
+Any stylesheet included in a page will be reloaded if modified on the filesystem. Prefer using absolute paths but relative paths should work as well.
 
 .Example HTML snippet
 ```html
@@ -502,7 +457,12 @@ with an absolute path it will be reloaded on change. Relative paths are currentl
 [:link {:rel "stylesheet" :href "/css/main.css"}]
 ```
 
-This will cause an update if the file `<:http-root>/css/main.css` is changed.
+.Using the built-in dev HTTP server
+```
+:dev-http {8000 "public"}
+```
+
+This will cause the browser to reload `/css/main.css` when `public/css/main.css` is changed.
 
 `shadow-cljs` currently provides no support for directly compiling CSS but the usual tools will work and should
 be run separately. Just make sure the output is generated into the correct places.
@@ -548,26 +508,3 @@ The client will make WebSocket request as well as normal XHR requests to load fi
 
 IMPORTANT: The requests must be forwarded to the main <<http, HTTP server>>, not the one configured in the build itself.
 
-=== Reverse Proxy Support
-
-By default the dev server will attempt to serve requests locally but sometimes you want to use an external web server to serve requests (eg. API request). This can be configured via `:proxy-url`.
-
-```
-{...
- :builds
- {:app {...
-        :devtools {:proxy-url "https://some.host"
-                   :http-root "public"
-                   :http-port 8000
-                   ...}}}}
-```
-
-A request going to `http://localhost:8000/api/foo` will serve the content returned by `https://some.host/api/foo` instead. All request that do not have a local file will be served by the proxied server.
-
-
-Additional optional Options to configure the connection handling are:
-[Horizontal]
-`:proxy-rewrite-host-header`:: boolean, defaults to true. Determines whether the original Host header will be used or the one from the `:proxy-url`. `localhost` vs `some.host` using the example above.
-`:proxy-reuse-x-forwarded`:: boolean, defaults to false. Configures if the proxy should add itself to `X-Forwarded-For` list or start a new one.
-`:proxy-max-connection-retries`:: int, defaults to 1.
-`:proxy-max-request-time`:: ms as int, defaults to 30000. 30sec request timeout.

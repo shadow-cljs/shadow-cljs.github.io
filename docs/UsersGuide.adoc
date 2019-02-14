@@ -360,9 +360,9 @@ IMPORTANT: You must generate the Certificate with a SAN (Subject Alternative Nam
 
 // TODO: full guide, other platforms
 
-=== HTTP(S) [[http]]
+=== Primary HTTP(S) [[http]]
 
-The `shadow-cljs` server starts one primary HTTP server. It is used by the builds to connect the Hot Reload and REPL clients via websocket. By default it listens on Port 9630. If that Port is in use it will increment by one and attempt again until an open Port is found.
+The `shadow-cljs` server starts one primary HTTP server. It is used to serve the UI and websockets used for Hot Reload and REPL clients. By default it listens on Port 9630. If that Port is in use it will increment by one and attempt again until an open Port is found.
 
 .Startup message indicating the Port used
 ```bash
@@ -372,8 +372,6 @@ shadow-cljs - server running at http://0.0.0.0:9630
 When `:ssl` is configured the server will be available via `https://` instead.
 
 TIP: The server automatically supports HTTP/2 when using `:ssl`.
-
-The UI served by this server is still in development so the main purpose of this HTTP server currently is serving the websockets.
 
 If you prefer to set your own port instead you can do this via the `:http` config.
 
@@ -394,6 +392,86 @@ If you prefer to set your own port instead you can do this via the `:http` confi
         :host "localhost"}
  ...}
 ```
+
+=== Development HTTP(S) [[dev-http]]
+
+`shadow-cljs` can provide additional basic HTTP servers via the `:dev-http` config entry. By default these will serve all static files from the configured paths, and fall back to `index.html` when a resource is not found (this is what you typically want when developing an application which uses browser push state).
+
+These servers are started automatically when `shadow-cljs` is running in server mode. They are not specific to any build and can be used to serve files for multiple builds as long as a unique `:output-dir` is used for each.
+
+IMPORTANT:: These are just generic web servers that server static files. They are not required for any live-reload or REPL logic. Any webserver will do, these are just provided for convenience.
+
+.Basic example serving the `public` directory via `http://localhost:8000`
+```
+{...
+ :dev-http {8000 "public"}
+ :builds {...}}
+```
+
+`:dev-http` expects a map of `port-number` to `config`. The `config` supports several shortcuts for the most common scenarios.
+
+.Serve directory from filesystem root
+```
+:dev-http {8000 "public"}
+```
+
+.Serve from classpath root
+```
+:dev-http {8000 "classpath:public"}
+```
+
+This would attempt to find a request to `/index.html` via `public/index.html` on the classpath. Which may include files in `.jar` files.
+
+.Serve from multiple roots
+```
+:dev-http {8000 ["a" "b" "classpath:c"]}
+```
+
+This would first attempt to find `<project-root>/a/index.html` then `<project-root>/b/index.html` then `c/index.html` on the classpath. If nothing is found the default handler will be called.
+
+The longer config version expects a map and the supported options are:
+
+`:root`:: (String) The path from which to serve requests. Paths starting with `classpath:` will serve from the classpath instead of the filesystem. All filesystem paths are relative to the project root.
+`:roots`:: (Vector of Strings) If you need multiple root paths, use instead of `:root`.
+`:ssl-port`:: When `:ssl` is configured use this port for ssl connections and server normal HTTP on the regular port. If `:ssl-port` is not set but `:ssl` is configured the default port will only server SSL requests.
+`:host`:: Optional. The hostname to listen on. Defaults to localhost.
+`:handler`:: Optional. A fully qualified symbol. A `(defn handler [req] resp)` that is used
+if a resource is not found for the given request. Defaults to `shadow.http.push-state/handle`.
+
+The following two options only apply when using the default, built-in handler and typically do not need to be changed:
+
+`:push-state/headers`:: (optional) A map of HTTP headers to respond with. Defaults to `text/html` standard headers.
+`:push-state/index`:: (optional) The file to serve. Defaults to `index.html`.
+
+
+```clojure
+{...
+ :dev-http
+ {8080 {:root "public"
+        :handler my.app/handler}}}
+```
+
+==== Reverse Proxy Support [[dev-http-proxy]]
+
+By default the dev server will attempt to serve requests locally but sometimes you may want to use an external web server to serve requests (eg. API request). This can be configured via `:proxy-url`.
+
+```
+{...
+ :dev-http
+ {8000
+  {:root "public"
+   :proxy-url "https://some.host"}}}
+```
+
+A request going to `http://localhost:8000/api/foo` will serve the content returned by `https://some.host/api/foo` instead. All request that do not have a local file will be served by the proxied server.
+
+Additional optional Options to configure the connection handling are:
+[Horizontal]
+`:proxy-rewrite-host-header`:: boolean, defaults to true. Determines whether the original Host header will be used or the one from the `:proxy-url`. `localhost` vs `some.host` using the example above.
+`:proxy-reuse-x-forwarded`:: boolean, defaults to false. Configures if the proxy should add itself to `X-Forwarded-For` list or start a new one.
+`:proxy-max-connection-retries`:: int, defaults to 1.
+`:proxy-max-request-time`:: ms as int, defaults to 30000. 30sec request timeout.
+
 = Build Configuration
 
 include::build-config.adoc[]
