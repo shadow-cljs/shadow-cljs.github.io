@@ -266,6 +266,8 @@ When using `deps.edn` to resolve dependencies you may sometimes want to activate
 ```
 This will make the `shadow-cljs` command use the `[:cider :cljs]` aliases in projects using `deps.edn`. This might be useful if you have an additional `:cider` alias in your `~/.clojure/deps.edn`.
 
+By default the `shadow-cljs` server-mode will launch an embedded nREPL server which you might not need. You can disable this by setting `:nrepl false` in user config.
+
 The only other currently accepted value in the user config is the <<open-file-command, :open-file-command>>. No other options are currently have any effect.
 
 == Server Options

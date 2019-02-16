@@ -1739,6 +1739,9 @@ In the case of <code>react</code> you probably need these 3 packages: <code>npm 
 <p>This will make the <code>shadow-cljs</code> command use the <code>[:cider :cljs]</code> aliases in projects using <code>deps.edn</code>. This might be useful if you have an additional <code>:cider</code> alias in your <code>~/.clojure/deps.edn</code>.</p>
 </div>
 <div class="paragraph">
+<p>By default the <code>shadow-cljs</code> server-mode will launch an embedded nREPL server which you might not need. You can disable this by setting <code>:nrepl false</code> in user config.</p>
+</div>
+<div class="paragraph">
 <p>The only other currently accepted value in the user config is the <a href="#open-file-command">:open-file-command</a>. No other options are currently have any effect.</p>
 </div>
 </div>
@@ -5962,7 +5965,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2019-02-16 21:02:53 STD
+Last updated 2019-02-16 21:11:05 STD
 </div>
 </div>
 </body>
