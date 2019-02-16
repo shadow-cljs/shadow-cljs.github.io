@@ -241,6 +241,33 @@ This means that you should `npm install react`.
 TIP: In the case of `react` you probably need these 3 packages: `npm install react react-dom create-react-class`.
 
 
+== User Configuration [[user-config]]
+
+Most configuration will be done in the projects themselves via `shadow-cljs.edn` but some config may be user-dependent. Tools like `cider` may require the additional `cider-nrepl` dependency which would be useless for a different team member using Cursive when adding that dependency via `shadow-cljs.edn`.
+
+A restricted set of config options can be added to `~/.shadow-cljs/config.edn` which will then apply to all projects built on this users machine.
+
+Adding dependencies is allowed via the usual `:dependencies` key. Note that dependencies added here will apply to ALL projects. Keep them to a minimum and only put tool related dependencies here. Everything that is relevant to a build should remain in `shadow-cljs.edn` as otherwise things may not compile for other users. These dependencies will automatically be added when using `deps.edn` or `lein` as well.
+
+.Example ~/.shadow-cljs/config.edn
+```
+{:dependencies
+ [[cider-nrepl "0.21.0"]]}
+```
+
+When using `deps.edn` to resolve dependencies you may sometimes want to activate additional aliases. This can be done via `:deps-aliases`.
+
+```
+;; shadow-cljs.edn in project
+{:deps {:aliases [:cljs]}}
+
+;; ~/.shadow-cljs/config.edn
+{:deps-aliases [:cider]}
+```
+This will make the `shadow-cljs` command use the `[:cider :cljs]` aliases in projects using `deps.edn`. This might be useful if you have an additional `:cider` alias in your `~/.clojure/deps.edn`.
+
+The only other currently accepted value in the user config is the <<open-file-command, :open-file-command>>. No other options are currently have any effect.
+
 == Server Options
 
 This section is for other options that configure the `shadow-cljs` server instance. They are optional.

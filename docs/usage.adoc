@@ -83,13 +83,13 @@ Once any server is running every other command will use that and run much faster
 
 == Build Tool Integration
 
-`shadow-cljs` can integrate with other Clojure tools since the primary distribution is just a `.jar` file available via https://clojars.org/thheller/shadow-cljs[Clojars].
+`shadow-cljs` can integrate with other Clojure tools since the primary distribution is just a `.jar` file available via https://clojars.org/thheller/shadow-cljs[Clojars]. By default your `:dependencies` are managed via `shadow-cljs.edn` but you can use other builds tools to manage your dependencies as well.
 
 CAUTION: It is strongly recommended to use the standalone `shadow-cljs` version. The command does a lot of things to optimize the user experience (e.g. faster startup) which are not done by other tools. You'll also save yourself a lot of headaches dealing with dependency conflicts and other related errors.
 
 === Leiningen [[Leiningen]]
 
-If you'd like to use https://leiningen.org/[Leiningen] for your build system (particularly if you use Cursive), the `shadow-cljs` command-line utility can be configured to use `lein` to run your commands. Enable this by adding a `:lein` entry to your `shadow-cljs.edn` config. With this setting, the `shadow-cljs` command will use `lein` to launch the JVM, ignoring any `:source-paths` and `:dependencies` in `shadow-cljs.edn`; relying instead on `lein` to set them from `project.clj`.
+If you'd like to use https://leiningen.org/[Leiningen] to manage your dependencies, you can do so by adding a `:lein` entry to your `shadow-cljs.edn` config. With this setting, the `shadow-cljs` command will use `lein` to launch the JVM, ignoring any `:source-paths` and `:dependencies` in `shadow-cljs.edn`; relying instead on `lein` to set them from `project.clj`.
 
 ```
 {:lein true
@@ -98,38 +98,28 @@ If you'd like to use https://leiningen.org/[Leiningen] for your build system (pa
  :builds { ... }
 ```
 
-When using `:lein` you must include the https://clojars.org/thheller/shadow-cljs[thheller/shadow-cljs] artifact in your `:dependencies` manually.
-
 .Using a dedicated `lein` profile
 ```
 {:lein {:profile "+cljs"}
  :builds {...}}
 ```
-
-.The `lein` command used by `shadow-cljs` as configured above
-```bash
-lein with-profile +cljs run -m shadow.cljs.devtools.cli ...
+.Sample project.clj
+```
+(defproject my-awesome-project
+  ...
+  :profiles
+  {:cljs
+   {:source-paths ["src/cljs"]
+    :dependencies [[reagent "0.8.1"]]}})
 ```
 
 ==== Running Tasks Directly From Leiningen
 
-You may also directly execute `shadow-cljs` commands via `lein` if you prefer to not use the `shadow-cljs` command itself. Most commands should work if you just replace `shadow-cljs ...` with `lein run -m shadow.cljs.devtools.cli ...`.
+You may also directly execute `shadow-cljs` commands via `lein` if you prefer to not use the `shadow-cljs` command itself.
 
-Some sample commands are listed below:
+IMPORTANT: It is recommended to still use the `shadow-cljs` command to run commands since that will take full advantage of a running server mode instance. This will run commands substantially faster than launching additional JVMs when using `lein` directly.
 
-.Listing Options
-```bash
-$ shadow-cljs help
-# or
-$ lein run -m shadow.cljs.devtools.cli help
-```
-
-.Start a dev mode build with a REPL and live-reload
-```bash
-$ shadow-cljs watch build-id
-# or
-$ lein run -m shadow.cljs.devtools.cli watch build-id
-```
+When executing directly via `lein` you must manually include the https://clojars.org/thheller/shadow-cljs[thheller/shadow-cljs] artifact in your `:dependencies`. This is automatically added when launching via `shadow-cljs`.
 
 .Just compile :dev mode once, no REPL or live-reload:
 ```bash

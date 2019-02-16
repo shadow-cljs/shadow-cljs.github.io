@@ -388,7 +388,7 @@ You can disable it completely by setting `:hud false` in the `:devtools` section
 
 You may also toggle certain features by specifying which features you care about via setting `:hud #{:errors :warnings}`. This will show errors/warnings but no progress indicator. Available options are `:errors`, `:warnings`, `:progress`. Only options included will be enabled, all other will be disabled.
 
-==== Opening Files
+==== Opening Files [[open-file-command]]
 
 Warnings include a link to source location which can be clicked to open the file in your editor. For this a little bit of config is required.
 

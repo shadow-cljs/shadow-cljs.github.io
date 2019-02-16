@@ -599,13 +599,14 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#npm-install">4.2.2. JavaScript</a></li>
 </ul>
 </li>
-<li><a href="#_server_options">4.3. Server Options</a>
+<li><a href="#user-config">4.3. User Configuration</a></li>
+<li><a href="#_server_options">4.4. Server Options</a>
 <ul class="sectlevel3">
-<li><a href="#nREPL">4.3.1. nREPL</a></li>
-<li><a href="#socket-repl">4.3.2. Socket REPL</a></li>
-<li><a href="#_ssl">4.3.3. SSL</a></li>
-<li><a href="#http">4.3.4. Primary HTTP(S)</a></li>
-<li><a href="#dev-http">4.3.5. Development HTTP(S)</a></li>
+<li><a href="#nREPL">4.4.1. nREPL</a></li>
+<li><a href="#socket-repl">4.4.2. Socket REPL</a></li>
+<li><a href="#_ssl">4.4.3. SSL</a></li>
+<li><a href="#http">4.4.4. Primary HTTP(S)</a></li>
+<li><a href="#dev-http">4.4.5. Development HTTP(S)</a></li>
 </ul>
 </li>
 </ul>
@@ -1124,7 +1125,7 @@ $ shadow-cljs restart</code></pre>
 <div class="sect2">
 <h3 id="_build_tool_integration"><a class="anchor" href="#_build_tool_integration"></a><a class="link" href="#_build_tool_integration">3.2. Build Tool Integration</a></h3>
 <div class="paragraph">
-<p><code>shadow-cljs</code> can integrate with other Clojure tools since the primary distribution is just a <code>.jar</code> file available via <a href="https://clojars.org/thheller/shadow-cljs">Clojars</a>.</p>
+<p><code>shadow-cljs</code> can integrate with other Clojure tools since the primary distribution is just a <code>.jar</code> file available via <a href="https://clojars.org/thheller/shadow-cljs">Clojars</a>. By default your <code>:dependencies</code> are managed via <code>shadow-cljs.edn</code> but you can use other builds tools to manage your dependencies as well.</p>
 </div>
 <div class="admonitionblock caution">
 <table>
@@ -1141,7 +1142,7 @@ It is strongly recommended to use the standalone <code>shadow-cljs</code> versio
 <div class="sect3">
 <h4 id="Leiningen"><a class="anchor" href="#Leiningen"></a><a class="link" href="#Leiningen">3.2.1. Leiningen</a></h4>
 <div class="paragraph">
-<p>If you&#8217;d like to use <a href="https://leiningen.org/">Leiningen</a> for your build system (particularly if you use Cursive), the <code>shadow-cljs</code> command-line utility can be configured to use <code>lein</code> to run your commands. Enable this by adding a <code>:lein</code> entry to your <code>shadow-cljs.edn</code> config. With this setting, the <code>shadow-cljs</code> command will use <code>lein</code> to launch the JVM, ignoring any <code>:source-paths</code> and <code>:dependencies</code> in <code>shadow-cljs.edn</code>; relying instead on <code>lein</code> to set them from <code>project.clj</code>.</p>
+<p>If you&#8217;d like to use <a href="https://leiningen.org/">Leiningen</a> to manage your dependencies, you can do so by adding a <code>:lein</code> entry to your <code>shadow-cljs.edn</code> config. With this setting, the <code>shadow-cljs</code> command will use <code>lein</code> to launch the JVM, ignoring any <code>:source-paths</code> and <code>:dependencies</code> in <code>shadow-cljs.edn</code>; relying instead on <code>lein</code> to set them from <code>project.clj</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1151,9 +1152,6 @@ It is strongly recommended to use the standalone <code>shadow-cljs</code> versio
  <span class="symbol">:builds</span> { <span class="keyword">..</span><span class="keyword">.</span> }</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>When using <code>:lein</code> you must include the <a href="https://clojars.org/thheller/shadow-cljs">thheller/shadow-cljs</a> artifact in your <code>:dependencies</code> manually.</p>
-</div>
 <div class="listingblock">
 <div class="title">Using a dedicated <code>lein</code> profile</div>
 <div class="content">
@@ -1162,34 +1160,35 @@ It is strongly recommended to use the standalone <code>shadow-cljs</code> versio
 </div>
 </div>
 <div class="listingblock">
-<div class="title">The <code>lein</code> command used by <code>shadow-cljs</code> as configured above</div>
+<div class="title">Sample project.clj</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">lein with-profile +cljs run -m shadow.cljs.devtools.cli ...</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">(defproject my-awesome-project
+  <span class="keyword">..</span><span class="keyword">.</span>
+  <span class="symbol">:profiles</span>
+  {<span class="symbol">:cljs</span>
+   {<span class="symbol">:source-paths</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">src/cljs</span><span class="delimiter">&quot;</span></span>]
+    <span class="symbol">:dependencies</span> [[reagent <span class="string"><span class="delimiter">&quot;</span><span class="content">0.8.1</span><span class="delimiter">&quot;</span></span>]]}})</code></pre>
 </div>
 </div>
 <div class="sect4">
 <h5 id="_running_tasks_directly_from_leiningen"><a class="anchor" href="#_running_tasks_directly_from_leiningen"></a><a class="link" href="#_running_tasks_directly_from_leiningen">Running Tasks Directly From Leiningen</a></h5>
 <div class="paragraph">
-<p>You may also directly execute <code>shadow-cljs</code> commands via <code>lein</code> if you prefer to not use the <code>shadow-cljs</code> command itself. Most commands should work if you just replace <code>shadow-cljs &#8230;&#8203;</code> with <code>lein run -m shadow.cljs.devtools.cli &#8230;&#8203;</code>.</p>
+<p>You may also directly execute <code>shadow-cljs</code> commands via <code>lein</code> if you prefer to not use the <code>shadow-cljs</code> command itself.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+It is recommended to still use the <code>shadow-cljs</code> command to run commands since that will take full advantage of a running server mode instance. This will run commands substantially faster than launching additional JVMs when using <code>lein</code> directly.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p>Some sample commands are listed below:</p>
-</div>
-<div class="listingblock">
-<div class="title">Listing Options</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">$ shadow-cljs help
-# or
-$ lein run -m shadow.cljs.devtools.cli help</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Start a dev mode build with a REPL and live-reload</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">$ shadow-cljs watch build-id
-# or
-$ lein run -m shadow.cljs.devtools.cli watch build-id</code></pre>
-</div>
+<p>When executing directly via <code>lein</code> you must manually include the <a href="https://clojars.org/thheller/shadow-cljs">thheller/shadow-cljs</a> artifact in your <code>:dependencies</code>. This is automatically added when launching via <code>shadow-cljs</code>.</p>
 </div>
 <div class="listingblock">
 <div class="title">Just compile :dev mode once, no REPL or live-reload:</div>
@@ -1707,12 +1706,49 @@ In the case of <code>react</code> you probably need these 3 packages: <code>npm 
 </div>
 </div>
 <div class="sect2">
-<h3 id="_server_options"><a class="anchor" href="#_server_options"></a><a class="link" href="#_server_options">4.3. Server Options</a></h3>
+<h3 id="user-config"><a class="anchor" href="#user-config"></a><a class="link" href="#user-config">4.3. User Configuration</a></h3>
+<div class="paragraph">
+<p>Most configuration will be done in the projects themselves via <code>shadow-cljs.edn</code> but some config may be user-dependent. Tools like <code>cider</code> may require the additional <code>cider-nrepl</code> dependency which would be useless for a different team member using Cursive when adding that dependency via <code>shadow-cljs.edn</code>.</p>
+</div>
+<div class="paragraph">
+<p>A restricted set of config options can be added to <code>~/.shadow-cljs/config.edn</code> which will then apply to all projects built on this users machine.</p>
+</div>
+<div class="paragraph">
+<p>Adding dependencies is allowed via the usual <code>:dependencies</code> key. Note that dependencies added here will apply to ALL projects. Keep them to a minimum and only put tool related dependencies here. Everything that is relevant to a build should remain in <code>shadow-cljs.edn</code> as otherwise things may not compile for other users. These dependencies will automatically be added when using <code>deps.edn</code> or <code>lein</code> as well.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example ~/.shadow-cljs/config.edn</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:dependencies</span>
+ [[cider-nrepl <span class="string"><span class="delimiter">&quot;</span><span class="content">0.21.0</span><span class="delimiter">&quot;</span></span>]]}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When using <code>deps.edn</code> to resolve dependencies you may sometimes want to activate additional aliases. This can be done via <code>:deps-aliases</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="comment">;; shadow-cljs.edn in project</span>
+{<span class="symbol">:deps</span> {<span class="symbol">:aliases</span> [<span class="symbol">:cljs</span>]}}
+
+<span class="comment">;; ~/.shadow-cljs/config.edn</span>
+{<span class="symbol">:deps-aliases</span> [<span class="symbol">:cider</span>]}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will make the <code>shadow-cljs</code> command use the <code>[:cider :cljs]</code> aliases in projects using <code>deps.edn</code>. This might be useful if you have an additional <code>:cider</code> alias in your <code>~/.clojure/deps.edn</code>.</p>
+</div>
+<div class="paragraph">
+<p>The only other currently accepted value in the user config is the <a href="#open-file-command">:open-file-command</a>. No other options are currently have any effect.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_server_options"><a class="anchor" href="#_server_options"></a><a class="link" href="#_server_options">4.4. Server Options</a></h3>
 <div class="paragraph">
 <p>This section is for other options that configure the <code>shadow-cljs</code> server instance. They are optional.</p>
 </div>
 <div class="sect3">
-<h4 id="nREPL"><a class="anchor" href="#nREPL"></a><a class="link" href="#nREPL">4.3.1. nREPL</a></h4>
+<h4 id="nREPL"><a class="anchor" href="#nREPL"></a><a class="link" href="#nREPL">4.4.1. nREPL</a></h4>
 <div class="paragraph">
 <p>The <code>shadow-cljs</code> <a href="#server-mode">server</a> provides a nREPL server via TCP. If you look at the startup message you&#8217;ll see the port of nREPL, and the port will also be stored in <code>target/shadow-cljs/nrepl.port</code>:</p>
 </div>
@@ -1814,7 +1850,7 @@ You still need to start the <a href="#embedded">embedded server</a> manually bef
 </div>
 </div>
 <div class="sect3">
-<h4 id="socket-repl"><a class="anchor" href="#socket-repl"></a><a class="link" href="#socket-repl">4.3.2. Socket REPL</a></h4>
+<h4 id="socket-repl"><a class="anchor" href="#socket-repl"></a><a class="link" href="#socket-repl">4.4.2. Socket REPL</a></h4>
 <div class="paragraph">
 <p>A Clojure Socket REPL is started automatically in server-mode and uses a random port by default. Tools can find the port it was started under by checking <code>.shadow-cljs/socket-repl.port</code> which will contain the port number.</p>
 </div>
@@ -1834,7 +1870,7 @@ You still need to start the <a href="#embedded">embedded server</a> manually bef
 </div>
 </div>
 <div class="sect3">
-<h4 id="_ssl"><a class="anchor" href="#_ssl"></a><a class="link" href="#_ssl">4.3.3. SSL</a></h4>
+<h4 id="_ssl"><a class="anchor" href="#_ssl"></a><a class="link" href="#_ssl">4.4.3. SSL</a></h4>
 <div class="paragraph">
 <p>The <code>shadow-cljs</code> HTTP servers support SSL. It requires a Java Keystore that provides a matching private key and certificate.</p>
 </div>
@@ -1885,7 +1921,7 @@ You must generate the Certificate with a SAN (Subject Alternative Name) for "loc
 </div>
 </div>
 <div class="sect3">
-<h4 id="http"><a class="anchor" href="#http"></a><a class="link" href="#http">4.3.4. Primary HTTP(S)</a></h4>
+<h4 id="http"><a class="anchor" href="#http"></a><a class="link" href="#http">4.4.4. Primary HTTP(S)</a></h4>
 <div class="paragraph">
 <p>The <code>shadow-cljs</code> server starts one primary HTTP server. It is used to serve the UI and websockets used for Hot Reload and REPL clients. By default it listens on Port 9630. If that Port is in use it will increment by one and attempt again until an open Port is found.</p>
 </div>
@@ -1936,7 +1972,7 @@ The server automatically supports HTTP/2 when using <code>:ssl</code>.
 </div>
 </div>
 <div class="sect3">
-<h4 id="dev-http"><a class="anchor" href="#dev-http"></a><a class="link" href="#dev-http">4.3.5. Development HTTP(S)</a></h4>
+<h4 id="dev-http"><a class="anchor" href="#dev-http"></a><a class="link" href="#dev-http">4.4.5. Development HTTP(S)</a></h4>
 <div class="paragraph">
 <p><code>shadow-cljs</code> can provide additional basic HTTP servers via the <code>:dev-http</code> config entry. By default these will serve all static files from the configured paths, and fall back to <code>index.html</code> when a resource is not found (this is what you typically want when developing an application which uses browser push state).</p>
 </div>
@@ -3519,7 +3555,7 @@ options for configuring an optional dev-time HTTP server for a build and CSS rel
 <p>You may also toggle certain features by specifying which features you care about via setting <code>:hud #{:errors :warnings}</code>. This will show errors/warnings but no progress indicator. Available options are <code>:errors</code>, <code>:warnings</code>, <code>:progress</code>. Only options included will be enabled, all other will be disabled.</p>
 </div>
 <div class="sect4">
-<h5 id="_opening_files"><a class="anchor" href="#_opening_files"></a><a class="link" href="#_opening_files">Opening Files</a></h5>
+<h5 id="open-file-command"><a class="anchor" href="#open-file-command"></a><a class="link" href="#open-file-command">Opening Files</a></h5>
 <div class="paragraph">
 <p>Warnings include a link to source location which can be clicked to open the file in your editor. For this a little bit of config is required.</p>
 </div>
@@ -5926,7 +5962,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2019-02-14 14:09:04 STD
+Last updated 2019-02-16 21:02:53 STD
 </div>
 </div>
 </body>
