@@ -1,4 +1,3 @@
-Unfortunately most editors these days expect you to work with the Leiningen `project.clj` setup so you might need to use the <<Leiningen, Leiningen integration>> for them to work properly.
 
 == Cursive
 
@@ -23,10 +22,11 @@ This section is written for CIDER version 0.18.0 and above. Ensure your Emacs en
 
 === Dependencies
 
-Many of CIDER's features require corresponding middleware running in the server. Add CIDER's nREPL middleware to the `:dependencies` entry of `shadow-cljs.edn`:
+Many of CIDER's features require corresponding middleware running in the server. Add CIDER's nREPL middleware to the `:dependencies` entry of <<user-config, ~/.shadow-cljs/config.edn>> or `shadow-cljs.edn`.
 
 ```clojure
-[cider/cider-nrepl "0.18.0"]
+{:dependencies
+ [[cider/cider-nrepl "0.21.0"]]}
 ```
 
 === Launch the server
@@ -151,7 +151,7 @@ You need to setup a couple of things to get it working.
 
 The file must define the `user/reset` fn since Proto REPL will call that when connecting. If `user/reset` is not found it will call `tools.namespace` which destroys the running `shadow-cljs` server. We don't want that. You could do something here but we don't need to do anything for CLJS.
 
-2) add `[proto-repl "0.3.1"]` to your `:dependencies`.
+2) add `[proto-repl "0.3.1"]` to your `:dependencies` in <<user-config, ~/.shadow-cljs/config.edn>> or `shadow-cljs.edn`.
 
 3) Configure a fixed <<nREPL, nREPL port>>
 
@@ -175,7 +175,7 @@ The file must define the `user/reset` fn since Proto REPL will call that when co
 
 You need VS Code and install the https://marketplace.visualstudio.com/items?itemName=cospaia.clojure4vscode#overview[Calva] extension.
 
-Since Calva uses nRepl and Cider you need to include this dependency in `shadow-cljs.edn`:
+Since Calva uses nRepl and Cider you need to include this dependency in <<user-config, ~/.shadow-cljs/config.edn>> or `shadow-cljs.edn`:
 
 ```clojure
 [cider/cider-nrepl "0.18.0"]
@@ -199,7 +199,7 @@ Once the app is loaded in the browser, and you see `JS runime connected` in the 
 
 Some of the things you can now do:
 
-==== Intellisence and stuff
+==== Intellisense and stuff
 
 - Peek at definitions on hover.
 - Get auto completion help.

@@ -5564,9 +5564,6 @@ The generated <code>report.html</code> is entirely self-contained and includes a
 <div class="sect1">
 <h2 id="_editor_integration"><a class="anchor" href="#_editor_integration"></a><a class="link" href="#_editor_integration">12. Editor Integration</a></h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>Unfortunately most editors these days expect you to work with the Leiningen <code>project.clj</code> setup so you might need to use the <a href="#Leiningen">Leiningen integration</a> for them to work properly.</p>
-</div>
 <div class="sect2">
 <h3 id="_cursive"><a class="anchor" href="#_cursive"></a><a class="link" href="#_cursive">12.1. Cursive</a></h3>
 <div class="paragraph">
@@ -5597,11 +5594,12 @@ The generated <code>report.html</code> is entirely self-contained and includes a
 <div class="sect3">
 <h4 id="_dependencies_2"><a class="anchor" href="#_dependencies_2"></a><a class="link" href="#_dependencies_2">12.2.1. Dependencies</a></h4>
 <div class="paragraph">
-<p>Many of CIDER&#8217;s features require corresponding middleware running in the server. Add CIDER&#8217;s nREPL middleware to the <code>:dependencies</code> entry of <code>shadow-cljs.edn</code>:</p>
+<p>Many of CIDER&#8217;s features require corresponding middleware running in the server. Add CIDER&#8217;s nREPL middleware to the <code>:dependencies</code> entry of <a href="#user-config">~/.shadow-cljs/config.edn</a> or <code>shadow-cljs.edn</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">[cider/cider-nrepl <span class="string"><span class="delimiter">&quot;</span><span class="content">0.18.0</span><span class="delimiter">&quot;</span></span>]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:dependencies</span>
+ [[cider/cider-nrepl <span class="string"><span class="delimiter">&quot;</span><span class="content">0.21.0</span><span class="delimiter">&quot;</span></span>]]}</code></pre>
 </div>
 </div>
 </div>
@@ -5777,7 +5775,7 @@ cljs.repl&gt;</code></pre>
 <p>The file must define the <code>user/reset</code> fn since Proto REPL will call that when connecting. If <code>user/reset</code> is not found it will call <code>tools.namespace</code> which destroys the running <code>shadow-cljs</code> server. We don&#8217;t want that. You could do something here but we don&#8217;t need to do anything for CLJS.</p>
 </div>
 <div class="paragraph">
-<p>2) add <code>[proto-repl "0.3.1"]</code> to your <code>:dependencies</code>.</p>
+<p>2) add <code>[proto-repl "0.3.1"]</code> to your <code>:dependencies</code> in <a href="#user-config">~/.shadow-cljs/config.edn</a> or <code>shadow-cljs.edn</code>.</p>
 </div>
 <div class="paragraph">
 <p>3) Configure a fixed <a href="#nREPL">nREPL port</a></p>
@@ -5812,7 +5810,7 @@ cljs.repl&gt;</code></pre>
 <p>You need VS Code and install the <a href="https://marketplace.visualstudio.com/items?itemName=cospaia.clojure4vscode#overview">Calva</a> extension.</p>
 </div>
 <div class="paragraph">
-<p>Since Calva uses nRepl and Cider you need to include this dependency in <code>shadow-cljs.edn</code>:</p>
+<p>Since Calva uses nRepl and Cider you need to include this dependency in <a href="#user-config">~/.shadow-cljs/config.edn</a> or <code>shadow-cljs.edn</code>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -5846,7 +5844,7 @@ cljs.repl&gt;</code></pre>
 <p>Some of the things you can now do:</p>
 </div>
 <div class="sect4">
-<h5 id="_intellisence_and_stuff"><a class="anchor" href="#_intellisence_and_stuff"></a><a class="link" href="#_intellisence_and_stuff">Intellisence and stuff</a></h5>
+<h5 id="_intellisense_and_stuff"><a class="anchor" href="#_intellisense_and_stuff"></a><a class="link" href="#_intellisense_and_stuff">Intellisense and stuff</a></h5>
 <div class="ulist">
 <ul>
 <li>
