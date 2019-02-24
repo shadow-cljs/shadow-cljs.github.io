@@ -630,9 +630,10 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_compiler_cache">5.4. Compiler Cache</a></li>
 <li><a href="#closure-defines">5.5. Closure Defines</a></li>
 <li><a href="#compiler-options">5.6. Compiler Options</a></li>
-<li><a href="#_conditional_reading">5.7. Conditional Reading</a></li>
-<li><a href="#config-merge">5.8. Overriding from the CLI</a></li>
-<li><a href="#shadow-env">5.9. Using Environment Variables</a></li>
+<li><a href="#_output_language_options">5.7. Output Language Options</a></li>
+<li><a href="#_conditional_reading">5.8. Conditional Reading</a></li>
+<li><a href="#config-merge">5.9. Overriding from the CLI</a></li>
+<li><a href="#shadow-env">5.10. Using Environment Variables</a></li>
 </ul>
 </li>
 <li><a href="#target-browser">6. Targeting the Browser</a>
@@ -2713,9 +2714,6 @@ It is generally safer to use the "disabled" variant as the default since it make
 <p><code>:checked-arrays</code> (Boolean), defaults to <code>false</code></p>
 </li>
 <li>
-<p><code>:language-in</code> and <code>:language-out</code></p>
-</li>
-<li>
 <p><code>:anon-fn-naming-policy</code></p>
 </li>
 <li>
@@ -2783,7 +2781,71 @@ It is generally safer to use the "disabled" variant as the default since it make
 </div>
 </div>
 <div class="sect2">
-<h3 id="_conditional_reading"><a class="anchor" href="#_conditional_reading"></a><a class="link" href="#_conditional_reading">5.7. Conditional Reading</a></h3>
+<h3 id="_output_language_options"><a class="anchor" href="#_output_language_options"></a><a class="link" href="#_output_language_options">5.7. Output Language Options</a></h3>
+<div class="paragraph">
+<p>By default the generated JS output will be compatible with ES5 and all "newer" features will be transpiled to compatible code using polyfills. This is currently the safest default and supports most browsers in active use (including IE10+).</p>
+</div>
+<div class="paragraph">
+<p>You can select other output options if you only care about more modern environments and want to keep the original code without replacements (eg. <code>node</code>, Chrome Extensions, &#8230;&#8203;)</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Note that this mostly affects imported JS code from <a href="#npm">npm</a> or <code>.js</code> files from the <a href="#classpath-js">classpath</a>. CLJS will currently only generate ES5 output and is not affected by setting higher options.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>You can configure this via the <code>:output-feature-set</code> in <code>:compiler-options</code>. The older <code>:language-out</code> option should not be used as <code>:output-feature-set</code> replaced it.</p>
+</div>
+<div class="paragraph">
+<p>Supported options are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>:es3</code></p>
+</li>
+<li>
+<p><code>:es5</code></p>
+</li>
+<li>
+<p><code>:es6</code> - <code>class</code>, <code>const</code>, <code>let</code>, &#8230;&#8203;</p>
+</li>
+<li>
+<p><code>:es7</code> - exponent <code>**</code> operator</p>
+</li>
+<li>
+<p><code>:es8</code> - <code>async/await</code>, <code>generators</code>, object literals with spread, &#8230;&#8203;</p>
+</li>
+<li>
+<p><code>:es-next</code> - all the features the Closure Compiler currently supports</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="title">Example</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:script</span>
+  {<span class="symbol">:target</span> <span class="symbol">:node-script</span>
+   <span class="symbol">:main</span> foo.bar/main
+   <span class="keyword">..</span><span class="keyword">.</span>
+   <span class="symbol">:compiler-options</span> {<span class="symbol">:output-feature-set</span> <span class="symbol">:es7</span>}}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Documentation on these options is a bit sparse and is mostly documented in the code <a href="https://github.com/google/closure-compiler/blob/master/src/com/google/javascript/jscomp/parsing/parser/FeatureSet.java">here</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_conditional_reading"><a class="anchor" href="#_conditional_reading"></a><a class="link" href="#_conditional_reading">5.8. Conditional Reading</a></h3>
 <div class="admonitionblock caution">
 <table>
 <tr>
@@ -2883,7 +2945,7 @@ This feature is only available in <code>.cljc</code> files and will fail in <cod
 </div>
 </div>
 <div class="sect2">
-<h3 id="config-merge"><a class="anchor" href="#config-merge"></a><a class="link" href="#config-merge">5.8. Overriding from the CLI</a></h3>
+<h3 id="config-merge"><a class="anchor" href="#config-merge"></a><a class="link" href="#config-merge">5.9. Overriding from the CLI</a></h3>
 <div class="paragraph">
 <p>It is sometimes desirable to make small adjustments to the build configuration from the command line with values that can&#8217;t be added statically to the <code>shadow-cljs.edn</code> config or may change depending on the environment you are in.</p>
 </div>
@@ -2930,7 +2992,7 @@ If you specify multiple build ids the data will be merged into all specified bui
 </div>
 </div>
 <div class="sect2">
-<h3 id="shadow-env"><a class="anchor" href="#shadow-env"></a><a class="link" href="#shadow-env">5.9. Using Environment Variables</a></h3>
+<h3 id="shadow-env"><a class="anchor" href="#shadow-env"></a><a class="link" href="#shadow-env">5.10. Using Environment Variables</a></h3>
 <div class="paragraph">
 <p>It is possible to use environment variables to set configuration values in <code>shadow-cljs.edn</code> but you should consider using <code>--config-merge</code> instead. If you really must use an environment variable you can do so via the <code>#shadow/env "FOO"</code> reader tag.</p>
 </div>

@@ -345,7 +345,6 @@ Currently supported options include
 - `:source-map-detail-level` `:all` or `:symbols` (`:symbols` reduces overall size a bit but also a bit less accurate)
 - `:externs` vector of paths, defaults to `[]`
 - `:checked-arrays` (Boolean), defaults to `false`
-- `:language-in` and `:language-out`
 - `:anon-fn-naming-policy`
 - `:rename-prefix` and `:rename-prefix-namespace`
 
@@ -369,6 +368,38 @@ Options that don't have any effect at all include
 - `:package-json-resolution` see <<js-resolve, :js-options :resolve>> instead
 - `:watch-fn`
 - `:process-shim`
+
+== Output Language Options
+
+By default the generated JS output will be compatible with ES5 and all "newer" features will be transpiled to compatible code using polyfills. This is currently the safest default and supports most browsers in active use (including IE10+).
+
+You can select other output options if you only care about more modern environments and want to keep the original code without replacements (eg. `node`, Chrome Extensions, ...)
+
+IMPORTANT: Note that this mostly affects imported JS code from <<npm, npm>> or `.js` files from the <<classpath-js, classpath>>. CLJS will currently only generate ES5 output and is not affected by setting higher options.
+
+You can configure this via the `:output-feature-set` in `:compiler-options`. The older `:language-out` option should not be used as `:output-feature-set` replaced it.
+
+Supported options are:
+
+- `:es3`
+- `:es5`
+- `:es6` - `class`, `const`, `let`, ...
+- `:es7` - exponent `**` operator
+- `:es8` - `async/await`, `generators`, object literals with spread, ...
+- `:es-next` - all the features the Closure Compiler currently supports
+
+.Example
+```
+{...
+ :builds
+ {:script
+  {:target :node-script
+   :main foo.bar/main
+   ...
+   :compiler-options {:output-feature-set :es7}}}}
+```
+
+Documentation on these options is a bit sparse and is mostly documented in the code https://github.com/google/closure-compiler/blob/master/src/com/google/javascript/jscomp/parsing/parser/FeatureSet.java[here].
 
 
 == Conditional Reading
