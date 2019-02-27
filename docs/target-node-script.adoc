@@ -24,11 +24,11 @@ You will need the same basic <<CommonConfig,main configuration>> as in other tar
 ```
 {:source-paths [...]
  ...
- :builds {:script
-            {:id        :script
-             :target    :node-script
-             :main      demo.script/main
-             :output-to "out/demo-script/script.js"}}}
+ :builds
+ {:script
+  {:target :node-script
+   :main demo.script/main
+   :output-to "out/demo-script/script.js"}}}
 ```
 
 When compiled this results in a standalone `out/demo-script/script.js` file intended to be called

@@ -1,0 +1,60 @@
+The `:target :react-native` produces code that is meant to integrate into the default `react-native` tooling (eg. `metro`). Tools like `expo` which wrap those tools should automatically work and require no additional setup.
+
+You will need the same basic <<CommonConfig,main configuration>> as in other targets (like
+`:source-paths`), the build specific config is very minimal and requires at least 2 options (besides `:target` itself)
+
+[horizontal]
+`:init-fn`:: (required). The namespace-qualified symbol of your apps init function. This function will be called once on startup and should probably render something.
+`:output-dir`:: (required). The directory used to write output files.
+
+// TODO: Thomas mentioned that node can be picky and sometimes output-dir is useful...an example would be nice.
+
+.Sample :react-native config
+```
+{:source-paths [...]
+ :dependencies [...]
+ ...
+ :builds
+ {:app
+  {:target :react-native
+   :init-fn demo.app/init
+   :output-dir "app"}}}
+```
+
+When compiled this results in a `app/index.js` file intended to be used as an entry point for the `react-native` tools. During development the `:output-dir` will contain many more files but you should only reference the generated `app/index.js` directly. A `release` build will only generated the optimized `app/index.js` and requires no additional files.
+
+== Expo
+
+https://expo.io/[expo] makes working with `react-native` quite easy. There are two provided example setups.
+
+- https://github.com/thheller/fulcro-expo
+- https://github.com/thheller/reagent-expo
+
+Both examples where generated using `expo init ...` and the only adjusted change in the config was adding the proper `entryPoint` to the generated `app.json`.
+
+```
+{
+  "expo": {
+    "name": "hello-world",
+    "slug": "reagent-expo",
+    ...
+    "entryPoint":"./app/index.js",
+    ...
+  }
+}
+```
+
+`expo` requires that a React Component is registered on startup which can be done manually or by using the `shadow.expo/render-root` function which takes care of creating the Component and instead directly expects a React Element instance to start rendering.
+
+.From the Reagent https://github.com/thheller/reagent-expo/blob/2c73ed0513a8f5050b250c0c7e53b9ae7543cee9/src/main/test/app.cljs#L34-L40[example]
+```
+(defn start
+  {:dev/after-load true}
+  []
+  (expo/render-root (r/as-element [root])))
+
+(defn init []
+  (start))
+```
+
+`init` is called once on startup. Since the example doesn't need to do any special setup it just calls `start` directly. `start` will be called repeatedly when `watch` is running each time after the code changes were reloaded. The `reagent.core/as-element` function can be used to generate the required React Element from the reagent hiccup markup.
