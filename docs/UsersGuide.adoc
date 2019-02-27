@@ -509,6 +509,10 @@ include::build-config.adoc[]
 
 include::target-browser.adoc[]
 
+= Targeting React Native [[target-react-native]]
+
+include::target-react-native.adoc[]
+
 = Targeting node.js [[target-node]]
 
 There is built-in support for generating code that is intended to be used as a stand-alone
@@ -526,6 +530,7 @@ include::target-node-script.adoc[]
 == node.js Libraries [[target-node-library]]
 
 include::target-node-library.adoc[]
+
 
 == Creating `npm` packages
 
