@@ -1,4 +1,3 @@
-
 == Cursive
 
 Cursive does not currently support resolving dependencies via `shadow-cljs.edn`. You can run `shadow-cljs pom` to generate a `pom.xml` and import that using the IntelliJ.
@@ -18,7 +17,7 @@ You can run `npx shadow-cljs server` inside the Terminal provided by IntelliJ an
 
 == Emacs / CIDER [[cider]]
 
-This section is written for CIDER version 0.18.0 and above. Ensure your Emacs environment has this version of the `cider` package or later. Refer to the link:http://cider.readthedocs.io/en/latest/[CIDER documentation] for full installation details.
+This section is written for CIDER version 0.20.0 and above. Ensure your Emacs environment has this version of the `cider` package or later. Refer to the link:https://docs.cider.mx[CIDER documentation] for full installation details.
 
 === Dependencies
 
@@ -100,7 +99,7 @@ JS runtime connected.
 Launch the ClojureScript REPL alongside the Clojure REPL connection. Make sure you are in the `cider-repl` buffer so that Emacs knows which connection to use.
 
 ```console
-M-x cider-create-sibling-cljs-repl
+M-x cider-connect-sibling-cljs
 ```
 
 CIDER will prompt you for the type of ClojureScript REPL:
@@ -175,10 +174,10 @@ The file must define the `user/reset` fn since Proto REPL will call that when co
 
 You need VS Code and install the https://marketplace.visualstudio.com/items?itemName=cospaia.clojure4vscode#overview[Calva] extension.
 
-Since Calva uses nRepl and Cider you need to include this dependency in <<user-config, ~/.shadow-cljs/config.edn>> or `shadow-cljs.edn`:
+Since Calva uses nREPL and the `cider-nrepl` middlewares you need to include this dependency in <<user-config, ~/.shadow-cljs/config.edn>> or `shadow-cljs.edn`:
 
 ```clojure
-[cider/cider-nrepl "0.18.0"]
+[cider/cider-nrepl "0.21.0"]
 ```
 
 `shadow-cljs` will inject the required `cider-nrepl` middleware once it sees this dependency.
