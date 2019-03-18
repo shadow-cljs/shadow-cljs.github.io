@@ -1308,8 +1308,8 @@ shadow-cljs - REPL - see (help), :repl/quit to exit
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">$ lein repl
 nREPL server started on port 57098 on host 127.0.0.1 - nrepl://127.0.0.1:57098
-REPL-y 0.3.7, nREPL 0.2.13
-Clojure 1.9.0
+REPL-y 0.4.3, nREPL 0.6.0
+Clojure 1.10.0
 ...
 
 user=&gt; (require '[shadow.cljs.devtools.server :as server])
@@ -1714,7 +1714,7 @@ In the case of <code>react</code> you probably need these 3 packages: <code>npm 
 <div class="sect2">
 <h3 id="user-config"><a class="anchor" href="#user-config"></a><a class="link" href="#user-config">4.3. User Configuration</a></h3>
 <div class="paragraph">
-<p>Most configuration will be done in the projects themselves via <code>shadow-cljs.edn</code> but some config may be user-dependent. Tools like <code>cider</code> may require the additional <code>cider-nrepl</code> dependency which would be useless for a different team member using Cursive when adding that dependency via <code>shadow-cljs.edn</code>.</p>
+<p>Most configuration will be done in the projects themselves via <code>shadow-cljs.edn</code> but some config may be user-dependent. Tools like <a href="https://docs.cider.mx">CIDER</a> may require the additional <code>cider-nrepl</code> dependency which would be useless for a different team member using Cursive when adding that dependency via <code>shadow-cljs.edn</code>.</p>
 </div>
 <div class="paragraph">
 <p>A restricted set of config options can be added to <code>~/.shadow-cljs/config.edn</code> which will then apply to all projects built on this users machine.</p>
@@ -1759,7 +1759,7 @@ In the case of <code>react</code> you probably need these 3 packages: <code>npm 
 <div class="sect3">
 <h4 id="nREPL"><a class="anchor" href="#nREPL"></a><a class="link" href="#nREPL">4.4.1. nREPL</a></h4>
 <div class="paragraph">
-<p>The <code>shadow-cljs</code> <a href="#server-mode">server</a> provides a nREPL server via TCP. If you look at the startup message you&#8217;ll see the port of nREPL, and the port will also be stored in <code>target/shadow-cljs/nrepl.port</code>:</p>
+<p>The <code>shadow-cljs</code> <a href="#server-mode">server</a> provides a <a href="https://nrepl.org">nREPL</a> server via TCP. If you look at the startup message you&#8217;ll see the port of nREPL, and the port will also be stored in <code>target/shadow-cljs/nrepl.port</code>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1840,7 +1840,7 @@ Use <code>:cljs/quit</code> to return to Clojure.
     shadow.cljs.devtools.server.nrepl/cljs-eval
     shadow.cljs.devtools.server.nrepl/cljs-select
     <span class="comment">;; required by some tools, not by shadow-cljs.</span>
-    cemerick.piggieback/wrap-cljs-repl]}
+    cider.piggieback/wrap-cljs-repl]}
   <span class="keyword">..</span><span class="keyword">.</span>)</code></pre>
 </div>
 </div>
@@ -5754,7 +5754,7 @@ The generated <code>report.html</code> is entirely self-contained and includes a
 <div class="sect2">
 <h3 id="cider"><a class="anchor" href="#cider"></a><a class="link" href="#cider">13.2. Emacs / CIDER</a></h3>
 <div class="paragraph">
-<p>This section is written for CIDER version 0.18.0 and above. Ensure your Emacs environment has this version of the <code>cider</code> package or later. Refer to the <a href="http://cider.readthedocs.io/en/latest/">CIDER documentation</a> for full installation details.</p>
+<p>This section is written for CIDER version 0.20.0 and above. Ensure your Emacs environment has this version of the <code>cider</code> package or later. Refer to the <a href="https://docs.cider.mx">CIDER documentation</a> for full installation details.</p>
 </div>
 <div class="sect3">
 <h4 id="_dependencies_2"><a class="anchor" href="#_dependencies_2"></a><a class="link" href="#_dependencies_2">13.2.1. Dependencies</a></h4>
@@ -5869,7 +5869,7 @@ The generated <code>report.html</code> is entirely self-contained and includes a
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="console">M-x cider-create-sibling-cljs-repl</code></pre>
+<pre class="CodeRay highlight"><code data-lang="console">M-x cider-connect-sibling-cljs</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -5975,11 +5975,11 @@ cljs.repl&gt;</code></pre>
 <p>You need VS Code and install the <a href="https://marketplace.visualstudio.com/items?itemName=cospaia.clojure4vscode#overview">Calva</a> extension.</p>
 </div>
 <div class="paragraph">
-<p>Since Calva uses nRepl and Cider you need to include this dependency in <a href="#user-config">~/.shadow-cljs/config.edn</a> or <code>shadow-cljs.edn</code>:</p>
+<p>Since Calva uses nREPL and the <code>cider-nrepl</code> middlewares you need to include this dependency in <a href="#user-config">~/.shadow-cljs/config.edn</a> or <code>shadow-cljs.edn</code>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">[cider/cider-nrepl <span class="string"><span class="delimiter">&quot;</span><span class="content">0.18.0</span><span class="delimiter">&quot;</span></span>]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">[cider/cider-nrepl <span class="string"><span class="delimiter">&quot;</span><span class="content">0.21.0</span><span class="delimiter">&quot;</span></span>]</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -6128,7 +6128,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2019-02-27 10:31:14 STD
+Last updated 2019-03-18 23:54:15 STD
 </div>
 </div>
 </body>
