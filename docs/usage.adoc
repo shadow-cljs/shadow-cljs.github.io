@@ -194,8 +194,8 @@ When you are not using the `shadow-cljs clj-repl` but instead a REPL started by 
 ```bash
 $ lein repl
 nREPL server started on port 57098 on host 127.0.0.1 - nrepl://127.0.0.1:57098
-REPL-y 0.3.7, nREPL 0.2.13
-Clojure 1.9.0
+REPL-y 0.4.3, nREPL 0.6.0
+Clojure 1.10.0
 ...
 
 user=> (require '[shadow.cljs.devtools.server :as server])
