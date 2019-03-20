@@ -279,10 +279,10 @@ This section is for other options that configure the `shadow-cljs` server instan
 The `shadow-cljs` <<server-mode, server>> provides a https://nrepl.org[nREPL] server via TCP. If you look at the startup message you'll see the port of nREPL, and the port will also be stored in `target/shadow-cljs/nrepl.port`:
 
 ```bash
-$ shadow-cljs watch dev
-shadow-cljs - HTTP server for ":app" available at http://localhost:8020
-shadow-cljs - server running at http://0.0.0.0:9630
-shadow-cljs - nrepl running at /0.0.0.0:9462
+$ shadow-cljs watch app
+shadow-cljs - HTTP server available at http://localhost:8600
+shadow-cljs - server version: <version> running at http://localhost:9630
+shadow-cljs - nREPL server started on port 64967
 shadow-cljs - watching build :app
 [:app] Configuring build.
 [:app] Compiling ...
@@ -297,8 +297,9 @@ You can configure the port and additional middleware with `shadow-cljs.edn`:
  ...}
 ```
 
-If the popular middleware https://github.com/clojure-emacs/cider-nrepl[cider-nrepl] is found on the classpath (e.g. it's included in `:dependencies`), it will be used automatically. No additional configuration required.
+The default global config file in `~/.nrepl/nrepl.edn` or the local `.nrepl.edn` will also be loaded on startup and can be used to configure `:middleware`.
 
+If the popular middleware https://github.com/clojure-emacs/cider-nrepl[cider-nrepl] is found on the classpath (e.g. it's included in `:dependencies`), it will be used automatically. No additional configuration required. This can be disabled by setting `:nrepl {:cider false}`.
 
 You may configure the namespace you start in when connecting by setting `:init-ns` in the `:nrepl` options. It defaults to `shadow.user`.
 
@@ -317,7 +318,7 @@ When connecting to the nREPL server the connection always starts out as a Clojur
 
 ```repl
 (shadow/watch :the-build)
-(shadow/nrepl-select :the-build)
+(shadow/repl :the-build)
 ```
 
 TIP: Use `:cljs/quit` to return to Clojure.

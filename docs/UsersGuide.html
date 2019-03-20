@@ -1763,10 +1763,10 @@ In the case of <code>react</code> you probably need these 3 packages: <code>npm 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">$ shadow-cljs watch dev
-shadow-cljs - HTTP server for &quot;:app&quot; available at http://localhost:8020
-shadow-cljs - server running at http://0.0.0.0:9630
-shadow-cljs - nrepl running at /0.0.0.0:9462
+<pre class="CodeRay highlight"><code data-lang="bash">$ shadow-cljs watch app
+shadow-cljs - HTTP server available at http://localhost:8600
+shadow-cljs - server version: &lt;version&gt; running at http://localhost:9630
+shadow-cljs - nREPL server started on port 64967
 shadow-cljs - watching build :app
 [:app] Configuring build.
 [:app] Compiling ...</code></pre>
@@ -1784,7 +1784,10 @@ shadow-cljs - watching build :app
 </div>
 </div>
 <div class="paragraph">
-<p>If the popular middleware <a href="https://github.com/clojure-emacs/cider-nrepl">cider-nrepl</a> is found on the classpath (e.g. it&#8217;s included in <code>:dependencies</code>), it will be used automatically. No additional configuration required.</p>
+<p>The default global config file in <code>~/.nrepl/nrepl.edn</code> or the local <code>.nrepl.edn</code> will also be loaded on startup and can be used to configure <code>:middleware</code>.</p>
+</div>
+<div class="paragraph">
+<p>If the popular middleware <a href="https://github.com/clojure-emacs/cider-nrepl">cider-nrepl</a> is found on the classpath (e.g. it&#8217;s included in <code>:dependencies</code>), it will be used automatically. No additional configuration required. This can be disabled by setting <code>:nrepl {:cider false}</code>.</p>
 </div>
 <div class="paragraph">
 <p>You may configure the namespace you start in when connecting by setting <code>:init-ns</code> in the <code>:nrepl</code> options. It defaults to <code>shadow.user</code>.</p>
@@ -1807,7 +1810,7 @@ shadow-cljs - watching build :app
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="repl">(shadow/watch :the-build)
-(shadow/nrepl-select :the-build)</code></pre>
+(shadow/repl :the-build)</code></pre>
 </div>
 </div>
 <div class="admonitionblock tip">
@@ -6128,7 +6131,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2019-03-18 23:54:15 STD
+Last updated 2019-03-20 12:28:57 STD
 </div>
 </div>
 </body>
