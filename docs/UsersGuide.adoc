@@ -252,7 +252,8 @@ Adding dependencies is allowed via the usual `:dependencies` key. Note that depe
 .Example ~/.shadow-cljs/config.edn
 ```
 {:dependencies
- [[cider-nrepl "0.21.0"]]}
+ [[cider/cider-nrepl "0.21.1"]]}
+;; this version may be out of date, check whichever is available
 ```
 
 When using `deps.edn` to resolve dependencies you may sometimes want to activate additional aliases. This can be done via `:deps-aliases`.
