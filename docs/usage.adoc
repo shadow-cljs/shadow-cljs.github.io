@@ -110,8 +110,11 @@ If you'd like to use https://leiningen.org/[Leiningen] to manage your dependenci
   :profiles
   {:cljs
    {:source-paths ["src/cljs"]
-    :dependencies [[reagent "0.8.1"]]}})
+    :dependencies [[thheller/shadow-cljs "..."]
+                   [reagent "0.8.1"]]}})
 ```
+
+When using `project.clj` to manage your `:dependencies` you must manually include the https://clojars.org/thheller/shadow-cljs[thheller/shadow-cljs] artifact in your `:dependencies` (directly for in a profile).
 
 ==== Running Tasks Directly From Leiningen
 
@@ -119,7 +122,6 @@ You may also directly execute `shadow-cljs` commands via `lein` if you prefer to
 
 IMPORTANT: It is recommended to still use the `shadow-cljs` command to run commands since that will take full advantage of a running server mode instance. This will run commands substantially faster than launching additional JVMs when using `lein` directly.
 
-When executing directly via `lein` you must manually include the https://clojars.org/thheller/shadow-cljs[thheller/shadow-cljs] artifact in your `:dependencies`. This is automatically added when launching via `shadow-cljs`.
 
 .Just compile :dev mode once, no REPL or live-reload:
 ```bash

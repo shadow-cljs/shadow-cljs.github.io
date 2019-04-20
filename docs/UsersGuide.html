@@ -1173,8 +1173,12 @@ It is strongly recommended to use the standalone <code>shadow-cljs</code> versio
   <span class="symbol">:profiles</span>
   {<span class="symbol">:cljs</span>
    {<span class="symbol">:source-paths</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">src/cljs</span><span class="delimiter">&quot;</span></span>]
-    <span class="symbol">:dependencies</span> [[reagent <span class="string"><span class="delimiter">&quot;</span><span class="content">0.8.1</span><span class="delimiter">&quot;</span></span>]]}})</code></pre>
+    <span class="symbol">:dependencies</span> [[thheller/shadow-cljs <span class="string"><span class="delimiter">&quot;</span><span class="content">...</span><span class="delimiter">&quot;</span></span>]
+                   [reagent <span class="string"><span class="delimiter">&quot;</span><span class="content">0.8.1</span><span class="delimiter">&quot;</span></span>]]}})</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>When using <code>project.clj</code> to manage your <code>:dependencies</code> you must manually include the <a href="https://clojars.org/thheller/shadow-cljs">thheller/shadow-cljs</a> artifact in your <code>:dependencies</code> (directly for in a profile).</p>
 </div>
 <div class="sect4">
 <h5 id="_running_tasks_directly_from_leiningen"><a class="anchor" href="#_running_tasks_directly_from_leiningen"></a><a class="link" href="#_running_tasks_directly_from_leiningen">Running Tasks Directly From Leiningen</a></h5>
@@ -1192,9 +1196,6 @@ It is recommended to still use the <code>shadow-cljs</code> command to run comma
 </td>
 </tr>
 </table>
-</div>
-<div class="paragraph">
-<p>When executing directly via <code>lein</code> you must manually include the <a href="https://clojars.org/thheller/shadow-cljs">thheller/shadow-cljs</a> artifact in your <code>:dependencies</code>. This is automatically added when launching via <code>shadow-cljs</code>.</p>
 </div>
 <div class="listingblock">
 <div class="title">Just compile :dev mode once, no REPL or live-reload:</div>
