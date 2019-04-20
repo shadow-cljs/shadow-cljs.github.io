@@ -114,7 +114,7 @@ If you'd like to use https://leiningen.org/[Leiningen] to manage your dependenci
                    [reagent "0.8.1"]]}})
 ```
 
-When using `project.clj` to manage your `:dependencies` you must manually include the https://clojars.org/thheller/shadow-cljs[thheller/shadow-cljs] artifact in your `:dependencies` (directly for in a profile).
+When using `project.clj` to manage your `:dependencies` you must manually include the https://clojars.org/thheller/shadow-cljs[thheller/shadow-cljs] artifact in your `:dependencies` (directly or in a profile).
 
 ==== Running Tasks Directly From Leiningen
 
