@@ -7,16 +7,12 @@ comes with a convenience mode that makes such integration easier.
 
 == Convenience Mode
 
-This target is meant to be as easy to access as possible, and does not actually require a specific
-build in the config. You still need a non-empty config file, but the default one from
-`shadow-cljs init` will do.
+This target is meant to be as easy to access as possible, and does not actually require a specific build in the config. You still need a non-empty config file, but the default one from `shadow-cljs init` will do.
 
-ClojureScript organizes files into namespaces which means that a `demo.foo` namespace should be inside a
-`src/demo/foo.cljs` file. Where `src` is the default source path the shadow-cljs tool (see <<CommonConfig, main configuration>>).
+ClojureScript organizes files into namespaces which means that a `demo.foo` namespace should be inside a `src/main/demo/foo.cljs` file. Where `src/main` is the default source path the shadow-cljs tool (see <<CommonConfig, main configuration>>).
 
-If you have this file in `src/demo`:
 
-.Sample source for `foo.cljs`
+.Sample source for `src/main/demo/foo.cljs`
 ```
 (ns demo.foo)
 

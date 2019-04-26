@@ -4321,19 +4321,13 @@ comes with a convenience mode that makes such integration easier.</p>
 <div class="sect2">
 <h3 id="_convenience_mode"><a class="anchor" href="#_convenience_mode"></a><a class="link" href="#_convenience_mode">9.1. Convenience Mode</a></h3>
 <div class="paragraph">
-<p>This target is meant to be as easy to access as possible, and does not actually require a specific
-build in the config. You still need a non-empty config file, but the default one from
-<code>shadow-cljs init</code> will do.</p>
+<p>This target is meant to be as easy to access as possible, and does not actually require a specific build in the config. You still need a non-empty config file, but the default one from <code>shadow-cljs init</code> will do.</p>
 </div>
 <div class="paragraph">
-<p>ClojureScript organizes files into namespaces which means that a <code>demo.foo</code> namespace should be inside a
-<code>src/demo/foo.cljs</code> file. Where <code>src</code> is the default source path the shadow-cljs tool (see <a href="#CommonConfig">main configuration</a>).</p>
-</div>
-<div class="paragraph">
-<p>If you have this file in <code>src/demo</code>:</p>
+<p>ClojureScript organizes files into namespaces which means that a <code>demo.foo</code> namespace should be inside a <code>src/main/demo/foo.cljs</code> file. Where <code>src/main</code> is the default source path the shadow-cljs tool (see <a href="#CommonConfig">main configuration</a>).</p>
 </div>
 <div class="listingblock">
-<div class="title">Sample source for <code>foo.cljs</code></div>
+<div class="title">Sample source for <code>src/main/demo/foo.cljs</code></div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">demo.foo</span>)
 
