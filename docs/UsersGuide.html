@@ -2251,7 +2251,9 @@ preloads option is simply a list of namespaces in the <code>:devtools</code>/<co
 <td class="content">
 Since version 2.0.130 shadow-cljs automatically adds <code>cljs-devtools</code> to the preloads in
 <code>watch</code> and <code>compile</code> if they are on the classpath. All you need to do is make sure <code>binaryage/devtools</code> is in your
-<code>dependencies</code> list. (Note, <strong>not</strong> binaryage/<strong>cljs-</strong>devtools.)
+<code>dependencies</code> list. (Note, <strong>not</strong> binaryage/<strong>cljs-</strong>devtools.) If you don&#8217;t want to have <code>cljs-devtools</code> in
+specific targets, you can suppress this by adding <code>:console-support false</code> to the <code>:devtools</code> section of
+those targets.
 </td>
 </tr>
 </table>
@@ -6127,7 +6129,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2019-03-31 21:46:40 DST
+Last updated 2019-05-19 15:31:29 CEST
 </div>
 </div>
 </body>
