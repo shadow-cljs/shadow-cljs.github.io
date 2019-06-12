@@ -198,7 +198,7 @@ This example would call `(my.util/hook build-state 1 2 3)` after the build compl
 
 The hook is a just a normal *Clojure* function with some additional metadata. The `{:shadow.build/stage :flush}` metadata informs the compiler to call this hook for `:flush` only. You may instead configure `{:shadow.build/stages #{:configure :flush}}` if the hook should be called after multiple stages. At least one configured stage is required since the hook otherwise would never do anything.
 
-All build hooks will the called after the `:target` work is done. They will receive the `build-state` (a clojure map with all the current build data) as their first argument and *must* return this `build-state` modified or unmodified. When using multiple stages you can add additional data to the `build-state` that later stages can see. It is strongly advised to use namespaced keys only to ensure not accidentally breaking the entire build.
+All build hooks will be called after the `:target` work is done. They will receive the `build-state` (a clojure map with all the current build data) as their first argument and *must* return this `build-state` modified or unmodified. When using multiple stages you can add additional data to the `build-state` that later stages can see. It is strongly advised to use namespaced keys only to ensure not accidentally breaking the entire build.
 
 The `build-state` has some important entries which might be useful for your hooks:
 

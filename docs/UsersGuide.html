@@ -2447,7 +2447,7 @@ If neither <code>:after-load</code> nor <code>:before-load</code> are set the co
 <p>The hook is a just a normal <strong>Clojure</strong> function with some additional metadata. The <code>{:shadow.build/stage :flush}</code> metadata informs the compiler to call this hook for <code>:flush</code> only. You may instead configure <code>{:shadow.build/stages #{:configure :flush}}</code> if the hook should be called after multiple stages. At least one configured stage is required since the hook otherwise would never do anything.</p>
 </div>
 <div class="paragraph">
-<p>All build hooks will the called after the <code>:target</code> work is done. They will receive the <code>build-state</code> (a clojure map with all the current build data) as their first argument and <strong>must</strong> return this <code>build-state</code> modified or unmodified. When using multiple stages you can add additional data to the <code>build-state</code> that later stages can see. It is strongly advised to use namespaced keys only to ensure not accidentally breaking the entire build.</p>
+<p>All build hooks will be called after the <code>:target</code> work is done. They will receive the <code>build-state</code> (a clojure map with all the current build data) as their first argument and <strong>must</strong> return this <code>build-state</code> modified or unmodified. When using multiple stages you can add additional data to the <code>build-state</code> that later stages can see. It is strongly advised to use namespaced keys only to ensure not accidentally breaking the entire build.</p>
 </div>
 <div class="paragraph">
 <p>The <code>build-state</code> has some important entries which might be useful for your hooks:</p>
