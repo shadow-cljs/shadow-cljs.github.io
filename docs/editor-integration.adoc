@@ -206,25 +206,24 @@ Some of the things you can now do:
 
 ==== Evaluation of the file, forms and selection
 
-- Evaluate the file: `ctrl+alt+v enter` (This is done automatically one opening files.)
-- Evaluate inline: `ctrl+alt+v e`
-- Evaluate and replace them in the editor: `ctrl+alt+v r`
-- Pretty print evaluation resuls: `ctrl+alt+v p`
-- Send forms to the integrated terminal repls for evaluation: `ctrl+alt+v alt+e`
+- Evaluate the file: `ctrl+alt+c enter` (This is done automatically one opening files.)
+- Evaluate inline: `ctrl+alt+c e`
+- Evaluate and replace them in the editor: `ctrl+alt+c r`
+- Pretty print evaluation resuls: `ctrl+alt+c p`
+- Send forms to the integrated terminal repls for evaluation: `ctrl+alt+c alt+e`
 
 ==== Run tests
 
-- Run namespace tests: `ctrl+alt+v t`
-- Run all tests: `ctrl+alt+v shift+t` (Really clunky in large projects so far.)
-- Rerun previously failing tests: `ctrl+alt+v ctrl+t`
+- Run namespace tests: `ctrl+alt+c t`
+- Run all tests: `ctrl+alt+c shift+t` (Really clunky in large projects so far.)
+- Rerun previously failing tests: `ctrl+alt+c ctrl+t`
 - Test failures are marked in the explorer and editors and listed in the Problem tab for easy access.
 
 ==== Terminal repls
 
-- Show repl terminal: `ctrl+alt+v z`
-- Switch namespace in terminal repl to that of the currently open file: `ctrl+alt+v n`
-- Load current file and switch namespace in: `ctrl+alt+v alt+n`
+- Switch namespace in terminal repl to that of the currently open file: `ctrl+alt+c n`
+- Load current file and switch namespace in: `ctrl+alt+c alt+n`
 
 ==== Cljc files
 
-- Switch between Clojure and Clojurescript repl `ctrl+alt+v alt+c` (or click the green `cljc/clj` button in the status bar). This determines both which repl is backing the editor and what terminal repl is being accessed, see above.
+- Switch between Clojure and Clojurescript repl `ctrl+alt+c ctrl+alt+t` (or click the green `cljc/clj` button in the status bar). This determines both which repl is backing the editor and what terminal repl is being accessed, see above.
