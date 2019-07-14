@@ -166,6 +166,20 @@ The file must define the `user/reset` fn since Proto REPL will call that when co
 
 9) Eval some JS, eg. `(js/alert "foo")`. If you get `There is no connected JS runtime` the client is not connected properly. Otherwise the Browser should show an alert.
 
+== Chlorine (Atom)
+
+Chlorine connects Atom to a Socket REPL, but also tries to refresh namespace. So first, open up Chlorine package config and check if configuration `Should we use clojure.tools.namespace to refresh` is set to `simple`, otherwise it'll destroy the running `shadow-cljs` server.
+
+Once you checked that the configuration is right, you can start your shadow app (replace `app` with whatever build):
+
+```
+$ shadow-cljs watch app
+```
+
+Now, all you have to do is to run the atom command `Chlorine: Connect Clojure Socket Repl`. This will connect a REPL to evaluate Clojure code. Next you need to run `Chlorine: Connect Embeded Clojurescript Repl`, and it'll connect the ClojureScript REPL too.
+
+Now, you can use the `Chlorine: Evaluate...` commands to evaluate any Clojure or ClojureScript REPL. It'll evaluate `.clj` files as Clojure, and `cljc` files as ClojureScript.
+
 == Calva (VS Code)
 
 (Only tested with `browser` targets so far. Probably works with other targets too.)
