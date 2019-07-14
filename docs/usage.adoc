@@ -141,10 +141,21 @@ IMPORTANT: `tools.deps` is still changing quite frequently. Make sure you are us
 
 To use this set the `:deps true` property in your config. It is also possible to configure which `deps.edn` aliases should be used.
 
-.Example with :cljs alias
+You must add the `thheller/shadow-cljs` artifact to your `deps.edn` manually.
+
+.Example `shadow-cljs.edn` with :cljs alias
 ```clojure
 {:deps {:aliases [:cljs]}
  :builds ...}
+```
+
+.Example `deps.edn`
+```clojure
+{:paths [...]
+ :deps {...}
+ :aliases
+ {:cljs
+  {:extra-deps {thheller/shadow-cljs {:mvn/version <latest>}}}}
 ```
 
 You may also specify `shadow-cljs -A:cljs ...` in the command line instead.

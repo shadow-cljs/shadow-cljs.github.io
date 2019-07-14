@@ -761,11 +761,12 @@ table.CodeRay td.code>pre{padding:0}
 </ul>
 </li>
 <li><a href="#_proto_repl_atom">13.3. Proto REPL (Atom)</a></li>
-<li><a href="#_calva_vs_code">13.4. Calva (VS Code)</a>
+<li><a href="#_chlorine_atom">13.4. Chlorine (Atom)</a></li>
+<li><a href="#_calva_vs_code">13.5. Calva (VS Code)</a>
 <ul class="sectlevel3">
-<li><a href="#_dependencies_3">13.4.1. Dependencies</a></li>
-<li><a href="#_connecting_calva_to_the_repls">13.4.2. Connecting Calva to the REPLs</a></li>
-<li><a href="#_features">13.4.3. Features</a></li>
+<li><a href="#_dependencies_3">13.5.1. Dependencies</a></li>
+<li><a href="#_connecting_calva_to_the_repls">13.5.2. Connecting Calva to the REPLs</a></li>
+<li><a href="#_features">13.5.3. Features</a></li>
 </ul>
 </li>
 </ul>
@@ -1231,11 +1232,24 @@ It is recommended to still use the <code>shadow-cljs</code> command to run comma
 <div class="paragraph">
 <p>To use this set the <code>:deps true</code> property in your config. It is also possible to configure which <code>deps.edn</code> aliases should be used.</p>
 </div>
+<div class="paragraph">
+<p>You must add the <code>thheller/shadow-cljs</code> artifact to your <code>deps.edn</code> manually.</p>
+</div>
 <div class="listingblock">
-<div class="title">Example with :cljs alias</div>
+<div class="title">Example <code>shadow-cljs.edn</code> with :cljs alias</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:deps</span> {<span class="symbol">:aliases</span> [<span class="symbol">:cljs</span>]}
  <span class="symbol">:builds</span> <span class="keyword">..</span><span class="keyword">.</span>}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Example <code>deps.edn</code></div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:paths</span> [<span class="keyword">..</span><span class="keyword">.</span>]
+ <span class="symbol">:deps</span> {<span class="keyword">..</span><span class="keyword">.</span>}
+ <span class="symbol">:aliases</span>
+ {<span class="symbol">:cljs</span>
+  {<span class="symbol">:extra-deps</span> {thheller/shadow-cljs {<span class="symbol">:mvn/version</span> &lt;latest&gt;}}}}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1928,7 +1942,7 @@ You still need to start the <a href="#embedded">embedded server</a> manually bef
 <div class="title">Important</div>
 </td>
 <td class="content">
-You must generate the Certificate with a SAN (Subject Alternative Name) for "localhost" (or whichever host you want to use). SAN is required to get Chrome to trust the Certificate and now show warnings. The password used when exporting must match the password assigned to the Keystore.
+You must generate the Certificate with a SAN (Subject Alternative Name) for "localhost" (or whichever host you want to use). SAN is required to get Chrome to trust the Certificate and not show warnings. The password used when exporting must match the password assigned to the Keystore.
 </td>
 </tr>
 </table>
@@ -5966,12 +5980,32 @@ cljs.repl&gt;</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_calva_vs_code"><a class="anchor" href="#_calva_vs_code"></a><a class="link" href="#_calva_vs_code">13.4. Calva (VS Code)</a></h3>
+<h3 id="_chlorine_atom"><a class="anchor" href="#_chlorine_atom"></a><a class="link" href="#_chlorine_atom">13.4. Chlorine (Atom)</a></h3>
+<div class="paragraph">
+<p>Chlorine connects Atom to a Socket REPL, but also tries to refresh namespace. So first, open up Chlorine package config and check if configuration <code>Should we use clojure.tools.namespace to refresh</code> is set to <code>simple</code>, otherwise it&#8217;ll destroy the running <code>shadow-cljs</code> server.</p>
+</div>
+<div class="paragraph">
+<p>Once you checked that the configuration is right, you can start your shadow app (replace <code>app</code> with whatever build):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">$ shadow-cljs watch app</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now, all you have to do is to run the atom command <code>Chlorine: Connect Clojure Socket Repl</code>. This will connect a REPL to evaluate Clojure code. Next you need to run <code>Chlorine: Connect Embeded Clojurescript Repl</code>, and it&#8217;ll connect the ClojureScript REPL too.</p>
+</div>
+<div class="paragraph">
+<p>Now, you can use the <code>Chlorine: Evaluate&#8230;&#8203;</code> commands to evaluate any Clojure or ClojureScript REPL. It&#8217;ll evaluate <code>.clj</code> files as Clojure, and <code>cljc</code> files as ClojureScript.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_calva_vs_code"><a class="anchor" href="#_calva_vs_code"></a><a class="link" href="#_calva_vs_code">13.5. Calva (VS Code)</a></h3>
 <div class="paragraph">
 <p>(Only tested with <code>browser</code> targets so far. Probably works with other targets too.)</p>
 </div>
 <div class="sect3">
-<h4 id="_dependencies_3"><a class="anchor" href="#_dependencies_3"></a><a class="link" href="#_dependencies_3">13.4.1. Dependencies</a></h4>
+<h4 id="_dependencies_3"><a class="anchor" href="#_dependencies_3"></a><a class="link" href="#_dependencies_3">13.5.1. Dependencies</a></h4>
 <div class="paragraph">
 <p>You need VS Code and install the <a href="https://marketplace.visualstudio.com/items?itemName=cospaia.clojure4vscode#overview">Calva</a> extension.</p>
 </div>
@@ -5988,7 +6022,7 @@ cljs.repl&gt;</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_connecting_calva_to_the_repls"><a class="anchor" href="#_connecting_calva_to_the_repls"></a><a class="link" href="#_connecting_calva_to_the_repls">13.4.2. Connecting Calva to the REPLs</a></h4>
+<h4 id="_connecting_calva_to_the_repls"><a class="anchor" href="#_connecting_calva_to_the_repls"></a><a class="link" href="#_connecting_calva_to_the_repls">13.5.2. Connecting Calva to the REPLs</a></h4>
 <div class="paragraph">
 <p>Once that is done start your shadow app. (Using whatever build instead of <code>app</code>.):</p>
 </div>
@@ -6005,7 +6039,7 @@ cljs.repl&gt;</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_features"><a class="anchor" href="#_features"></a><a class="link" href="#_features">13.4.3. Features</a></h4>
+<h4 id="_features"><a class="anchor" href="#_features"></a><a class="link" href="#_features">13.5.3. Features</a></h4>
 <div class="paragraph">
 <p>Some of the things you can now do:</p>
 </div>
@@ -6030,19 +6064,19 @@ cljs.repl&gt;</code></pre>
 <div class="ulist">
 <ul>
 <li>
-<p>Evaluate the file: <code>ctrl+alt+v enter</code> (This is done automatically one opening files.)</p>
+<p>Evaluate the file: <code>ctrl+alt+c enter</code> (This is done automatically one opening files.)</p>
 </li>
 <li>
-<p>Evaluate inline: <code>ctrl+alt+v e</code></p>
+<p>Evaluate inline: <code>ctrl+alt+c e</code></p>
 </li>
 <li>
-<p>Evaluate and replace them in the editor: <code>ctrl+alt+v r</code></p>
+<p>Evaluate and replace them in the editor: <code>ctrl+alt+c r</code></p>
 </li>
 <li>
-<p>Pretty print evaluation resuls: <code>ctrl+alt+v p</code></p>
+<p>Pretty print evaluation resuls: <code>ctrl+alt+c p</code></p>
 </li>
 <li>
-<p>Send forms to the integrated terminal repls for evaluation: <code>ctrl+alt+v alt+e</code></p>
+<p>Send forms to the integrated terminal repls for evaluation: <code>ctrl+alt+c alt+e</code></p>
 </li>
 </ul>
 </div>
@@ -6052,13 +6086,13 @@ cljs.repl&gt;</code></pre>
 <div class="ulist">
 <ul>
 <li>
-<p>Run namespace tests: <code>ctrl+alt+v t</code></p>
+<p>Run namespace tests: <code>ctrl+alt+c t</code></p>
 </li>
 <li>
-<p>Run all tests: <code>ctrl+alt+v shift+t</code> (Really clunky in large projects so far.)</p>
+<p>Run all tests: <code>ctrl+alt+c shift+t</code> (Really clunky in large projects so far.)</p>
 </li>
 <li>
-<p>Rerun previously failing tests: <code>ctrl+alt+v ctrl+t</code></p>
+<p>Rerun previously failing tests: <code>ctrl+alt+c ctrl+t</code></p>
 </li>
 <li>
 <p>Test failures are marked in the explorer and editors and listed in the Problem tab for easy access.</p>
@@ -6071,13 +6105,10 @@ cljs.repl&gt;</code></pre>
 <div class="ulist">
 <ul>
 <li>
-<p>Show repl terminal: <code>ctrl+alt+v z</code></p>
+<p>Switch namespace in terminal repl to that of the currently open file: <code>ctrl+alt+c n</code></p>
 </li>
 <li>
-<p>Switch namespace in terminal repl to that of the currently open file: <code>ctrl+alt+v n</code></p>
-</li>
-<li>
-<p>Load current file and switch namespace in: <code>ctrl+alt+v alt+n</code></p>
+<p>Load current file and switch namespace in: <code>ctrl+alt+c alt+n</code></p>
 </li>
 </ul>
 </div>
@@ -6087,7 +6118,7 @@ cljs.repl&gt;</code></pre>
 <div class="ulist">
 <ul>
 <li>
-<p>Switch between Clojure and Clojurescript repl <code>ctrl+alt+v alt+c</code> (or click the green <code>cljc/clj</code> button in the status bar). This determines both which repl is backing the editor and what terminal repl is being accessed, see above.</p>
+<p>Switch between Clojure and Clojurescript repl <code>ctrl+alt+c ctrl+alt+t</code> (or click the green <code>cljc/clj</code> button in the status bar). This determines both which repl is backing the editor and what terminal repl is being accessed, see above.</p>
 </li>
 </ul>
 </div>
@@ -6129,7 +6160,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2019-05-22 17:34:33 DST
+Last updated 2019-07-14 12:05:04 CEST
 </div>
 </div>
 </body>
