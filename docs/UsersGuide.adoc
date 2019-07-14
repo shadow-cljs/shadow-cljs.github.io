@@ -387,7 +387,7 @@ The created `Certificates.p12` (macOS) or `localhost.pfx` (Linux, Windows) file 
 $ keytool -importkeystore -destkeystore keystore.jks -srcstoretype PKCS12 -srckeystore localhost.pfx
 ```
 
-IMPORTANT: You must generate the Certificate with a SAN (Subject Alternative Name) for "localhost" (or whichever host you want to use). SAN is required to get Chrome to trust the Certificate and now show warnings. The password used when exporting must match the password assigned to the Keystore.
+IMPORTANT: You must generate the Certificate with a SAN (Subject Alternative Name) for "localhost" (or whichever host you want to use). SAN is required to get Chrome to trust the Certificate and not show warnings. The password used when exporting must match the password assigned to the Keystore.
 
 // TODO: full guide, other platforms
 
