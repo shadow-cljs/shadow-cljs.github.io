@@ -63,7 +63,7 @@ The following table can be used for translation:
 |===
 
 Notice that previously we were stuck using bundled code which included a lot of code we didn’t actually need. Now we're in a better situation:
-Some libraries are also packaged in ways  ways that allow you to include only the parts you need, leading to much less code in your final build.
+Some libraries are also packaged in ways that allow you to include only the parts you need, leading to much less code in your final build.
 
 `react-virtualized` is a great example:
 
