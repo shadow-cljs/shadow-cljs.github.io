@@ -43,7 +43,7 @@ Controlling what code is actually exported is done via one of the following opti
 .Consuming the generated code
 ```bash
 $ node
-> var f = require(2'./lib.js');
+> var f = require('./lib.js');
 f(); // the actual demo.ns/f function
 ```
 
