@@ -19,87 +19,12 @@ You can run `npx shadow-cljs server` inside the Terminal provided by IntelliJ an
 
 This section is written for CIDER version 0.20.0 and above. Ensure your Emacs environment has this version of the `cider` package or later. Refer to the link:https://docs.cider.mx[CIDER documentation] for full installation details.
 
-=== Dependencies
-
-Many of CIDER's features require corresponding middleware running in the server. Add CIDER's nREPL middleware to the `:dependencies` entry of <<user-config, ~/.shadow-cljs/config.edn>> or `shadow-cljs.edn`.
-
-```clojure
-{:dependencies
- [[cider/cider-nrepl "0.21.0"]]}
-```
-
-=== Launch the server
-
-Launch the `shadow-cljs` server with a build target.
-
-====
-Launching with the `app` build target:
-
-```bash
-$ shadow-cljs watch app
-```
-====
-
-Look at the startup message for the nREPL port (or see <<nREPL>> for further details):
-
-====
-The message to look for will be similar to this one, the port in this case is `9462`:
-
-```
-shadow-cljs - nrepl running at /0.0.0.0:9462
-```
-====
-
-====
-You can include `deps.edn` aliases with the -A command line parameter
-
-```bash
-$ shadow-cljs watch app -A:nrepl
-```
-====
-
-=== Connect to CIDER for a Clojure REPL
-
-In Emacs, connect to the running nREPL server:
-
-```
-M-x cider-connect
-```
-
-Enter the connection details:
-
-```console
-Host:
-```
-
-Enter `localhost`.
-
-```console
-Port for localhost:
-```
-
-Enter the nREPL port of the shadow-cljs and CIDER will connect to it, displaying a new `cider-repl` buffer:
-
-```console
-shadow.user>
-```
-
-=== Connect the JavaScript environment
-
-If you haven't already done so, connect a JavaScript runtime to the shadow-cljs server. For example, for browser development, browse to `http://localhost:8080`.
-
-In the `cider-repl` buffer, you should see a message:
-
-```
-JS runtime connected.
-```
-
 === Launch the ClojureScript REPL
 
-Launch the ClojureScript REPL alongside the Clojure REPL connection. Make sure you are in the `cider-repl` buffer so that Emacs knows which connection to use.
+Launch the nREPL and a ClojureScript REPL.
 
 ```console
-M-x cider-connect-sibling-cljs
+M-x cider-jack-in-cljs
 ```
 
 CIDER will prompt you for the type of ClojureScript REPL:
@@ -126,13 +51,20 @@ cljs.repl>
 
 You should now be able to eval ClojureScript, jump to the definitions of vars (with `cider-find-var`) and much more.
 
-====
 For example, to display an alert in the browser:
 
 ```console
 cljs.repl> (js/alert "Jurassic Park!")
 ```
-====
+
+=== Simplify startup with dir-local
+
+You can simplify startup flow by a creating a `dir-local.el` file at project root.
+
+```
+((nil . ((cider-default-cljs-repl . shadow)
+	 (cider-shadow-cljs-default-options . "<your-build-name-here>"))))
+```
 
 == Proto REPL (Atom)
 
