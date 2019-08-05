@@ -522,9 +522,6 @@ script, and also for code that is intended to be used as a library. See the
 section on <<CommonConfig,common configuration>> for the base settings needed in
 a configuration file.
 
-NOTE: The optimizations in node at the time of this writing default to `:simple`.
-You can use the normal configuration options to set the <<Optimization, optimization level>>.
-
 == node.js Scripts [[target-node-script]]
 
 include::target-node-script.adoc[]
