@@ -478,7 +478,7 @@ document root used to serve your content.
              :devtools {:watch-dir "public"}}}}
 ```
 
-=== Proxy Support
+=== Proxy Support [[proxy-support]]
 
 By default the devtools client will attempt to connect to the `shadow-cljs` process via the configured <<http, HTTP server>> (usually `localhost`). If you are using a reverse proxy to serve your HTML that might not be possible. You can set `:devtools-url` to configure which URL to use.
 

@@ -602,6 +602,8 @@ include::release.adoc[]
 
 include::editor-integration.adoc[]
 
+include::repl-troubleshoot.adoc[]
+
 = What to do when things don’t work?
 
 Since the JS world is still evolving rapidly and not everyone is using the same way to write and

@@ -654,7 +654,7 @@ table.CodeRay td.code>pre{padding:0}
 <ul class="sectlevel3">
 <li><a href="#hud">6.8.1. Heads-Up Display (HUD)</a></li>
 <li><a href="#_css_reloading">6.8.2. CSS Reloading</a></li>
-<li><a href="#_proxy_support">6.8.3. Proxy Support</a></li>
+<li><a href="#proxy-support">6.8.3. Proxy Support</a></li>
 </ul>
 </li>
 </ul>
@@ -770,10 +770,23 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 </ul>
 </li>
-<li><a href="#_what_to_do_when_things_don_t_work">14. What to do when things don’t work?</a></li>
-<li><a href="#_hacking">15. Hacking</a>
+<li><a href="#repl-troubleshooting">14. REPL Troubleshooting</a>
 <ul class="sectlevel2">
-<li><a href="#_patching_libraries">15.1. Patching Libraries</a></li>
+<li><a href="#cljs-repl-anatomy">14.1. Anatomy of the CLJS REPL</a></li>
+<li><a href="#_javascript_runtimes">14.2. JavaScript Runtimes</a></li>
+<li><a href="#missing-js-runtime">14.3. Missing JS runtime</a>
+<ul class="sectlevel3">
+<li><a href="#repl-trouble-browser">14.3.1. :target :browser</a></li>
+<li><a href="#repl-trouble-node">14.3.2. :target :node-script, :node-library</a></li>
+<li><a href="#repl-trouble-react-native">14.3.3. :target :react-native</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_what_to_do_when_things_don_t_work">15. What to do when things don’t work?</a></li>
+<li><a href="#_hacking">16. Hacking</a>
+<ul class="sectlevel2">
+<li><a href="#_patching_libraries">16.1. Patching Libraries</a></li>
 </ul>
 </li>
 </ul>
@@ -3797,7 +3810,7 @@ document root used to serve your content.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_proxy_support"><a class="anchor" href="#_proxy_support"></a><a class="link" href="#_proxy_support">6.8.3. Proxy Support</a></h4>
+<h4 id="proxy-support"><a class="anchor" href="#proxy-support"></a><a class="link" href="#proxy-support">6.8.3. Proxy Support</a></h4>
 <div class="paragraph">
 <p>By default the devtools client will attempt to connect to the <code>shadow-cljs</code> process via the configured <a href="#http">HTTP server</a> (usually <code>localhost</code>). If you are using a reverse proxy to serve your HTML that might not be possible. You can set <code>:devtools-url</code> to configure which URL to use.</p>
 </div>
@@ -6060,7 +6073,105 @@ cljs.repl&gt;</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_what_to_do_when_things_don_t_work"><a class="anchor" href="#_what_to_do_when_things_don_t_work"></a><a class="link" href="#_what_to_do_when_things_don_t_work">14. What to do when things don’t work?</a></h2>
+<h2 id="repl-troubleshooting"><a class="anchor" href="#repl-troubleshooting"></a><a class="link" href="#repl-troubleshooting">14. REPL Troubleshooting</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Getting a CLJS REPL working can sometimes be tricky and a lot can go wrong since all the moving parts can be quite complicated. This guide hopes to address the most common issues that people run into and how to fix them.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="assets/img/shadow-cljs-repl.png" alt="shadow cljs repl">
+</div>
+</div>
+<div class="sect2">
+<h3 id="cljs-repl-anatomy"><a class="anchor" href="#cljs-repl-anatomy"></a><a class="link" href="#cljs-repl-anatomy">14.1. Anatomy of the CLJS REPL</a></h3>
+<div class="paragraph">
+<p>A REPL in Clojure does exactly that the name implies: Read one form, Eval it, Print the result, Loop to do it again.</p>
+</div>
+<div class="paragraph">
+<p>In ClojureScript however things are a bit more complicated since compilation happens on the JVM but the results are eval&#8217;d in a JavaScript runtime. There are a couple more steps that need to be done due in order to "emulate" the plain REPL experience. Although things are implemented a bit differently in <code>shadow-cljs</code> over regular CLJS the basic principles remain the same.</p>
+</div>
+<div class="paragraph">
+<p>First you&#8217;ll need a REPL client. This could just be the CLI (eg. <code>shadow-cljs cljs-repl app</code>) or your Editor connected via <code>nREPL</code>. The Client will always talk directly to the <code>shadow-cljs</code> server and it&#8217;ll handle the rest. From the Client side it still looks like a regular REPL but there are a few more steps happening in the background.</p>
+</div>
+<div class="paragraph">
+<p>1) Read: It all starts with reading a singular CLJS form from a given InputStream. That is either a blocking read directly from <code>stdin</code> or read from a string in case of <code>nREPL</code>. A Stream of characters are turned into actual datastructures, <code>"(+ 1 2)"</code> (a string) becomes <code>(+ 1 2)</code> (a list).</p>
+</div>
+<div class="paragraph">
+<p>2) Compile: That form is then compiled on the <code>shadow-cljs</code> JVM side and transformed to a set of instructions.</p>
+</div>
+<div class="paragraph">
+<p>3) Transfer Out: Those instructions are transferred to a connected JavaScript runtime. This could be a Browser or a <code>node</code> process.</p>
+</div>
+<div class="paragraph">
+<p>4) Eval: The connected runtime will take the received instructions and <code>eval</code> them.</p>
+</div>
+<div class="paragraph">
+<p>5) Print: The <code>eval</code> result is printed as a String in the JS runtime.</p>
+</div>
+<div class="paragraph">
+<p>6) Transfer Back: The printed result is transferred back to the <code>shadow-cljs</code> JVM side.</p>
+</div>
+<div class="paragraph">
+<p>7) Reply: The JVM side will forward the received results back to initial caller and the result is printed to the proper OutputStream (or sent as a nREPL message).</p>
+</div>
+<div class="paragraph">
+<p>8) Loop: Repeat from 1).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_javascript_runtimes"><a class="anchor" href="#_javascript_runtimes"></a><a class="link" href="#_javascript_runtimes">14.2. JavaScript Runtimes</a></h3>
+<div class="paragraph">
+<p>The <code>shadow-cljs</code> JVM side of things will require one running <code>watch</code> for a given build which will handle all the related REPL commands as well. It uses a dedicated thread and manages all the given events that can happen during development (eg. REPL input, changing files, etc).</p>
+</div>
+<div class="paragraph">
+<p>The compiled JS code however must also be loaded by a JS runtime (eg. Browser or <code>node</code> process) and that JS runtime must connect back to the running <code>shadow-cljs</code> process. Most <code>:target</code> configurations will have the necessary code added by default and should just connect automatically. How that connect is happening is dependent on the runtime but usually it is using a WebSocket to connect to the running <code>shadow-cljs</code> <a href="#http">HTTP server</a>.</p>
+</div>
+<div class="paragraph">
+<p>Once connected the REPL is ready to use. Note that reloading the JS runtime (eg. manual browser page reload) will wipe out all REPL state of the runtime but some of the compiler side state will remain until the <code>watch</code> is also restarted.</p>
+</div>
+<div class="paragraph">
+<p>It is possible for more than one JS runtime to connect to the <code>watch</code> process. <code>shadow-cljs</code> by default picks the first JS runtime that connected as the <code>eval</code> target. If you open a given <code>:browser</code> build in multiple Browsers only the first one will be used to <code>eval</code> code. Or you could be opening a <code>:react-native</code> app in iOS and Android next to each other during development. Only one runtime can eval and if that disconnects the next one takes over based on the time it connected.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="missing-js-runtime"><a class="anchor" href="#missing-js-runtime"></a><a class="link" href="#missing-js-runtime">14.3. Missing JS runtime</a></h3>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>No application has connected to the REPL server. Make sure your JS environment has loaded your compiled ClojureScript code.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>This error message just means that no JS runtime (eg. Browser) has connected to the <code>shadow-cljs</code> server. Your REPL client has successfully connected to the <code>shadow-cljs</code> server but as explained above we still need a JS runtime to actually <code>eval</code> anything.</p>
+</div>
+<div class="paragraph">
+<p>Regular <code>shadow-cljs</code> builds do not manage any JS runtime of their own so you are responsible for running them.</p>
+</div>
+<div class="sect3">
+<h4 id="repl-trouble-browser"><a class="anchor" href="#repl-trouble-browser"></a><a class="link" href="#repl-trouble-browser">14.3.1. :target :browser</a></h4>
+<div class="paragraph">
+<p>For <a href="#target-browser"><code>:target :browser</code></a> builds the <code>watch</code> process will have compiled the given code to a configured <code>:output-dir</code> (defaults to <code>public/js</code>). The generated <code>.js</code> must be loaded in a browser. Once loaded the Browser Console should show a <code>WebSocket connected</code> message. If you are using any kind of custom HTTP servers or have over-eager firewalls blocking the connections you might need to set some additional configuration (eg. via <a href="#proxy-support">:devtools-url</a>). The goal is to be able to connect to the <a href="#http">primary HTTP server</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="repl-trouble-node"><a class="anchor" href="#repl-trouble-node"></a><a class="link" href="#repl-trouble-node">14.3.2. :target :node-script, :node-library</a></h4>
+<div class="paragraph">
+<p>These targets will have produced a <code>.js</code> file that are intended to run in a <code>node</code> process. Given the variety of options however you&#8217;ll need to run them yourself. For example a <code>:node-script</code> you&#8217;d run via <code>node the-script.js</code> and on startup it&#8217;ll try to connect to the <code>shadow-cljs</code> server. You should see a <code>WebSocket connected</code> message on startup. The output is designed to only run on the machine they were compiled on, don&#8217;t copy <code>watch</code> output to other machines.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="repl-trouble-react-native"><a class="anchor" href="#repl-trouble-react-native"></a><a class="link" href="#repl-trouble-react-native">14.3.3. :target :react-native</a></h4>
+<div class="paragraph">
+<p>The generated <code>&lt;:output-dir&gt;/index.js</code> file needs to be added to your <code>react-native</code> app and then loaded on an actual device or emulator. On startup it will also attempt to connect to the <code>shadow-cljs</code> server. You can check the log output via <code>react-native log-android|log-ios</code> and should show a <code>WebSocket connected</code> message once the app is running. If you see a websocket related error on startup instead it may have failed to connect to the shadow-cljs process. This can happen when the IP detection picked an incorrect IP. You can check which IP was used via <code>shadow-cljs watch app --verbose</code> and override it via <code>shadow-cljs watch app --config-merge '{:local-ip "1.2.3.4"}'</code>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_to_do_when_things_don_t_work"><a class="anchor" href="#_what_to_do_when_things_don_t_work"></a><a class="link" href="#_what_to_do_when_things_don_t_work">15. What to do when things don’t work?</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Since the JS world is still evolving rapidly and not everyone is using the same way to write and
@@ -6074,10 +6185,10 @@ can usually be solved with custom <code>:resolve</code> configs, but there may a
 </div>
 </div>
 <div class="sect1">
-<h2 id="_hacking"><a class="anchor" href="#_hacking"></a><a class="link" href="#_hacking">15. Hacking</a></h2>
+<h2 id="_hacking"><a class="anchor" href="#_hacking"></a><a class="link" href="#_hacking">16. Hacking</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_patching_libraries"><a class="anchor" href="#_patching_libraries"></a><a class="link" href="#_patching_libraries">15.1. Patching Libraries</a></h3>
+<h3 id="_patching_libraries"><a class="anchor" href="#_patching_libraries"></a><a class="link" href="#_patching_libraries">16.1. Patching Libraries</a></h3>
 <div class="paragraph">
 <p>The <code>shadow-cljs</code> compiler ensures that things on your source paths are compiled first, overriding files from JARs. This means that you can copy a source file from a library, patch it, and include it in your own source directory.</p>
 </div>
@@ -6092,7 +6203,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2019-08-16 10:22:11 CEST
+Last updated 2019-08-16 12:11:29 CEST
 </div>
 </div>
 </body>
