@@ -503,6 +503,25 @@ Additional optional Options to configure the connection handling are:
 `:proxy-max-connection-retries`:: int, defaults to 1.
 `:proxy-max-request-time`:: ms as int, defaults to 30000. 30sec request timeout.
 
+
+== JVM Configuration [[jvm-opts]]
+
+When `shadow-cljs.edn` is used in charge of starting the JVM you can configure additional command line arguments to be passed directly to the JVM. For example you may want to decrease or increase the amount of RAM used by shadow-cljs.
+
+This is done by configuring `:jvm-opts` at the root of `shadow-cljs.edn` expecting a vector of strings.
+
+.Example limited RAM use to 1GB
+```clojure
+{:source-paths [...]
+ :dependencies [...]
+ :jvm-opts ["-Xmx1G"]
+ :builds ...}
+```
+
+The arguments that can be passed to the JVM vary depending on the version but you can find an example list https://docs.oracle.com/javase/8/docs/technotes/tools/windows/java.html[here]. Please note that assigning too little or too much RAM can degrade performance. The defaults are usually good enough.
+
+IMPORTANT: When using `deps.edn` or `project.clj` the `:jvm-opts` need to be configured there.
+
 = Build Configuration
 
 include::build-config.adoc[]

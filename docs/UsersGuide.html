@@ -609,6 +609,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#dev-http">4.4.5. Development HTTP(S)</a></li>
 </ul>
 </li>
+<li><a href="#jvm-opts">4.5. JVM Configuration</a></li>
 </ul>
 </li>
 <li><a href="#_build_configuration">5. Build Configuration</a>
@@ -2140,6 +2141,39 @@ if a resource is not found for the given request. Defaults to <code>shadow.http.
 </dl>
 </div>
 </div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="jvm-opts"><a class="anchor" href="#jvm-opts"></a><a class="link" href="#jvm-opts">4.5. JVM Configuration</a></h3>
+<div class="paragraph">
+<p>When <code>shadow-cljs.edn</code> is used in charge of starting the JVM you can configure additional command line arguments to be passed directly to the JVM. For example you may want to decrease or increase the amount of RAM used by shadow-cljs.</p>
+</div>
+<div class="paragraph">
+<p>This is done by configuring <code>:jvm-opts</code> at the root of <code>shadow-cljs.edn</code> expecting a vector of strings.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example limited RAM use to 1GB</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:source-paths</span> [<span class="keyword">..</span><span class="keyword">.</span>]
+ <span class="symbol">:dependencies</span> [<span class="keyword">..</span><span class="keyword">.</span>]
+ <span class="symbol">:jvm-opts</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">-Xmx1G</span><span class="delimiter">&quot;</span></span>]
+ <span class="symbol">:builds</span> <span class="keyword">..</span><span class="keyword">.</span>}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The arguments that can be passed to the JVM vary depending on the version but you can find an example list <a href="https://docs.oracle.com/javase/8/docs/technotes/tools/windows/java.html">here</a>. Please note that assigning too little or too much RAM can degrade performance. The defaults are usually good enough.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+When using <code>deps.edn</code> or <code>project.clj</code> the <code>:jvm-opts</code> need to be configured there.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -6058,7 +6092,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2019-08-05 17:29:41 CEST
+Last updated 2019-08-16 10:22:11 CEST
 </div>
 </div>
 </body>
