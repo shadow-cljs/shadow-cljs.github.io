@@ -335,13 +335,11 @@ When you use `shadow-cljs` embedded in other tools that provide their own nREPL 
   :repl-options
   {:init-ns shadow.user ;; or any of your choosing
    :nrepl-middleware
-   [shadow.cljs.devtools.server.nrepl/cljs-load-file
-    shadow.cljs.devtools.server.nrepl/cljs-eval
-    shadow.cljs.devtools.server.nrepl/cljs-select
-    ;; required by some tools, not by shadow-cljs.
-    cider.piggieback/wrap-cljs-repl]}
+   [shadow.cljs.devtools.server.nrepl04/middleware]}
   ...)
 ```
+
+IMPORTANT: When using older `nREPL` versions (before v0.4+) you'll need to use `shadow.cljs.devtools.server.nrepl/middleware` instead.
 
 TIP: You still need to start the <<embedded, embedded server>> manually before using the CLJS REPL.
 

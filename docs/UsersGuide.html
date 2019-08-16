@@ -1867,13 +1867,21 @@ Use <code>:cljs/quit</code> to return to Clojure.
   <span class="symbol">:repl-options</span>
   {<span class="symbol">:init-ns</span> shadow.user <span class="comment">;; or any of your choosing</span>
    <span class="symbol">:nrepl-middleware</span>
-   [shadow.cljs.devtools.server.nrepl/cljs-load-file
-    shadow.cljs.devtools.server.nrepl/cljs-eval
-    shadow.cljs.devtools.server.nrepl/cljs-select
-    <span class="comment">;; required by some tools, not by shadow-cljs.</span>
-    cider.piggieback/wrap-cljs-repl]}
+   [shadow.cljs.devtools.server.nrepl04/middleware]}
   <span class="keyword">..</span><span class="keyword">.</span>)</code></pre>
 </div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+When using older <code>nREPL</code> versions (before v0.4+) you&#8217;ll need to use <code>shadow.cljs.devtools.server.nrepl/middleware</code> instead.
+</td>
+</tr>
+</table>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -6203,7 +6211,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2019-08-16 12:11:29 CEST
+Last updated 2019-08-16 12:59:07 CEST
 </div>
 </div>
 </body>
