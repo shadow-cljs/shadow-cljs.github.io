@@ -783,10 +783,21 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 </ul>
 </li>
-<li><a href="#_what_to_do_when_things_don_t_work">15. What to do when things don’t work?</a></li>
-<li><a href="#_hacking">16. Hacking</a>
+<li><a href="#publish">15. Publishing Libraries</a>
 <ul class="sectlevel2">
-<li><a href="#_patching_libraries">16.1. Patching Libraries</a></li>
+<li><a href="#publish-lein">15.1. Leiningen</a>
+<ul class="sectlevel3">
+<li><a href="#_disable_jar_signing">15.1.1. Disable JAR Signing</a></li>
+<li><a href="#_keep_your_jar_clean">15.1.2. Keep your JAR clean</a></li>
+</ul>
+</li>
+<li><a href="#publish-deps-cljs">15.2. Declaring JS dependencies</a></li>
+</ul>
+</li>
+<li><a href="#_what_to_do_when_things_don_t_work">16. What to do when things don’t work?</a></li>
+<li><a href="#_hacking">17. Hacking</a>
+<ul class="sectlevel2">
+<li><a href="#_patching_libraries">17.1. Patching Libraries</a></li>
 </ul>
 </li>
 </ul>
@@ -6179,7 +6190,116 @@ cljs.repl&gt;</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_what_to_do_when_things_don_t_work"><a class="anchor" href="#_what_to_do_when_things_don_t_work"></a><a class="link" href="#_what_to_do_when_things_don_t_work">15. What to do when things don’t work?</a></h2>
+<h2 id="publish"><a class="anchor" href="#publish"></a><a class="link" href="#publish">15. Publishing Libraries</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ClojureScript libraries are published to <code>maven</code> repositories just like Clojure. Most commonly they are published to <a href="https://clojars.org/">Clojars</a> but all other standard maven repositories work too.</p>
+</div>
+<div class="paragraph">
+<p><code>shadow-cljs</code> itself does not have direct support for publishing but since ClojureScript libraries are just uncompiled source files published in a JAR (basically just a ZIP compressed file) any common tool that is able to publish to maven will work. (eg. <code>mvn</code>, <code>gradle</code>, <code>lein</code>, etc). No extra compilation or other steps are required to publish. The ClojureScript compiler and therefore shadow-cljs is not involved at all.</p>
+</div>
+<div class="sect2">
+<h3 id="publish-lein"><a class="anchor" href="#publish-lein"></a><a class="link" href="#publish-lein">15.1. Leiningen</a></h3>
+<div class="paragraph">
+<p>There are a variety of options to publish libraries and I currently recommend <a href="https://leiningen.org/">Leiningen</a>. The setup is very straightforward and doesn&#8217;t require much configuration at all.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+This does not mean that you have to use Leiningen during development of the library itself. It is recommended to just use Leiningen for publishing but use <code>shadow-cljs</code> normally otherwise. You&#8217;ll only need to copy the actual <code>:dependencies</code> definition once you publish. Remember to keep development related dependencies out though.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Assuming you are already using the recommended project structure where all your primary sources are located in <code>src/main</code> you can publish with a very simple <code>project.clj</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(defproject your.cool/library <span class="string"><span class="delimiter">&quot;</span><span class="content">1.0.0</span><span class="delimiter">&quot;</span></span>
+  <span class="symbol">:description</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Does cool stuff</span><span class="delimiter">&quot;</span></span>
+  <span class="symbol">:url</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">https://the.inter.net/wherever</span><span class="delimiter">&quot;</span></span>
+
+  <span class="comment">;; this is optional, add what you want or remove it</span>
+  <span class="symbol">:license</span> {<span class="symbol">:name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Eclipse Public License</span><span class="delimiter">&quot;</span></span>
+            <span class="symbol">:url</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.eclipse.org/legal/epl-v10.html</span><span class="delimiter">&quot;</span></span>}
+
+  <span class="symbol">:dependencies</span>
+  <span class="comment">;; always use &quot;provided&quot; for Clojure(Script)</span>
+  [[org.clojure/clojurescript <span class="string"><span class="delimiter">&quot;</span><span class="content">1.10.520</span><span class="delimiter">&quot;</span></span> <span class="symbol">:scope</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">provided</span><span class="delimiter">&quot;</span></span>]
+   [some.other/library <span class="string"><span class="delimiter">&quot;</span><span class="content">1.0.0</span><span class="delimiter">&quot;</span></span>]
+
+  <span class="symbol">:source-paths</span>
+  [<span class="string"><span class="delimiter">&quot;</span><span class="content">src/main</span><span class="delimiter">&quot;</span></span>])</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will generate the required <code>pom.xml</code> and put all sources from <code>src/main</code> into the published <code>.jar</code> file. All you need to run is <code>lein deploy clojars</code> to publish it. When doing this for the first time you&#8217;ll first need to setup proper authentication. Please refer to the official  <a href="https://github.com/technomancy/leiningen/blob/stable/doc/DEPLOY.md">Leiningen</a> and <a href="https://github.com/clojars/clojars-web/wiki/Tutorial">Clojars</a> documentation on how to set that up.</p>
+</div>
+<div class="sect3">
+<h4 id="_disable_jar_signing"><a class="anchor" href="#_disable_jar_signing"></a><a class="link" href="#_disable_jar_signing">15.1.1. Disable JAR Signing</a></h4>
+<div class="paragraph">
+<p>Leiningen defaults to signing libraries via GPG before publishing which is a good default but given that this can be a hassle to setup and not many people are actually verifying the signatures you can disable that step via adding a simple <code>:repositories</code> config to the <code>project.clj</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(defproject your.cool/library <span class="string"><span class="delimiter">&quot;</span><span class="content">1.0.0</span><span class="delimiter">&quot;</span></span>
+  <span class="keyword">..</span><span class="keyword">.</span>
+  <span class="symbol">:repositories</span>
+  {<span class="string"><span class="delimiter">&quot;</span><span class="content">clojars</span><span class="delimiter">&quot;</span></span> {<span class="symbol">:url</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">https://clojars.org/repo</span><span class="delimiter">&quot;</span></span>
+              <span class="symbol">:sign-releases</span> <span class="predefined-constant">false</span>}}
+  <span class="keyword">..</span><span class="keyword">.</span>)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_keep_your_jar_clean"><a class="anchor" href="#_keep_your_jar_clean"></a><a class="link" href="#_keep_your_jar_clean">15.1.2. Keep your JAR clean</a></h4>
+<div class="paragraph">
+<p>If you write tests or user other development related code for your library make sure to keep them in <code>src/dev</code> or <code>src/test</code> to avoid publishing them together with the library.</p>
+</div>
+<div class="paragraph">
+<p>Also avoid generating output to <code>resources/*</code> since Leiningen and other tools may include those files into the <code>.jar</code> which may cause problems for downstream users. Your <code>.jar</code> should ONLY contains the actual source files, no compiled code at all.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+You can and should verify that everything is clean by running <code>lein jar</code> and inspecting the files that end up in it via <code>jar -tvf target/library-1.0.0.jar</code>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="publish-deps-cljs"><a class="anchor" href="#publish-deps-cljs"></a><a class="link" href="#publish-deps-cljs">15.2. Declaring JS dependencies</a></h3>
+<div class="paragraph">
+<p>Please note that currently only <code>shadow-cljs</code> has a clean automatic interop story with <code>npm</code>. That may represent a problem for users of your libraries using other tools. You may want to consider providing a CLJSJS fallback and/or publishing extra documentation for <code>webpack</code> related workflows.</p>
+</div>
+<div class="paragraph">
+<p>You can declare <code>npm</code> dependencies directly by including a <code>deps.cljs</code> with <code>:npm-deps</code> in your project (eg. <code>src/main/deps.cljs</code>).</p>
+</div>
+<div class="listingblock">
+<div class="title">Example src/main/deps.cljs</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:npm-deps</span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">the-thing</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">1.0.0</span><span class="delimiter">&quot;</span></span>}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can also provide extra <code>:foreign-libs</code> definitions here. They won&#8217;t affect <code>shadow-cljs</code> but might help other tools.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_to_do_when_things_don_t_work"><a class="anchor" href="#_what_to_do_when_things_don_t_work"></a><a class="link" href="#_what_to_do_when_things_don_t_work">16. What to do when things don’t work?</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Since the JS world is still evolving rapidly and not everyone is using the same way to write and
@@ -6193,10 +6313,10 @@ can usually be solved with custom <code>:resolve</code> configs, but there may a
 </div>
 </div>
 <div class="sect1">
-<h2 id="_hacking"><a class="anchor" href="#_hacking"></a><a class="link" href="#_hacking">16. Hacking</a></h2>
+<h2 id="_hacking"><a class="anchor" href="#_hacking"></a><a class="link" href="#_hacking">17. Hacking</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_patching_libraries"><a class="anchor" href="#_patching_libraries"></a><a class="link" href="#_patching_libraries">16.1. Patching Libraries</a></h3>
+<h3 id="_patching_libraries"><a class="anchor" href="#_patching_libraries"></a><a class="link" href="#_patching_libraries">17.1. Patching Libraries</a></h3>
 <div class="paragraph">
 <p>The <code>shadow-cljs</code> compiler ensures that things on your source paths are compiled first, overriding files from JARs. This means that you can copy a source file from a library, patch it, and include it in your own source directory.</p>
 </div>
@@ -6211,7 +6331,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2019-08-16 12:59:07 CEST
+Last updated 2019-08-18 13:32:22 CEST
 </div>
 </div>
 </body>

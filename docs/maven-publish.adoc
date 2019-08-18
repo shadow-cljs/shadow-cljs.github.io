@@ -1,0 +1,68 @@
+# Publishing Libraries [[publish]]
+
+ClojureScript libraries are published to `maven` repositories just like Clojure. Most commonly they are published to https://clojars.org/[Clojars] but all other standard maven repositories work too.
+
+`shadow-cljs` itself does not have direct support for publishing but since ClojureScript libraries are just uncompiled source files published in a JAR (basically just a ZIP compressed file) any common tool that is able to publish to maven will work. (eg. `mvn`, `gradle`, `lein`, etc). No extra compilation or other steps are required to publish. The ClojureScript compiler and therefore shadow-cljs is not involved at all.
+
+## Leiningen [[publish-lein]]
+
+There are a variety of options to publish libraries and I currently recommend https://leiningen.org/[Leiningen]. The setup is very straightforward and doesn't require much configuration at all.
+
+IMPORTANT: This does not mean that you have to use Leiningen during development of the library itself. It is recommended to just use Leiningen for publishing but use `shadow-cljs` normally otherwise. You'll only need to copy the actual `:dependencies` definition once you publish. Remember to keep development related dependencies out though.
+
+Assuming you are already using the recommended project structure where all your primary sources are located in `src/main` you can publish with a very simple `project.clj`.
+
+```clojure
+(defproject your.cool/library "1.0.0"
+  :description "Does cool stuff"
+  :url "https://the.inter.net/wherever"
+
+  ;; this is optional, add what you want or remove it
+  :license {:name "Eclipse Public License"
+            :url "http://www.eclipse.org/legal/epl-v10.html"}
+
+  :dependencies
+  ;; always use "provided" for Clojure(Script)
+  [[org.clojure/clojurescript "1.10.520" :scope "provided"]
+   [some.other/library "1.0.0"]
+
+  :source-paths
+  ["src/main"])
+```
+
+This will generate the required `pom.xml` and put all sources from `src/main` into the published `.jar` file. All you need to run is `lein deploy clojars` to publish it. When doing this for the first time you'll first need to setup proper authentication. Please refer to the official  https://github.com/technomancy/leiningen/blob/stable/doc/DEPLOY.md[Leiningen] and https://github.com/clojars/clojars-web/wiki/Tutorial[Clojars] documentation on how to set that up.
+
+### Disable JAR Signing
+
+Leiningen defaults to signing libraries via GPG before publishing which is a good default but given that this can be a hassle to setup and not many people are actually verifying the signatures you can disable that step via adding a simple `:repositories` config to the `project.clj`.
+
+```clojure
+(defproject your.cool/library "1.0.0"
+  ...
+  :repositories
+  {"clojars" {:url "https://clojars.org/repo"
+              :sign-releases false}}
+  ...)
+```
+
+### Keep your JAR clean
+
+If you write tests or user other development related code for your library make sure to keep them in `src/dev` or `src/test` to avoid publishing them together with the library.
+
+Also avoid generating output to `resources/*` since Leiningen and other tools may include those files into the `.jar` which may cause problems for downstream users. Your `.jar` should ONLY contains the actual source files, no compiled code at all.
+
+IMPORTANT: You can and should verify that everything is clean by running `lein jar` and inspecting the files that end up in it via `jar -tvf target/library-1.0.0.jar`.
+
+## Declaring JS dependencies [[publish-deps-cljs]]
+
+Please note that currently only `shadow-cljs` has a clean automatic interop story with `npm`. That may represent a problem for users of your libraries using other tools. You may want to consider providing a CLJSJS fallback and/or publishing extra documentation for `webpack` related workflows.
+
+You can declare `npm` dependencies directly by including a `deps.cljs` with `:npm-deps` in your project (eg. `src/main/deps.cljs`).
+
+.Example src/main/deps.cljs
+```clojure
+{:npm-deps {"the-thing" "1.0.0"}}
+```
+
+You can also provide extra `:foreign-libs` definitions here. They won't affect `shadow-cljs` but might help other tools.
+
