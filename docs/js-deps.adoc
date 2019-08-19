@@ -145,16 +145,10 @@ Until support in Closure gets more reliable `:shadow` is the recommend JS Provid
    }}}
 ```
 
+
 === Resolving Packages [[js-resolve]]
 
 By default `shadow-cljs` will resolve all `(:require ["thing" :as x])` requires following the `npm` convention. This means it will look at `<project>/node_modules/thing/package.json` and follow the code from there. To customize how this works `shadow-cljs` exposes a `:resolve` config option that lets you override how things are resolved.
-
-=== Alternate Node Modules [[alt-node-modules]]
-Builds can use different directories for `node_modules` by setting :node-modules-dir.
-
-```
-:js-options {:node-modules-dir "some/nested/path"}
-```
 
 ==== Using a CDN [[js-resolve-global]]
 
@@ -217,6 +211,30 @@ The `:shadow-js` and `:closure` have full control over `:resolve` and everything
 ```
 
 The above works fine in the Browser since every `"react"` require will be replaced, including the `"react"` require `"react-table"` has internally. For `:js-provider :require` however a `require("react-table")` will be emitted and `node` will be in control how that is resolved. Meaning that it will resolve it to the standard `"react"` and not the `"preact"` we had configured.
+
+=== Alternate Modules Directories [[alt-node-modules]]
+
+By default `shadow-cljs` will only look at the `<project-dir>/node_modules` directory when resolving JS packages. This can be configured via the `:js-package-dirs` option in `:js-options`. This can be applied globally or per build.
+
+Relative paths will be resolved relative to the project root directory. Paths will be tried from left to right and the first matching package will be used.
+
+.Global config in `shadow-cljs.edn`
+```
+{...
+ :js-options {:js-package-dirs ["node_modules" "../node_modules"]}
+ ...}
+```
+
+.Config applied to single build
+
+```
+{...
+ :builds
+ {:app
+  {...
+   :js-options {:js-package-dirs ["node_modules" "../node_modules"]}}}}
+```
+
 
 == Dealing with .js Files [[classpath-js]]
 

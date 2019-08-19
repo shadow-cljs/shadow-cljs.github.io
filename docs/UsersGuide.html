@@ -713,7 +713,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_using_npm_packages">11.1.1. Using npm packages</a></li>
 <li><a href="#js-provider">11.1.2. Package Provider</a></li>
 <li><a href="#js-resolve">11.1.3. Resolving Packages</a></li>
-<li><a href="#alt-node-modules">11.1.4. Alternate Node Modules</a></li>
+<li><a href="#alt-node-modules">11.1.4. Alternate Modules Directories</a></li>
 </ul>
 </li>
 <li><a href="#classpath-js">11.2. Dealing with .js Files</a>
@@ -5062,17 +5062,6 @@ Some libraries are also packaged in ways that allow you to include only the part
 <div class="paragraph">
 <p>By default <code>shadow-cljs</code> will resolve all <code>(:require ["thing" :as x])</code> requires following the <code>npm</code> convention. This means it will look at <code>&lt;project&gt;/node_modules/thing/package.json</code> and follow the code from there. To customize how this works <code>shadow-cljs</code> exposes a <code>:resolve</code> config option that lets you override how things are resolved.</p>
 </div>
-</div>
-<div class="sect3">
-<h4 id="alt-node-modules"><a class="anchor" href="#alt-node-modules"></a><a class="link" href="#alt-node-modules">11.1.4. Alternate Node Modules</a></h4>
-<div class="paragraph">
-<p>Builds can use different directories for <code>node_modules</code> by setting :node-modules-dir.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure"><span class="symbol">:js-options</span> {<span class="symbol">:node-modules-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">some/nested/path</span><span class="delimiter">&quot;</span></span>}</code></pre>
-</div>
-</div>
 <div class="sect4">
 <h5 id="js-resolve-global"><a class="anchor" href="#js-resolve-global"></a><a class="link" href="#js-resolve-global">Using a CDN</a></h5>
 <div class="paragraph">
@@ -5147,6 +5136,33 @@ Some libraries are also packaged in ways that allow you to include only the part
 </div>
 <div class="paragraph">
 <p>The above works fine in the Browser since every <code>"react"</code> require will be replaced, including the <code>"react"</code> require <code>"react-table"</code> has internally. For <code>:js-provider :require</code> however a <code>require("react-table")</code> will be emitted and <code>node</code> will be in control how that is resolved. Meaning that it will resolve it to the standard <code>"react"</code> and not the <code>"preact"</code> we had configured.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="alt-node-modules"><a class="anchor" href="#alt-node-modules"></a><a class="link" href="#alt-node-modules">11.1.4. Alternate Modules Directories</a></h4>
+<div class="paragraph">
+<p>By default <code>shadow-cljs</code> will only look at the <code>&lt;project-dir&gt;/node_modules</code> directory when resolving JS packages. This can be configured via the <code>:js-package-dirs</code> option in <code>:js-options</code>. This can be applied globally or per build.</p>
+</div>
+<div class="paragraph">
+<p>Relative paths will be resolved relative to the project root directory. Paths will be tried from left to right and the first matching package will be used.</p>
+</div>
+<div class="listingblock">
+<div class="title">Global config in <code>shadow-cljs.edn</code></div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:js-options</span> {<span class="symbol">:js-package-dirs</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">node_modules</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">../node_modules</span><span class="delimiter">&quot;</span></span>]}
+ <span class="keyword">..</span><span class="keyword">.</span>}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Config applied to single build</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span>
+  {<span class="keyword">..</span><span class="keyword">.</span>
+   <span class="symbol">:js-options</span> {<span class="symbol">:js-package-dirs</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">node_modules</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">../node_modules</span><span class="delimiter">&quot;</span></span>]}}}}</code></pre>
 </div>
 </div>
 </div>
