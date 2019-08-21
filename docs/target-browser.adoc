@@ -471,11 +471,23 @@ When you are not using the built-in HTTP Server you can specify `:watch-dir` ins
 document root used to serve your content.
 
 .Example :watch-dir config
-```
+```clojure
 {...
     {:builds
       {:app {...
              :devtools {:watch-dir "public"}}}}
+```
+
+When your HTTP Server is serving the files from a virtual directory and the filesystem paths don't exactly match the path used in the HTML you may adjust the path by setting `:watch-path` which will be used as a prefix.
+
+.Example `public/css/main.css` being served under `/foo/css/main.css`
+```clojure
+{...
+ {:builds
+  {:app
+   {...
+    :devtools {:watch-dir "public"
+               :watch-path "/foo"}}}}
 ```
 
 === Proxy Support [[proxy-support]]

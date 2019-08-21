@@ -3827,6 +3827,20 @@ document root used to serve your content.</p>
              <span class="symbol">:devtools</span> {<span class="symbol">:watch-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public</span><span class="delimiter">&quot;</span></span>}}}}</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>When your HTTP Server is serving the files from a virtual directory and the filesystem paths don&#8217;t exactly match the path used in the HTML you may adjust the path by setting <code>:watch-path</code> which will be used as a prefix.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example <code>public/css/main.css</code> being served under <code>/foo/css/main.css</code></div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ {<span class="symbol">:builds</span>
+  {<span class="symbol">:app</span>
+   {<span class="keyword">..</span><span class="keyword">.</span>
+    <span class="symbol">:devtools</span> {<span class="symbol">:watch-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public</span><span class="delimiter">&quot;</span></span>
+               <span class="symbol">:watch-path</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">/foo</span><span class="delimiter">&quot;</span></span>}}}}</code></pre>
+</div>
+</div>
 </div>
 <div class="sect3">
 <h4 id="proxy-support"><a class="anchor" href="#proxy-support"></a><a class="link" href="#proxy-support">6.8.3. Proxy Support</a></h4>
