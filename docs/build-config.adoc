@@ -40,13 +40,16 @@ Each build `:target` typically provides some development support. They are group
 
 === REPL
 
-When running `watch` code for the REPL is injected automatically and usually does not require additional configuration. Currently there is one config option that allows configuring which namespace the REPL will start in. It defaults to `cljs.user`.
+When running `watch` code for the REPL is injected automatically and usually does not require additional configuration. Additional options are available to control REPL behavior:
 
+- `:repl-init-ns` allows configuring which namespace the REPL will start in. It defaults to `cljs.user`.
+- `:repl-pprint` makes the REPL use `cljs.pprint` instead of the regular `pr-str` when printing eval results. Defaults to false.
 ```
 {...
  :builds
  {:app {...
         :devtools {:repl-init-ns my.app
+                   :repl-pprint true
                    ...}}}}
 ```
 

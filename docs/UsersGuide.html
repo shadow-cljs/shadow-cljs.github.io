@@ -2287,7 +2287,17 @@ the target you select.</p>
 <div class="sect3">
 <h4 id="_repl_2"><a class="anchor" href="#_repl_2"></a><a class="link" href="#_repl_2">5.2.1. REPL</a></h4>
 <div class="paragraph">
-<p>When running <code>watch</code> code for the REPL is injected automatically and usually does not require additional configuration. Currently there is one config option that allows configuring which namespace the REPL will start in. It defaults to <code>cljs.user</code>.</p>
+<p>When running <code>watch</code> code for the REPL is injected automatically and usually does not require additional configuration. Additional options are available to control REPL behavior:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>:repl-init-ns</code> allows configuring which namespace the REPL will start in. It defaults to <code>cljs.user</code>.</p>
+</li>
+<li>
+<p><code>:repl-pprint</code> makes the REPL use <code>cljs.pprint</code> instead of the regular <code>pr-str</code> when printing eval results. Defaults to false.</p>
+</li>
+</ul>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -2295,6 +2305,7 @@ the target you select.</p>
  <span class="symbol">:builds</span>
  {<span class="symbol">:app</span> {<span class="keyword">..</span><span class="keyword">.</span>
         <span class="symbol">:devtools</span> {<span class="symbol">:repl-init-ns</span> my.app
+                   <span class="symbol">:repl-pprint</span> <span class="predefined-constant">true</span>
                    <span class="keyword">..</span><span class="keyword">.</span>}}}}</code></pre>
 </div>
 </div>
