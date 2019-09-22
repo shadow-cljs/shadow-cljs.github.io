@@ -18,3 +18,7 @@ People who prefer developing against a Docker container can use the `Dockerfile`
 - Ruby
 - Bundler
 - Make
+
+### Visual Studio Code
+
+Provided that you have you have the "Visual Studio Code Remote - Container" extension installed, Visual Studio Code users will be able to develop against the Docker container immediately.

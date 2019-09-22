@@ -1,0 +1,5 @@
+{
+  "name": "shadow-cljs.github.io",
+  "dockerFile": "Dockerfile",
+  "postCreateCommand": "bundle install"
+}
