@@ -2820,6 +2820,12 @@ It is generally safer to use the "disabled" variant as the default since it make
 <li>
 <p><code>:rename-prefix</code> and <code>:rename-prefix-namespace</code></p>
 </li>
+<li>
+<p><code>:warnings</code> as a map of <code>{warning-type true|false}</code>, eg. <code>:warnings {:undeclared-var false}</code> to turn off specific warnings.</p>
+</li>
+<li>
+<p><code>:warnings-as-errors</code> takes a boolean or a set of warning-type keywords, eg. <code>:warnings-as-errors #{:undeclared-var}</code>.</p>
+</li>
 </ul>
 </div>
 <div class="paragraph">
@@ -6372,7 +6378,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2019-09-22 13:25:29 UTC
+Last updated 2019-08-18 13:32:22 CEST
 </div>
 </div>
 </body>

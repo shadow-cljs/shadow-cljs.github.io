@@ -352,6 +352,8 @@ Currently supported options include
 - `:checked-arrays` (Boolean), defaults to `false`
 - `:anon-fn-naming-policy`
 - `:rename-prefix` and `:rename-prefix-namespace`
+- `:warnings` as a map of `{warning-type true|false}`, eg. `:warnings {:undeclared-var false}` to turn off specific warnings.
+- `:warnings-as-errors` takes a boolean or a set of warning-type keywords, eg. `:warnings-as-errors #{:undeclared-var}`.
 
 *Unsupported or non-applicable Options*
 
