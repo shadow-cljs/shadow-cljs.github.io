@@ -59,7 +59,7 @@ cljs.repl> (js/alert "Jurassic Park!")
 
 === Simplify startup with dir-local
 
-You can simplify startup flow by a creating a `dir-local.el` file at project root.
+You can simplify startup flow by a creating a `.dir-locals.el` file at project root.
 
 ```
 ((nil . ((cider-default-cljs-repl . shadow)
