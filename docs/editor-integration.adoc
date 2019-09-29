@@ -63,7 +63,7 @@ You can simplify startup flow by a creating a `dir-local.el` file at project roo
 
 ```
 ((nil . ((cider-default-cljs-repl . shadow)
-	 (cider-shadow-cljs-default-options . "<your-build-name-here>"))))
+	 (cider-shadow-default-options . "<your-build-name-here>"))))
 ```
 
 == Proto REPL (Atom)
