@@ -5934,12 +5934,12 @@ cljs.repl&gt;</code></pre>
 <div class="sect3">
 <h4 id="_simplify_startup_with_dir_local"><a class="anchor" href="#_simplify_startup_with_dir_local"></a><a class="link" href="#_simplify_startup_with_dir_local">13.2.2. Simplify startup with dir-local</a></h4>
 <div class="paragraph">
-<p>You can simplify startup flow by a creating a <code>dir-local.el</code> file at project root.</p>
+<p>You can simplify startup flow by a creating a <code>.dir-locals.el</code> file at project root.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">((<span class="predefined-constant">nil</span> <span class="keyword">.</span> ((cider-default-cljs-repl <span class="keyword">.</span> shadow)
-         (cider-shadow-cljs-default-options <span class="keyword">.</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">&lt;your-build-name-here&gt;</span><span class="delimiter">&quot;</span></span>))))</code></pre>
+         (cider-shadow-default-options <span class="keyword">.</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">&lt;your-build-name-here&gt;</span><span class="delimiter">&quot;</span></span>))))</code></pre>
 </div>
 </div>
 </div>
