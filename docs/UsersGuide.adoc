@@ -335,7 +335,7 @@ When you use `shadow-cljs` embedded in other tools that provide their own nREPL 
   :repl-options
   {:init-ns shadow.user ;; or any of your choosing
    :nrepl-middleware
-   [shadow.cljs.devtools.server.nrepl04/middleware]}
+   [shadow.cljs.devtools.server.nrepl/middleware]}
   ...)
 ```
 
