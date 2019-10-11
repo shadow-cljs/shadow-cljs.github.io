@@ -353,7 +353,6 @@ Currently supported options include
 - `:anon-fn-naming-policy`
 - `:rename-prefix` and `:rename-prefix-namespace`
 - `:warnings` as a map of `{warning-type true|false}`, eg. `:warnings {:undeclared-var false}` to turn off specific warnings.
-- `:warnings-as-errors` takes a boolean or a set of warning-type keywords, eg. `:warnings-as-errors #{:undeclared-var}`.
 
 *Unsupported or non-applicable Options*
 
@@ -375,6 +374,43 @@ Options that don't have any effect at all include
 - `:package-json-resolution` see <<js-resolve, :js-options :resolve>> instead
 - `:watch-fn`
 - `:process-shim`
+
+=== Warnings as Errors [[warnigs-as-errors]]
+
+It is sometimes desireable to fail a build with warnings rather than continuing with the build (eg. in CI envs). You can use the `:warnings-as-errors` compiler options to customize how that is handled.
+
+.Treat all warnings as errors
+```
+{...
+ :builds
+ {:app
+  {...
+   :compiler-options {:warnings-as-errors true}}}}
+```
+
+.Only throw certain warnings
+```
+{...
+ :builds
+ {:app
+  {...
+   :compiler-options {:warnings-as-errors #{:undeclared-var}}}}
+```
+
+A set of possible warning-type keywords can be found https://github.com/clojure/clojurescript/blob/5ad96a8b3ae2e3616a19715ba9ba2471a36933a2/src/main/clojure/cljs/analyzer.cljc#L124-L163[here].
+
+.Only throw for certain namespaces
+```
+{...
+ :builds
+ {:app
+  {...
+   :compiler-options {:warnings-as-errors {:ignore #{some.ns some.library.*}
+                                           :warnings-types #{:undeclared-var}}}
+```
+
+`:ignore` takes a set of symbols refering to namespaces. Either direct matches or `.*` wildcards are allowed. `:warning-types` has the same functionality as above, not specifying it means all warnings will throw except the ignored namespaces.
+
 
 == Output Language Options
 

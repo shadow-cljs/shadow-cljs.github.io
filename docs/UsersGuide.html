@@ -630,7 +630,11 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 <li><a href="#_compiler_cache">5.4. Compiler Cache</a></li>
 <li><a href="#closure-defines">5.5. Closure Defines</a></li>
-<li><a href="#compiler-options">5.6. Compiler Options</a></li>
+<li><a href="#compiler-options">5.6. Compiler Options</a>
+<ul class="sectlevel3">
+<li><a href="#warnigs-as-errors">5.6.1. Warnings as Errors</a></li>
+</ul>
+</li>
 <li><a href="#_output_language_options">5.7. Output Language Options</a></li>
 <li><a href="#_conditional_reading">5.8. Conditional Reading</a></li>
 <li><a href="#config-merge">5.9. Overriding from the CLI</a></li>
@@ -2823,9 +2827,6 @@ It is generally safer to use the "disabled" variant as the default since it make
 <li>
 <p><code>:warnings</code> as a map of <code>{warning-type true|false}</code>, eg. <code>:warnings {:undeclared-var false}</code> to turn off specific warnings.</p>
 </li>
-<li>
-<p><code>:warnings-as-errors</code> takes a boolean or a set of warning-type keywords, eg. <code>:warnings-as-errors #{:undeclared-var}</code>.</p>
-</li>
 </ul>
 </div>
 <div class="paragraph">
@@ -2885,6 +2886,49 @@ It is generally safer to use the "disabled" variant as the default since it make
 <p><code>:process-shim</code></p>
 </li>
 </ul>
+</div>
+<div class="sect3">
+<h4 id="warnigs-as-errors"><a class="anchor" href="#warnigs-as-errors"></a><a class="link" href="#warnigs-as-errors">5.6.1. Warnings as Errors</a></h4>
+<div class="paragraph">
+<p>It is sometimes desireable to fail a build with warnings rather than continuing with the build (eg. in CI envs). You can use the <code>:warnings-as-errors</code> compiler options to customize how that is handled.</p>
+</div>
+<div class="listingblock">
+<div class="title">Treat all warnings as errors</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span>
+  {<span class="keyword">..</span><span class="keyword">.</span>
+   <span class="symbol">:compiler-options</span> {<span class="symbol">:warnings-as-errors</span> <span class="predefined-constant">true</span>}}}}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Only throw certain warnings</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span>
+  {<span class="keyword">..</span><span class="keyword">.</span>
+   <span class="symbol">:compiler-options</span> {<span class="symbol">:warnings-as-errors</span> #{<span class="symbol">:undeclared-var</span>}}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A set of possible warning-type keywords can be found <a href="https://github.com/clojure/clojurescript/blob/5ad96a8b3ae2e3616a19715ba9ba2471a36933a2/src/main/clojure/cljs/analyzer.cljc#L124-L163">here</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Only throw for certain namespaces</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span>
+  {<span class="keyword">..</span><span class="keyword">.</span>
+   <span class="symbol">:compiler-options</span> {<span class="symbol">:warnings-as-errors</span> {<span class="symbol">:ignore</span> #{some.ns some.library.*}
+                                           <span class="symbol">:warnings-types</span> #{<span class="symbol">:undeclared-var</span>}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>:ignore</code> takes a set of symbols refering to namespaces. Either direct matches or <code>.*</code> wildcards are allowed. <code>:warning-types</code> has the same functionality as above, not specifying it means all warnings will throw except the ignored namespaces.</p>
+</div>
 </div>
 </div>
 <div class="sect2">
