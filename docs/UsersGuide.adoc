@@ -125,9 +125,9 @@ The artifact can be found at:
 image::https://img.shields.io/clojars/v/thheller/shadow-cljs.svg[link=https://clojars.org/thheller/shadow-cljs]
 image::https://img.shields.io/npm/v/shadow-cljs.svg[link=https://github.com/thheller/shadow-cljs]
 
-= Usage
-
 include::usage.adoc[]
+
+include::repl.adoc[]
 
 = Configuration
 
