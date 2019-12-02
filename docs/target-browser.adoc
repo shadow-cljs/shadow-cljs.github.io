@@ -294,11 +294,39 @@ NOTE: Hot code reload does not support reloading code in the worker while it is 
 I suggest shutting down all workers using the `:devtools :before-load` function and restarting it
 in the `:after-load`.
 
-== Cacheable Output [[NameHashing]]
+== Cacheable Output
 
 In a web setting it is desirable to cache `.js` files for a very long time to avoid extra request. It is common
 practice the generate a unique name for the `.js` file for every released version. This changes the URL used to
 access it and thereby is safe to cache forever.
+
+=== Release Versions [[release-version]]
+
+Creating unique filenames for each release can be done via the `:release-version` config setting. Generally you'll pass this in from the command line via <<config-merge, --config-merge>>.
+
+```
+shadow-cljs release app --config-merge '{:release-version "v1"}'
+```
+
+.Example :modules config
+```
+{...
+ :builds
+   {:app
+     {:target :browser
+      ...
+      :output-dir "public/js"
+      :asset-path "/js"
+      :modules {:main  {:entries [my.app]}
+                :extra {:entries [my.app.extra]
+                        :depends-on #{:main}}}}}}
+```
+
+This would create the `main.v1.js` and `extra.v1.js` files in `public/js` instead of the usual `main.js` and `extra.js`.
+
+You can use manual versions or something automated like the `git` sha at the time of the build. Just make sure that you bump whatever it is once you shipped something out to the user since with caching they won't be requesting newer versions of old files.
+
+=== Filenames with Fingerprint-Hash [[NameHashing]]
 
 You can add `:module-hash-names true` to your build config to automatically create a MD5
 signature for each generated output module file. That means that a `:main` module will generate
