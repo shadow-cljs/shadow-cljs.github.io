@@ -173,3 +173,22 @@ Some of the things you can now do:
 ==== Cljc files
 
 - Switch between Clojure and Clojurescript repl `ctrl+alt+c ctrl+alt+t` (or click the green `cljc/clj` button in the status bar). This determines both which repl is backing the editor and what terminal repl is being accessed, see above.
+
+== Fireplace.vim (Vim/Neovim)
+
+https://www.vim.org/scripts/script.php?script_id=4978[Fireplace.vim] is a Vim/Neovim plug-in which provides Clojure REPL integration by acting as an https://nrepl.org/[nREPL] client.
+
+This guide uses as an example the app created in https://github.com/thheller/shadow-cljs#quick-start[Shadow-CLJS Quick Start] therefore refers to a few configuration items in the app's `shadow-cljs.edn`. That being said, these configuration items are fairly generic so should be applicable to other apps with minor modifications.
+
+=== Dependencies
+
+Install https://www.vim.org/scripts/script.php?script_id=4978[Fireplace.vim] using your favorite method of installing plug-ins in Vim/Neovim.
+
+As an https://nrepl.org/[nREPL] client, https://www.vim.org/scripts/script.php?script_id=4978[Fireplace.vim] depends on https://docs.cider.mx/cider-nrepl/[`cider-nrepl`] (which is nREPL middleware that provides common, editor-agnostic REPL operations) therefore you need to include this dependency in <<user-config, ~/.shadow-cljs/config.edn>> or `shadow-cljs.edn`:
+
+```clojure
+[cider/cider-nrepl "0.22.4"]
+```
+
+`shadow-cljs` will inject the required `cider-nrepl` middleware once it sees this dependency.
+
