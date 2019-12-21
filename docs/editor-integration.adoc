@@ -215,7 +215,7 @@ Create the example app by following the official https://github.com/thheller/sha
    :modules {:main {:init-fn acme.frontend.app/init}}}}}
 ```
 
-Once that is done, start the app (note the build ID, `frontend`, specified in `shadow-cljs.edn`):
+Once that is done, start the app (note the Shadow-CLJS build ID, `frontend`, specified in `shadow-cljs.edn`):
 
 ```sh
 npx shadow-cljs watch frontend
