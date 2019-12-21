@@ -224,7 +224,8 @@ npx shadow-cljs watch frontend
 Open the app in a browser at http://localhost:8080/. Without this step, you would get the following error message from https://www.vim.org/scripts/script.php?script_id=4978[Fireplace.vim] if you attempt to connect to the REPL server from within Vim/Neovim:
 
 ```
-No application has connected to the REPL server. Make sure your JS environment has loaded your compiled ClojureScript code.
+No application has connected to the REPL server. 
+Make sure your JS environment has loaded your compiled ClojureScript code.
 ```
 
 === Connecting Fireplace.vim to REPL Server
