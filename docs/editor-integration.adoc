@@ -108,7 +108,7 @@ Once you checked that the configuration is right, you can start your shadow app 
 $ shadow-cljs watch app
 ```
 
-Now, all you have to do is to run the atom command `Chlorine: Connect Clojure Socket Repl`. This will connect a REPL to evaluate Clojure code. Next you need to run `Chlorine: Connect Embeded Clojurescript Repl`, and it'll connect the ClojureScript REPL too.
+Now, all you have to do is to run the atom command `Chlorine: Connect Clojure Socket Repl`. This will connect a REPL to evaluate Clojure code. Next you need to run `Chlorine: Connect Embedded`, and it'll connect the ClojureScript REPL too.
 
 Now, you can use the `Chlorine: Evaluate...` commands to evaluate any Clojure or ClojureScript REPL. It'll evaluate `.clj` files as Clojure, and `cljc` files as ClojureScript.
 
