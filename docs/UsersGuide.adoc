@@ -536,7 +536,7 @@ include::target-react-native.adoc[]
 
 There is built-in support for generating code that is intended to be used as a stand-alone
 script, and also for code that is intended to be used as a library. See the
-section on <<CommonConfig,common configuration>> for the base settings needed in
+section on <<Configuration,common configuration>> for the base settings needed in
 a configuration file.
 
 == node.js Scripts [[target-node-script]]

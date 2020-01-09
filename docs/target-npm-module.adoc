@@ -9,7 +9,7 @@ comes with a convenience mode that makes such integration easier.
 
 This target is meant to be as easy to access as possible, and does not actually require a specific build in the config. You still need a non-empty config file, but the default one from `shadow-cljs init` will do.
 
-ClojureScript organizes files into namespaces which means that a `demo.foo` namespace should be inside a `src/main/demo/foo.cljs` file. Where `src/main` is the default source path the shadow-cljs tool (see <<CommonConfig, main configuration>>).
+ClojureScript organizes files into namespaces which means that a `demo.foo` namespace should be inside a `src/main/demo/foo.cljs` file. Where `src/main` is the default source path the shadow-cljs tool (see <<Configuration, main configuration>>).
 
 
 .Sample source for `src/main/demo/foo.cljs`
@@ -43,7 +43,7 @@ Watching with incremental compile is as simple as running `shadow-cljs watch npm
 
 You can also treat `:npm-module` on the same footing with your other builds: give it explicit
 configuration. This allows you to also customize the code generation options. Of course
-you will configure the <<CommonConfig, main configuration>> as in all targets. The target-specific
+you will configure the <<Configuration, main configuration>> as in all targets. The target-specific
 options are:
 
 [horizontal]
