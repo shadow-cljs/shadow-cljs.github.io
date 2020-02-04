@@ -339,10 +339,7 @@ When you use `shadow-cljs` embedded in other tools that provide their own nREPL 
   ...)
 ```
 
-IMPORTANT: When using older `nREPL` versions (before v0.4+) you'll need to use `shadow.cljs.devtools.server.nrepl/middleware` instead.
-
 TIP: You still need to start the <<embedded, embedded server>> manually before using the CLJS REPL.
-
 
 === Socket REPL [[socket-repl]]
 
