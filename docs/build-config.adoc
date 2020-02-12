@@ -481,8 +481,12 @@ While you can use <<closure-defines, :closure-defines>> to conditionally compile
    #?@(:node [[]]
        :cljs [["codemirror" :as CodeMirror]])))
 
-#?(:node
-   (defn init-cm [dom-node] ...))
+#?(:node ;; node platform override
+   (defn init-cm [dom-node]
+    :no-op)
+   :cljs ;; default impl
+   (defn init-cm [dom-node]
+     ... actual impl ...))
 
 ...
 ```
@@ -510,6 +514,10 @@ The `:server` build will then no longer have the `codemirror` require and the `i
   (:require
     ["react" :as react]))
 
+;; this will likely be removed as dead code if
+;; its never actually called anywhere
+
+(defn init-cm [dom-node] :no-op)
 ...
 ```
 

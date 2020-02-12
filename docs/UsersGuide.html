@@ -3150,8 +3150,12 @@ This feature only works in <code>shadow-cljs</code>. It was officially <a href="
    <span class="error">#</span>?@(<span class="symbol">:node</span> [[]]
        <span class="symbol">:cljs</span> [[<span class="string"><span class="delimiter">&quot;</span><span class="content">codemirror</span><span class="delimiter">&quot;</span></span> <span class="symbol">:as</span> CodeMirror]])))
 
-<span class="error">#</span>?(<span class="symbol">:node</span>
-   (<span class="keyword">defn</span> <span class="function">init-cm</span> [dom-node] <span class="keyword">..</span><span class="keyword">.</span>))
+<span class="error">#</span>?(<span class="symbol">:node</span> <span class="comment">;; node platform override</span>
+   (<span class="keyword">defn</span> <span class="function">init-cm</span> [dom-node]
+    <span class="symbol">:no-op</span>)
+   <span class="symbol">:cljs</span> <span class="comment">;; default impl</span>
+   (<span class="keyword">defn</span> <span class="function">init-cm</span> [dom-node]
+     <span class="keyword">..</span><span class="keyword">.</span> actual impl <span class="keyword">..</span><span class="keyword">.</span>))
 
 <span class="keyword">..</span><span class="keyword">.</span></code></pre>
 </div>
@@ -3182,6 +3186,10 @@ This feature only works in <code>shadow-cljs</code>. It was officially <a href="
   (<span class="symbol">:require</span>
     [<span class="string"><span class="delimiter">&quot;</span><span class="content">react</span><span class="delimiter">&quot;</span></span> <span class="symbol">:as</span> react]))
 
+<span class="comment">;; this will likely be removed as dead code if</span>
+<span class="comment">;; its never actually called anywhere</span>
+
+(<span class="keyword">defn</span> <span class="function">init-cm</span> [dom-node] <span class="symbol">:no-op</span>)
 <span class="keyword">..</span><span class="keyword">.</span></code></pre>
 </div>
 </div>
