@@ -1781,6 +1781,17 @@ configuration and a <code>:builds</code> entry for all your builds.</p>
 <p>Your dependencies are managed via the <code>:dependencies</code> key at the root of the <code>shadow-cljs.edn</code> config file. They are declared in the same notation that other Clojure tools like <code>lein</code> or <code>boot</code> use.</p>
 </div>
 <div class="paragraph">
+<p>Each dependency is written as a vector using <code>[library-name "version-string"]</code> nested in one outer vector.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example :dependencies</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:source-paths</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">src</span><span class="delimiter">&quot;</span></span>]
+ <span class="symbol">:dependencies</span> [[reagent <span class="string"><span class="delimiter">&quot;</span><span class="content">0.9.1</span><span class="delimiter">&quot;</span></span>]]
+ <span class="symbol">:builds</span> <span class="keyword">..</span><span class="keyword">.</span>}</code></pre>
+</div>
+</div>
+<div class="paragraph">
 <p>Notice that the source path is <strong>only</strong> specified once in the entire configuration. The system will use namespace dependency graphs to determine what code is needed in the final output of any given build.</p>
 </div>
 </div>
@@ -4719,7 +4730,7 @@ renaming an artifact.</p>
 <h2 id="_testing"><a class="anchor" href="#_testing"></a><a class="link" href="#_testing">11. Testing</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>shadow-cljs</code> provides a few ultility targets to make building tests a little easier.</p>
+<p><code>shadow-cljs</code> provides a few utility targets to make building tests a little easier.</p>
 </div>
 <div class="paragraph">
 <p>All test targets generate a test runner and automatically add all namespaces matching the configurable <code>:ns-regexp</code>. The default test runners were built for <code>cljs.test</code> but you can create custom runners if you prefer to use other test frameworks.</p>
@@ -5112,6 +5123,18 @@ using <code>(:require ["thing" :as thing])</code> and then <code>(thing)</code>.
 </div>
 <div class="paragraph">
 <p>The following table can be used for translation:</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+This table only applies if the code you are consuming is packaged as actual ES6+ code. If the code is packaged as CommonJS instead the <code>:default</code> may not apply. See the section below for more info.
+</td>
+</tr>
+</table>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Table 1. ES6 Import to CLJS Require</caption>
@@ -6664,7 +6687,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2020-02-04 13:04:10 CET
+Last updated 2020-02-12 22:24:38 CET
 </div>
 </div>
 </body>

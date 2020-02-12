@@ -30,6 +30,8 @@ More recently some packages started using ES6 `import` statements in their examp
 
 The following table can be used for translation:
 
+IMPORTANT: This table only applies if the code you are consuming is packaged as actual ES6+ code. If the code is packaged as CommonJS instead the `:default` may not apply. See the section below for more info.
+
 .ES6 Import to CLJS Require
 |===
 |ES6 Import|CLJS Require

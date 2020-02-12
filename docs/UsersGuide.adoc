@@ -201,6 +201,15 @@ It is not recommended to separate source files by extension (eg. `src/clj`, `src
 
 Your dependencies are managed via the `:dependencies` key at the root of the `shadow-cljs.edn` config file. They are declared in the same notation that other Clojure tools like `lein` or `boot` use.
 
+Each dependency is written as a vector using `[library-name "version-string"]` nested in one outer vector.
+
+.Example :dependencies
+```clojure
+{:source-paths ["src"]
+ :dependencies [[reagent "0.9.1"]]
+ :builds ...}
+```
+
 Notice that the source path is *only* specified once in the entire configuration. The system will use namespace dependency graphs to determine what code is needed in the final output of any given build.
 
 === JavaScript [[npm-install]]
