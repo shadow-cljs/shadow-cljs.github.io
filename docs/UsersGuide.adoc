@@ -556,7 +556,7 @@ include::target-npm-module.adoc[]
 
 = Testing
 
-`shadow-cljs` provides a few ultility targets to make building tests a little easier.
+`shadow-cljs` provides a few utility targets to make building tests a little easier.
 
 All test targets generate a test runner and automatically add all namespaces matching the configurable `:ns-regexp`. The default test runners were built for `cljs.test` but you can create custom runners if you prefer to use other test frameworks.
 
