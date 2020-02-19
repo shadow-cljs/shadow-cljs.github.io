@@ -178,7 +178,7 @@ Running with `clj` directly.
  :deps {...}
  :aliases
  {:shadow-cljs
-  {:extra-deps {thheller/shadow-cljs {:mvn/version <latest>}
+  {:extra-deps {thheller/shadow-cljs {:mvn/version <latest>}}
    :main-opts ["-m" "shadow.cljs.devtools.cli"]}}}
 ```
 
