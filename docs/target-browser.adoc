@@ -278,15 +278,15 @@ both development and release modes.
 
 (js/self.addEventListener "message"
   (fn [^js e]
-    (js/postMessage (.. e -data))
+    (js/postMessage (.. e -data))))
 ```
 
 .Sample using the worker
 ```
 (ns my.app)
 
-(let [worker (js/Worker. "/js/worker.js"))]
-  (.. worker (addEventListener (fn [e] (js/console.log e))))
+(let [worker (js/Worker. "/js/worker.js")]
+  (.. worker (addEventListener "message" (fn [e] (js/console.log e))))
   (.. worker (postMessage "hello world")))
 ```
 
