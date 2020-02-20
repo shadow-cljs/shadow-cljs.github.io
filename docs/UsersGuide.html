@@ -3779,6 +3779,25 @@ both development and release modes.</p>
     (<span class="keyword">..</span> worker (postMessage <span class="string"><span class="delimiter">&quot;</span><span class="content">hello world</span><span class="delimiter">&quot;</span></span>))))</code></pre>
 </div>
 </div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Since we now have a <code>:shared</code> module you must ensure to load it properly in your HTML. If you just load <code>main.js</code> you will get an error.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">HTML Loading shared.js and main.js</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">&lt;script src<span class="keyword">=</span><span class="string"><span class="delimiter">&quot;</span><span class="content">/js/shared.js</span><span class="delimiter">&quot;</span></span>&gt;&lt;/script&gt;
+&lt;script src<span class="keyword">=</span><span class="string"><span class="delimiter">&quot;</span><span class="content">/js/main.js</span><span class="delimiter">&quot;</span></span>&gt;&lt;/script&gt;</code></pre>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_cacheable_output"><a class="anchor" href="#_cacheable_output"></a><a class="link" href="#_cacheable_output">7.6. Cacheable Output</a></h3>

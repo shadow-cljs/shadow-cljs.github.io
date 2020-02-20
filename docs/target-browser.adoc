@@ -302,6 +302,14 @@ The `:devtools {:browser-inject :main}` is currently required to tell the compil
     (.. worker (postMessage "hello world"))))
 ```
 
+IMPORTANT: Since we now have a `:shared` module you must ensure to load it properly in your HTML. If you just load `main.js` you will get an error.
+
+.HTML Loading shared.js and main.js
+```
+<script src="/js/shared.js"></script>
+<script src="/js/main.js"></script>
+```
+
 == Cacheable Output
 
 In a web setting it is desirable to cache `.js` files for a very long time to avoid extra request. It is common
