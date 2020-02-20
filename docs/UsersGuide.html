@@ -3752,7 +3752,7 @@ both development and release modes.</p>
 
 (js/self.addEventListener <span class="string"><span class="delimiter">&quot;</span><span class="content">message</span><span class="delimiter">&quot;</span></span>
   (<span class="keyword">fn</span> [^js e]
-    (js/postMessage (<span class="keyword">..</span> e -data))</code></pre>
+    (js/postMessage (<span class="keyword">..</span> e -data))))</code></pre>
 </div>
 </div>
 <div class="listingblock">
@@ -3760,8 +3760,8 @@ both development and release modes.</p>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">my.app</span>)
 
-(<span class="keyword">let</span> [worker (js/Worker. <span class="string"><span class="delimiter">&quot;</span><span class="content">/js/worker.js</span><span class="delimiter">&quot;</span></span>))]
-  (<span class="keyword">..</span> worker (addEventListener (<span class="keyword">fn</span> [e] (js/console.log e))))
+(<span class="keyword">let</span> [worker (js/Worker. <span class="string"><span class="delimiter">&quot;</span><span class="content">/js/worker.js</span><span class="delimiter">&quot;</span></span>)]
+  (<span class="keyword">..</span> worker (addEventListener <span class="string"><span class="delimiter">&quot;</span><span class="content">message</span><span class="delimiter">&quot;</span></span> (<span class="keyword">fn</span> [e] (js/console.log e))))
   (<span class="keyword">..</span> worker (postMessage <span class="string"><span class="delimiter">&quot;</span><span class="content">hello world</span><span class="delimiter">&quot;</span></span>)))</code></pre>
 </div>
 </div>
