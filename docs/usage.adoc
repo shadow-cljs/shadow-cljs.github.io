@@ -118,6 +118,8 @@ If you'd like to use https://leiningen.org/[Leiningen] to manage your dependenci
 
 When using `project.clj` to manage your `:dependencies` you must manually include the https://clojars.org/thheller/shadow-cljs[thheller/shadow-cljs] artifact in your `:dependencies` (directly or in a profile).
 
+IMPORTANT: When you are running into weird Java Stackstraces when starting `shadow-cljs` or trying compile builds you may have a dependency conflict. It is very important that `shadow-cljs` is used with proper matching `org.clojure/clojurescript` and `closure-compiler` versions. You can check via `lein deps :tree` and the required versions are listed on https://clojars.org/thheller/shadow-cljs[clojars] (on the right side).
+
 ==== Running Tasks Directly From Leiningen
 
 You may also directly execute `shadow-cljs` commands via `lein` if you prefer to not use the `shadow-cljs` command itself.
