@@ -245,7 +245,7 @@ IMPORTANT: Note that the created variable isn't actually useful directly. It wil
 == Web Workers
 
 The `:modules` configuration may also be used to generate files intended to be used as a Web Workers.
-You may declare any module (except the default) as a Web Worker by setting `:web-worker true`. The
+You may declare any module as a Web Worker by setting `:web-worker true`. The
 generated file will contain some additional bootstrap code which will load its dependencies
 automatically. The way `:modules` work also ensures that code used only by the worker will also only
 be in the final file for the worker. Each worker should have a dedicated CLJS namespace.
@@ -254,45 +254,53 @@ be in the final file for the worker. Each worker should have a dedicated CLJS na
 ```
 {...
  :builds
-   {:app
-    {:target :browser
-     :output-dir "public/js"
-     :asset-path "/js"
-     ...
-     :modules {:main   {:entries [my.app]}
-               :extra  {:entries [my.app.extra]
-                        :depends-on #{:main}}
-               :worker {:entries [my.app.worker]
-                        :depends-on #{:main}
-                        :web-worker true}}}}}
+ {:app
+  {:target :browser
+   :output-dir "public/js"
+   :asset-path "/js"
+   ...
+   :modules
+   {:shared
+    {:entries []}
+    :main
+    {:init-fn my.app/init
+     :depends-on #{:shared}}
+    :worker
+    {:init-fn my.app.worker/init
+     :depends-on #{:shared}
+     :web-worker true}}
+   :devtools {:browser-inject :main}
+   }}}
 ```
 
 The above configuration will generate `worker.js` which you can use to start the Web Worker.
-It will have all code from the `:main` module available (but not `:extra`). The code in the
+It will have all code from the `:shared` module available (but not `:main`). The code in the
 `my.app.worker` namespace will only ever execute in the worker. Worker generation happens in
 both development and release modes.
+
+Note that the empty `:entries []` in the `:shared` module will make it collect all the code shared between the `:main` and `:worker` modules.
+
+The `:devtools {:browser-inject :main}` is currently required to tell the compiler where the browser devtools/hud should be added to. It defaults to adding them to the "base" module which would be `:shared` in this case. Since that contains code not compatible with the Worker environment we need to move it.
 
 .Sample echo worker
 ```
 (ns my.app.worker)
 
-(js/self.addEventListener "message"
-  (fn [^js e]
-    (js/postMessage (.. e -data))))
+(defn init []
+  (js/self.addEventListener "message"
+    (fn [^js e]
+      (js/postMessage (.. e -data)))))
 ```
 
 .Sample using the worker
 ```
 (ns my.app)
 
-(let [worker (js/Worker. "/js/worker.js")]
-  (.. worker (addEventListener "message" (fn [e] (js/console.log e))))
-  (.. worker (postMessage "hello world")))
+(defn init []
+  (let [worker (js/Worker. "/js/worker.js")]
+    (.. worker (addEventListener "message" (fn [e] (js/console.log e))))
+    (.. worker (postMessage "hello world"))))
 ```
-
-NOTE: Hot code reload does not support reloading code in the worker while it is running.
-I suggest shutting down all workers using the `:devtools :before-load` function and restarting it
-in the `:after-load`.
 
 == Cacheable Output
 

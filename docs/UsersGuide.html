@@ -3716,7 +3716,7 @@ Note that the created variable isn&#8217;t actually useful directly. It will con
 <h3 id="_web_workers"><a class="anchor" href="#_web_workers"></a><a class="link" href="#_web_workers">7.5. Web Workers</a></h3>
 <div class="paragraph">
 <p>The <code>:modules</code> configuration may also be used to generate files intended to be used as a Web Workers.
-You may declare any module (except the default) as a Web Worker by setting <code>:web-worker true</code>. The
+You may declare any module as a Web Worker by setting <code>:web-worker true</code>. The
 generated file will contain some additional bootstrap code which will load its dependencies
 automatically. The way <code>:modules</code> work also ensures that code used only by the worker will also only
 be in the final file for the worker. Each worker should have a dedicated CLJS namespace.</p>
@@ -3726,33 +3726,46 @@ be in the final file for the worker. Each worker should have a dedicated CLJS na
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
  <span class="symbol">:builds</span>
-   {<span class="symbol">:app</span>
-    {<span class="symbol">:target</span> <span class="symbol">:browser</span>
-     <span class="symbol">:output-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public/js</span><span class="delimiter">&quot;</span></span>
-     <span class="symbol">:asset-path</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">/js</span><span class="delimiter">&quot;</span></span>
-     <span class="keyword">..</span><span class="keyword">.</span>
-     <span class="symbol">:modules</span> {<span class="symbol">:main</span>   {<span class="symbol">:entries</span> [my.app]}
-               <span class="symbol">:extra</span>  {<span class="symbol">:entries</span> [my.app.extra]
-                        <span class="symbol">:depends-on</span> #{<span class="symbol">:main</span>}}
-               <span class="symbol">:worker</span> {<span class="symbol">:entries</span> [my.app.worker]
-                        <span class="symbol">:depends-on</span> #{<span class="symbol">:main</span>}
-                        <span class="symbol">:web-worker</span> <span class="predefined-constant">true</span>}}}}}</code></pre>
+ {<span class="symbol">:app</span>
+  {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+   <span class="symbol">:output-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public/js</span><span class="delimiter">&quot;</span></span>
+   <span class="symbol">:asset-path</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">/js</span><span class="delimiter">&quot;</span></span>
+   <span class="keyword">..</span><span class="keyword">.</span>
+   <span class="symbol">:modules</span>
+   {<span class="symbol">:shared</span>
+    {<span class="symbol">:entries</span> []}
+    <span class="symbol">:main</span>
+    {<span class="symbol">:init-fn</span> my.app/init
+     <span class="symbol">:depends-on</span> #{<span class="symbol">:shared</span>}}
+    <span class="symbol">:worker</span>
+    {<span class="symbol">:init-fn</span> my.app.worker/init
+     <span class="symbol">:depends-on</span> #{<span class="symbol">:shared</span>}
+     <span class="symbol">:web-worker</span> <span class="predefined-constant">true</span>}}
+   <span class="symbol">:devtools</span> {<span class="symbol">:browser-inject</span> <span class="symbol">:main</span>}
+   }}}</code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>The above configuration will generate <code>worker.js</code> which you can use to start the Web Worker.
-It will have all code from the <code>:main</code> module available (but not <code>:extra</code>). The code in the
+It will have all code from the <code>:shared</code> module available (but not <code>:main</code>). The code in the
 <code>my.app.worker</code> namespace will only ever execute in the worker. Worker generation happens in
 both development and release modes.</p>
+</div>
+<div class="paragraph">
+<p>Note that the empty <code>:entries []</code> in the <code>:shared</code> module will make it collect all the code shared between the <code>:main</code> and <code>:worker</code> modules.</p>
+</div>
+<div class="paragraph">
+<p>The <code>:devtools {:browser-inject :main}</code> is currently required to tell the compiler where the browser devtools/hud should be added to. It defaults to adding them to the "base" module which would be <code>:shared</code> in this case. Since that contains code not compatible with the Worker environment we need to move it.</p>
 </div>
 <div class="listingblock">
 <div class="title">Sample echo worker</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">my.app.worker</span>)
 
-(js/self.addEventListener <span class="string"><span class="delimiter">&quot;</span><span class="content">message</span><span class="delimiter">&quot;</span></span>
-  (<span class="keyword">fn</span> [^js e]
-    (js/postMessage (<span class="keyword">..</span> e -data))))</code></pre>
+(<span class="keyword">defn</span> <span class="function">init</span> []
+  (js/self.addEventListener <span class="string"><span class="delimiter">&quot;</span><span class="content">message</span><span class="delimiter">&quot;</span></span>
+    (<span class="keyword">fn</span> [^js e]
+      (js/postMessage (<span class="keyword">..</span> e -data)))))</code></pre>
 </div>
 </div>
 <div class="listingblock">
@@ -3760,24 +3773,11 @@ both development and release modes.</p>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">my.app</span>)
 
-(<span class="keyword">let</span> [worker (js/Worker. <span class="string"><span class="delimiter">&quot;</span><span class="content">/js/worker.js</span><span class="delimiter">&quot;</span></span>)]
-  (<span class="keyword">..</span> worker (addEventListener <span class="string"><span class="delimiter">&quot;</span><span class="content">message</span><span class="delimiter">&quot;</span></span> (<span class="keyword">fn</span> [e] (js/console.log e))))
-  (<span class="keyword">..</span> worker (postMessage <span class="string"><span class="delimiter">&quot;</span><span class="content">hello world</span><span class="delimiter">&quot;</span></span>)))</code></pre>
+(<span class="keyword">defn</span> <span class="function">init</span> []
+  (<span class="keyword">let</span> [worker (js/Worker. <span class="string"><span class="delimiter">&quot;</span><span class="content">/js/worker.js</span><span class="delimiter">&quot;</span></span>)]
+    (<span class="keyword">..</span> worker (addEventListener <span class="string"><span class="delimiter">&quot;</span><span class="content">message</span><span class="delimiter">&quot;</span></span> (<span class="keyword">fn</span> [e] (js/console.log e))))
+    (<span class="keyword">..</span> worker (postMessage <span class="string"><span class="delimiter">&quot;</span><span class="content">hello world</span><span class="delimiter">&quot;</span></span>))))</code></pre>
 </div>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-Hot code reload does not support reloading code in the worker while it is running.
-I suggest shutting down all workers using the <code>:devtools :before-load</code> function and restarting it
-in the <code>:after-load</code>.
-</td>
-</tr>
-</table>
 </div>
 </div>
 <div class="sect2">
