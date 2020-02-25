@@ -2560,11 +2560,22 @@ The functions will receive one callback function that must be called when their 
 <p>It is possible to tag namespaces with metadata so they will never be reloaded even if they are recompiled.</p>
 </div>
 <div class="listingblock">
-<div class="title">non-reloadable ns</div>
+<div class="title">A non-reloadable ns</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> ^<span class="symbol">:dev/once</span> my.thing)
 
 (js/console.warn <span class="string"><span class="delimiter">&quot;</span><span class="content">will only execute once</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Namespaces can also be tagged to always reload.</p>
+</div>
+<div class="listingblock">
+<div class="title">An always-reloadable ns</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> ^<span class="symbol">:dev/always</span> my.thing)
+
+(js/console.warn <span class="string"><span class="delimiter">&quot;</span><span class="content">will execute on every code change</span><span class="delimiter">&quot;</span></span>)</code></pre>
 </div>
 </div>
 </div>
