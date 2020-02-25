@@ -137,12 +137,22 @@ IMPORTANT: The functions will receive one callback function that must be called 
 
 It is possible to tag namespaces with metadata so they will never be reloaded even if they are recompiled.
 
-.non-reloadable ns
+.A non-reloadable ns
 ```
 (ns ^:dev/once my.thing)
 
 (js/console.warn "will only execute once")
 ```
+
+Namespaces can also be tagged to always reload.
+
+.An always-reloadable ns
+```
+(ns ^:dev/always my.thing)
+
+(js/console.warn "will execute on every code change")
+```
+
 
 ==== Config
 
