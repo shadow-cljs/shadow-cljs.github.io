@@ -23,6 +23,12 @@ You will need the same basic <<CommonConfig,main configuration>> as in other tar
 
 When compiled this results in a `app/index.js` file intended to be used as an entry point for the `react-native` tools. During development the `:output-dir` will contain many more files but you should only reference the generated `app/index.js` directly. A `release` build will only generated the optimized `app/index.js` and requires no additional files.
 
+== React Native
+
+There are two ways to use `react-native`, "plain" `react-native`, which allows you to use native code and libraries and the one "wrapped" in https://expo.io/[expo] (described below). All the steps described above are sufficient to start using shadow-cljs with the plain `react-native`. See this example repo:
+
+- https://github.com/thheller/reagent-react-native
+
 == Expo
 
 https://expo.io/[expo] makes working with `react-native` quite easy. There are two provided example setups.
