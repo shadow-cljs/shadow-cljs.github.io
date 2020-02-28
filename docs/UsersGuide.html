@@ -596,9 +596,9 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 </ul>
 </li>
-<li><a href="#_configuration">5. Configuration</a>
+<li><a href="#config">5. Configuration</a>
 <ul class="sectlevel2">
-<li><a href="#_source_paths">5.1. Source Paths</a></li>
+<li><a href="#source-paths">5.1. Source Paths</a></li>
 <li><a href="#_dependencies">5.2. Dependencies</a>
 <ul class="sectlevel3">
 <li><a href="#_clojure_script">5.2.1. Clojure(Script)</a></li>
@@ -676,7 +676,8 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 <li><a href="#target-react-native">8. Targeting React Native</a>
 <ul class="sectlevel2">
-<li><a href="#_expo">8.1. Expo</a></li>
+<li><a href="#_react_native">8.1. React Native</a></li>
+<li><a href="#_expo">8.2. Expo</a></li>
 </ul>
 </li>
 <li><a href="#target-node">9. Targeting node.js</a>
@@ -1706,7 +1707,7 @@ If you want to switch to a CLJS REPL this may require additional setup in the to
 </div>
 </div>
 <div class="sect1">
-<h2 id="_configuration"><a class="anchor" href="#_configuration"></a><a class="link" href="#_configuration">5. Configuration</a></h2>
+<h2 id="config"><a class="anchor" href="#config"></a><a class="link" href="#config">5. Configuration</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p><code>shadow-cljs</code> is configured by a <code>shadow-cljs.edn</code> file in your project root directory. You can
@@ -1752,7 +1753,7 @@ configuration and a <code>:builds</code> entry for all your builds.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_source_paths"><a class="anchor" href="#_source_paths"></a><a class="link" href="#_source_paths">5.1. Source Paths</a></h3>
+<h3 id="source-paths"><a class="anchor" href="#source-paths"></a><a class="link" href="#source-paths">5.1. Source Paths</a></h3>
 <div class="paragraph">
 <p><code>:source-paths</code> configures your JVM classpath. The compiler will use this config to find Clojure(Script) source files (eg. <code>.cljs</code>).</p>
 </div>
@@ -4159,7 +4160,7 @@ The requests must be forwarded to the main <a href="#http">HTTP server</a>, not 
 <p>The <code>:target :react-native</code> produces code that is meant to integrate into the default <code>react-native</code> tooling (eg. <code>metro</code>). Tools like <code>expo</code> which wrap those tools should automatically work and require no additional setup.</p>
 </div>
 <div class="paragraph">
-<p>You will need the same basic <a href="#CommonConfig">main configuration</a> as in other targets (like
+<p>You will need the same basic <a href="#config">main configuration</a> as in other targets (like
 <code>:source-paths</code>), the build specific config is very minimal and requires at least 2 options (besides <code>:target</code> itself)</p>
 </div>
 <div class="hdlist">
@@ -4199,7 +4200,20 @@ The requests must be forwarded to the main <a href="#http">HTTP server</a>, not 
 <p>When compiled this results in a <code>app/index.js</code> file intended to be used as an entry point for the <code>react-native</code> tools. During development the <code>:output-dir</code> will contain many more files but you should only reference the generated <code>app/index.js</code> directly. A <code>release</code> build will only generated the optimized <code>app/index.js</code> and requires no additional files.</p>
 </div>
 <div class="sect2">
-<h3 id="_expo"><a class="anchor" href="#_expo"></a><a class="link" href="#_expo">8.1. Expo</a></h3>
+<h3 id="_react_native"><a class="anchor" href="#_react_native"></a><a class="link" href="#_react_native">8.1. React Native</a></h3>
+<div class="paragraph">
+<p>There are two ways to use <code>react-native</code>, "plain" <code>react-native</code>, which allows you to use native code and libraries and the one "wrapped" in <a href="https://expo.io/">expo</a> (described below). All the steps described above are sufficient to start using shadow-cljs with the plain <code>react-native</code>. See this example repo:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/thheller/reagent-react-native" class="bare">https://github.com/thheller/reagent-react-native</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_expo"><a class="anchor" href="#_expo"></a><a class="link" href="#_expo">8.2. Expo</a></h3>
 <div class="paragraph">
 <p><a href="https://expo.io/">expo</a> makes working with <code>react-native</code> quite easy. There are two provided example setups.</p>
 </div>
@@ -4256,7 +4270,7 @@ The requests must be forwarded to the main <a href="#http">HTTP server</a>, not 
 <div class="paragraph">
 <p>There is built-in support for generating code that is intended to be used as a stand-alone
 script, and also for code that is intended to be used as a library. See the
-section on <a href="#CommonConfig">common configuration</a> for the base settings needed in
+section on <a href="#config">common configuration</a> for the base settings needed in
 a configuration file.</p>
 </div>
 <div class="sect2">
@@ -4276,7 +4290,7 @@ The code is just ClojureScript, and an entry point is easy to define:</p>
 <div class="sect3">
 <h4 id="_build_options"><a class="anchor" href="#_build_options"></a><a class="link" href="#_build_options">9.1.1. Build Options</a></h4>
 <div class="paragraph">
-<p>You will need the same basic <a href="#CommonConfig">main configuration</a> as in other targets (like
+<p>You will need the same basic <a href="#config">main configuration</a> as in other targets (like
 <code>:source-paths</code>), but you&#8217;ll need some node-specific build target options:</p>
 </div>
 <div class="hdlist">
@@ -4429,7 +4443,7 @@ artifacts used.
 useful for publishing your code for re-use as a compiled Javascript artifact.</p>
 </div>
 <div class="paragraph">
-<p>As with other modes the <a href="#CommonConfig">main configuration options</a> apply and must be set.
+<p>As with other modes the <a href="#config">main configuration options</a> apply and must be set.
 The target-specific options are:</p>
 </div>
 <div class="hdlist">
@@ -4665,7 +4679,7 @@ comes with a convenience mode that makes such integration easier.</p>
 <p>This target is meant to be as easy to access as possible, and does not actually require a specific build in the config. You still need a non-empty config file, but the default one from <code>shadow-cljs init</code> will do.</p>
 </div>
 <div class="paragraph">
-<p>ClojureScript organizes files into namespaces which means that a <code>demo.foo</code> namespace should be inside a <code>src/main/demo/foo.cljs</code> file. Where <code>src/main</code> is the default source path the shadow-cljs tool (see <a href="#CommonConfig">main configuration</a>).</p>
+<p>ClojureScript organizes files into namespaces which means that a <code>demo.foo</code> namespace should be inside a <code>src/main/demo/foo.cljs</code> file. Where <code>src/main</code> is the default source path the shadow-cljs tool (see <a href="#config">main configuration</a>).</p>
 </div>
 <div class="listingblock">
 <div class="title">Sample source for <code>src/main/demo/foo.cljs</code></div>
@@ -4706,7 +4720,7 @@ comes with a convenience mode that makes such integration easier.</p>
 <div class="paragraph">
 <p>You can also treat <code>:npm-module</code> on the same footing with your other builds: give it explicit
 configuration. This allows you to also customize the code generation options. Of course
-you will configure the <a href="#CommonConfig">main configuration</a> as in all targets. The target-specific
+you will configure the <a href="#config">main configuration</a> as in all targets. The target-specific
 options are:</p>
 </div>
 <div class="hdlist">
@@ -6729,7 +6743,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2020-02-12 22:24:38 CET
+Last updated 2020-02-28 16:04:00 CET
 </div>
 </div>
 </body>
