@@ -1,6 +1,6 @@
 The `:target :react-native` produces code that is meant to integrate into the default `react-native` tooling (eg. `metro`). Tools like `expo` which wrap those tools should automatically work and require no additional setup.
 
-You will need the same basic <<CommonConfig,main configuration>> as in other targets (like
+You will need the same basic <<config,main configuration>> as in other targets (like
 `:source-paths`), the build specific config is very minimal and requires at least 2 options (besides `:target` itself)
 
 [horizontal]

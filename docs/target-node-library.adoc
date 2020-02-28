@@ -1,7 +1,7 @@
 The `:target :node-library` emits code that can be used (via `require`) as a standard node library, and is
 useful for publishing your code for re-use as a compiled Javascript artifact.
 
-As with other modes the <<CommonConfig, main configuration options>> apply and must be set.
+As with other modes the <<config, main configuration options>> apply and must be set.
 The target-specific options are:
 
 [horizontal]

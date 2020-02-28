@@ -129,7 +129,7 @@ include::usage.adoc[]
 
 include::repl.adoc[]
 
-= Configuration
+= Configuration [[config]]
 
 `shadow-cljs` is configured by a `shadow-cljs.edn` file in your project root directory. You can
 create a default one by running `shadow-cljs init`. It should contain a map with some global
@@ -167,7 +167,7 @@ The file structure for this example should look like this:
         └── app.cljs
 ```
 
-== Source Paths
+== Source Paths [[source-paths]]
 
 `:source-paths` configures your JVM classpath. The compiler will use this config to find Clojure(Script) source files (eg. `.cljs`).
 
@@ -542,7 +542,7 @@ include::target-react-native.adoc[]
 
 There is built-in support for generating code that is intended to be used as a stand-alone
 script, and also for code that is intended to be used as a library. See the
-section on <<CommonConfig,common configuration>> for the base settings needed in
+section on <<config,common configuration>> for the base settings needed in
 a configuration file.
 
 == node.js Scripts [[target-node-script]]

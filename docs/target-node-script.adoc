@@ -10,7 +10,7 @@ The code is just ClojureScript, and an entry point is easy to define:
 
 === Build Options
 
-You will need the same basic <<CommonConfig,main configuration>> as in other targets (like
+You will need the same basic <<config,main configuration>> as in other targets (like
 `:source-paths`), but you'll need some node-specific build target options:
 
 [horizontal]
