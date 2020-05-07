@@ -190,6 +190,19 @@ Sometimes you wan't more control over which `npm` package is actually used depen
                        :require "preact-compat"}}}
 ```
 
+You can also use a file to override the dependency, the path is relative to the project root.
+
+```
+{...
+ :builds
+ {:app
+  {:target :browser
+   ...
+   :js-options
+   {:resolve {"react" {:target :file
+                       :file   "src/main/override-react.js"}}}
+```
+
 ==== Limitations [[js-resolve-limitations]]
 
 The `:shadow-js` and `:closure` have full control over `:resolve` and everything mentioned above works without any downsides. The `:js-provider :require` however is more limited. Only the initial require can be influenced since the standard `require` is in control after that. This means it is not possible to influence what a package might `require` internally. It is therefore not recommended to be used with targets that use `require` directly (eg. `:node-script`).
