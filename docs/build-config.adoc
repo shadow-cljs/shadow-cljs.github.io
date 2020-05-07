@@ -579,3 +579,32 @@ It is possible to use environment variables to set configuration values in `shad
 ```
 
 IMPORTANT: The environment variables used when the `shadow-cljs` process was started are used. If a server process is used its environment variables will be used over those potentially set by other commands. This is mostly relevant during development but may be confusing. `--config-merge` does not have this limitation.
+
+== Build and Target defaults [[build-target-defaults]]
+
+It is possible to use set defaults that will be used for all builds, or for all targets of a certain type.
+
+Configuration merge order is as follows `:build-defaults` -> `:target-defaults` -> actual build config -> extra config overrides.
+
+.Example `shadow-cljs.edn` config
+```
+{...
+ :build-defaults
+ {:closure-defines 
+   {your.app/VERBOSE true}}
+   
+ :target-defaults
+ {:browser
+   {:js-options
+     {:resolve {"react" {:target :global
+                         :global "React"}}}}}
+ 
+ :builds
+ {:app
+  {:target :browser
+   ...}}}
+```
+
+In this example the `:app` target will inherit both `:build-defaults` and the `:target-defaults` for `:browser`.
+
+IMPORTANT: Configs later in the merge order can override, but not remove previous configuration items. Once a default is set, the only way to remove it is by overriding it.

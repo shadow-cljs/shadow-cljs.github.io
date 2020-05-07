@@ -645,6 +645,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_conditional_reading">6.8. Conditional Reading</a></li>
 <li><a href="#config-merge">6.9. Overriding from the CLI</a></li>
 <li><a href="#shadow-env">6.10. Using Environment Variables</a></li>
+<li><a href="#build-target-defaults">6.11. Build and Target defaults</a></li>
 </ul>
 </li>
 <li><a href="#target-browser">7. Targeting the Browser</a>
@@ -3313,6 +3314,50 @@ If you specify multiple build ids the data will be merged into all specified bui
 </td>
 <td class="content">
 The environment variables used when the <code>shadow-cljs</code> process was started are used. If a server process is used its environment variables will be used over those potentially set by other commands. This is mostly relevant during development but may be confusing. <code>--config-merge</code> does not have this limitation.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="build-target-defaults"><a class="anchor" href="#build-target-defaults"></a><a class="link" href="#build-target-defaults">6.11. Build and Target defaults</a></h3>
+<div class="paragraph">
+<p>It is possible to use set defaults that will be used for all builds, or for all targets of a certain type.</p>
+</div>
+<div class="paragraph">
+<p>Configuration merge order is as follows <code>:build-defaults</code> &#8594; <code>:target-defaults</code> &#8594; actual build config &#8594; extra config overrides.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example <code>shadow-cljs.edn</code> config</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:build-defaults</span>
+ {<span class="symbol">:closure-defines</span>
+   {your.app/VERBOSE <span class="predefined-constant">true</span>}}
+
+ <span class="symbol">:target-defaults</span>
+ {<span class="symbol">:browser</span>
+   {<span class="symbol">:js-options</span>
+     {<span class="symbol">:resolve</span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">react</span><span class="delimiter">&quot;</span></span> {<span class="symbol">:target</span> <span class="symbol">:global</span>
+                         <span class="symbol">:global</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">React</span><span class="delimiter">&quot;</span></span>}}}}}
+
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span>
+  {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+   <span class="keyword">..</span><span class="keyword">.</span>}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this example the <code>:app</code> target will inherit both <code>:build-defaults</code> and the <code>:target-defaults</code> for <code>:browser</code>.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Configs later in the merge order can override, but not remove previous configuration items. Once a default is set, the only way to remove it is by overriding it.
 </td>
 </tr>
 </table>
@@ -6743,7 +6788,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2020-05-04 21:01:23 CEST
+Last updated 2020-05-07 14:30:34 UTC
 </div>
 </div>
 </body>
