@@ -702,9 +702,7 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 <li><a href="#target-npm-module">10. Embedding in the JS Ecosystem&#8201;&#8212;&#8201;The <code>:npm-module</code> Target</a>
 <ul class="sectlevel2">
-<li><a href="#_convenience_mode">10.1. Convenience Mode</a></li>
-<li><a href="#_explicit_configuration">10.2. Explicit Configuration</a></li>
-<li><a href="#_working_with_optimizations">10.3. Working with Optimizations</a></li>
+<li><a href="#_working_with_optimizations">10.1. Working with Optimizations</a></li>
 </ul>
 </li>
 <li><a href="#_testing">11. Testing</a>
@@ -4710,80 +4708,17 @@ Development mode has the <a href="#NodeModes">same setup</a> as for node scripts
 <h2 id="target-npm-module"><a class="anchor" href="#target-npm-module"></a><a class="link" href="#target-npm-module">10. Embedding in the JS Ecosystem&#8201;&#8212;&#8201;The <code>:npm-module</code> Target</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>There is an additional target that is intended to help you use <code>shadow-cljs</code> as <strong>part</strong> of
-a project and provide seamless integration with existing JS tools (eg. webpack, browserify, babel,
-create-react-app, &#8230;&#8203;) with as little configuration as possible.</p>
-</div>
-<div class="paragraph">
-<p>It can be configured like other targets, but since it is meant to work in the JS ecosystem it
-comes with a convenience mode that makes such integration easier.</p>
-</div>
-<div class="sect2">
-<h3 id="_convenience_mode"><a class="anchor" href="#_convenience_mode"></a><a class="link" href="#_convenience_mode">10.1. Convenience Mode</a></h3>
-<div class="paragraph">
-<p>This target is meant to be as easy to access as possible, and does not actually require a specific build in the config. You still need a non-empty config file, but the default one from <code>shadow-cljs init</code> will do.</p>
-</div>
-<div class="paragraph">
-<p>ClojureScript organizes files into namespaces which means that a <code>demo.foo</code> namespace should be inside a <code>src/main/demo/foo.cljs</code> file. Where <code>src/main</code> is the default source path the shadow-cljs tool (see <a href="#config">main configuration</a>).</p>
-</div>
-<div class="listingblock">
-<div class="title">Sample source for <code>src/main/demo/foo.cljs</code></div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">demo.foo</span>)
-
-(<span class="keyword">defn</span> <span class="function">hello</span> [who]
-  (<span class="keyword">str</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Hello, </span><span class="delimiter">&quot;</span></span> who <span class="string"><span class="delimiter">&quot;</span><span class="content">!</span><span class="delimiter">&quot;</span></span>))</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>you can compile it (and any others) via:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">$ shadow-cljs compile npm
-[:npm] Build completed. (16 files, 5 compiled, 0 warnings, 7.91s)</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The generated exports will be named <code>shadow-cljs/</code> with the CLJS namespace.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="js"><span class="predefined">$</span> node
-&gt; <span class="keyword">var</span> x = require(<span class="string"><span class="delimiter">&quot;</span><span class="content">shadow-cljs/demo.foo</span><span class="delimiter">&quot;</span></span>);
-<span class="predefined-constant">undefined</span>
-&gt; x.hello(<span class="string"><span class="delimiter">&quot;</span><span class="content">JS</span><span class="delimiter">&quot;</span></span>)
-<span class="string"><span class="delimiter">'</span><span class="content">Hello, JS!</span><span class="delimiter">'</span></span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Watching with incremental compile is as simple as running <code>shadow-cljs watch npm</code>.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_explicit_configuration"><a class="anchor" href="#_explicit_configuration"></a><a class="link" href="#_explicit_configuration">10.2. Explicit Configuration</a></h3>
-<div class="paragraph">
-<p>You can also treat <code>:npm-module</code> on the same footing with your other builds: give it explicit
-configuration. This allows you to also customize the code generation options. Of course
-you will configure the <a href="#config">main configuration</a> as in all targets. The target-specific
-options are:</p>
+<p>There is an additional target that is intended to integrate CLJS into an existing JS project. The output can seamlessly integrate with existing JS tools (eg. webpack, browserify, babel,
+create-react-app, &#8230;&#8203;) with little configuration.</p>
 </div>
 <div class="hdlist">
 <table>
 <tr>
 <td class="hdlist1">
-<code>:target</code>
-</td>
-<td class="hdlist2">
-<p>Use :npm-module</p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
 <code>:output-dir</code>
 </td>
 <td class="hdlist2">
-<p>The path for supporting files in development mode.</p>
+<p>The path for the output files are written to, defaults to <code>node_modules/shadow-cljs</code>.</p>
 </td>
 </tr>
 <tr>
@@ -4791,21 +4726,29 @@ options are:</p>
 <code>:entries</code>
 </td>
 <td class="hdlist2">
-<p>(optional) A vector of namespaces to include. Everything from these will be included.
-Defaults to everything it can find.</p>
+<p>(required) A vector of namespace symbols that should be compiled</p>
 </td>
 </tr>
 </table>
 </div>
+<div class="listingblock">
+<div class="title">Example <code>shadow-cljs.edn</code> config</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:code</span>
+  {<span class="symbol">:target</span> <span class="symbol">:npm-module</span>
+   <span class="symbol">:entries</span> [demo.foo]}}}</code></pre>
+</div>
+</div>
 <div class="paragraph">
-<p>If you use an <code>:output-dir</code> like <code>"node_modules/shadow-cljs"</code> you can access them by using <code>require("shadow-cljs/demo.foo")</code>. When using something not in <code>node_modules</code> you must include them using a relative path. With <code>:output-dir "out"</code> that would be <code>require("./out/demo.foo")</code> from your project root.</p>
+<p>If you use the default <code>:output-dir</code> of <code>"node_modules/shadow-cljs"</code> you can access the declared namespaces by using <code>require("shadow-cljs/demo.foo")</code> in JS. When using something not in <code>node_modules</code> you must include them using a relative path. With <code>:output-dir "out"</code> that would be <code>require("./out/demo.foo")</code> from your project root.</p>
 </div>
 <div class="paragraph">
 <p>If you plan to distribute code on NPM, then you may want to use the <a href="#NodeLibrary"><code>:node-library</code> target</a> instead since it allows for a finer level of control over exports and optimization.</p>
 </div>
-</div>
 <div class="sect2">
-<h3 id="_working_with_optimizations"><a class="anchor" href="#_working_with_optimizations"></a><a class="link" href="#_working_with_optimizations">10.3. Working with Optimizations</a></h3>
+<h3 id="_working_with_optimizations"><a class="anchor" href="#_working_with_optimizations"></a><a class="link" href="#_working_with_optimizations">10.1. Working with Optimizations</a></h3>
 <div class="paragraph">
 <p>Unlike the <code>:node-library</code> target, the module target does not know what you want to call the
 symbols you&#8217;re exporting, so it just exports them as-is. If you use advanced compilation, then everything
@@ -4816,13 +4759,24 @@ will get a minified munged name!</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">def</span> ^<span class="symbol">:export</span> my-constant <span class="float">5.662</span>)
-(<span class="keyword">defn</span> ^<span class="symbol">:export</span> my-function [] <span class="keyword">..</span><span class="keyword">.</span>)</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">demo.foo</span>)
+
+(<span class="keyword">def</span> ^<span class="symbol">:export</span> foo <span class="float">5.662</span>)
+
+(<span class="keyword">defn</span> ^<span class="symbol">:export</span> bar [] <span class="keyword">..</span><span class="keyword">.</span>)</code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>This is a standard annotation that is understood by ClojureScript and prevents Google Closure from
-renaming an artifact.</p>
+renaming an artifact. JS code will still be able to access them after optimizations. Without the <code>^:export</code> hint the closure-compiler will likely have removed or renamed them.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="keyword">var</span> <span class="keyword">ns</span> <span class="namespace">=</span> <span class="keyword">require</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">shadow-cljs/demo.foo</span><span class="delimiter">&quot;</span></span>)<span class="comment">;</span>
+
+ns.foo<span class="comment">;</span>
+ns.bar()<span class="comment">;</span></code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -6788,7 +6742,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2020-05-07 14:30:34 UTC
+Last updated 2020-05-04 21:01:23 CEST
 </div>
 </div>
 </body>
