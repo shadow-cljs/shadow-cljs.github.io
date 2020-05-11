@@ -104,17 +104,26 @@ You will need:
 - https://www.npmjs.com[`npm`] or https://www.yarnpkg.com[`yarn`]
 - Any Java SDK (Version 8 or higher). http://openjdk.java.net/install/[OpenJDK] or http://www.oracle.com/technetwork/java/javase/downloads/index.html[Oracle]
 
+In your project directory you'll need a `package.json`. If you do not have one yet you can create one by running `npm init -y`. If you don't have a project directory yet consider creating it by running
+```
+$ npx create-cljs-project my-project
+```
+
+This will create all the necessary basic files and you can skip the following commands.
+
+If you have a `package.json` already and just want to add `shadow-cljs` run
+
 .NPM
 ```bash
 $ npm install --save-dev shadow-cljs
-$ npm install -g shadow-cljs
 ```
 
 .Yarn
 ```bash
 $ yarn add --dev shadow-cljs
-$ yarn global add shadow-cljs
 ```
+
+For convience you can run `npm install -g shadow-cljs` or `yarn global add shadow-cljs`. This will let you run the `shadow-cljs` command directly later. There should always be a shadow-cljs version installed in your project though.
 
 == Library
 

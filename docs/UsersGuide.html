@@ -1033,19 +1033,34 @@ interest:</p>
 </li>
 </ul>
 </div>
+<div class="paragraph">
+<p>In your project directory you&#8217;ll need a <code>package.json</code>. If you do not have one yet you can create one by running <code>npm init -y</code>. If you don&#8217;t have a project directory yet consider creating it by running</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">$ npx create-cljs-project my-project</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will create all the necessary basic files and you can skip the following commands.</p>
+</div>
+<div class="paragraph">
+<p>If you have a <code>package.json</code> already and just want to add <code>shadow-cljs</code> run</p>
+</div>
 <div class="listingblock">
 <div class="title">NPM</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">$ npm install --save-dev shadow-cljs
-$ npm install -g shadow-cljs</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">$ npm install --save-dev shadow-cljs</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">Yarn</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">$ yarn add --dev shadow-cljs
-$ yarn global add shadow-cljs</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">$ yarn add --dev shadow-cljs</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>For convience you can run <code>npm install -g shadow-cljs</code> or <code>yarn global add shadow-cljs</code>. This will let you run the <code>shadow-cljs</code> command directly later. There should always be a shadow-cljs version installed in your project though.</p>
 </div>
 </div>
 <div class="sect2">
@@ -6742,7 +6757,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2020-05-04 21:01:23 CEST
+Last updated 2020-05-11 22:49:55 CEST
 </div>
 </div>
 </body>
