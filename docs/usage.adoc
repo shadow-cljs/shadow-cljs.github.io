@@ -28,6 +28,8 @@ $ yarn shadow-cljs help
 $ ./node_modules/.bin/shadow-cljs help
 ```
 
+The guide will assume there is a global install to keep examples short but this is not required.
+
 .Commonly used shadow-cljs commands during development
 ```bash
 # compile a build once and exit

@@ -123,7 +123,7 @@ $ npm install --save-dev shadow-cljs
 $ yarn add --dev shadow-cljs
 ```
 
-For convience you can run `npm install -g shadow-cljs` or `yarn global add shadow-cljs`. This will let you run the `shadow-cljs` command directly later. There should always be a shadow-cljs version installed in your project though.
+For convenience you can run `npm install -g shadow-cljs` or `yarn global add shadow-cljs`. This will let you run the `shadow-cljs` command directly later. There should always be a shadow-cljs version installed in your project, the global install is optional.
 
 == Library
 
