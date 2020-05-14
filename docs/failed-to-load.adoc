@@ -1,0 +1,60 @@
+== Startup Errors [[failed-to-load]]
+
+Sometimes `shadow-cljs` can fail to start properly. The errors are often very confusing and hard to identify. Most commonly this is caused by a few dependency conflicts on some of the important dependencies. When using just `shadow-cljs.edn` to manage your `:dependencies` it will provide a few extra checks to protect against these kinds of errors but when using `deps.edn` or `project.clj` these protections cannot be done so these errors happen more often when using those tools.
+
+Generally the important dependencies to watch out for are
+
+- org.clojure/clojure
+- org.clojure/clojurescript
+- org.clojure/core.async
+- com.google.javascript/closure-compiler-unshaded
+
+Each `shadow-cljs` version is only tested with one particular combination of versions and it is recommended to stick with that version set for best compatibility. It might work when using different versions but if you encounter any kind of weird issues consider fixing your dependency versions first.
+
+You can find the required dependencies for each version on clojars:
+
+- https://clojars.org/thheller/shadow-cljs
+
+The way to diagnose these issues vary by tool, so please refer to the appropriate section for further info.
+
+Generally if you want to be sure you can just declare the matching dependency versions directly together with your chosen `shadow-cljs` version but that means you must also update those versions whenever you upgrade `shadow-cljs`. Correctly identifying where unwanted dependencies may be more work but will make future upgrades easier.
+
+`shadow-cljs` will likely always be on the very latest version for all the listed dependencies above so if you need to stick with an older dependency you might need to stick with an older shadow-cljs version as well.
+
+`shadow-cljs` is very often several versions ahead on the `com.google.javascript/closure-compiler-unshaded` version it uses, so if you are depending on the version `org.clojure/clojurescript` normally supplies that might cause issues. Make sure the `thheller/shadow-cljs` version is picked over the version preferred by `org.clojure/clojurescript`.
+
+If you want to make your live easier just use `shadow-cljs.edn` to manage your dependencies if you can. It is much less likely to have these problems or will at least warn you directly.
+
+If you have ensured that you are getting all the correct versions but things still go wrong please open a https://github.com/thheller/shadow-cljs/issues[Github Issue] with a full problem description including your full dependency list.
+
+=== deps.edn / tools.deps
+
+When using `deps.edn` to manage your dependencies via the <<tools-deps, :deps>> key in `shadow-cljs.edn` it is recommended to use the `clj` tool directly for further diagnosis. First you need to check which aliases you are applying via `shadow-cljs.edn`. So if you are setting `:deps {:aliases [:dev :cljs]}` you'll need to specify these aliases when running further commands.
+
+First of all you should ensure that all dependencies directly declared in `deps.edn` have the expected version. Sometimes transitive dependencies can cause the inclusion of problematic versions. You can list all dependencies via:
+
+.Listing all active dependencies
+```bash
+$ clj -A:dev:cljs -Stree
+```
+
+This will list all the dependencies. Tracking this down is a bit manual but you'll need to verify that you get the correct versions for the dependencies mentioned above.
+
+Please refer to the official https://clojure.org/reference/deps_and_cli[tools.deps] documentation for further information.
+
+=== project.clj / Leiningen
+
+When using `project.clj` to manage you dependencies you'll need to specify your configured `:lein` profiles from `shadow-cljs.edn` when using `lein` directly to diagnose the problem. For example `:lein {:profiles "+cljs"}` would require `lein with-profiles +cljs` for every command.
+
+.Example listing of deps
+```
+# no profile
+$ lein deps :tree
+
+# with profile
+$ lein with-profiles +cljs deps :tree
+```
+
+This will usually list all the current conflicts at the top and provide suggestions with the dependency tree at the bottom. The suggestions aren't always fully accurate so don't get mislead and don't add exclusions to the `thheller/shadow-cljs` artifact.
+
+Please refer to the https://leiningen.org/[Leiningen] documentation for more information.

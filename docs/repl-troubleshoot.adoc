@@ -1,10 +1,10 @@
-# REPL Troubleshooting [[repl-troubleshooting]]
+## REPL [[repl-troubleshooting]]
 
 Getting a CLJS REPL working can sometimes be tricky and a lot can go wrong since all the moving parts can be quite complicated. This guide hopes to address the most common issues that people run into and how to fix them.
 
 image::shadow-cljs-repl.png[]
 
-## Anatomy of the CLJS REPL [[cljs-repl-anatomy]]
+### Anatomy of the CLJS REPL [[cljs-repl-anatomy]]
 
 A REPL in Clojure does exactly what the name implies: Read one form, Eval it, Print the result, Loop to do it again.
 
@@ -29,7 +29,7 @@ First you'll need a REPL client. This could just be the CLI (eg. `shadow-cljs cl
 8) Loop: Repeat from 1).
 
 
-## JavaScript Runtimes
+### JavaScript Runtimes
 
 The `shadow-cljs` JVM side of things will require one running `watch` for a given build which will handle all the related REPL commands as well. It uses a dedicated thread and manages all the given events that can happen during development (eg. REPL input, changing files, etc).
 
@@ -40,7 +40,7 @@ Once connected the REPL is ready to use. Note that reloading the JS runtime (eg.
 It is possible for more than one JS runtime to connect to the `watch` process. `shadow-cljs` by default picks the first JS runtime that connected as the `eval` target. If you open a given `:browser` build in multiple Browsers only the first one will be used to `eval` code. Or you could be opening a `:react-native` app in iOS and Android next to each other during development. Only one runtime can eval and if that disconnects the next one takes over based on the time it connected.
 
 
-## Missing JS runtime [[missing-js-runtime]]
+### Missing JS runtime [[missing-js-runtime]]
 
 > No application has connected to the REPL server. Make sure your JS environment has loaded your compiled ClojureScript code.
 
@@ -48,15 +48,15 @@ This error message just means that no JS runtime (eg. Browser) has connected to 
 
 Regular `shadow-cljs` builds do not manage any JS runtime of their own so you are responsible for running them.
 
-### :target :browser [[repl-trouble-browser]]
+#### :target :browser [[repl-trouble-browser]]
 
 For <<target-browser, `:target :browser`>> builds the `watch` process will have compiled the given code to a configured `:output-dir` (defaults to `public/js`). The generated `.js` must be loaded in a browser. Once loaded the Browser Console should show a `WebSocket connected` message. If you are using any kind of custom HTTP servers or have over-eager firewalls blocking the connections you might need to set some additional configuration (eg. via <<proxy-support, :devtools-url>>). The goal is to be able to connect to the <<http, primary HTTP server>>.
 
 
-### :target :node-script, :node-library [[repl-trouble-node]]
+#### :target :node-script, :node-library [[repl-trouble-node]]
 
 These targets will have produced a `.js` file that are intended to run in a `node` process. Given the variety of options however you'll need to run them yourself. For example a `:node-script` you'd run via `node the-script.js` and on startup it'll try to connect to the `shadow-cljs` server. You should see a `WebSocket connected` message on startup. The output is designed to only run on the machine they were compiled on, don't copy `watch` output to other machines.
 
-### :target :react-native [[repl-trouble-react-native]]
+#### :target :react-native [[repl-trouble-react-native]]
 
 The generated `<:output-dir>/index.js` file needs to be added to your `react-native` app and then loaded on an actual device or emulator. On startup it will also attempt to connect to the `shadow-cljs` server. You can check the log output via `react-native log-android|log-ios` and should show a `WebSocket connected` message once the app is running. If you see a websocket related error on startup instead it may have failed to connect to the shadow-cljs process. This can happen when the IP detection picked an incorrect IP. You can check which IP was used via `shadow-cljs watch app --verbose` and override it via `shadow-cljs watch app --config-merge '{:local-ip "1.2.3.4"}'`.

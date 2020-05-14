@@ -615,6 +615,10 @@ include::release.adoc[]
 
 include::editor-integration.adoc[]
 
+= Troubleshooting
+
+include::failed-to-load.adoc[]
+
 include::repl-troubleshoot.adoc[]
 
 include::maven-publish.adoc[]

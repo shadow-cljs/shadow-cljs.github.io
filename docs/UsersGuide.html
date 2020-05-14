@@ -792,15 +792,19 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 </ul>
 </li>
-<li><a href="#repl-troubleshooting">15. REPL Troubleshooting</a>
+<li><a href="#_troubleshooting">15. Troubleshooting</a>
 <ul class="sectlevel2">
-<li><a href="#cljs-repl-anatomy">15.1. Anatomy of the CLJS REPL</a></li>
-<li><a href="#_javascript_runtimes">15.2. JavaScript Runtimes</a></li>
-<li><a href="#missing-js-runtime">15.3. Missing JS runtime</a>
+<li><a href="#failed-to-load">15.1. Startup Errors</a>
 <ul class="sectlevel3">
-<li><a href="#repl-trouble-browser">15.3.1. :target :browser</a></li>
-<li><a href="#repl-trouble-node">15.3.2. :target :node-script, :node-library</a></li>
-<li><a href="#repl-trouble-react-native">15.3.3. :target :react-native</a></li>
+<li><a href="#_deps_edn_tools_deps">15.1.1. deps.edn / tools.deps</a></li>
+<li><a href="#_project_clj_leiningen">15.1.2. project.clj / Leiningen</a></li>
+</ul>
+</li>
+<li><a href="#repl-troubleshooting">15.2. REPL</a>
+<ul class="sectlevel3">
+<li><a href="#cljs-repl-anatomy">15.2.1. Anatomy of the CLJS REPL</a></li>
+<li><a href="#_javascript_runtimes">15.2.2. JavaScript Runtimes</a></li>
+<li><a href="#missing-js-runtime">15.2.3. Missing JS runtime</a></li>
 </ul>
 </li>
 </ul>
@@ -6521,8 +6525,109 @@ Press ENTER <span class="keyword">or</span> <span class="keyword">type</span> co
 </div>
 </div>
 <div class="sect1">
-<h2 id="repl-troubleshooting"><a class="anchor" href="#repl-troubleshooting"></a><a class="link" href="#repl-troubleshooting">15. REPL Troubleshooting</a></h2>
+<h2 id="_troubleshooting"><a class="anchor" href="#_troubleshooting"></a><a class="link" href="#_troubleshooting">15. Troubleshooting</a></h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="failed-to-load"><a class="anchor" href="#failed-to-load"></a><a class="link" href="#failed-to-load">15.1. Startup Errors</a></h3>
+<div class="paragraph">
+<p>Sometimes <code>shadow-cljs</code> can fail to start properly. The errors are often very confusing and hard to identify. Most commonly this is caused by a few dependency conflicts on some of the important dependencies. When using just <code>shadow-cljs.edn</code> to manage your <code>:dependencies</code> it will provide a few extra checks to protect against these kinds of errors but when using <code>deps.edn</code> or <code>project.clj</code> these protections cannot be done so these errors happen more often when using those tools.</p>
+</div>
+<div class="paragraph">
+<p>Generally the important dependencies to watch out for are</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>org.clojure/clojure</p>
+</li>
+<li>
+<p>org.clojure/clojurescript</p>
+</li>
+<li>
+<p>org.clojure/core.async</p>
+</li>
+<li>
+<p>com.google.javascript/closure-compiler-unshaded</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Each <code>shadow-cljs</code> version is only tested with one particular combination of versions and it is recommended to stick with that version set for best compatibility. It might work when using different versions but if you encounter any kind of weird issues consider fixing your dependency versions first.</p>
+</div>
+<div class="paragraph">
+<p>You can find the required dependencies for each version on clojars:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://clojars.org/thheller/shadow-cljs" class="bare">https://clojars.org/thheller/shadow-cljs</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The way to diagnose these issues vary by tool, so please refer to the appropriate section for further info.</p>
+</div>
+<div class="paragraph">
+<p>Generally if you want to be sure you can just declare the matching dependency versions directly together with your chosen <code>shadow-cljs</code> version but that means you must also update those versions whenever you upgrade <code>shadow-cljs</code>. Correctly identifying where unwanted dependencies may be more work but will make future upgrades easier.</p>
+</div>
+<div class="paragraph">
+<p><code>shadow-cljs</code> will likely always be on the very latest version for all the listed dependencies above so if you need to stick with an older dependency you might need to stick with an older shadow-cljs version as well.</p>
+</div>
+<div class="paragraph">
+<p><code>shadow-cljs</code> is very often several versions ahead on the <code>com.google.javascript/closure-compiler-unshaded</code> version it uses, so if you are depending on the version <code>org.clojure/clojurescript</code> normally supplies that might cause issues. Make sure the <code>thheller/shadow-cljs</code> version is picked over the version preferred by <code>org.clojure/clojurescript</code>.</p>
+</div>
+<div class="paragraph">
+<p>If you want to make your live easier just use <code>shadow-cljs.edn</code> to manage your dependencies if you can. It is much less likely to have these problems or will at least warn you directly.</p>
+</div>
+<div class="paragraph">
+<p>If you have ensured that you are getting all the correct versions but things still go wrong please open a <a href="https://github.com/thheller/shadow-cljs/issues">Github Issue</a> with a full problem description including your full dependency list.</p>
+</div>
+<div class="sect3">
+<h4 id="_deps_edn_tools_deps"><a class="anchor" href="#_deps_edn_tools_deps"></a><a class="link" href="#_deps_edn_tools_deps">15.1.1. deps.edn / tools.deps</a></h4>
+<div class="paragraph">
+<p>When using <code>deps.edn</code> to manage your dependencies via the <a href="#tools-deps">:deps</a> key in <code>shadow-cljs.edn</code> it is recommended to use the <code>clj</code> tool directly for further diagnosis. First you need to check which aliases you are applying via <code>shadow-cljs.edn</code>. So if you are setting <code>:deps {:aliases [:dev :cljs]}</code> you&#8217;ll need to specify these aliases when running further commands.</p>
+</div>
+<div class="paragraph">
+<p>First of all you should ensure that all dependencies directly declared in <code>deps.edn</code> have the expected version. Sometimes transitive dependencies can cause the inclusion of problematic versions. You can list all dependencies via:</p>
+</div>
+<div class="listingblock">
+<div class="title">Listing all active dependencies</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ clj -A:dev:cljs -Stree</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will list all the dependencies. Tracking this down is a bit manual but you&#8217;ll need to verify that you get the correct versions for the dependencies mentioned above.</p>
+</div>
+<div class="paragraph">
+<p>Please refer to the official <a href="https://clojure.org/reference/deps_and_cli">tools.deps</a> documentation for further information.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_project_clj_leiningen"><a class="anchor" href="#_project_clj_leiningen"></a><a class="link" href="#_project_clj_leiningen">15.1.2. project.clj / Leiningen</a></h4>
+<div class="paragraph">
+<p>When using <code>project.clj</code> to manage you dependencies you&#8217;ll need to specify your configured <code>:lein</code> profiles from <code>shadow-cljs.edn</code> when using <code>lein</code> directly to diagnose the problem. For example <code>:lein {:profiles "+cljs"}</code> would require <code>lein with-profiles +cljs</code> for every command.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example listing of deps</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="error">#</span> no profile
+$ lein deps <span class="symbol">:tree</span>
+
+<span class="error">#</span> with profile
+$ lein with-profiles +cljs deps <span class="symbol">:tree</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will usually list all the current conflicts at the top and provide suggestions with the dependency tree at the bottom. The suggestions aren&#8217;t always fully accurate so don&#8217;t get mislead and don&#8217;t add exclusions to the <code>thheller/shadow-cljs</code> artifact.</p>
+</div>
+<div class="paragraph">
+<p>Please refer to the <a href="https://leiningen.org/">Leiningen</a> documentation for more information.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="repl-troubleshooting"><a class="anchor" href="#repl-troubleshooting"></a><a class="link" href="#repl-troubleshooting">15.2. REPL</a></h3>
 <div class="paragraph">
 <p>Getting a CLJS REPL working can sometimes be tricky and a lot can go wrong since all the moving parts can be quite complicated. This guide hopes to address the most common issues that people run into and how to fix them.</p>
 </div>
@@ -6531,8 +6636,8 @@ Press ENTER <span class="keyword">or</span> <span class="keyword">type</span> co
 <img src="assets/img/shadow-cljs-repl.png" alt="shadow cljs repl">
 </div>
 </div>
-<div class="sect2">
-<h3 id="cljs-repl-anatomy"><a class="anchor" href="#cljs-repl-anatomy"></a><a class="link" href="#cljs-repl-anatomy">15.1. Anatomy of the CLJS REPL</a></h3>
+<div class="sect3">
+<h4 id="cljs-repl-anatomy"><a class="anchor" href="#cljs-repl-anatomy"></a><a class="link" href="#cljs-repl-anatomy">15.2.1. Anatomy of the CLJS REPL</a></h4>
 <div class="paragraph">
 <p>A REPL in Clojure does exactly what the name implies: Read one form, Eval it, Print the result, Loop to do it again.</p>
 </div>
@@ -6567,8 +6672,8 @@ Press ENTER <span class="keyword">or</span> <span class="keyword">type</span> co
 <p>8) Loop: Repeat from 1).</p>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_javascript_runtimes"><a class="anchor" href="#_javascript_runtimes"></a><a class="link" href="#_javascript_runtimes">15.2. JavaScript Runtimes</a></h3>
+<div class="sect3">
+<h4 id="_javascript_runtimes"><a class="anchor" href="#_javascript_runtimes"></a><a class="link" href="#_javascript_runtimes">15.2.2. JavaScript Runtimes</a></h4>
 <div class="paragraph">
 <p>The <code>shadow-cljs</code> JVM side of things will require one running <code>watch</code> for a given build which will handle all the related REPL commands as well. It uses a dedicated thread and manages all the given events that can happen during development (eg. REPL input, changing files, etc).</p>
 </div>
@@ -6582,8 +6687,8 @@ Press ENTER <span class="keyword">or</span> <span class="keyword">type</span> co
 <p>It is possible for more than one JS runtime to connect to the <code>watch</code> process. <code>shadow-cljs</code> by default picks the first JS runtime that connected as the <code>eval</code> target. If you open a given <code>:browser</code> build in multiple Browsers only the first one will be used to <code>eval</code> code. Or you could be opening a <code>:react-native</code> app in iOS and Android next to each other during development. Only one runtime can eval and if that disconnects the next one takes over based on the time it connected.</p>
 </div>
 </div>
-<div class="sect2">
-<h3 id="missing-js-runtime"><a class="anchor" href="#missing-js-runtime"></a><a class="link" href="#missing-js-runtime">15.3. Missing JS runtime</a></h3>
+<div class="sect3">
+<h4 id="missing-js-runtime"><a class="anchor" href="#missing-js-runtime"></a><a class="link" href="#missing-js-runtime">15.2.3. Missing JS runtime</a></h4>
 <div class="quoteblock">
 <blockquote>
 <div class="paragraph">
@@ -6597,22 +6702,23 @@ Press ENTER <span class="keyword">or</span> <span class="keyword">type</span> co
 <div class="paragraph">
 <p>Regular <code>shadow-cljs</code> builds do not manage any JS runtime of their own so you are responsible for running them.</p>
 </div>
-<div class="sect3">
-<h4 id="repl-trouble-browser"><a class="anchor" href="#repl-trouble-browser"></a><a class="link" href="#repl-trouble-browser">15.3.1. :target :browser</a></h4>
+<div class="sect4">
+<h5 id="repl-trouble-browser"><a class="anchor" href="#repl-trouble-browser"></a><a class="link" href="#repl-trouble-browser">:target :browser</a></h5>
 <div class="paragraph">
 <p>For <a href="#target-browser"><code>:target :browser</code></a> builds the <code>watch</code> process will have compiled the given code to a configured <code>:output-dir</code> (defaults to <code>public/js</code>). The generated <code>.js</code> must be loaded in a browser. Once loaded the Browser Console should show a <code>WebSocket connected</code> message. If you are using any kind of custom HTTP servers or have over-eager firewalls blocking the connections you might need to set some additional configuration (eg. via <a href="#proxy-support">:devtools-url</a>). The goal is to be able to connect to the <a href="#http">primary HTTP server</a>.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="repl-trouble-node"><a class="anchor" href="#repl-trouble-node"></a><a class="link" href="#repl-trouble-node">15.3.2. :target :node-script, :node-library</a></h4>
+<div class="sect4">
+<h5 id="repl-trouble-node"><a class="anchor" href="#repl-trouble-node"></a><a class="link" href="#repl-trouble-node">:target :node-script, :node-library</a></h5>
 <div class="paragraph">
 <p>These targets will have produced a <code>.js</code> file that are intended to run in a <code>node</code> process. Given the variety of options however you&#8217;ll need to run them yourself. For example a <code>:node-script</code> you&#8217;d run via <code>node the-script.js</code> and on startup it&#8217;ll try to connect to the <code>shadow-cljs</code> server. You should see a <code>WebSocket connected</code> message on startup. The output is designed to only run on the machine they were compiled on, don&#8217;t copy <code>watch</code> output to other machines.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="repl-trouble-react-native"><a class="anchor" href="#repl-trouble-react-native"></a><a class="link" href="#repl-trouble-react-native">15.3.3. :target :react-native</a></h4>
+<div class="sect4">
+<h5 id="repl-trouble-react-native"><a class="anchor" href="#repl-trouble-react-native"></a><a class="link" href="#repl-trouble-react-native">:target :react-native</a></h5>
 <div class="paragraph">
 <p>The generated <code>&lt;:output-dir&gt;/index.js</code> file needs to be added to your <code>react-native</code> app and then loaded on an actual device or emulator. On startup it will also attempt to connect to the <code>shadow-cljs</code> server. You can check the log output via <code>react-native log-android|log-ios</code> and should show a <code>WebSocket connected</code> message once the app is running. If you see a websocket related error on startup instead it may have failed to connect to the shadow-cljs process. This can happen when the IP detection picked an incorrect IP. You can check which IP was used via <code>shadow-cljs watch app --verbose</code> and override it via <code>shadow-cljs watch app --config-merge '{:local-ip "1.2.3.4"}'</code>.</p>
+</div>
 </div>
 </div>
 </div>
@@ -6760,7 +6866,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2020-05-11 22:51:22 CEST
+Last updated 2020-05-14 22:39:48 CEST
 </div>
 </div>
 </body>
