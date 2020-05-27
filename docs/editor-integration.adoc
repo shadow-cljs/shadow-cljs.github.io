@@ -2,6 +2,14 @@
 
 Cursive does not currently support resolving dependencies via `shadow-cljs.edn`. You can run `shadow-cljs pom` to generate a `pom.xml` and import that using the IntelliJ.
 
+```
+$ shadow-cljs pom
+```
+
+Then in Cursive *File -> New -> Project from Existing Sources* then select the generated `pom.xml` in the project directory.
+
+IMPORTANT: You need to have the "Build Tools" -> "Maven" Plugin enabled for this. It might not be enabled by default.
+
 Alternatively you can create a dummy `project.clj` or use the full <<Leiningen, Leiningen integration>>.
 
 ```
@@ -13,7 +21,11 @@ Alternatively you can create a dummy `project.clj` or use the full <<Leiningen, 
   ["src"])
 ```
 
-You can run `npx shadow-cljs server` inside the Terminal provided by IntelliJ and use `Clojure REPL -> Remote` Run Configuration to connect to the provided <<nREPL, nREPL server>>.
+You can run `npx shadow-cljs server` inside the Terminal provided by IntelliJ and use `Clojure REPL -> Remote` Run Configuration to connect to the provided <<nREPL, nREPL server>>. Just select the "Use port from nREPL file" option in Cursive Clojure REPL -> Remote or configure a fixed nREPL port if you prefer.
+
+Note that the Cursive REPL when first connected always starts out as a CLJ REPL. You can switch it to CLJS by calling `(shadow/repl :your-build-id)`. This will automatically switch the Cursive option as well. You can type `:cljs/quit` to drop back down to the CLJ REPL.
+
+NOTE: You cannot switch from CLJ->CLJS via the Cursive select box. Make sure you use the call above to switch.
 
 == Emacs / CIDER [[cider]]
 

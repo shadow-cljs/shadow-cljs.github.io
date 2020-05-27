@@ -6148,6 +6148,26 @@ The generated <code>report.html</code> is entirely self-contained and includes a
 <div class="paragraph">
 <p>Cursive does not currently support resolving dependencies via <code>shadow-cljs.edn</code>. You can run <code>shadow-cljs pom</code> to generate a <code>pom.xml</code> and import that using the IntelliJ.</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">$ shadow-cljs pom</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then in Cursive <strong>File &#8594; New &#8594; Project from Existing Sources</strong> then select the generated <code>pom.xml</code> in the project directory.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+You need to have the "Build Tools" &#8594; "Maven" Plugin enabled for this. It might not be enabled by default.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>Alternatively you can create a dummy <code>project.clj</code> or use the full <a href="#Leiningen">Leiningen integration</a>.</p>
 </div>
@@ -6162,7 +6182,22 @@ The generated <code>report.html</code> is entirely self-contained and includes a
 </div>
 </div>
 <div class="paragraph">
-<p>You can run <code>npx shadow-cljs server</code> inside the Terminal provided by IntelliJ and use <code>Clojure REPL &#8594; Remote</code> Run Configuration to connect to the provided <a href="#nREPL">nREPL server</a>.</p>
+<p>You can run <code>npx shadow-cljs server</code> inside the Terminal provided by IntelliJ and use <code>Clojure REPL &#8594; Remote</code> Run Configuration to connect to the provided <a href="#nREPL">nREPL server</a>. Just select the "Use port from nREPL file" option in Cursive Clojure REPL &#8594; Remote or configure a fixed nREPL port if you prefer.</p>
+</div>
+<div class="paragraph">
+<p>Note that the Cursive REPL when first connected always starts out as a CLJ REPL. You can switch it to CLJS by calling <code>(shadow/repl :your-build-id)</code>. This will automatically switch the Cursive option as well. You can type <code>:cljs/quit</code> to drop back down to the CLJ REPL.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+You cannot switch from CLJ&#8594;CLJS via the Cursive select box. Make sure you use the call above to switch.
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect2">
