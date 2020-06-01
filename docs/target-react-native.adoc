@@ -29,6 +29,26 @@ There are two ways to use `react-native`, "plain" `react-native`, which allows y
 
 - https://github.com/thheller/reagent-react-native
 
+
+=== Android Emulator
+
+If you're using the Android emulator remember that `localhost` is the loopback on the emulated device,
+not your host machine. Thus, connecting to your "server API" or getting shadow websockets to connect
+requires you to use the special (pre-allocated) IP address `10.0.2.2` which points back to your
+development host machine.
+
+This means that you'll need to update the devtools to have the correct URL:
+
+[source]
+-----
+  :builds
+  {:native-thing
+   {:target :react-native
+    :devtools   {:autoload     true
+                 :devtools-url "http://10.0.2.2:9630"
+                 ...
+-----
+
 == Expo
 
 https://expo.io/[expo] makes working with `react-native` quite easy. There are two provided example setups.
