@@ -130,7 +130,7 @@ Now, you can use the `Chlorine: Evaluate...` commands to evaluate any Clojure or
 
 === Dependencies
 
-You need VS Code and install the https://marketplace.visualstudio.com/items?itemName=cospaia.clojure4vscode#overview[Calva] extension.
+You need VS Code and install the https://marketplace.visualstudio.com/items?itemName=betterthantomorrow.calva#overview[Calva] extension.
 
 Since Calva uses nREPL and the `cider-nrepl` middlewares you need to include this dependency in <<user-config, ~/.shadow-cljs/config.edn>> or `shadow-cljs.edn`:
 
@@ -150,7 +150,7 @@ $ shadow-cljs watch app
 
 Once the app is loaded in the browser, and you see `JS runime connected` in the terminal where you started the app, Calva can connect to its repl. Open the project in VS Code and Calva will by default try to auto connect and prompt you with a list of builds read from `shadow-cljs.edn`. Select the right one (`:app` in this example) and Calva's Clojure and Clojurescript support is activated.
 
-(If you already have the project open in VS Code when you start the app, issue the `clojure4vscode: connect` command.)
+(If you already have the project open in VS Code when you start the app, issue the `Calva: Connect to a Running REPL Server in the Project` command.)
 
 === Features
 
