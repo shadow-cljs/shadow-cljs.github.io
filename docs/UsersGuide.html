@@ -3312,7 +3312,7 @@ If you specify multiple build ids the data will be merged into all specified bui
 <div class="sect2">
 <h3 id="shadow-env"><a class="anchor" href="#shadow-env"></a><a class="link" href="#shadow-env">6.10. Using Environment Variables</a></h3>
 <div class="paragraph">
-<p>It is possible to use environment variables to set configuration values in <code>shadow-cljs.edn</code> but you should consider using <code>--config-merge</code> instead. If you really must use an environment variable you can do so via the <code>#shadow/env "FOO"</code> reader tag.</p>
+<p>It is possible to use environment variables to set configuration values in <code>shadow-cljs.edn</code> but you should consider using <code>--config-merge</code> instead. If you really must use an environment variable you can do so via the <code>#shadow/env "FOO"</code> reader tag. You can also use the shorter <code>#env</code>.</p>
 </div>
 <div class="listingblock">
 <div class="title">Example <code>shadow-cljs.edn</code> config</div>
@@ -3325,6 +3325,23 @@ If you specify multiple build ids the data will be merged into all specified bui
    <span class="symbol">:closure-defines</span> {your.app/URL <span class="error">#</span>shadow/env <span class="string"><span class="delimiter">&quot;</span><span class="content">APP_URL</span><span class="delimiter">&quot;</span></span>}
    <span class="keyword">..</span><span class="keyword">.</span>}}}</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>The are also a few more supported forms that you can use <code>#shadow/env</code> with.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="error">#</span>shadow/env <span class="string"><span class="delimiter">&quot;</span><span class="content">APP_URL</span><span class="delimiter">&quot;</span></span>
+<span class="error">#</span>shadow/env [<span class="string"><span class="delimiter">&quot;</span><span class="content">APP_URL</span><span class="delimiter">&quot;</span></span>]
+<span class="comment">;; with default value, used if env variable is not set</span>
+<span class="error">#</span>shadow/env [<span class="string"><span class="delimiter">&quot;</span><span class="content">APP_URL</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">default-value</span><span class="delimiter">&quot;</span></span>]
+<span class="error">#</span>shadow/env [<span class="string"><span class="delimiter">&quot;</span><span class="content">APP_URL</span><span class="delimiter">&quot;</span></span> <span class="symbol">:default</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">default-value</span><span class="delimiter">&quot;</span></span>]
+<span class="comment">;; turn PORT env into an integer, with default</span>
+<span class="error">#</span>shadow/env [<span class="string"><span class="delimiter">&quot;</span><span class="content">PORT</span><span class="delimiter">&quot;</span></span> <span class="symbol">:as</span> <span class="symbol">:int</span> <span class="symbol">:default</span> <span class="integer">8080</span>]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Supported <code>:as</code> coercions are <code>:int</code>, <code>:bool</code>, <code>:keyword</code>, <code>:symbol</code>. Supplied <code>:default</code> values will not be converted and are expected to be in the correct type already.</p>
 </div>
 <div class="admonitionblock important">
 <table>

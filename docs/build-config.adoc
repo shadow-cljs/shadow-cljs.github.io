@@ -565,7 +565,7 @@ IMPORTANT: If you specify multiple build ids the data will be merged into all sp
 
 == Using Environment Variables [[shadow-env]]
 
-It is possible to use environment variables to set configuration values in `shadow-cljs.edn` but you should consider using `--config-merge` instead. If you really must use an environment variable you can do so via the `#shadow/env "FOO"` reader tag.
+It is possible to use environment variables to set configuration values in `shadow-cljs.edn` but you should consider using `--config-merge` instead. If you really must use an environment variable you can do so via the `#shadow/env "FOO"` reader tag. You can also use the shorter `#env`.
 
 .Example `shadow-cljs.edn` config
 ```
@@ -577,6 +577,20 @@ It is possible to use environment variables to set configuration values in `shad
    :closure-defines {your.app/URL #shadow/env "APP_URL"}
    ...}}}
 ```
+
+The are also a few more supported forms that you can use `#shadow/env` with.
+
+```
+#shadow/env "APP_URL"
+#shadow/env ["APP_URL"]
+;; with default value, used if env variable is not set
+#shadow/env ["APP_URL" "default-value"]
+#shadow/env ["APP_URL" :default "default-value"]
+;; turn PORT env into an integer, with default
+#shadow/env ["PORT" :as :int :default 8080]
+```
+
+Supported `:as` coercions are `:int`, `:bool`, `:keyword`, `:symbol`. Supplied `:default` values will not be converted and are expected to be in the correct type already.
 
 IMPORTANT: The environment variables used when the `shadow-cljs` process was started are used. If a server process is used its environment variables will be used over those potentially set by other commands. This is mostly relevant during development but may be confusing. `--config-merge` does not have this limitation.
 
