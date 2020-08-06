@@ -57,7 +57,7 @@ This is unlike `npm` where the package name itself is never used inside the pack
 
 `shadow-cljs` can be started in "server" mode which is required for long-running tasks such as `watch`. A `watch` will implicitly start the server instance if it is not already running. The server will provide the Websocket endpoint that builds will connect to as well as all the other endpoints for nREPL, Socket REPL and the development HTTP servers.
 
-When using the `shadow-cljs` CLI interface all commands will re-use a running server instance JVM instead of starting a new JVM. This is substantially faster since start-up time can be quite slow.
+When using the `shadow-cljs` CLI all commands will re-use a running server instance JVM instead of starting a new JVM. This is substantially faster since start-up time can be quite slow.
 
 Once the server is running however you only have to restart it whenever your `:dependencies` change and everything else can be done via the REPL.
 
