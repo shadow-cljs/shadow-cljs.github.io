@@ -66,3 +66,5 @@ You can declare `npm` dependencies directly by including a `deps.cljs` with `:np
 
 You can also provide extra `:foreign-libs` definitions here. They won't affect `shadow-cljs` but might help other tools.
 
+See https://clojurescript.org/reference/packaging-foreign-deps for more info.
+
