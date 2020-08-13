@@ -177,6 +177,8 @@ files that have been recompiled.  This function *must* by synchronous in nature.
                    ...}}}}
 ```
 
+IMPORTANT: Hooks cannot be declared in the `cljs.user` namespace. Hooks are only used if the namespace containing them is actually included in the build. If you use an extra namespace make sure to include it via `:preloads`.
+
 TIP: If neither `:after-load` nor `:before-load` are set the compiler will only attempt to hot reload the code in the `:browser` target. If you still want hot reloading but don't need any of the callbacks you can set `:autoload true` instead.
 
 

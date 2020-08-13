@@ -2646,6 +2646,18 @@ files that have been recompiled.  This function <strong>must</strong> by synchro
                    <span class="keyword">..</span><span class="keyword">.</span>}}}}</code></pre>
 </div>
 </div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Hooks cannot be declared in the <code>cljs.user</code> namespace. Hooks are only used if the namespace containing them is actually included in the build. If you use an extra namespace make sure to include it via <code>:preloads</code>.
+</td>
+</tr>
+</table>
+</div>
 <div class="admonitionblock tip">
 <table>
 <tr>
@@ -6918,7 +6930,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2020-05-14 22:39:48 CEST
+Last updated 2020-08-10 17:45:17 CEST
 </div>
 </div>
 </body>
