@@ -269,7 +269,6 @@ be in the final file for the worker. Each worker should have a dedicated CLJS na
     {:init-fn my.app.worker/init
      :depends-on #{:shared}
      :web-worker true}}
-   :devtools {:browser-inject :main}
    }}}
 ```
 
@@ -279,8 +278,6 @@ It will have all code from the `:shared` module available (but not `:main`). The
 both development and release modes.
 
 Note that the empty `:entries []` in the `:shared` module will make it collect all the code shared between the `:main` and `:worker` modules.
-
-The `:devtools {:browser-inject :main}` is currently required to tell the compiler where the browser devtools/hud should be added to. It defaults to adding them to the "base" module which would be `:shared` in this case. Since that contains code not compatible with the Worker environment we need to move it.
 
 .Sample echo worker
 ```

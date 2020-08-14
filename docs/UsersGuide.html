@@ -3859,7 +3859,6 @@ be in the final file for the worker. Each worker should have a dedicated CLJS na
     {<span class="symbol">:init-fn</span> my.app.worker/init
      <span class="symbol">:depends-on</span> #{<span class="symbol">:shared</span>}
      <span class="symbol">:web-worker</span> <span class="predefined-constant">true</span>}}
-   <span class="symbol">:devtools</span> {<span class="symbol">:browser-inject</span> <span class="symbol">:main</span>}
    }}}</code></pre>
 </div>
 </div>
@@ -3871,9 +3870,6 @@ both development and release modes.</p>
 </div>
 <div class="paragraph">
 <p>Note that the empty <code>:entries []</code> in the <code>:shared</code> module will make it collect all the code shared between the <code>:main</code> and <code>:worker</code> modules.</p>
-</div>
-<div class="paragraph">
-<p>The <code>:devtools {:browser-inject :main}</code> is currently required to tell the compiler where the browser devtools/hud should be added to. It defaults to adding them to the "base" module which would be <code>:shared</code> in this case. Since that contains code not compatible with the Worker environment we need to move it.</p>
 </div>
 <div class="listingblock">
 <div class="title">Sample echo worker</div>
