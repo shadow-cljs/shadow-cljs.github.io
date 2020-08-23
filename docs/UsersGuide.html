@@ -5606,7 +5606,41 @@ It is expected that the classpath only contains JavaScript that can be consumed 
 </table>
 </div>
 <div class="paragraph">
-<p>The Closure Compiler is used for processing all JavaScript found on the classpath using its <code>ECMASCRIPT_NEXT</code> language setting. What exactly this setting means is not well documented but it mostly represents the next generation JavaScript code which might not even be supported by most browsers yet. ES6 is very well supported as well as most ES7 features. Similarly to standard CLJS this will be compiled down to ES5 with polyfills when required.</p>
+<p>The Closure Compiler is used for processing all JavaScript found on the classpath using its <code>ECMASCRIPT_NEXT</code> language setting. What exactly this setting means is not well documented but it mostly represents the next generation JavaScript code which might not even be supported by most browsers yet. ES6 is very well supported as well as most ES8 features. Similarly to standard CLJS this will be compiled down to ES5 with polyfills when required.</p>
+</div>
+<div class="paragraph">
+<p>Since the Closure Compiler is getting constant updates newer features will be available over time. Just don&#8217;t expect to use the latest cutting edge preview features to be available immediately. Somewhat recent additions like <code>async/await</code> already work quite well.</p>
+</div>
+<div class="paragraph">
+<p>The JS should be written using ES Module Syntax using <code>import</code> and <code>export</code>. JS files can include other JS files and reference CLJS code directly. They may also access <code>npm</code> packages directly with one caveat.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="js"><span class="comment">// regular JS require</span>
+<span class="reserved">import</span> Foo, { something } from <span class="string"><span class="delimiter">&quot;</span><span class="content">./other.js</span><span class="delimiter">&quot;</span></span>;
+
+<span class="comment">// npm require</span>
+<span class="reserved">import</span> React from <span class="string"><span class="delimiter">&quot;</span><span class="content">react</span><span class="delimiter">&quot;</span></span>;
+
+<span class="comment">// require CLJS or Closure Library JS</span>
+<span class="reserved">import</span> cljs from <span class="string"><span class="delimiter">&quot;</span><span class="content">goog:cljs.core</span><span class="delimiter">&quot;</span></span>;
+
+<span class="reserved">export</span> <span class="keyword">function</span> <span class="function">inc</span>(num) {
+  <span class="keyword">return</span> cljs.inc(<span class="integer">1</span>);
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Due to strict checking of the Closure Compiler it is not possible to use the <code>import * as X from "npm";</code> syntax when requiring CLJS or npm code. It is fine to use when requiring other JS files.
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect3">
