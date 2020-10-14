@@ -205,7 +205,7 @@ https://github.com/jgdavey/boot-shadow-cljs
 
 == Running Clojure Code [[clj-run]]
 
-You can use the `shadow-cljs` CLI to call specific Clojure functions from the command line. This is useful when you want run some code before/after certain tasks. Suppose you wanted to `rsync` the output of your `release` build to a remote server.
+You can use the `shadow-cljs` CLI to call specific Clojure functions from the command line. This is useful when you want to run some code before/after certain tasks. Suppose you wanted to `rsync` the output of your `release` build to a remote server.
 
 .Example Clojure Namespace in `src/my/build.clj`
 ```clojure
