@@ -933,7 +933,7 @@ When a filename exists multiple times on the classpath then only the first one i
 <p><code>shadow-cljs</code> can be started in "server" mode which is required for long-running tasks such as <code>watch</code>. A <code>watch</code> will implicitly start the server instance if it is not already running. The server will provide the Websocket endpoint that builds will connect to as well as all the other endpoints for nREPL, Socket REPL and the development HTTP servers.</p>
 </div>
 <div class="paragraph">
-<p>When using the <code>shadow-cljs</code> CLI interface all commands will re-use a running server instance JVM instead of starting a new JVM. This is substantially faster since start-up time can be quite slow.</p>
+<p>When using the <code>shadow-cljs</code> CLI all commands will re-use a running server instance JVM instead of starting a new JVM. This is substantially faster since start-up time can be quite slow.</p>
 </div>
 <div class="paragraph">
 <p>Once the server is running however you only have to restart it whenever your <code>:dependencies</code> change and everything else can be done via the REPL.</p>
@@ -5453,6 +5453,21 @@ Some libraries are also packaged in ways that allow you to include only the part
                        <span class="symbol">:require</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">preact-compat</span><span class="delimiter">&quot;</span></span>}}}</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>You can also use a file to override the dependency, the path is relative to the project root.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span>
+  {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+   <span class="keyword">..</span><span class="keyword">.</span>
+   <span class="symbol">:js-options</span>
+   {<span class="symbol">:resolve</span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">react</span><span class="delimiter">&quot;</span></span> {<span class="symbol">:target</span> <span class="symbol">:file</span>
+                       <span class="symbol">:file</span>   <span class="string"><span class="delimiter">&quot;</span><span class="content">src/main/override-react.js</span><span class="delimiter">&quot;</span></span>}}}</code></pre>
+</div>
+</div>
 </div>
 <div class="sect4">
 <h5 id="js-resolve-limitations"><a class="anchor" href="#js-resolve-limitations"></a><a class="link" href="#js-resolve-limitations">Limitations</a></h5>
@@ -6923,6 +6938,9 @@ You can and should verify that everything is clean by running <code>lein jar</co
 </div>
 <div class="paragraph">
 <p>You can also provide extra <code>:foreign-libs</code> definitions here. They won&#8217;t affect <code>shadow-cljs</code> but might help other tools.</p>
+</div>
+<div class="paragraph">
+<p>See <a href="https://clojurescript.org/reference/packaging-foreign-deps" class="bare">https://clojurescript.org/reference/packaging-foreign-deps</a> for more info.</p>
 </div>
 </div>
 </div>
