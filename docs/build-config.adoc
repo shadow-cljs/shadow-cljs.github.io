@@ -160,7 +160,7 @@ In addition to the metadata you can configure the lifecycle hooks via `shadow-cl
 
 [Horizontal]
 `:before-load`:: A symbol (with namespace) of a function to run just before refreshing
-files that have been recompiled.  This function *must* by synchronous in nature.
+files that have been recompiled.  This function *must* be synchronous in nature.
 `:before-load-async`:: A symbol (with namespace) of a function `(fn [done])` to run just before refreshing. This function can do async processing, but *must* call `(done)` to indicate it is complete.
 `:after-load`:: A symbol (with namespace) of a function to run after hot code reload is complete.
 `:after-load-async`:: A symbol (with namespace) of a function `(fn [done])` to run after hot code reload is complete. This function can do async processing, but *must* call `(done)` to indicate it is complete.
