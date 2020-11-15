@@ -216,7 +216,7 @@ Each of these options is specified as a Set of Strings. Please note that all the
 ****
 
 
-== Build Report
+== Build Report [[build-report]] 
 
 `shadow-cljs` can generate a detailed report for your `release` builds which includes a detailed breakdown of the included sources and how much they each contributed to the overall size.
 
