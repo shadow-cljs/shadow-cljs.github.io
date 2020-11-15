@@ -125,6 +125,7 @@ Currently there are 3 supported JS Providers:
 `:require`:: Maps directly to the JS `require("thing")` function call. It is the default for all `node.js` targets since it can resolve `require` natively at runtime. The included JS is not processed in any way.
 `:shadow`:: Resolves the JS via `node_modules` and includes a minified version of each referenced file in the build. It is the default for the `:browser` target. `node_modules` sources do not go through `:advanced` compilation.
 `:closure`:: Resolves similarly to `:shadow` but attempts to process all included files via the Closure Compiler CommonJS/ES6 rewrite facilities. They will also be processed via `:advanced` compilation.
+`:external`:: Only collects JS requires and emits an index file (configured via `:external-index "foo/bar.js"`) that is meant to be processed by any other JS build tool and will actually provide the JS dependencies. The emitted index file contains a bit of glue code so that the CLJS output can access the JS dependencies. The output of the external index file should be loaded before the CLJS output.
 
 .`:shadow` vs `:closure`
 ****
@@ -147,6 +148,24 @@ Until support in Closure gets more reliable `:shadow` is the recommend JS Provid
    }}}
 ```
 
+=== CommonJS vs ESM [[js-entry-keys]]
+
+Nowadays many `npm` packages ship multiple build variants. `shadow-cljs` will by default pick the variant linked under the `main` or `browser` key in `package.json`. This most commonly refers to CommonJS code. Some modern packages also provide a `module` entry which usually refers to ECMAScript code (meaning "modern" JS). Interop between CommonJS and ESM can be tricky so `shadow-cljs` defaults to using CommonJS but it can be beneficial to use ESM.
+
+It is largely dependent on the packages you use whether this will work or not. You can configure `shadow-cljs`  to prefer the `module` entry via the `:entry-keys` JS option. It takes a vector of string keys found in `package.json` which will be tried in order. The default is `"["browser" "main" "module"]`.
+
+.Example config for using `:closure` in a `:browser` build.
+```clojure
+{...
+ :builds
+ {:app
+  {:target :browser
+   ...
+   :js-options {:entry-keys ["module" "browser" "main"]} ;; try "module" first
+   }}}
+```
+
+Make sure to test thoroughly and compare the <<build-report, build report>> output to check size differences when switching this. Results may vary greatly in positive or negative ways.
 
 === Resolving Packages [[js-resolve]]
 

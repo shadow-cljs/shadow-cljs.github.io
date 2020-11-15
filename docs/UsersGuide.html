@@ -727,8 +727,9 @@ table.CodeRay td.code>pre{padding:0}
 <ul class="sectlevel3">
 <li><a href="#_using_npm_packages">12.1.1. Using npm packages</a></li>
 <li><a href="#js-provider">12.1.2. Package Provider</a></li>
-<li><a href="#js-resolve">12.1.3. Resolving Packages</a></li>
-<li><a href="#alt-node-modules">12.1.4. Alternate Modules Directories</a></li>
+<li><a href="#js-entry-keys">12.1.3. CommonJS vs ESM</a></li>
+<li><a href="#js-resolve">12.1.4. Resolving Packages</a></li>
+<li><a href="#alt-node-modules">12.1.5. Alternate Modules Directories</a></li>
 </ul>
 </li>
 <li><a href="#classpath-js">12.2. Dealing with .js Files</a>
@@ -5374,6 +5375,10 @@ Some libraries are also packaged in ways that allow you to include only the part
 <dd>
 <p>Resolves similarly to <code>:shadow</code> but attempts to process all included files via the Closure Compiler CommonJS/ES6 rewrite facilities. They will also be processed via <code>:advanced</code> compilation.</p>
 </dd>
+<dt><code>:external</code></dt>
+<dd>
+<p>Only collects JS requires and emits an index file (configured via <code>:external-index "foo/bar.js"</code>) that is meant to be processed by any other JS build tool and will actually provide the JS dependencies. The emitted index file contains a bit of glue code so that the CLJS output can access the JS dependencies. The output of the external index file should be loaded before the CLJS output.</p>
+</dd>
 </dl>
 </div>
 <div class="sidebarblock">
@@ -5404,7 +5409,31 @@ Some libraries are also packaged in ways that allow you to include only the part
 </div>
 </div>
 <div class="sect3">
-<h4 id="js-resolve"><a class="anchor" href="#js-resolve"></a><a class="link" href="#js-resolve">12.1.3. Resolving Packages</a></h4>
+<h4 id="js-entry-keys"><a class="anchor" href="#js-entry-keys"></a><a class="link" href="#js-entry-keys">12.1.3. CommonJS vs ESM</a></h4>
+<div class="paragraph">
+<p>Nowadays many <code>npm</code> packages ship multiple build variants. <code>shadow-cljs</code> will by default pick the variant linked under the <code>main</code> or <code>browser</code> key in <code>package.json</code>. This most commonly refers to CommonJS code. Some modern packages also provide a <code>module</code> entry which usually refers to ECMAScript code (meaning "modern" JS). Interop between CommonJS and ESM can be tricky so <code>shadow-cljs</code> defaults to using CommonJS but it can be beneficial to use ESM.</p>
+</div>
+<div class="paragraph">
+<p>It is largely dependent on the packages you use whether this will work or not. You can configure <code>shadow-cljs</code>  to prefer the <code>module</code> entry via the <code>:entry-keys</code> JS option. It takes a vector of string keys found in <code>package.json</code> which will be tried in order. The default is <code>"["browser" "main" "module"]</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example config for using <code>:closure</code> in a <code>:browser</code> build.</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span>
+  {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+   <span class="keyword">..</span><span class="keyword">.</span>
+   <span class="symbol">:js-options</span> {<span class="symbol">:entry-keys</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">module</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">browser</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">main</span><span class="delimiter">&quot;</span></span>]} <span class="comment">;; try &quot;module&quot; first</span>
+   }}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Make sure to test thoroughly and compare the <a href="#build-report">build report</a> output to check size differences when switching this. Results may vary greatly in positive or negative ways.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="js-resolve"><a class="anchor" href="#js-resolve"></a><a class="link" href="#js-resolve">12.1.4. Resolving Packages</a></h4>
 <div class="paragraph">
 <p>By default <code>shadow-cljs</code> will resolve all <code>(:require ["thing" :as x])</code> requires following the <code>npm</code> convention. This means it will look at <code>&lt;project&gt;/node_modules/thing/package.json</code> and follow the code from there. To customize how this works <code>shadow-cljs</code> exposes a <code>:resolve</code> config option that lets you override how things are resolved.</p>
 </div>
@@ -5501,7 +5530,7 @@ Some libraries are also packaged in ways that allow you to include only the part
 </div>
 </div>
 <div class="sect3">
-<h4 id="alt-node-modules"><a class="anchor" href="#alt-node-modules"></a><a class="link" href="#alt-node-modules">12.1.4. Alternate Modules Directories</a></h4>
+<h4 id="alt-node-modules"><a class="anchor" href="#alt-node-modules"></a><a class="link" href="#alt-node-modules">12.1.5. Alternate Modules Directories</a></h4>
 <div class="paragraph">
 <p>By default <code>shadow-cljs</code> will only look at the <code>&lt;project-dir&gt;/node_modules</code> directory when resolving JS packages. This can be configured via the <code>:js-package-dirs</code> option in <code>:js-options</code>. This can be applied globally or per build.</p>
 </div>
