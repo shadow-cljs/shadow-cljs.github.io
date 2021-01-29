@@ -1,10 +1,10 @@
 == NPM [[npm]]
 
-https://www.npmjs.com/[npm] has come the de-facto standard package manager for JavaScript. Almost all JS libraries can be found there and shadow-cljs provides seamless integration for accessing those packages.
+https://www.npmjs.com/[npm] has become the de-facto standard package manager for JavaScript. Almost all JS libraries can be found there and shadow-cljs provides seamless integration for accessing those packages.
 
 === Using npm packages
 
-Most npm packages will also include some instructions on how to use the actual code. The “old” CommonJS style just has require calls which translate directly:
+Most npm packages will also include some instructions on how to use the actual code. The “old” CommonJS style just has `require` calls which translate directly:
 
 ```js
 var react = require("react");
