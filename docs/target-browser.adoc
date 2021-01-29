@@ -445,7 +445,7 @@ The `:open-file-command` expects a vector representing a very simple DSL. String
 
 The above example would execute
 ```bash
-$ idea /path/to/project-root --line 3 /path/to/project-root/srv/main/demo/foo.cljs
+$ idea /path/to/project-root --line 3 /path/to/project-root/src/main/demo/foo.cljs
 ```
 
 .`emacsclient` example
@@ -455,7 +455,7 @@ $ idea /path/to/project-root --line 3 /path/to/project-root/srv/main/demo/foo.cl
 ```
 
 ```bash
-$ emacsclient -n +3:1 /path/to/project-root/srv/main/demo/foo.cljs
+$ emacsclient -n +3:1 /path/to/project-root/src/main/demo/foo.cljs
 ```
 
 The available replacement variables are:
