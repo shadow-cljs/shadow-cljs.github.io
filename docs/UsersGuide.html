@@ -4084,7 +4084,7 @@ options for configuring an optional dev-time HTTP server for a build and CSS rel
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">$ idea /path/to/project-root --line 3 /path/to/project-root/srv/main/demo/foo.cljs</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">$ idea /path/to/project-root --line 3 /path/to/project-root/src/main/demo/foo.cljs</code></pre>
 </div>
 </div>
 <div class="listingblock">
@@ -4096,7 +4096,7 @@ options for configuring an optional dev-time HTTP server for a build and CSS rel
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">$ emacsclient -n +3:1 /path/to/project-root/srv/main/demo/foo.cljs</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">$ emacsclient -n +3:1 /path/to/project-root/src/main/demo/foo.cljs</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -5188,12 +5188,12 @@ HeadlessChrome 0.0.0 (Mac OS X 10.12.6): Executed 1 of 1 SUCCESS (0.007 secs / 0
 <div class="sect2">
 <h3 id="npm"><a class="anchor" href="#npm"></a><a class="link" href="#npm">12.1. NPM</a></h3>
 <div class="paragraph">
-<p><a href="https://www.npmjs.com/">npm</a> has come the de-facto standard package manager for JavaScript. Almost all JS libraries can be found there and shadow-cljs provides seamless integration for accessing those packages.</p>
+<p><a href="https://www.npmjs.com/">npm</a> has become the de-facto standard package manager for JavaScript. Almost all JS libraries can be found there and shadow-cljs provides seamless integration for accessing those packages.</p>
 </div>
 <div class="sect3">
 <h4 id="_using_npm_packages"><a class="anchor" href="#_using_npm_packages"></a><a class="link" href="#_using_npm_packages">12.1.1. Using npm packages</a></h4>
 <div class="paragraph">
-<p>Most npm packages will also include some instructions on how to use the actual code. The “old” CommonJS style just has require calls which translate directly:</p>
+<p>Most npm packages will also include some instructions on how to use the actual code. The “old” CommonJS style just has <code>require</code> calls which translate directly:</p>
 </div>
 <div class="listingblock">
 <div class="content">
