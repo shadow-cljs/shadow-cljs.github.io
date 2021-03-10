@@ -10,7 +10,7 @@ A basic browser configuration looks like this:
  {:app {:target :browser
         :output-dir "public/assets/app/js"
         :asset-path "/assets/app/js"
-        :modules {:main {:entries [my.app]}}}]}
+        :modules {:main {:entries [my.app]}}}}}
 ```
 
 == Output Settings
