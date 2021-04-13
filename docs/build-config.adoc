@@ -61,8 +61,8 @@ As a developer most of your time is spent in development mode. You're probably f
 
 Preloads are used to force certain namespaces into the front of your generated Javascript. This is
 generally used to inject tools and instrumentation before the application actually loads and runs. The
-preloads option is simply a list of namespaces in the `:devtools`/`:preloads` section of
-`shadow-cljs-edn`:
+preloads option is simply a list of namespaces either in the `:devtools`/`:preloads` section of
+`shadow-cljs.edn` or within the `:preloads` key of a specific module:
 
 ```
 {...
@@ -70,7 +70,27 @@ preloads option is simply a list of namespaces in the `:devtools`/`:preloads` se
  {:app {...
         :devtools {:preloads [fulcro.inspect.preload]
                    ...}}}}
+
 ```
+
+For example to only include the preloads within a main module during development, and not in a web worker:
+
+```
+{...
+ :builds
+ {:app {...
+        :modules {:main {...
+                         :preloads
+                         [com.fulcrologic.fulcro.inspect.preload
+                          com.fulcrologic.fulcro.inspect.dom-picker-preload]
+                         :depends-on #{:shared}}
+                  :shared {:entries []}
+                  :web-worker {...
+                    :depends-on #{:shared}
+                    :web-worker true}}}}}
+```
+
+`:preloads` are only applied to development builds and will not be applied to release builds.
 
 NOTE: Since version 2.0.130 shadow-cljs automatically adds `cljs-devtools` to the preloads in
 `watch` and `compile` if they are on the classpath. All you need to do is make sure `binaryage/devtools` is in your
@@ -606,15 +626,15 @@ Configuration merge order is as follows `:build-defaults` -> `:target-defaults` 
 ```
 {...
  :build-defaults
- {:closure-defines 
+ {:closure-defines
    {your.app/VERBOSE true}}
-   
+
  :target-defaults
  {:browser
    {:js-options
      {:resolve {"react" {:target :global
                          :global "React"}}}}}
- 
+
  :builds
  {:app
   {:target :browser

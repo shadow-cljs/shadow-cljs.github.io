@@ -2472,8 +2472,8 @@ the target you select.</p>
 <div class="paragraph">
 <p>Preloads are used to force certain namespaces into the front of your generated Javascript. This is
 generally used to inject tools and instrumentation before the application actually loads and runs. The
-preloads option is simply a list of namespaces in the <code>:devtools</code>/<code>:preloads</code> section of
-<code>shadow-cljs-edn</code>:</p>
+preloads option is simply a list of namespaces either in the <code>:devtools</code>/<code>:preloads</code> section of
+<code>shadow-cljs.edn</code> or within the <code>:preloads</code> key of a specific module:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -2483,6 +2483,28 @@ preloads option is simply a list of namespaces in the <code>:devtools</code>/<co
         <span class="symbol">:devtools</span> {<span class="symbol">:preloads</span> [fulcro.inspect.preload]
                    <span class="keyword">..</span><span class="keyword">.</span>}}}}</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>For example to only include the preloads within a main module during development, and not in a web worker:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span> {<span class="keyword">..</span><span class="keyword">.</span>
+        <span class="symbol">:modules</span> {<span class="symbol">:main</span> {<span class="keyword">..</span><span class="keyword">.</span>
+                         <span class="symbol">:preloads</span>
+                         [com.fulcrologic.fulcro.inspect.preload
+                          com.fulcrologic.fulcro.inspect.dom-picker-preload]
+                         <span class="symbol">:depends-on</span> #{<span class="symbol">:shared</span>}}
+                  <span class="symbol">:shared</span> {<span class="symbol">:entries</span> []}
+                  <span class="symbol">:web-worker</span> {<span class="keyword">..</span><span class="keyword">.</span>
+                    <span class="symbol">:depends-on</span> #{<span class="symbol">:shared</span>}
+                    <span class="symbol">:web-worker</span> <span class="predefined-constant">true</span>}}}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>:preloads</code> are only applied to development builds and will not be applied to release builds.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -7007,7 +7029,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2020-08-10 17:45:17 CEST
+Last updated 2021-04-13 09:43:28 EDT
 </div>
 </div>
 </body>
