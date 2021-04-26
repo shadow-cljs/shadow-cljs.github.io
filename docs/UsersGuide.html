@@ -3455,7 +3455,7 @@ Configs later in the merge order can override, but not remove previous configura
  {<span class="symbol">:app</span> {<span class="symbol">:target</span> <span class="symbol">:browser</span>
         <span class="symbol">:output-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public/assets/app/js</span><span class="delimiter">&quot;</span></span>
         <span class="symbol">:asset-path</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">/assets/app/js</span><span class="delimiter">&quot;</span></span>
-        <span class="symbol">:modules</span> {<span class="symbol">:main</span> {<span class="symbol">:entries</span> [my.app]}}}]}</code></pre>
+        <span class="symbol">:modules</span> {<span class="symbol">:main</span> {<span class="symbol">:entries</span> [my.app]}}}}}</code></pre>
 </div>
 </div>
 <div class="sect2">
@@ -6261,6 +6261,12 @@ The generated <code>report.html</code> is entirely self-contained and includes a
 </td>
 </tr>
 </table>
+</div>
+<div class="paragraph">
+<p>Any running build watches will not affect the output of the build report.</p>
+</div>
+<div class="paragraph">
+<p>The build report runs separately from any other watches you may have running, you do not need to stop any of them nor do you need to stop the shadow-cljs server before building the report.</p>
 </div>
 </div>
 </div>
