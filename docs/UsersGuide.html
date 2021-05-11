@@ -3154,6 +3154,9 @@ Note that this mostly affects imported JS code from <a href="#npm">npm</a> or <c
 <div class="ulist">
 <ul>
 <li>
+<p><code>:bare-minimum</code></p>
+</li>
+<li>
 <p><code>:es3</code></p>
 </li>
 <li>
@@ -3166,10 +3169,25 @@ Note that this mostly affects imported JS code from <a href="#npm">npm</a> or <c
 <p><code>:es7</code> - exponent <code>**</code> operator</p>
 </li>
 <li>
-<p><code>:es8</code> - <code>async/await</code>, <code>generators</code>, object literals with spread, &#8230;&#8203;</p>
+<p><code>:es8</code> - <code>async/await</code>, <code>generators</code>, shared memory and atomics</p>
+</li>
+<li>
+<p><code>:es2018</code> - async iteration, <code>Promise.finally</code>, several <code>RegExp</code> features, spread syntax in object literals</p>
+</li>
+<li>
+<p><code>:es2019</code></p>
+</li>
+<li>
+<p><code>:es2020</code> - <code>AsyncIterator</code>, <code>BigInt</code>, <code>??</code> operator, dynamic imports</p>
 </li>
 <li>
 <p><code>:es-next</code> - all the features the Closure Compiler currently supports</p>
+</li>
+<li>
+<p><code>:browser-2020</code> - <code>:es2019</code> minus several RegExp features</p>
+</li>
+<li>
+<p><code>:browser-2021</code> - <code>:es2020</code> minus RegExp Unicode properties</p>
 </li>
 </ul>
 </div>
@@ -3455,7 +3473,7 @@ Configs later in the merge order can override, but not remove previous configura
  {<span class="symbol">:app</span> {<span class="symbol">:target</span> <span class="symbol">:browser</span>
         <span class="symbol">:output-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">public/assets/app/js</span><span class="delimiter">&quot;</span></span>
         <span class="symbol">:asset-path</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">/assets/app/js</span><span class="delimiter">&quot;</span></span>
-        <span class="symbol">:modules</span> {<span class="symbol">:main</span> {<span class="symbol">:entries</span> [my.app]}}}]}</code></pre>
+        <span class="symbol">:modules</span> {<span class="symbol">:main</span> {<span class="symbol">:entries</span> [my.app]}}}}}</code></pre>
 </div>
 </div>
 <div class="sect2">
@@ -7029,7 +7047,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2021-04-13 09:43:28 EDT
+Last updated 2021-05-11 12:53:23 CDT
 </div>
 </div>
 </body>
