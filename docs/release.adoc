@@ -216,7 +216,7 @@ Each of these options is specified as a Set of Strings. Please note that all the
 ****
 
 
-== Build Report [[build-report]] 
+== Build Report [[build-report]]
 
 `shadow-cljs` can generate a detailed report for your `release` builds which includes a detailed breakdown of the included sources and how much they each contributed to the overall size.
 
@@ -231,3 +231,7 @@ $ npx shadow-cljs run shadow.cljs.build-report app report.html
 The above example will generate a `report.html` in the project directory for the `:app` build.
 
 TIP: The generated `report.html` is entirely self-contained and includes all the required data/js/css. No other external sources are required.
+
+Any running build watches will not affect the output of the build report.
+
+The build report runs separately from any other watches you may have running, you do not need to stop any of them nor do you need to stop the shadow-cljs server before building the report.
