@@ -466,6 +466,8 @@ Supported options are:
 - `:es2019`
 - `:es2020` - `AsyncIterator`, `BigInt`, `??` operator, dynamic imports
 - `:es-next` - all the features the Closure Compiler currently supports
+- `:browser-2020` - `:es2019` minus several RegExp features
+- `:browser-2021` - `:es2020` minus RegExp Unicode properties
 
 .Example
 ```
