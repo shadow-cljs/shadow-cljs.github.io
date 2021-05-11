@@ -456,11 +456,15 @@ You can configure this via the `:output-feature-set` in `:compiler-options`. The
 
 Supported options are:
 
+- `:bare-minimum`
 - `:es3`
 - `:es5`
 - `:es6` - `class`, `const`, `let`, ...
 - `:es7` - exponent `**` operator
-- `:es8` - `async/await`, `generators`, object literals with spread, ...
+- `:es8` - `async/await`, `generators`, shared memory and atomics
+- `:es2018` - async iteration, `Promise.finally`, several `RegExp` features, spread syntax in object literals
+- `:es2019`
+- `:es2020` - `AsyncIterator`, `BigInt`, `??` operator, dynamic imports
 - `:es-next` - all the features the Closure Compiler currently supports
 
 .Example
