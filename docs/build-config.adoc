@@ -587,7 +587,7 @@ $ shadow-cljs release app --config-merge '{:output-dir "somewhere/else"}'
 $ shadow-cljs release app --config-merge '{:closure-defines {your.app/DEBUG true}}'
 ```
 
-`--config-merge` expects one EDN map and can be used multiple times, they will be merged left to right. The data added is also visible to build-hooks.
+`--config-merge` expects one EDN map and can be used multiple times, they will be merged left to right. The data added is also visible to build-hooks. It will also accept a file path like `--config-merge a/path.edn` or `--config-merge classpath:a/resource.edn`.
 
 IMPORTANT: If you specify multiple build ids the data will be merged into all specified builds. `shadow-cljs release frontend backend --config-merge '{:hello "world"}'` will be applied to both.
 
