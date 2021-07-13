@@ -23,9 +23,7 @@ Alternatively you can create a dummy `project.clj` or use the full <<Leiningen, 
 
 You can run `npx shadow-cljs server` inside the Terminal provided by IntelliJ and use `Clojure REPL -> Remote` Run Configuration to connect to the provided <<nREPL, nREPL server>>. Just select the "Use port from nREPL file" option in Cursive Clojure REPL -> Remote or configure a fixed nREPL port if you prefer.
 
-Note that the Cursive REPL when first connected always starts out as a CLJ REPL. You can switch it to CLJS by calling `(shadow/repl :your-build-id)`. This will automatically switch the Cursive option as well. You can type `:cljs/quit` to drop back down to the CLJ REPL.
-
-NOTE: You cannot switch from CLJ->CLJS via the Cursive select box. Make sure you use the call above to switch.
+Note that the Cursive REPL when first connected always starts out as a CLJ REPL. You should switch it to CLJS via the Cursive select box, and then select it by calling `(shadow.cljs.devtools.api/repl :your-build-id)`. You can type `:cljs/quit` to drop back down to the CLJ REPL.
 
 == Emacs / CIDER [[cider]]
 
