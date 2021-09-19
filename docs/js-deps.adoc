@@ -196,7 +196,7 @@ The `:app` build will now use the global `React` instance while the `:server` bu
 
 ==== Redirecting “require” [[js-resolve-npm]]
 
-Sometimes you wan't more control over which `npm` package is actually used depending on your build. You can "redirect" certain requires from your build config without changing the code. This is often useful if you either don't have access to the sources using such packages or you just want to change it for one build.
+Sometimes you want more control over which `npm` package is actually used depending on your build. You can "redirect" certain requires from your build config without changing the code. This is often useful if you either don't have access to the sources using such packages or you just want to change it for one build.
 
 ```
 {...
