@@ -780,8 +780,8 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_calva_vs_code">14.5. Calva (VS Code)</a>
 <ul class="sectlevel3">
 <li><a href="#_dependencies_2">14.5.1. Dependencies</a></li>
-<li><a href="#_connecting_calva_to_the_repls">14.5.2. Connecting Calva to the REPLs</a></li>
-<li><a href="#_features">14.5.3. Features</a></li>
+<li><a href="#_start_the_repl">14.5.2. Start the REPL</a></li>
+<li><a href="#_connecting_calva_to_the_build">14.5.3. Connecting Calva to the build</a></li>
 </ul>
 </li>
 <li><a href="#_fireplace_vim_vim_neovim">14.6. Fireplace.vim (Vim/Neovim)</a>
@@ -3347,7 +3347,7 @@ This feature is only available in <code>.cljc</code> files and will fail in <cod
 </div>
 </div>
 <div class="paragraph">
-<p><code>--config-merge</code> expects one EDN map and can be used multiple times, they will be merged left to right. The data added is also visible to build-hooks.</p>
+<p><code>--config-merge</code> expects one EDN map and can be used multiple times, they will be merged left to right. The data added is also visible to build-hooks. It will also accept a file path like <code>--config-merge a/path.edn</code> or <code>--config-merge classpath:a/resource.edn</code>.</p>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -6535,126 +6535,49 @@ cljs.repl&gt;</code></pre>
 <div class="sect2">
 <h3 id="_calva_vs_code"><a class="anchor" href="#_calva_vs_code"></a><a class="link" href="#_calva_vs_code">14.5. Calva (VS Code)</a></h3>
 <div class="paragraph">
-<p>(Only tested with <code>browser</code> targets so far. Probably works with other targets too.)</p>
+<p>Calva has built-in support for <strong>shadow-cljs</strong>.</p>
 </div>
 <div class="sect3">
 <h4 id="_dependencies_2"><a class="anchor" href="#_dependencies_2"></a><a class="link" href="#_dependencies_2">14.5.1. Dependencies</a></h4>
 <div class="paragraph">
-<p>You need VS Code and install the <a href="https://marketplace.visualstudio.com/items?itemName=betterthantomorrow.calva#overview">Calva</a> extension.</p>
-</div>
-<div class="paragraph">
-<p>Since Calva uses nREPL and the <code>cider-nrepl</code> middlewares you need to include this dependency in <a href="#user-config">~/.shadow-cljs/config.edn</a> or <code>shadow-cljs.edn</code>:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">[cider/cider-nrepl <span class="string"><span class="delimiter">&quot;</span><span class="content">0.21.0</span><span class="delimiter">&quot;</span></span>]</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p><code>shadow-cljs</code> will inject the required <code>cider-nrepl</code> middleware once it sees this dependency.</p>
+<p>You need VS Code and the <a href="https://marketplace.visualstudio.com/items?itemName=betterthantomorrow.calva#overview">Calva</a> extension.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_connecting_calva_to_the_repls"><a class="anchor" href="#_connecting_calva_to_the_repls"></a><a class="link" href="#_connecting_calva_to_the_repls">14.5.2. Connecting Calva to the REPLs</a></h4>
+<h4 id="_start_the_repl"><a class="anchor" href="#_start_the_repl"></a><a class="link" href="#_start_the_repl">14.5.2. Start the REPL</a></h4>
 <div class="paragraph">
-<p>Once that is done start your shadow app. (Using whatever build instead of <code>app</code>.):</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">$ shadow-cljs watch app</code></pre>
-</div>
+<p>The easiest way to start the REPL is to use Calva&#8217;s <strong>Jack-in</strong> command and then select the <code>shadow-cljs</code> <strong>Project Type</strong>. This will start the shadow-cljs watcher and inject the necessary <strong>cider-nrepl</strong> dependencies.</p>
 </div>
 <div class="paragraph">
-<p>Once the app is loaded in the browser, and you see <code>JS runime connected</code> in the terminal where you started the app, Calva can connect to its repl. Open the project in VS Code and Calva will by default try to auto connect and prompt you with a list of builds read from <code>shadow-cljs.edn</code>. Select the right one (<code>:app</code> in this example) and Calva&#8217;s Clojure and Clojurescript support is activated.</p>
+<p>If you want to start the REPL yourself you can:</p>
 </div>
-<div class="paragraph">
-<p>(If you already have the project open in VS Code when you start the app, issue the <code>Calva: Connect to a Running REPL Server in the Project</code> command.)</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Use the Calva command <strong>Copy Jack-in Command to Clipboard</strong></p>
+</li>
+<li>
+<p>Start the REPL from the terminal (VS Code&#8217;s built-in terminal works great for this)</p>
+</li>
+<li>
+<p>Use the Calva command <strong>Connect to a Running REPL</strong></p>
+</li>
+</ol>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_features"><a class="anchor" href="#_features"></a><a class="link" href="#_features">14.5.3. Features</a></h4>
+<h4 id="_connecting_calva_to_the_build"><a class="anchor" href="#_connecting_calva_to_the_build"></a><a class="link" href="#_connecting_calva_to_the_build">14.5.3. Connecting Calva to the build</a></h4>
 <div class="paragraph">
-<p>Some of the things you can now do:</p>
+<p>Once shadow is done with its initial compile, start the app (in the browser, or node, or whatever, depending on your app).</p>
 </div>
-<div class="sect4">
-<h5 id="_intellisense_and_stuff"><a class="anchor" href="#_intellisense_and_stuff"></a><a class="link" href="#_intellisense_and_stuff">Intellisense and stuff</a></h5>
-<div class="ulist">
-<ul>
-<li>
-<p>Peek at definitions on hover.</p>
-</li>
-<li>
-<p>Get auto completion help.</p>
-</li>
-<li>
-<p>Navigate to definitions (<code>cmd-click</code> on Mac, might be <code>ctrl-click</code> on Windows and Linux).</p>
-</li>
-</ul>
+<div class="paragraph">
+<p>Calva will prompt you for witch build to attach the REPL connection to. Calva has a command (and a statusbar button) for switching witch build is attached.</p>
 </div>
+<div class="paragraph">
+<p>Hack away!</p>
 </div>
-<div class="sect4">
-<h5 id="_evaluation_of_the_file_forms_and_selection"><a class="anchor" href="#_evaluation_of_the_file_forms_and_selection"></a><a class="link" href="#_evaluation_of_the_file_forms_and_selection">Evaluation of the file, forms and selection</a></h5>
-<div class="ulist">
-<ul>
-<li>
-<p>Evaluate the file: <code>ctrl+alt+c enter</code> (This is done automatically one opening files.)</p>
-</li>
-<li>
-<p>Evaluate inline: <code>ctrl+alt+c e</code></p>
-</li>
-<li>
-<p>Evaluate and replace them in the editor: <code>ctrl+alt+c r</code></p>
-</li>
-<li>
-<p>Pretty print evaluation resuls: <code>ctrl+alt+c p</code></p>
-</li>
-<li>
-<p>Send forms to the integrated terminal repls for evaluation: <code>ctrl+alt+c alt+e</code></p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_run_tests"><a class="anchor" href="#_run_tests"></a><a class="link" href="#_run_tests">Run tests</a></h5>
-<div class="ulist">
-<ul>
-<li>
-<p>Run namespace tests: <code>ctrl+alt+c t</code></p>
-</li>
-<li>
-<p>Run all tests: <code>ctrl+alt+c shift+t</code> (Really clunky in large projects so far.)</p>
-</li>
-<li>
-<p>Rerun previously failing tests: <code>ctrl+alt+c ctrl+t</code></p>
-</li>
-<li>
-<p>Test failures are marked in the explorer and editors and listed in the Problem tab for easy access.</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_terminal_repls"><a class="anchor" href="#_terminal_repls"></a><a class="link" href="#_terminal_repls">Terminal repls</a></h5>
-<div class="ulist">
-<ul>
-<li>
-<p>Switch namespace in terminal repl to that of the currently open file: <code>ctrl+alt+c n</code></p>
-</li>
-<li>
-<p>Load current file and switch namespace in: <code>ctrl+alt+c alt+n</code></p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_cljc_files"><a class="anchor" href="#_cljc_files"></a><a class="link" href="#_cljc_files">Cljc files</a></h5>
-<div class="ulist">
-<ul>
-<li>
-<p>Switch between Clojure and Clojurescript repl <code>ctrl+alt+c ctrl+alt+t</code> (or click the green <code>cljc/clj</code> button in the status bar). This determines both which repl is backing the editor and what terminal repl is being accessed, see above.</p>
-</li>
-</ul>
-</div>
+<div class="paragraph">
+<p>See <a href="https://calva.io">calva.io</a> for information about how to use Calva.</p>
 </div>
 </div>
 </div>
