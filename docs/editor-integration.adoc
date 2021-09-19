@@ -126,65 +126,32 @@ Now, you can use the `Chlorine: Evaluate...` commands to evaluate any Clojure or
 
 == Calva (VS Code)
 
-(Only tested with `browser` targets so far. Probably works with other targets too.)
+Calva has built-in support for *shadow-cljs*.
 
 === Dependencies
 
-You need VS Code and install the https://marketplace.visualstudio.com/items?itemName=betterthantomorrow.calva#overview[Calva] extension.
+You need VS Code and the https://marketplace.visualstudio.com/items?itemName=betterthantomorrow.calva#overview[Calva] extension.
 
-Since Calva uses nREPL and the `cider-nrepl` middlewares you need to include this dependency in <<user-config, ~/.shadow-cljs/config.edn>> or `shadow-cljs.edn`:
 
-```clojure
-[cider/cider-nrepl "0.21.0"]
-```
+=== Start the REPL
 
-`shadow-cljs` will inject the required `cider-nrepl` middleware once it sees this dependency.
+The easiest way to start the REPL is to use Calva's *Jack-in* command and then select the `shadow-cljs` *Project Type*. This will start the shadow-cljs watcher and inject the necessary *cider-nrepl* dependencies.
 
-=== Connecting Calva to the REPLs
+If you want to start the REPL yourself you can:
 
-Once that is done start your shadow app. (Using whatever build instead of `app`.):
+1. Use the Calva command *Copy Jack-in Command to Clipboard*
+2. Start the REPL from the terminal (VS Code's built-in terminal works great for this)
+3. Use the Calva command *Connect to a Running REPL*
 
-```
-$ shadow-cljs watch app
-```
+=== Connecting Calva to the build
 
-Once the app is loaded in the browser, and you see `JS runime connected` in the terminal where you started the app, Calva can connect to its repl. Open the project in VS Code and Calva will by default try to auto connect and prompt you with a list of builds read from `shadow-cljs.edn`. Select the right one (`:app` in this example) and Calva's Clojure and Clojurescript support is activated.
+Once shadow is done with its initial compile, start the app (in the browser, or node, or whatever, depending on your app).
 
-(If you already have the project open in VS Code when you start the app, issue the `Calva: Connect to a Running REPL Server in the Project` command.)
+Calva will prompt you for witch build to attach the REPL connection to. Calva has a command (and a statusbar button) for switching witch build is attached.
 
-=== Features
+Hack away!
 
-Some of the things you can now do:
-
-==== Intellisense and stuff
-
-- Peek at definitions on hover.
-- Get auto completion help.
-- Navigate to definitions (`cmd-click` on Mac, might be `ctrl-click` on Windows and Linux).
-
-==== Evaluation of the file, forms and selection
-
-- Evaluate the file: `ctrl+alt+c enter` (This is done automatically one opening files.)
-- Evaluate inline: `ctrl+alt+c e`
-- Evaluate and replace them in the editor: `ctrl+alt+c r`
-- Pretty print evaluation resuls: `ctrl+alt+c p`
-- Send forms to the integrated terminal repls for evaluation: `ctrl+alt+c alt+e`
-
-==== Run tests
-
-- Run namespace tests: `ctrl+alt+c t`
-- Run all tests: `ctrl+alt+c shift+t` (Really clunky in large projects so far.)
-- Rerun previously failing tests: `ctrl+alt+c ctrl+t`
-- Test failures are marked in the explorer and editors and listed in the Problem tab for easy access.
-
-==== Terminal repls
-
-- Switch namespace in terminal repl to that of the currently open file: `ctrl+alt+c n`
-- Load current file and switch namespace in: `ctrl+alt+c alt+n`
-
-==== Cljc files
-
-- Switch between Clojure and Clojurescript repl `ctrl+alt+c ctrl+alt+t` (or click the green `cljc/clj` button in the status bar). This determines both which repl is backing the editor and what terminal repl is being accessed, see above.
+See https://calva.io[calva.io] for information about how to use Calva.
 
 == Fireplace.vim (Vim/Neovim)
 
