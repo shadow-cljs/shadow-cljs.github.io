@@ -22,3 +22,13 @@ People who prefer developing against a Docker container can use the `Dockerfile`
 ### Visual Studio Code
 
 Provided that you have you have the "Visual Studio Code Remote - Container" extension installed, Visual Studio Code users will be able to develop against the Docker container immediately.
+
+# Generate HTML using docker
+
+1. Install docker
+
+2. Build the docs using docker:
+
+```bash
+make docker-build
+```
