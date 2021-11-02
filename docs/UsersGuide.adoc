@@ -480,7 +480,7 @@ The longer config version expects a map and the supported options are:
 `:ssl-port`:: When `:ssl` is configured use this port for ssl connections and server normal HTTP on the regular port. If `:ssl-port` is not set but `:ssl` is configured the default port will only server SSL requests.
 `:host`:: Optional. The hostname to listen on. Defaults to localhost.
 `:handler`:: Optional. A fully qualified symbol. A `(defn handler [req] resp)` that is used
-if a resource is not found for the given request. Defaults to `shadow.http.push-state/handle`.
+if a resource is not found for the given request. Defaults to `shadow.http.push-state/handle` (this handler will only respond to requests with `Accept: text/html` header.)
 
 The following two options only apply when using the default, built-in handler and typically do not need to be changed:
 
