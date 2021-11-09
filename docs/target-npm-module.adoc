@@ -4,6 +4,7 @@ create-react-app, ...) with little configuration.
 [horizontal]
 `:output-dir`:: The path for the output files are written to, defaults to `node_modules/shadow-cljs`.
 `:entries`:: (required) A vector of namespace symbols that should be compiled
+`:ns-regexp`:: (optional) A regular expression matching namespaces against project files. This only scans files, and will not scan jars.
 
 .Example `shadow-cljs.edn` config
 ```
