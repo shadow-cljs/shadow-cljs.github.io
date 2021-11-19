@@ -3128,7 +3128,7 @@ It is generally safer to use the "disabled" variant as the default since it make
 <div class="sect2">
 <h3 id="_output_language_options"><a class="anchor" href="#_output_language_options"></a><a class="link" href="#_output_language_options">6.7. Output Language Options</a></h3>
 <div class="paragraph">
-<p>By default the generated JS output will be compatible with ES5 and all "newer" features will be transpiled to compatible code using polyfills. This is currently the safest default and supports most browsers in active use (including IE10+).</p>
+<p>By default the generated JS output will be compatible with ES6 and all "newer" features will be transpiled to compatible code using polyfills. This is currently the safest default and supports most browsers in active use (including IE10+).</p>
 </div>
 <div class="paragraph">
 <p>You can select other output options if you only care about more modern environments and want to keep the original code without replacements (eg. <code>node</code>, Chrome Extensions, &#8230;&#8203;)</p>
@@ -5033,16 +5033,13 @@ In general you will need a config that looks like this:</p>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
- <span class="symbol">:builds</span> {<span class="symbol">:test</span>     {<span class="symbol">:target</span>    <span class="symbol">:browser-test</span>
-                     <span class="symbol">:test-dir</span>  <span class="string"><span class="delimiter">&quot;</span><span class="content">resources/public/js/test</span><span class="delimiter">&quot;</span></span>
-                     <span class="symbol">:ns-regexp</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">-spec$</span><span class="delimiter">&quot;</span></span>
-                     <span class="symbol">:runner-ns</span> tests.client-test-main
-                     <span class="symbol">:devtools</span>  {<span class="symbol">:http-port</span>          <span class="integer">8021</span>
-                                 <span class="symbol">:http-root</span>          <span class="string"><span class="delimiter">&quot;</span><span class="content">resources/public/js/test</span><span class="delimiter">&quot;</span></span>}}</code></pre>
+ <span class="comment">;; tests are served via http://localhost:8021</span>
+ <span class="symbol">:dev-http</span> {<span class="integer">8021</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">out/test</span><span class="delimiter">&quot;</span></span>}
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:test</span>
+  {<span class="symbol">:target</span> <span class="symbol">:browser-test</span>
+   <span class="symbol">:test-dir</span>  <span class="string"><span class="delimiter">&quot;</span><span class="content">out/test</span><span class="delimiter">&quot;</span></span>}}}</code></pre>
 </div>
-</div>
-<div class="paragraph">
-<p>Remember that the test directory will have the index.html, and a js folder.</p>
 </div>
 <div class="paragraph">
 <p>If you choose to supply a custom <code>:runner-ns</code>, it might look like this:</p>
@@ -5061,6 +5058,9 @@ In general you will need a config that looks like this:</p>
 (<span class="keyword">defn</span> ^<span class="symbol">:export</span> init []
   (start))</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>Then in the build config add <code>:runner-ns tests.client-test-main</code>.</p>
 </div>
 <div class="paragraph">
 <p>It just has <code>init</code>, <code>start</code>, <code>stop</code> methods. <code>init</code> will be called once on startup, <code>stop</code> will be called before any code is reloaded and <code>start</code> will be called after all code was reloaded.</p>
@@ -5094,6 +5094,9 @@ not be overwritten.</p>
 auto-generated.</p>
 </li>
 </ul>
+</div>
+<div class="paragraph">
+<p>Any webserver is fine, <a href="#dev-http">:dev-http</a> is just a convenient option.</p>
 </div>
 </div>
 </div>

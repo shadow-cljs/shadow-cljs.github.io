@@ -446,7 +446,7 @@ A set of possible warning-type keywords can be found https://github.com/clojure/
 
 == Output Language Options
 
-By default the generated JS output will be compatible with ES5 and all "newer" features will be transpiled to compatible code using polyfills. This is currently the safest default and supports most browsers in active use (including IE10+).
+By default the generated JS output will be compatible with ES6 and all "newer" features will be transpiled to compatible code using polyfills. This is currently the safest default and supports most browsers in active use (including IE10+).
 
 You can select other output options if you only care about more modern environments and want to keep the original code without replacements (eg. `node`, Chrome Extensions, ...)
 
