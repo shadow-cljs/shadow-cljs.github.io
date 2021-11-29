@@ -6764,7 +6764,7 @@ Press ENTER <span class="keyword">or</span> <span class="keyword">type</span> co
 <div class="sect3">
 <h4 id="_project_clj_leiningen"><a class="anchor" href="#_project_clj_leiningen"></a><a class="link" href="#_project_clj_leiningen">15.1.2. project.clj / Leiningen</a></h4>
 <div class="paragraph">
-<p>When using <code>project.clj</code> to manage you dependencies you&#8217;ll need to specify your configured <code>:lein</code> profiles from <code>shadow-cljs.edn</code> when using <code>lein</code> directly to diagnose the problem. For example <code>:lein {:profiles "+cljs"}</code> would require <code>lein with-profiles +cljs</code> for every command.</p>
+<p>When using <code>project.clj</code> to manage you dependencies you&#8217;ll need to specify your configured <code>:lein</code> profiles from <code>shadow-cljs.edn</code> when using <code>lein</code> directly to diagnose the problem. For example <code>:lein {:profile "+cljs"}</code> would require <code>lein with-profile +cljs</code> for every command.</p>
 </div>
 <div class="listingblock">
 <div class="title">Example listing of deps</div>
@@ -6773,7 +6773,7 @@ Press ENTER <span class="keyword">or</span> <span class="keyword">type</span> co
 $ lein deps <span class="symbol">:tree</span>
 
 <span class="error">#</span> with profile
-$ lein with-profiles +cljs deps <span class="symbol">:tree</span></code></pre>
+$ lein with-profile +cljs deps <span class="symbol">:tree</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
