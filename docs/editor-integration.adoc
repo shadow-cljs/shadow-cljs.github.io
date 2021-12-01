@@ -78,6 +78,14 @@ You can simplify startup flow by a creating a `.dir-locals.el` file at project r
 	 (cider-shadow-default-options . "<your-build-name-here>"))))
 ```
 
+Or, when watching several builds:
+
+```
+((nil . ((cider-default-cljs-repl . shadow)
+         (cider-shadow-default-options . "<your-build-name-here>")
+         (cider-shadow-watched-builds . ("<first-build>" "<other-build>")))))
+```
+
 == Proto REPL (Atom)
 
 Proto REPL is mostly intended for Clojure development so most features do not work for ClojureScript. It is however possible to use it for simple evals.
