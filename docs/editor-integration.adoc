@@ -86,6 +86,8 @@ Or, when watching several builds:
          (cider-shadow-watched-builds . ("<first-build>" "<other-build>")))))
 ```
 
+Read about Emacs and shadow-cljs, using the `.dir-locals.el` file at the https://docs.cider.mx/cider/1.1/cljs/shadow-cljs.html[Cider docs]
+
 == Proto REPL (Atom)
 
 Proto REPL is mostly intended for Clojure development so most features do not work for ClojureScript. It is however possible to use it for simple evals.
