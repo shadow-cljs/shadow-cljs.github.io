@@ -36,7 +36,7 @@ https://expo.io/[expo] makes working with `react-native` quite easy. There are t
 - https://github.com/thheller/fulcro-expo
 - https://github.com/thheller/reagent-expo
 
-Both examples where generated using `expo init ...` and the only adjusted change in the config was adding the proper `entryPoint` to the generated `app.json`.
+Both examples were generated using `expo init ...` and the only adjusted change in the config was adding the proper `entryPoint` to the generated `app.json`.
 
 ```
 {
