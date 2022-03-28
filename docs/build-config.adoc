@@ -593,7 +593,7 @@ IMPORTANT: If you specify multiple build ids the data will be merged into all sp
 
 == Using Environment Variables [[shadow-env]]
 
-It is possible to use environment variables to set configuration values in `shadow-cljs.edn` but you should consider using `--config-merge` instead. If you really must use an environment variable you can do so via the `#shadow/env "FOO"` reader tag. You can also use the shorter `#env`.
+It is possible to use environment variables to set configuration values in `shadow-cljs.edn` but you should consider using `--config-merge` instead. If you really must use an environment variable you can do so via the `#shadow/env "APP_URL"` reader tag. You can also use the shorter `#env`. This will update a symbol defined in your app via `(goog-define URL "")` with the value of the environment variable.
 
 .Example `shadow-cljs.edn` config
 ```
