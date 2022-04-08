@@ -21,7 +21,7 @@ You will need the same basic <<config,main configuration>> as in other targets (
    :output-dir "app"}}}
 ```
 
-When compiled this results in a `app/index.js` file intended to be used as an entry point for the `react-native` tools. During development the `:output-dir` will contain many more files but you should only reference the generated `app/index.js` directly. A `release` build will only generated the optimized `app/index.js` and requires no additional files.
+When compiled this results in a `app/index.js` file intended to be used as an entry point for the `react-native` tools. During development the `:output-dir` will contain many more files but you should only reference the generated `app/index.js` directly. A `release` build will only generate the optimized `app/index.js` and requires no additional files.
 
 == React Native
 
