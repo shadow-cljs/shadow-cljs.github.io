@@ -24,7 +24,7 @@ Assuming you are already using the recommended project structure where all your 
   :dependencies
   ;; always use "provided" for Clojure(Script)
   [[org.clojure/clojurescript "1.10.520" :scope "provided"]
-   [some.other/library "1.0.0"]
+   [some.other/library "1.0.0"]]
 
   :source-paths
   ["src/main"])
