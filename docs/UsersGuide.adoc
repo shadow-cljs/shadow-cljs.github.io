@@ -543,6 +543,10 @@ include::build-config.adoc[]
 
 include::target-browser.adoc[]
 
+= Targeting JavaScript Modules [[target-esm]]
+
+include::target-esm.adoc[]
+
 = Targeting React Native [[target-react-native]]
 
 include::target-react-native.adoc[]
