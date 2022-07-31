@@ -773,6 +773,7 @@ table.CodeRay td.code>pre{padding:0}
 <ul class="sectlevel3">
 <li><a href="#_launch_the_clojurescript_repl">14.2.1. Launch the ClojureScript REPL</a></li>
 <li><a href="#_simplify_startup_with_dir_local">14.2.2. Simplify startup with dir-local</a></li>
+<li><a href="#_using_deps_edn_with_custom_repl_intialization">14.2.3. Using deps.edn with custom repl intialization.</a></li>
 </ul>
 </li>
 <li><a href="#_proto_repl_atom">14.3. Proto REPL (Atom)</a></li>
@@ -922,7 +923,7 @@ When a filename exists multiple times on the classpath then only the first one i
 </table>
 </div>
 <div class="paragraph">
-<p>It is therefore recommended to be very disciplined about the names you choose and properly namespacing everything. It may seem repetitive to always use <code>(ns your-company.components.foo)</code> over <code>(ns components.foo)</code> but it will save you from lot of headaches later on.</p>
+<p>It is therefore recommended to be very disciplined about the names you choose and about properly namespacing everything. It may seem repetitive to always use <code>(ns your-company.components.foo)</code> over <code>(ns components.foo)</code> but it will save you from lot of headaches later on.</p>
 </div>
 <div class="paragraph">
 <p>This is unlike <code>npm</code> where the package name itself is never used inside the package itself and only relative paths are used.</p>
@@ -2258,7 +2259,7 @@ The server automatically supports HTTP/2 when using <code>:ssl</code>.
 <dt class="hdlist1"><code>:handler</code></dt>
 <dd>
 <p>Optional. A fully qualified symbol. A <code>(defn handler [req] resp)</code> that is used
-if a resource is not found for the given request. Defaults to <code>shadow.http.push-state/handle</code>.</p>
+if a resource is not found for the given request. Defaults to <code>shadow.http.push-state/handle</code> (this handler will only respond to requests with <code>Accept: text/html</code> header.)</p>
 </dd>
 </dl>
 </div>
@@ -4817,6 +4818,14 @@ create-react-app, &#8230;&#8203;) with little configuration.</p>
 <p>(required) A vector of namespace symbols that should be compiled</p>
 </td>
 </tr>
+<tr>
+<td class="hdlist1">
+<code>:ns-regexp</code>
+</td>
+<td class="hdlist2">
+<p>(optional) A regular expression matching namespaces against project files. This only scans files, and will not scan jars.</p>
+</td>
+</tr>
 </table>
 </div>
 <div class="listingblock">
@@ -6178,14 +6187,14 @@ Externs are only required for <code>:advanced</code>, they are not required in <
 <div class="title">Important</div>
 </td>
 <td class="content">
-Don&#8217;t annotate everything with <code>^js</code>. Sometimes you may be doing interop on CLJS or ClosureJS objects. Those do not require externs. If you are certain you are working with a CLJS Object prefer using the <code>^clj</code> hint.
- It is not the end of the world when using <code>^js</code> incorrectly but it may affect some optimizations when a variable is not renamed when it could be.
+Don&#8217;t annotate everything with <code>^js</code>. Sometimes you may be doing interop on CLJS or ClosureJS objects. Those do not require externs. If you are certain you are working with a CLJS object use the <code>^clj</code> hint instead.
+ It is not the end of the world to use <code>^js</code> incorrectly but it may affect some optimizations when a variable is not renamed when it could be.
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>Calls on globals do not require a typehint when using direct <code>js/</code> calls.</p>
+<p>Calling a global using <code>js/</code> does not require a typehint.</p>
 </div>
 <div class="listingblock">
 <div class="title">No hint required, externs inferred automatically</div>
@@ -6517,9 +6526,63 @@ cljs.repl&gt;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">((<span class="predefined-constant">nil</span> <span class="keyword">.</span> ((cider-default-cljs-repl <span class="keyword">.</span> shadow)
-         (cider-shadow-default-options <span class="keyword">.</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">&lt;your-build-name-here&gt;</span><span class="delimiter">&quot;</span></span>))))</code></pre>
+<pre class="CodeRay highlight"><code data-lang="elisp">((nil . ((cider-default-cljs-repl . shadow)
+         (cider-shadow-default-options . &quot;&lt;your-build-name-here&gt;&quot;))))</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>Or, when watching several builds:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="elisp">((nil . ((cider-default-cljs-repl . shadow)
+         (cider-shadow-default-options . &quot;&lt;your-build-name-here&gt;&quot;)
+         (cider-shadow-watched-builds . (&quot;&lt;first-build&gt;&quot; &quot;&lt;other-build&gt;&quot;)))))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Read about Emacs and shadow-cljs, using the <code>.dir-locals.el</code> file at the <a href="https://docs.cider.mx/cider/1.1/cljs/shadow-cljs.html">Cider docs</a></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_using_deps_edn_with_custom_repl_intialization"><a class="anchor" href="#_using_deps_edn_with_custom_repl_intialization"></a><a class="link" href="#_using_deps_edn_with_custom_repl_intialization">14.2.3. Using deps.edn with custom repl intialization.</a></h4>
+<div class="paragraph">
+<p>In case you want to manage your dependencies via <a href="https://clojure.org/guides/deps_and_cli">deps.edn</a>, you can use
+custom cljs-repl init form. Create a <code>:dev</code> alias with an extra source path of "dev" and add the following
+namespace</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clj">(ns user
+  (:require [shadow.cljs.devtools.api :as shadow]
+            [shadow.cljs.devtools.server :as server]))
+
+(defn cljs-repl
+  &quot;Connects to a given build-id. Defaults to `:app`.&quot;
+  ([]
+   (cljs-repl :app))
+  ([build-id]
+   (server/start!)
+   (shadow/watch build-id)
+   (shadow/nrepl-select build-id)))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Supposing your build-id is <code>:app</code>, add the following to your <code>.dir-locals.el</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="elisp">((nil . ((cider-clojure-cli-global-options . &quot;-A:dev&quot;)
+         (cider-preferred-build-tool       . clojure-cli)
+         (cider-default-cljs-repl          . custom)
+         (cider-custom-cljs-repl-init-form . &quot;(do (user/cljs-repl))&quot;)
+         (eval . (progn
+                   (make-variable-buffer-local 'cider-jack-in-nrepl-middlewares)
+                   (add-to-list 'cider-jack-in-nrepl-middlewares &quot;shadow.cljs.devtools.server.nrepl/middleware&quot;))))))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>cider-jack-in-cljs</code> should then work out of the box.</p>
 </div>
 </div>
 </div>
@@ -6978,7 +7041,7 @@ This does not mean that you have to use Leiningen during development of the libr
   <span class="symbol">:dependencies</span>
   <span class="comment">;; always use &quot;provided&quot; for Clojure(Script)</span>
   [[org.clojure/clojurescript <span class="string"><span class="delimiter">&quot;</span><span class="content">1.10.520</span><span class="delimiter">&quot;</span></span> <span class="symbol">:scope</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">provided</span><span class="delimiter">&quot;</span></span>]
-   [some.other/library <span class="string"><span class="delimiter">&quot;</span><span class="content">1.0.0</span><span class="delimiter">&quot;</span></span>]
+   [some.other/library <span class="string"><span class="delimiter">&quot;</span><span class="content">1.0.0</span><span class="delimiter">&quot;</span></span>]]
 
   <span class="symbol">:source-paths</span>
   [<span class="string"><span class="delimiter">&quot;</span><span class="content">src/main</span><span class="delimiter">&quot;</span></span>])</code></pre>
@@ -7081,7 +7144,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2020-08-10 17:45:17 CEST
+Last updated 2022-07-31 10:13:27 CEST
 </div>
 </div>
 </body>
