@@ -133,11 +133,11 @@ It can get tedious to annotate every single interop call so you can annotate the
   (.baz x))
 ```
 
-IMPORTANT: Don't annotate everything with `^js`. Sometimes you may be doing interop on CLJS or ClosureJS objects. Those do not require externs. If you are certain you are working with a CLJS Object prefer using the `^clj` hint.
- It is not the end of the world when using `^js` incorrectly but it may affect some optimizations when a variable is not renamed when it could be.
+IMPORTANT: Don't annotate everything with `^js`. Sometimes you may be doing interop on CLJS or ClosureJS objects. Those do not require externs. If you are certain you are working with a CLJS object use the `^clj` hint instead.
+ It is not the end of the world to use `^js` incorrectly but it may affect some optimizations when a variable is not renamed when it could be.
 
 
-Calls on globals do not require a typehint when using direct `js/` calls.
+Calling a global using `js/` does not require a typehint.
 
 .No hint required, externs inferred automatically
 ```
