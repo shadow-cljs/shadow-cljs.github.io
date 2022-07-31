@@ -48,7 +48,7 @@ In the Clojure(Script) everything is namespaced and each name is expected to res
 
 IMPORTANT: When a filename exists multiple times on the classpath then only the first one is used. Everything on the JVM and Clojure(Script) is namespaced to avoid such conflicts. Very similar to `npm` where each package must have a unique name.
 
-It is therefore recommended to be very disciplined about the names you choose and properly namespacing everything. It may seem repetitive to always use `(ns your-company.components.foo)` over `(ns components.foo)` but it will save you from lot of headaches later on.
+It is therefore recommended to be very disciplined about the names you choose and about properly namespacing everything. It may seem repetitive to always use `(ns your-company.components.foo)` over `(ns components.foo)` but it will save you from lot of headaches later on.
 
 This is unlike `npm` where the package name itself is never used inside the package itself and only relative paths are used.
 
