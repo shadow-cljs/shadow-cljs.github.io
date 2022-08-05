@@ -100,9 +100,9 @@ Code examples may be similarly shortened.
 
 You will need:
 
-- https://nodejs.org[`node.js`] (v6.0.0+, most recent version preferred)
-- https://www.npmjs.com[`npm`] or https://www.yarnpkg.com[`yarn`]
-- Any Java SDK (Version 8 or higher). http://openjdk.java.net/install/[OpenJDK] or http://www.oracle.com/technetwork/java/javase/downloads/index.html[Oracle]
+- https://nodejs.org[node.js] (v6.0.0+, most recent version preferred)
+- https://www.npmjs.com[npm] (comes with `node` by default) or https://www.yarnpkg.com[yarn]
+- Any Java SDK (Version 11 or higher, LTS release recommended). https://adoptium.net/
 
 In your project directory you'll need a `package.json`. If you do not have one yet you can create one by running `npm init -y`. If you don't have a project directory yet consider creating it by running
 ```
@@ -123,7 +123,7 @@ $ npm install --save-dev shadow-cljs
 $ yarn add --dev shadow-cljs
 ```
 
-For convenience you can run `npm install -g shadow-cljs` or `yarn global add shadow-cljs`. This will let you run the `shadow-cljs` command directly later. There should always be a shadow-cljs version installed in your project, the global install is optional.
+For convenience, you can run `npm install -g shadow-cljs` or `yarn global add shadow-cljs`. This will let you run the `shadow-cljs` command directly later. There should always be a shadow-cljs version installed in your project, the global install is optional.
 
 == Library
 
