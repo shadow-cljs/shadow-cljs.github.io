@@ -28,7 +28,8 @@ In general you will need a config that looks like this:
 If you choose to supply a custom `:runner-ns`, it might look like this:
 
 ```
-(ns tests.client-test-main)
+(ns tests.client-test-main
+  {:dev/always true})
 
 (defn start []
   ... run the tests...)
