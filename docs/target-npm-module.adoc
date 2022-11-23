@@ -17,7 +17,7 @@ create-react-app, ...) with little configuration.
 
 If you use the default `:output-dir` of `"node_modules/shadow-cljs"` you can access the declared namespaces by using `require("shadow-cljs/demo.foo")` in JS. When using something not in `node_modules` you must include them using a relative path. With `:output-dir "out"` that would be `require("./out/demo.foo")` from your project root.
 
-If you plan to distribute code on NPM, then you may want to use the <<NodeLibrary, `:node-library` target>> instead since it allows for a finer level of control over exports and optimization.
+If you plan to distribute code on NPM, then you may want to use the <<target-node-library, `:node-library` target>> instead since it allows for a finer level of control over exports and optimization.
 
 == Working with Optimizations
 
