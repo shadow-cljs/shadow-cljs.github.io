@@ -6,7 +6,7 @@ can add the appropriate wrappers around your tests so they will work in it.
 === Installing Karma
 
 See their http://karma-runner.github.io[website] for full instructions. You'll typically need
-something like this is your `package.json`:
+something like this in your `package.json`:
 
 ```json
 {
