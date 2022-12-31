@@ -99,7 +99,7 @@ import defaultExport, * as name from "module-name";
 ```clojure
 (:require
   ["module-name" :as name]
-  ["module-name$export" :as defaultExport])
+  ["module-name$default" :as defaultExport])
 ```
 
 .Example Module Import without use (including a Module for side-effects only)
