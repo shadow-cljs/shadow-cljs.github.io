@@ -23,7 +23,7 @@ Generally if you want to be sure you can just declare the matching dependency ve
 
 `shadow-cljs` is very often several versions ahead on the `com.google.javascript/closure-compiler-unshaded` version it uses, so if you are depending on the version `org.clojure/clojurescript` normally supplies that might cause issues. Make sure the `thheller/shadow-cljs` version is picked over the version preferred by `org.clojure/clojurescript`.
 
-If you want to make your live easier just use `shadow-cljs.edn` to manage your dependencies if you can. It is much less likely to have these problems or will at least warn you directly.
+If you want to make your life easier just use `shadow-cljs.edn` to manage your dependencies if you can. It is much less likely to have these problems or will at least warn you directly.
 
 If you have ensured that you are getting all the correct versions but things still go wrong please open a https://github.com/thheller/shadow-cljs/issues[Github Issue] with a full problem description including your full dependency list.
 

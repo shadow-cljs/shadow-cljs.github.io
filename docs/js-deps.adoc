@@ -425,7 +425,7 @@ function myComponent() {
 export { myComponent };
 ```
 
-We run https://babeljs.io/docs/usage/cli/[babel] to convert the files and write them to the configured `src/gen` directory. Which directory you use it up to you. I prefer `src/gen` for generated files.
+We run https://babeljs.io/docs/usage/cli/[babel] to convert the files and write them to the configured `src/gen` directory. Which directory you use is up to you. I prefer `src/gen` for generated files.
 
 ```bash
 $ babel src/js --out-dir src/gen
