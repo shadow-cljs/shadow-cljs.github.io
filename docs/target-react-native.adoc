@@ -64,3 +64,7 @@ Both examples were generated using `expo init ...` and the only adjusted change 
 ```
 
 `init` is called once on startup. Since the example doesn't need to do any special setup it just calls `start` directly. `start` will be called repeatedly when `watch` is running each time after the code changes were reloaded. The `reagent.core/as-element` function can be used to generate the required React Element from the reagent hiccup markup.
+
+== Hot Code Reload
+
+React native requires to reload not only compiled files and files explicitly requiring those, but also their transitive dependents, for changes to take effect. To accomplish this, use `:reload-strategy` option as in <<reload-strategy, Hot Reload of Transitive Dependents>>.

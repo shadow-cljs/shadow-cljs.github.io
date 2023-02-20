@@ -109,6 +109,23 @@ In order to use it you simply run:
 shadow-cljs watch build-id
 ```
 
+==== Hot Reload of Transitive Dependents [[reload-strategy]]
+
+By default compiled files and files explicitly requiring those are reloaded. This approach may not be sufficient eg.
+during development for `:react-native` target. To reload also all transitive dependents, use `:reload-strategy`
+option with value `:full` as follows:
+
+```
+{...
+ :builds
+ {:app {:target :react-native
+                :init-fn      some.app/init
+                :output-dir "app"
+                ...
+                :devtools     {:autoload true
+                               :reload-strategy :full}}}}
+```
+
 === Lifecycle Hooks
 
 You can configure the compiler to run functions just before hot code reload brings in updated code, and just after. These are useful for stopping/starting things that would otherwise close over old code.
