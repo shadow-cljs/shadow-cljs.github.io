@@ -3717,7 +3717,7 @@ to find everything needed to actually compile and include in the output. Namespa
 </ul>
 </div>
 <div class="paragraph">
-<p>One good configuration for this would be to have one common module that is shared between all the pages. Then one for each page.</p>
+<p>One possible configuration for this would be to have one common module that is shared between all the pages. Then one for each page.</p>
 </div>
 <div class="listingblock">
 <div class="title">Example config with multiple <code>:modules</code></div>
@@ -3787,10 +3787,72 @@ The <code>.js</code> files must be included in the correct order. The <a href="#
 <div class="sect3">
 <h4 id="_loading_code_dynamically"><a class="anchor" href="#_loading_code_dynamically"></a><a class="link" href="#_loading_code_dynamically">7.3.1. Loading code dynamically</a></h4>
 <div class="paragraph">
-<p>These days Single-Page-Apps (SPA) are becoming more popular and they work similarly only that instead of letting the Server decide which JS to include to Client does it by itself.</p>
+<p>The more dynamic your website gets, the more dynamic your requirements may get. The server may not always know what the client may end up needing. Therefore, it is possible to have the client load code dynamically when needed.</p>
+</div>
+<div class="paragraph">
+<p>There are a couple ways of loading code dynamically. <code>shadow.lazy</code> is the most convenient and easiest.</p>
+</div>
+<div class="sect4">
+<h5 id="_using_shadow_lazy"><a class="anchor" href="#_using_shadow_lazy"></a><a class="link" href="#_using_shadow_lazy">Using shadow.lazy</a></h5>
+<div class="paragraph">
+<p>As <a href="https://clojureverse.org/t/shadow-lazy-convenience-wrapper-for-shadow-loader-cljs-loader/3841">announced here</a> shadow-cljs provides a convenience method for referring to potentially lazy loaded code.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">demo.app</span>
+  (<span class="symbol">:require</span>
+    [shadow.lazy <span class="symbol">:as</span> lazy]
+    [shadow.cljs.modern <span class="symbol">:refer</span> (js-await)]))
+
+(<span class="keyword">def</span> <span class="function">x-lazy</span> (lazy/loadable demo.thing/x))
+
+(<span class="keyword">defn</span> <span class="function">on-event</span> [e]
+  (js-await [x (lazy/load x-lazy)]
+    (x e)))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s assume that the <code>on-event</code> function above is called when something in your app happens, for example when the user clicked a button. The <code>lazy/loadable</code> configured what that thing will be. The <code>lazy/load</code> will actually load it. This may require an async network hop, so it will go async at this point. In the body of the <code>js-await</code> above <code>x</code> will be whatever <code>demo.thing/x</code> was at the time of loading it.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">demo.thing</span>)
+(<span class="keyword">defn</span> <span class="function">x</span> [e]
+  <span class="string"><span class="delimiter">&quot;</span><span class="content">hello world</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this case it would be the function, which we can call directly.</p>
+</div>
+<div class="paragraph">
+<p>You do not need to worry about specifying which module this code ended up in. The compiler will figure that out during compilation. The <code>loadable</code> macro also allows more complex references.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">def</span> <span class="function">xy</span> (lazy/loadable [demo.thing/x demo.other/y]))
+
+(<span class="keyword">def</span> <span class="function">xym</span> (lazy/loadable {<span class="symbol">:x</span> demo.thing/x
+                         <span class="symbol">:y</span> demo.other/y}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you load <code>xy</code> the result will be a vector with two things. If you load <code>xym</code> it&#8217;ll be a map. You may include vars that span multiple modules that way. The loader will ensure all modules are loaded before continuing.</p>
+</div>
 </div>
 <div class="sect4">
 <h5 id="_using_shadow_cljs_s_built_in_loader_support"><a class="anchor" href="#_using_shadow_cljs_s_built_in_loader_support"></a><a class="link" href="#_using_shadow_cljs_s_built_in_loader_support">Using shadow-cljs&#8217;s built-in Loader Support</a></h5>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+This is the low level version, which the above is built upoin. Use it if you want to build your own abstraction for async loading. The above is much more convenient to use.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>The compiler supports generating the required data for using the <code>shadow.loader</code> utility namespace. It exposes a simple interface to let you load modules on-demand at runtime.</p>
 </div>
@@ -3798,7 +3860,7 @@ The <code>.js</code> files must be included in the correct order. The <a href="#
 <p>You only need to add <code>:module-loader true</code> to your build config. The loader will always be injected into the default module (the one everything else depends on).</p>
 </div>
 <div class="paragraph">
-<p>At runtime you may use the <code>shadow.loader</code> namespace to load modules. You may also load a module eagerly by just using a <code>&lt;script&gt;</code> tag in your page.</p>
+<p>At runtime you may use the <code>shadow.loader</code> namespace to load modules. You may also still load a module eagerly by just using a <code>&lt;script&gt;</code> tag in your page.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -3855,6 +3917,9 @@ The <code>.js</code> files must be included in the correct order. The <a href="#
 <div class="paragraph">
 <p>You can check if a module is loaded using <code>(loaded? "module-name")</code>.</p>
 </div>
+<div class="paragraph">
+<p>You can read more about a more practical example in this blog post about <a href="https://code.thheller.com/blog/shadow-cljs/2019/03/03/code-splitting-clojurescript.html"> Code-Splitting ClojureScript</a>. This is only a basic overview.</p>
+</div>
 <div class="sect5">
 <h6 id="_loader_costs"><a class="anchor" href="#_loader_costs"></a><a class="link" href="#_loader_costs">Loader Costs</a></h6>
 <div class="paragraph">
@@ -3865,15 +3930,10 @@ The <code>.js</code> files must be included in the correct order. The <a href="#
 <div class="sect4">
 <h5 id="_using_the_standard_clojurescript_api"><a class="anchor" href="#_using_the_standard_clojurescript_api"></a><a class="link" href="#_using_the_standard_clojurescript_api">Using the Standard ClojureScript API</a></h5>
 <div class="paragraph">
-<p>The generated code is capable of using the standard ClojureScript <code>cljs.loader</code> API. See the
-<a href="https://clojurescript.org/news/2017-07-10-code-splitting">documentation</a> on the ClojureScript
-website for instructions.</p>
+<p>The generated code is capable of using the standard ClojureScript <code>cljs.loader</code> API. See the <a href="https://clojurescript.org/news/2017-07-10-code-splitting">documentation</a> on the ClojureScript website for instructions.</p>
 </div>
 <div class="paragraph">
-<p>The advantage of using the standard API is that your code will play well with others. This
-may be of particular importance to library authors. The disadvantage is that the dynamic module
-loading API in the standard distribution is currently somewhat less easy-to-use than the
-support in <code>shadow-cljs</code>.</p>
+<p>The advantage of using the standard API is that your code will play well with others. This may be of particular importance to library authors. The disadvantage is that the dynamic module loading API in the standard distribution is currently somewhat less easy-to-use than the support in <code>shadow-cljs</code>.</p>
 </div>
 </div>
 </div>

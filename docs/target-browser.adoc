@@ -102,7 +102,7 @@ Say you have a traditional website with actual different pages.
 - `www.acme.com/login` - serving the login form
 - `www.acme.com/protected` - protected section that is only available once the user is logged in
 
-One good configuration for this would be to have one common module that is shared between all the pages. Then one for each page.
+One possible configuration for this would be to have one common module that is shared between all the pages. Then one for each page.
 
 .Example config with multiple `:modules`
 ```clojure
@@ -147,15 +147,57 @@ IMPORTANT: The `.js` files must be included in the correct order. The <<BrowserM
 
 === Loading code dynamically
 
-These days Single-Page-Apps (SPA) are becoming more popular and they work similarly only that instead of letting the Server decide which JS to include to Client does it by itself.
+The more dynamic your website gets, the more dynamic your requirements may get. The server may not always know what the client may end up needing. Therefore, it is possible to have the client load code dynamically when needed.
+
+There are a couple ways of loading code dynamically. `shadow.lazy` is the most convenient and easiest.
+
+==== Using shadow.lazy
+
+As https://clojureverse.org/t/shadow-lazy-convenience-wrapper-for-shadow-loader-cljs-loader/3841[announced here] shadow-cljs provides a convenience method for referring to potentially lazy loaded code.
+
+```clojure
+(ns demo.app
+  (:require
+    [shadow.lazy :as lazy]
+    [shadow.cljs.modern :refer (js-await)]))
+
+(def x-lazy (lazy/loadable demo.thing/x))
+
+(defn on-event [e]
+  (js-await [x (lazy/load x-lazy)]
+    (x e)))
+```
+
+Let's assume that the `on-event` function above is called when something in your app happens, for example when the user clicked a button. The `lazy/loadable` configured what that thing will be. The `lazy/load` will actually load it. This may require an async network hop, so it will go async at this point. In the body of the `js-await` above `x` will be whatever `demo.thing/x` was at the time of loading it.
+
+```clojure
+(ns demo.thing)
+(defn x [e]
+  "hello world")
+```
+
+In this case it would be the function, which we can call directly.
+
+You do not need to worry about specifying which module this code ended up in. The compiler will figure that out during compilation. The `loadable` macro also allows more complex references.
+
+```clojure
+(def xy (lazy/loadable [demo.thing/x demo.other/y]))
+
+(def xym (lazy/loadable {:x demo.thing/x
+                         :y demo.other/y}))
+```
+
+If you load `xy` the result will be a vector with two things. If you load `xym` it'll be a map. You may include vars that span multiple modules that way. The loader will ensure all modules are loaded before continuing.
 
 ==== Using shadow-cljs's built-in Loader Support
+
+IMPORTANT: This is the low level version, which the above is built upoin. Use it if you want to build your own abstraction for async loading. The above is much more convenient to use.
 
 The compiler supports generating the required data for using the `shadow.loader` utility namespace. It exposes a simple interface to let you load modules on-demand at runtime.
 
 You only need to add `:module-loader true` to your build config. The loader will always be injected into the default module (the one everything else depends on).
 
-At runtime you may use the `shadow.loader` namespace to load modules. You may also load a module eagerly by just using a `<script>` tag in your page.
+At runtime you may use the `shadow.loader` namespace to load modules. You may also still load a module eagerly by just using a `<script>` tag in your page.
 
 ```
 {...
@@ -204,20 +246,17 @@ Then the following expressions can be used for loading code:
 
 You can check if a module is loaded using `(loaded? "module-name")`.
 
+You can read more about a more practical example in this blog post about https://code.thheller.com/blog/shadow-cljs/2019/03/03/code-splitting-clojurescript.html[ Code-Splitting ClojureScript]. This is only a basic overview.
+
 ===== Loader Costs
 
 Using the loader is very lightweight. It has a few dependencies which you may not be otherwise using. In practice using `:module-loader true` adds about 8KB gzip'd to the default module. This will vary depending on how much of `goog.net` and `goog.events` you are already using, and what level of optimization you use for your release builds.
 
 ==== Using the Standard ClojureScript API
 
-The generated code is capable of using the standard ClojureScript `cljs.loader` API. See the
-https://clojurescript.org/news/2017-07-10-code-splitting[documentation] on the ClojureScript
-website for instructions.
+The generated code is capable of using the standard ClojureScript `cljs.loader` API. See the https://clojurescript.org/news/2017-07-10-code-splitting[documentation] on the ClojureScript website for instructions.
 
-The advantage of using the standard API is that your code will play well with others. This
-may be of particular importance to library authors. The disadvantage is that the dynamic module
-loading API in the standard distribution is currently somewhat less easy-to-use than the
-support in `shadow-cljs`.
+The advantage of using the standard API is that your code will play well with others. This may be of particular importance to library authors. The disadvantage is that the dynamic module loading API in the standard distribution is currently somewhat less easy-to-use than the support in `shadow-cljs`.
 
 == Output Wrapper [[output-wrapper]]
 
