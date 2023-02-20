@@ -691,6 +691,7 @@ table.CodeRay td.code>pre{padding:0}
 <ul class="sectlevel2">
 <li><a href="#_react_native">9.1. React Native</a></li>
 <li><a href="#_expo">9.2. Expo</a></li>
+<li><a href="#_hot_code_reload_2">9.3. Hot Code Reload</a></li>
 </ul>
 </li>
 <li><a href="#target-node">10. Targeting node.js</a>
@@ -2550,6 +2551,37 @@ system includes everything you need to do your hot code reload, without needing 
 <pre class="CodeRay highlight"><code data-lang="clojure">shadow-cljs watch build-id</code></pre>
 </div>
 </div>
+<div class="sect4">
+<h5 id="reload-strategy"><a class="anchor" href="#reload-strategy"></a><a class="link" href="#reload-strategy">Hot Reload of Transitive Dependents</a></h5>
+<div class="paragraph">
+<p>By default, compiled files and files explicitly requiring those are reloaded. This approach may not be sufficient eg. during development for <code>:react-native</code> target. To reload also all transitive dependents, use <code>:reload-strategy</code> option with value <code>:full</code> as follows:</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+This may become slow for larger apps, only use it if you really need it.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
+ <span class="symbol">:builds</span>
+ {<span class="symbol">:app</span>
+  {<span class="symbol">:target</span> <span class="symbol">:react-native</span>
+   <span class="symbol">:init-fn</span> some.app/init
+   <span class="symbol">:output-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">app</span><span class="delimiter">&quot;</span></span>
+   <span class="keyword">..</span><span class="keyword">.</span>
+   <span class="symbol">:devtools</span>
+   {<span class="symbol">:reload-strategy</span> <span class="symbol">:full</span>}}}}</code></pre>
+</div>
+</div>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_lifecycle_hooks"><a class="anchor" href="#_lifecycle_hooks"></a><a class="link" href="#_lifecycle_hooks">6.2.4. Lifecycle Hooks</a></h4>
@@ -2996,7 +3028,7 @@ It is generally safer to use the "disabled" variant as the default since it make
 <p><code>:optimizations</code> supports <code>:advanced</code>, <code>:simple</code> or <code>:whitespace</code>, defaults to <code>:advanced</code>. <code>:none</code> is the default for development and cannot be set manually. <code>release</code> with <code>:none</code> won&#8217;t work.</p>
 </li>
 <li>
-<p><code>:infer-externs</code> <code>:all</code>, <code>:auto</code>, <code>true</code> or <code>false</code>, defaults to <code>true</code></p>
+<p><code>:infer-externs</code> <code>:all</code>, <code>:auto</code>, <code>true</code> or <code>false</code>, defaults to <code>:auto</code></p>
 </li>
 <li>
 <p><code>:static-fns</code> (Boolean) defaults to <code>true</code></p>
@@ -4727,6 +4759,12 @@ The additional target-specific options are:</p>
 <p><code>init</code> is called once on startup. Since the example doesn&#8217;t need to do any special setup it just calls <code>start</code> directly. <code>start</code> will be called repeatedly when <code>watch</code> is running each time after the code changes were reloaded. The <code>reagent.core/as-element</code> function can be used to generate the required React Element from the reagent hiccup markup.</p>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_hot_code_reload_2"><a class="anchor" href="#_hot_code_reload_2"></a><a class="link" href="#_hot_code_reload_2">9.3. Hot Code Reload</a></h3>
+<div class="paragraph">
+<p>React native requires to reload not only compiled files and files explicitly requiring those, but also their transitive dependents, for changes to take effect. To accomplish this, use <code>:reload-strategy</code> option as in <a href="#reload-strategy">Hot Reload of Transitive Dependents</a>.</p>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -5388,16 +5426,25 @@ In general you will need a config that looks like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">tests.client-test-main</span>)
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">tests.client-test-main</span>
+  {<span class="symbol">:dev/always</span> <span class="predefined-constant">true</span>}
+  (<span class="symbol">:require</span> [shadow.test <span class="symbol">:as</span> st]
+            [shadow.test.env <span class="symbol">:as</span> env]
+            [cljs-test-display.core <span class="symbol">:as</span> ctd]
+            [shadow.dom <span class="symbol">:as</span> dom]))
 
 (<span class="keyword">defn</span> <span class="function">start</span> []
-  <span class="keyword">..</span><span class="keyword">.</span> run the tests.<span class="keyword">..</span>)
+  (<span class="keyword">-&gt;</span> (env/get-test-data)
+      (env/reset-test-data!))
+
+  (st/run-all-tests (ctd/init! <span class="string"><span class="delimiter">&quot;</span><span class="content">test-root</span><span class="delimiter">&quot;</span></span>)))
 
 (<span class="keyword">defn</span> <span class="function">stop</span> [done]
   <span class="comment">; tests can be async. You must call done so that the runner knows you actually finished</span>
   (done))
 
 (<span class="keyword">defn</span> ^<span class="symbol">:export</span> init []
+  (dom/append [<span class="symbol">:div#test-root</span>])
   (start))</code></pre>
 </div>
 </div>
@@ -6437,25 +6484,10 @@ Externs are only required for <code>:advanced</code>, they are not required in <
 <div class="sect3">
 <h4 id="infer-externs"><a class="anchor" href="#infer-externs"></a><a class="link" href="#infer-externs">14.2.1. Externs Inference</a></h4>
 <div class="paragraph">
-<p>To help deal with Externs the <code>shadow-cljs</code> compiler provides enhanced externs inference which can be enabled by setting <code>:infer-externs :auto</code> for your build.</p>
-</div>
-<div class="listingblock">
-<div class="title">Example Config</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
- <span class="symbol">:builds</span>
- {<span class="symbol">:app</span>
-  {<span class="symbol">:target</span> <span class="symbol">:browser</span>
-   <span class="keyword">..</span><span class="keyword">.</span>
-   <span class="symbol">:compiler-options</span> {<span class="symbol">:infer-externs</span> <span class="symbol">:auto</span>}
-   }}}}</code></pre>
-</div>
+<p>To help deal with Externs the <code>shadow-cljs</code> compiler provides enhanced externs inference, which is enabled by default. The compiler will perform additional checks at compile time for your files only. It won&#8217;t warn you about possible externs issues in library code.</p>
 </div>
 <div class="paragraph">
-<p>With <code>:auto</code> the compiler will perform additional checks at compile time for your files only. It won&#8217;t warn you about possible externs issues in library code. <code>:all</code> will enable it for everthing but be aware that you may get a lot of warnings.</p>
-</div>
-<div class="paragraph">
-<p>When enabled you&#8217;ll get warnings whenever the Compiler cannot figure out whether you are working with JS or CLJS code.</p>
+<p>You&#8217;ll get warnings whenever the Compiler cannot figure out whether you are working with JS or CLJS code. If you don&#8217;t get any warnings you should be OK.</p>
 </div>
 <div class="listingblock">
 <div class="title">Example Code</div>
@@ -6479,10 +6511,10 @@ Externs are only required for <code>:advanced</code>, they are not required in <
 </div>
 </div>
 <div class="paragraph">
-<p>In <code>:advanced</code> the compiler will be renaming <code>.baz</code> to something "shorter" and Externs inform the Compiler that this is an external property that should not be renamed.</p>
+<p>In <code>:advanced</code> the compiler might be renaming <code>.baz</code> to something "shorter" and Externs inform the Compiler that this is an external property that should not be renamed.</p>
 </div>
 <div class="paragraph">
-<p><code>shadow-cljs</code> can generate the appropriate externs if you add a typehint to the object you are performing native interop on.</p>
+<p>The warning tells you that the compiler did not recognize the property <code>baz</code> in the <code>x</code> binding. <code>shadow-cljs</code> can generate the appropriate externs if you add a typehint to the object you are performing native interop on.</p>
 </div>
 <div class="listingblock">
 <div class="title">Type-hint to help externs generation</div>
@@ -6492,7 +6524,7 @@ Externs are only required for <code>:advanced</code>, they are not required in <
 </div>
 </div>
 <div class="paragraph">
-<p>The <code>^js</code> typehint will cause the compiler to generate proper externs and the warning will go away. The property is now safe from renaming.</p>
+<p>The <code>^js</code> typehint will cause the compiler to generate proper externs and the warning will go away. The property is now safe from renaming. You may either directly tag the interop form, or you may tag the variable name where it is first bound.</p>
 </div>
 <div class="listingblock">
 <div class="title">Multiple interop calls</div>
@@ -6503,7 +6535,7 @@ Externs are only required for <code>:advanced</code>, they are not required in <
 </div>
 </div>
 <div class="paragraph">
-<p>It can get tedious to annotate every single interop call so you can annotate the variable binding itself. It will be used in the entire scope for this variable. Externs for both calls will still be generated.</p>
+<p>It can get tedious to annotate every single interop call, so you can annotate the variable binding itself. It will be used in the entire scope for this variable. Externs for both calls will still be generated. So, instead you do:</p>
 </div>
 <div class="listingblock">
 <div class="title">Annotate <code>x</code> directly</div>
@@ -6521,7 +6553,7 @@ Externs are only required for <code>:advanced</code>, they are not required in <
 </td>
 <td class="content">
 Don&#8217;t annotate everything with <code>^js</code>. Sometimes you may be doing interop on CLJS or ClosureJS objects. Those do not require externs. If you are certain you are working with a CLJS object use the <code>^clj</code> hint instead.
- It is not the end of the world to use <code>^js</code> incorrectly but it may affect some optimizations when a variable is not renamed when it could be.
+ It is not the end of the world to use <code>^js</code> incorrectly, but it may affect some optimizations when a variable is not renamed when it could be.
 </td>
 </tr>
 </table>

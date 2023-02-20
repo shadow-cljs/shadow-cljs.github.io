@@ -111,19 +111,20 @@ shadow-cljs watch build-id
 
 ==== Hot Reload of Transitive Dependents [[reload-strategy]]
 
-By default compiled files and files explicitly requiring those are reloaded. This approach may not be sufficient eg.
-during development for `:react-native` target. To reload also all transitive dependents, use `:reload-strategy`
-option with value `:full` as follows:
+By default, compiled files and files explicitly requiring those are reloaded. This approach may not be sufficient eg. during development for `:react-native` target. To reload also all transitive dependents, use `:reload-strategy` option with value `:full` as follows:
 
-```
+IMPORTANT: This may become slow for larger apps, only use it if you really need it.
+
+```clojure
 {...
  :builds
- {:app {:target :react-native
-                :init-fn      some.app/init
-                :output-dir "app"
-                ...
-                :devtools     {:autoload true
-                               :reload-strategy :full}}}}
+ {:app
+  {:target :react-native
+   :init-fn some.app/init
+   :output-dir "app"
+   ...
+   :devtools
+   {:reload-strategy :full}}}}
 ```
 
 === Lifecycle Hooks
@@ -389,7 +390,7 @@ Most of the standard ClojureScript https://clojurescript.org/reference/compiler-
 Currently supported options include
 
 - `:optimizations` supports `:advanced`, `:simple` or `:whitespace`, defaults to `:advanced`. `:none` is the default for development and cannot be set manually. `release` with `:none` won't work.
-- `:infer-externs` `:all`, `:auto`, `true` or `false`, defaults to `true`
+- `:infer-externs` `:all`, `:auto`, `true` or `false`, defaults to `:auto`
 - `:static-fns` (Boolean) defaults to `true`
 - `:fn-invoke-direct` (Boolean) defaults to `false`
 - `:elide-asserts` (Boolean) default to `false` in development and `true` in `release` builds

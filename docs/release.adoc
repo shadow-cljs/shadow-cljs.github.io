@@ -69,22 +69,9 @@ TIP: Externs are only required for `:advanced`, they are not required in `:simpl
 
 === Externs Inference [[infer-externs]]
 
-To help deal with Externs the `shadow-cljs` compiler provides enhanced externs inference which can be enabled by setting `:infer-externs :auto` for your build.
+To help deal with Externs the `shadow-cljs` compiler provides enhanced externs inference, which is enabled by default. The compiler will perform additional checks at compile time for your files only. It won't warn you about possible externs issues in library code.
 
-.Example Config
-```clojure
-{...
- :builds
- {:app
-  {:target :browser
-   ...
-   :compiler-options {:infer-externs :auto}
-   }}}}
-```
-
-With `:auto` the compiler will perform additional checks at compile time for your files only. It won't warn you about possible externs issues in library code. `:all` will enable it for everthing but be aware that you may get a lot of warnings.
-
-When enabled you'll get warnings whenever the Compiler cannot figure out whether you are working with JS or CLJS code.
+You'll get warnings whenever the Compiler cannot figure out whether you are working with JS or CLJS code. If you don't get any warnings you should be OK.
 
 .Example Code
 ```
@@ -105,9 +92,9 @@ When enabled you'll get warnings whenever the Compiler cannot figure out whether
 --------------------------------------------------------------------------------
 ```
 
-In `:advanced` the compiler will be renaming `.baz` to something "shorter" and Externs inform the Compiler that this is an external property that should not be renamed.
+In `:advanced` the compiler might be renaming `.baz` to something "shorter" and Externs inform the Compiler that this is an external property that should not be renamed.
 
-`shadow-cljs` can generate the appropriate externs if you add a typehint to the object you are performing native interop on.
+The warning tells you that the compiler did not recognize the property `baz` in the `x` binding. `shadow-cljs` can generate the appropriate externs if you add a typehint to the object you are performing native interop on.
 
 .Type-hint to help externs generation
 ```clojure
@@ -115,7 +102,7 @@ In `:advanced` the compiler will be renaming `.baz` to something "shorter" and E
   (.baz ^js x))
 ```
 
-The `^js` typehint will cause the compiler to generate proper externs and the warning will go away. The property is now safe from renaming.
+The `^js` typehint will cause the compiler to generate proper externs and the warning will go away. The property is now safe from renaming. You may either directly tag the interop form, or you may tag the variable name where it is first bound.
 
 .Multiple interop calls
 ```clojure
@@ -124,7 +111,7 @@ The `^js` typehint will cause the compiler to generate proper externs and the wa
   (.baz ^js x))
 ```
 
-It can get tedious to annotate every single interop call so you can annotate the variable binding itself. It will be used in the entire scope for this variable. Externs for both calls will still be generated.
+It can get tedious to annotate every single interop call, so you can annotate the variable binding itself. It will be used in the entire scope for this variable. Externs for both calls will still be generated. So, instead you do:
 
 .Annotate `x` directly
 ```clojure
@@ -134,8 +121,7 @@ It can get tedious to annotate every single interop call so you can annotate the
 ```
 
 IMPORTANT: Don't annotate everything with `^js`. Sometimes you may be doing interop on CLJS or ClosureJS objects. Those do not require externs. If you are certain you are working with a CLJS object use the `^clj` hint instead.
- It is not the end of the world to use `^js` incorrectly but it may affect some optimizations when a variable is not renamed when it could be.
-
+ It is not the end of the world to use `^js` incorrectly, but it may affect some optimizations when a variable is not renamed when it could be.
 
 Calling a global using `js/` does not require a typehint.
 
