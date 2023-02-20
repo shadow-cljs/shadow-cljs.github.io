@@ -28,16 +28,25 @@ In general you will need a config that looks like this:
 If you choose to supply a custom `:runner-ns`, it might look like this:
 
 ```
-(ns tests.client-test-main)
+(ns tests.client-test-main
+  {:dev/always true}
+  (:require [shadow.test :as st]
+            [shadow.test.env :as env]
+            [cljs-test-display.core :as ctd]
+            [shadow.dom :as dom]))
 
 (defn start []
-  ... run the tests...)
+  (-> (env/get-test-data)
+      (env/reset-test-data!))
+
+  (st/run-all-tests (ctd/init! "test-root")))
 
 (defn stop [done]
   ; tests can be async. You must call done so that the runner knows you actually finished
   (done))
 
 (defn ^:export init []
+  (dom/append [:div#test-root])
   (start))
 ```
 
