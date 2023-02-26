@@ -174,34 +174,6 @@ global:SomeGlobalVariable
 
 In this example the compiler will stop renaming `something.foo()`, `something.bar()`.
 
-== Code Stripping
-
-The Closure Compiler supports removing unwanted code by name. This allows removing code that normal dead-code removal can't or won't remove. This is quite dangerous as it can remove code you actually care about but it can remove a lot of dev only code easily. It is grouped into 4 separate options of which pretty much only `:strip-type-prefixes` is relevant to ClojureScript but other may be useful as well.
-
-.Example removing all uses of `cljs.pprint`
-```
-{...
- :builds
- {:app
-  {:target :browser
-   ...
-   :compiler-options {:strip-type-prefixes #{"cljs.pprint"}
-   }}}
-```
-
-Each of these options is specified as a Set of Strings. Please note that all the names specified here are JS names so certain CLJS names must be munged. `my-lib.core` becomes `my_lib.core`.
-
-[Horizontal]
-`:strip-types`:: Allows removing deftype/defrecord declarations or uses. `#{"my.ns.FooBar}` removes `(defrecord FooBar [])`.
-`:strip-type-prefixes`:: Removes everything starting with any of the given Prefixes. Allows removing entire CLJS namespaces.
-`:strip-name-prefixes`:: Allows removing properties by prefix. `#{"log"}` removes `this.logX` or `(defn log-me [...])`
-`:strip-name-suffixes`:: Allows removing properties by suffix. `#{"log"}` removes `this.myLog` or `(defn my-log [...])`
-
-****
-*DANGER: Be careful with these options. They apply to your entire build and may remove code you actually need. You may accidentally remove code in libraries not written by you. Always consider other options before using this.*
-****
-
-
 == Build Report [[build-report]]
 
 `shadow-cljs` can generate a detailed report for your `release` builds which includes a detailed breakdown of the included sources and how much they each contributed to the overall size.
