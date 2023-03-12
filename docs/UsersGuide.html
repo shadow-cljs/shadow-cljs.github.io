@@ -5237,7 +5237,7 @@ create-react-app, &#8230;&#8203;) with little configuration.</p>
 <code>:output-dir</code>
 </td>
 <td class="hdlist2">
-<p>The path for the output files are written to, defaults to <code>node_modules/shadow-cljs</code>.</p>
+<p>(required) The path for the output files are written to</p>
 </td>
 </tr>
 <tr>
@@ -5265,11 +5265,12 @@ create-react-app, &#8230;&#8203;) with little configuration.</p>
  <span class="symbol">:builds</span>
  {<span class="symbol">:code</span>
   {<span class="symbol">:target</span> <span class="symbol">:npm-module</span>
+   <span class="symbol">:output-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">out</span><span class="delimiter">&quot;</span></span>
    <span class="symbol">:entries</span> [demo.foo]}}}</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>If you use the default <code>:output-dir</code> of <code>"node_modules/shadow-cljs"</code> you can access the declared namespaces by using <code>require("shadow-cljs/demo.foo")</code> in JS. When using something not in <code>node_modules</code> you must include them using a relative path. With <code>:output-dir "out"</code> that would be <code>require("./out/demo.foo")</code> from your project root.</p>
+<p>With a JS file sitting in your project root, you may <code>require("./out/demo.foo")</code> to load the CLJS namespace and access it from JS. The JS requires must be the relative path from the JS file location to the CLJS output.</p>
 </div>
 <div class="paragraph">
 <p>If you plan to distribute code on NPM, then you may want to use the <a href="#target-node-library"><code>:node-library</code> target</a> instead since it allows for a finer level of control over exports and optimization.</p>

@@ -2,7 +2,7 @@ There is an additional target that is intended to integrate CLJS into an existin
 create-react-app, ...) with little configuration.
 
 [horizontal]
-`:output-dir`:: The path for the output files are written to, defaults to `node_modules/shadow-cljs`.
+`:output-dir`:: (required) The path for the output files are written to
 `:entries`:: (required) A vector of namespace symbols that should be compiled
 `:ns-regexp`:: (optional) A regular expression matching namespaces against project files. This only scans files, and will not scan jars.
 
@@ -12,10 +12,11 @@ create-react-app, ...) with little configuration.
  :builds
  {:code
   {:target :npm-module
+   :output-dir "out"
    :entries [demo.foo]}}}
 ```
 
-If you use the default `:output-dir` of `"node_modules/shadow-cljs"` you can access the declared namespaces by using `require("shadow-cljs/demo.foo")` in JS. When using something not in `node_modules` you must include them using a relative path. With `:output-dir "out"` that would be `require("./out/demo.foo")` from your project root.
+With a JS file sitting in your project root, you may `require("./out/demo.foo")` to load the CLJS namespace and access it from JS. The JS requires must be the relative path from the JS file location to the CLJS output.
 
 If you plan to distribute code on NPM, then you may want to use the <<target-node-library, `:node-library` target>> instead since it allows for a finer level of control over exports and optimization.
 
