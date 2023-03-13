@@ -30,11 +30,11 @@ Assuming you are already using the recommended project structure where all your 
   ["src/main"])
 ```
 
-This will generate the required `pom.xml` and put all sources from `src/main` into the published `.jar` file. All you need to run is `lein deploy clojars` to publish it. When doing this for the first time you'll first need to setup proper authentication. Please refer to the official  https://github.com/technomancy/leiningen/blob/stable/doc/DEPLOY.md[Leiningen] and https://github.com/clojars/clojars-web/wiki/Tutorial[Clojars] documentation on how to set that up.
+This will generate the required `pom.xml` and put all sources from `src/main` into the published `.jar` file. All you need to run is `lein deploy clojars` to publish it. When doing this for the first time you'll first need to set up proper authentication. Please refer to the official  https://github.com/technomancy/leiningen/blob/stable/doc/DEPLOY.md[Leiningen] and https://github.com/clojars/clojars-web/wiki/Tutorial[Clojars] documentation on how to set that up.
 
 ### Disable JAR Signing
 
-Leiningen defaults to signing libraries via GPG before publishing which is a good default but given that this can be a hassle to setup and not many people are actually verifying the signatures you can disable that step via adding a simple `:repositories` config to the `project.clj`.
+Leiningen defaults to signing libraries via GPG before publishing which is a good default but given that this can be a hassle to set up and not many people are actually verifying the signatures you can disable that step via adding a simple `:repositories` config to the `project.clj`.
 
 ```clojure
 (defproject your.cool/library "1.0.0"
