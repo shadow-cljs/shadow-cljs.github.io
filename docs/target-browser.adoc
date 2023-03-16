@@ -406,7 +406,8 @@ of generating conflicts. I recommend using the full hash.
 Instead of generating `main.js` it will now generate `main.<hash>.js` in the `:output-dir`.
 
 Since the filename can change with every release it gets a little bit more complicated to include them
-in your HTML. The <<BrowserManifest, Output Manifest>> can help with that.
+in your HTML. If you want to accomplish this with a program external to shadow-cljs, you can find programmatic information about filenames in the <<BrowserManifest, Output Manifest>>.
+If you want to accomplish this as part of the build, have a look at <<Build Configuration, Build Hooks>>, and at https://github.com/thheller/shadow-cljs/blob/9a36743674e7bac457c43761c2ef0cce0423862a/src/main/shadow/html.clj#L28-L60[this hook specifically] for inspiration.
 
 == Output Manifest [[BrowserManifest]]
 
