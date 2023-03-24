@@ -671,6 +671,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#hud">7.8.1. Heads-Up Display (HUD)</a></li>
 <li><a href="#_css_reloading">7.8.2. CSS Reloading</a></li>
 <li><a href="#proxy-support">7.8.3. Proxy Support</a></li>
+<li><a href="#js-provider-external">7.8.4. Using External JS Bundlers</a></li>
 </ul>
 </li>
 </ul>
@@ -4383,6 +4384,91 @@ The requests must be forwarded to the main <a href="#http">HTTP server</a>, not 
 </td>
 </tr>
 </table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="js-provider-external"><a class="anchor" href="#js-provider-external"></a><a class="link" href="#js-provider-external">7.8.4. Using External JS Bundlers</a></h4>
+<div class="paragraph">
+<p>Sometimes npm packages you may wish to use may use features that <code>shadow-cljs</code> itself does not support. Some packages are even written with the explicit expectation to be processed by <code>webpack</code>. In these cases it might be simpler to just use <code>webpack</code> (or similar), instead of letting <code>shadow-cljs</code> try to bundle those packages and working arround the issues that may occur.</p>
+</div>
+<div class="paragraph">
+<p><code>shadow-cljs</code> supports an option to let it focus on compiling CLJS code, but let something else process the npm/JS requires. You can do so via <code>:js-provider :external</code>. I wrote more on this subject <a href="https://code.thheller.com/blog/shadow-cljs/2020/05/08/how-about-webpack-now.html#option-2-js-provider-external:">in this blogpost</a>.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+This will limit certain dynamic interaction. Adding new npm requires will require reloading the page, since they can no longer be hot-loaded in by shadow-cljs. Requiring npm packages at the REPL will also be limited to those already provided by the external JS file. Which often is not a big deal, but something to be aware of.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>In your build config you add:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:builds</span>
+ {<span class="symbol">:app</span>
+  {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+   <span class="symbol">:output-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">...</span><span class="delimiter">&quot;</span></span>
+   <span class="symbol">:modules</span> {<span class="symbol">:main</span> {<span class="keyword">..</span><span class="keyword">.</span>}}
+   <span class="symbol">:js-options</span>
+   {<span class="symbol">:js-provider</span> <span class="symbol">:external</span>
+    <span class="symbol">:external-index</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">target/index.js</span><span class="delimiter">&quot;</span></span>}}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>shadow-cljs</code> will then just output all required <code>npm</code> package requires in a format that regular JS tools can understand. You&#8217;ll then need to run <code>webpack</code> (or similar) manually, and include the output of that build separately from the <code>shadow-cljs</code> output.</p>
+</div>
+<div class="paragraph">
+<p>So, instead of just including one <code>script</code> tag in your HTML, you include two.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="html"><span class="tag">&lt;script</span> <span class="attribute-name">defer</span> <span class="attribute-name">src</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">/js/libs.js</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span><span class="tag">&lt;/script&gt;</span>
+<span class="tag">&lt;script</span> <span class="attribute-name">defer</span> <span class="attribute-name">src</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">/js/main.js</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span><span class="tag">&lt;/script&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With <code>libs.js</code> here presuming to be the output of <code>webpack</code>.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Note that <code>webpack</code> (or similar) sometimes output more than one file, so which exactly you need to include may depend on how you built everything. Please consult their documentation for more details. The only important part as far as shadow-cljs is concerned that the external output is loaded before the <code>shadow-cljs</code> output.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_js_tree_shaking"><a class="anchor" href="#_js_tree_shaking"></a><a class="link" href="#_js_tree_shaking">JS Tree Shaking</a></h5>
+<div class="paragraph">
+<p>Tools like <code>webpack</code> can potentially tree-shake npm dependencies to make their build output smaller. For this the <code>:external-index</code> file needs to generate ESM code, instead of the current default CommonJS, i.e. <code>require()</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:builds</span>
+ {<span class="symbol">:app</span>
+  {<span class="symbol">:target</span> <span class="symbol">:browser</span>
+   <span class="symbol">:output-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">...</span><span class="delimiter">&quot;</span></span>
+   <span class="symbol">:modules</span> {<span class="symbol">:main</span> {<span class="keyword">..</span><span class="keyword">.</span>}}
+   <span class="symbol">:js-options</span>
+   {<span class="symbol">:js-provider</span> <span class="symbol">:external</span>
+    <span class="symbol">:external-index</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">target/index.js</span><span class="delimiter">&quot;</span></span>
+    <span class="symbol">:external-index-format</span> <span class="symbol">:esm</span>}}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will only use <code>import</code> in the <code>:external-index</code> file. For <code>release</code> builds this file will list all the referenced imports, for watch/compile it&#8217;ll still reference everything.</p>
+</div>
 </div>
 </div>
 </div>
