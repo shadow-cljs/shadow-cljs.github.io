@@ -671,7 +671,11 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#hud">7.8.1. Heads-Up Display (HUD)</a></li>
 <li><a href="#_css_reloading">7.8.2. CSS Reloading</a></li>
 <li><a href="#proxy-support">7.8.3. Proxy Support</a></li>
-<li><a href="#js-provider-external">7.8.4. Using External JS Bundlers</a></li>
+</ul>
+</li>
+<li><a href="#js-provider-external">7.9. Using External JS Bundlers</a>
+<ul class="sectlevel3">
+<li><a href="#_js_tree_shaking">7.9.1. JS Tree Shaking</a></li>
 </ul>
 </li>
 </ul>
@@ -4386,8 +4390,9 @@ The requests must be forwarded to the main <a href="#http">HTTP server</a>, not 
 </table>
 </div>
 </div>
-<div class="sect3">
-<h4 id="js-provider-external"><a class="anchor" href="#js-provider-external"></a><a class="link" href="#js-provider-external">7.8.4. Using External JS Bundlers</a></h4>
+</div>
+<div class="sect2">
+<h3 id="js-provider-external"><a class="anchor" href="#js-provider-external"></a><a class="link" href="#js-provider-external">7.9. Using External JS Bundlers</a></h3>
 <div class="paragraph">
 <p>Sometimes npm packages you may wish to use may use features that <code>shadow-cljs</code> itself does not support. Some packages are even written with the explicit expectation to be processed by <code>webpack</code>. In these cases it might be simpler to just use <code>webpack</code> (or similar), instead of letting <code>shadow-cljs</code> try to bundle those packages and working arround the issues that may occur.</p>
 </div>
@@ -4448,8 +4453,8 @@ Note that <code>webpack</code> (or similar) sometimes output more than one file,
 </tr>
 </table>
 </div>
-<div class="sect4">
-<h5 id="_js_tree_shaking"><a class="anchor" href="#_js_tree_shaking"></a><a class="link" href="#_js_tree_shaking">JS Tree Shaking</a></h5>
+<div class="sect3">
+<h4 id="_js_tree_shaking"><a class="anchor" href="#_js_tree_shaking"></a><a class="link" href="#_js_tree_shaking">7.9.1. JS Tree Shaking</a></h4>
 <div class="paragraph">
 <p>Tools like <code>webpack</code> can potentially tree-shake npm dependencies to make their build output smaller. For this the <code>:external-index</code> file needs to generate ESM code, instead of the current default CommonJS, i.e. <code>require()</code>.</p>
 </div>
@@ -4468,7 +4473,6 @@ Note that <code>webpack</code> (or similar) sometimes output more than one file,
 </div>
 <div class="paragraph">
 <p>This will only use <code>import</code> in the <code>:external-index</code> file. For <code>release</code> builds this file will list all the referenced imports, for watch/compile it&#8217;ll still reference everything.</p>
-</div>
 </div>
 </div>
 </div>

@@ -600,7 +600,7 @@ The client will make WebSocket request as well as normal XHR requests to load fi
 
 IMPORTANT: The requests must be forwarded to the main <<http, HTTP server>>, not the one configured in the build itself.
 
-=== Using External JS Bundlers [[js-provider-external]]
+== Using External JS Bundlers [[js-provider-external]]
 
 Sometimes npm packages you may wish to use may use features that `shadow-cljs` itself does not support. Some packages are even written with the explicit expectation to be processed by `webpack`. In these cases it might be simpler to just use `webpack` (or similar), instead of letting `shadow-cljs` try to bundle those packages and working arround the issues that may occur.
 
@@ -635,7 +635,7 @@ With `libs.js` here presuming to be the output of `webpack`.
 
 IMPORTANT: Note that `webpack` (or similar) sometimes output more than one file, so which exactly you need to include may depend on how you built everything. Please consult their documentation for more details. The only important part as far as shadow-cljs is concerned that the external output is loaded before the `shadow-cljs` output.
 
-==== JS Tree Shaking
+=== JS Tree Shaking
 
 Tools like `webpack` can potentially tree-shake npm dependencies to make their build output smaller. For this the `:external-index` file needs to generate ESM code, instead of the current default CommonJS, i.e. `require()`.
 
