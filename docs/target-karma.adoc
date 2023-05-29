@@ -35,6 +35,8 @@ The build options are:
 `:target`::     `:karma`
 `:output-to`::  A path/filename for the js file.
 `:ns-regexp`::  (optional) A regex to match the test namespaces, defaults to "-test$
+`:runner-ns`:: (optional) A namespace that can contain a start, stop, and init function. Defaults to
+`shadow.test.karma`.
 
 So you might have something like this:
 
@@ -81,4 +83,17 @@ $ karma start --single-run
 LOG: 'Testing boo.sample-spec'
 HeadlessChrome 0.0.0 (Mac OS X 10.12.6): Executed 1 of 1 SUCCESS (0.007 secs / 0.002 secs)
 ```
+
+In case you need to perform extra initialization steps before the tests are run you can do so by supplying a custom `:runner-ns`, which might look like this:
+
+```cljs
+(ns myapp.karma
+  (:require [shadow.test.karma]))
+
+(defn ^:export init []
+  (my-extra-init-step)
+  (shadow.test.karma/init))
+```
+
+Then in the build config add `:runner-ns myapp.karma`.
 
