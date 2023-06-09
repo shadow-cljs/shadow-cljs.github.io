@@ -433,12 +433,12 @@ $ babel src/js --out-dir src/gen
 $ babel src/js --out-dir src/gen --watch
 ```
 
-`babel` itself is configured via the `src/js/.babelrc`. See the official https://babeljs.io/docs/plugins/transform-react-jsx/[example for JSX].
+`babel` itself is configured via the `src/js/.babelrc`. See the official https://babeljs.io/docs/plugins/transform-react-jsx/[example for JSX] and more about https://babeljs.io/docs/config-files[configuration files].
 
 .JSX minimal .babelrc
 ```json
 {
-  "plugins": ["transform-react-jsx"]
+  "plugins": ["@babel/plugin-transform-react-jsx"]
 }
 ```
 
