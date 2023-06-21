@@ -176,7 +176,14 @@ You must add the `thheller/shadow-cljs` artifact to your `deps.edn` manually.
   {:extra-deps {thheller/shadow-cljs {:mvn/version <latest>}}}}
 ```
 
-Running with `clj` directly.
+With this you are all set, and can run `shadow-cljs` as normal.
+
+==== Option: Running via clj directly
+
+Optionally, if you want to skip running the `shadow-cljs` command line tool directly, you may as well just run directly via `clj`.
+
+IMPORTANT: This bypasses the "server mode". Meaning that everything you run will run a new JVM instance and potentially be much slower. You'll lose out on some features https://code.thheller.com/blog/shadow-cljs/2017/11/18/the-many-ways-to-use-shadow-cljs.html[outlined here]. Other than that the compilation results will be identical.
+
 ```
 {:paths [...]
  :deps {...}
@@ -191,8 +198,6 @@ clj -A:shadow-cljs watch app
 ```
 
 You may also specify additional aliases via the command line using `-A`, eg. `shadow-cljs -A:foo:bar ...`.
-
-IMPORTANT: Aliases are only applied when a new instance/server is started. They do not apply when connecting to a running server using the `shadow-cljs` command. Running via `clj` will always start a new JVM and does not support server-mode.
 
 === Boot
 
