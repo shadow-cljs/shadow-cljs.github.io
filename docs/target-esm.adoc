@@ -193,8 +193,17 @@ Modules can also be loaded dynamically at runtime via the provided `shadow.esm/d
     (js/console.log "loaded module" mod)))
 ```
 
-This would load an external ESM module dynamically at runtime without it ever being part of the build. You can of course also load your own `:modules` dynamically this way too.
+This would load an external ESM module dynamically at runtime without it ever being part of the build. You can of course also load your own `:modules` dynamically this way too, referencing them by url. It is not currently possible to load your modules by name with `dynamic-import`.
 
+`dynamic-import` is only intended for use with the `:esm` target. The purpose of this helper is to work around an issue with the Closure compiler - we cannot directly call https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import[`import`] from code processed by Closure. `dynamic-import` calls a function that wraps `import` in a way that Closure cannot interfere with. If you are using a different target such as `:browser`, you can make `shadow.esm/dynamic-import` work by adding to your build config: 
+
+```clojure
+{:builds 
+ {:build-id 
+  {:modules 
+   {:module-id 
+    {:prepend "window.shadow_esm_import = function(x) { return import(x); };"}}}}}
+```
 
 == Third Party Tool Integration
 
