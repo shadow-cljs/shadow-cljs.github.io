@@ -6060,7 +6060,7 @@ Some libraries are also packaged in ways that allow you to include only the part
 <p>It is largely dependent on the packages you use whether this will work or not. You can configure <code>shadow-cljs</code>  to prefer the <code>module</code> entry via the <code>:entry-keys</code> JS option. It takes a vector of string keys found in <code>package.json</code> which will be tried in order. The default is <code>"["browser" "main" "module"]</code>.</p>
 </div>
 <div class="listingblock">
-<div class="title">Example config for using <code>:closure</code> in a <code>:browser</code> build.</div>
+<div class="title">Example config preferring "module" over "browser" and "main".</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">{<span class="keyword">..</span><span class="keyword">.</span>
  <span class="symbol">:builds</span>
