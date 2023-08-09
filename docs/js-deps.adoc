@@ -194,7 +194,7 @@ Nowadays many `npm` packages ship multiple build variants. `shadow-cljs` will by
 
 It is largely dependent on the packages you use whether this will work or not. You can configure `shadow-cljs`  to prefer the `module` entry via the `:entry-keys` JS option. It takes a vector of string keys found in `package.json` which will be tried in order. The default is `"["browser" "main" "module"]`.
 
-.Example config for using `:closure` in a `:browser` build.
+.Example config preferring "module" over "browser" and "main".
 ```clojure
 {...
  :builds
