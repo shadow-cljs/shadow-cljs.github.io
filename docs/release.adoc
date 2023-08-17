@@ -174,6 +174,8 @@ global:SomeGlobalVariable
 
 In this example the compiler will stop renaming `something.foo()`, `something.bar()`.
 
+TIP: If you'd need to create a long `externs/<your-build>.txt` (maybe a library is generating `.js` files), you have the option to wrap your `.js` files in an NPM package by placing them in `packages/<your-package>`, running `npm init -y` and adding the build config `:js-options {:js-package-dirs ["node_modules" "packages"]}`. Doing so, your `.js` files will be treated like any other NPM package, so no externs required.
+
 == Build Report [[build-report]]
 
 `shadow-cljs` can generate a detailed report for your `release` builds which includes a detailed breakdown of the included sources and how much they each contributed to the overall size.
