@@ -2783,7 +2783,7 @@ If neither <code>:after-load</code> nor <code>:before-load</code> are set the co
 </div>
 </div>
 <div class="paragraph">
-<p>This example would call <code>(my.util/hook build-state 1 2 3)</code> after the build completed the <code>:flush</code> <a href="#compilation-stages">stage</a> (ie. written to disk). The example would print <code>[:hello-world (1 2 3)]</code> but please do something more useful in actual hooks.</p>
+<p>This example would call <code>(my.util/hook build-state 1 2 3)</code> after the build completed the <code>:flush</code> <a href="#compile-stages">stage</a> (ie. written to disk). The example would print <code>[:hello-world (1 2 3)]</code> but please do something more useful in actual hooks.</p>
 </div>
 <div class="paragraph">
 <p>The hook is a just a normal <strong>Clojure</strong> function with some additional metadata. The <code>{:shadow.build/stage :flush}</code> metadata informs the compiler to call this hook for <code>:flush</code> only. You may instead configure <code>{:shadow.build/stages #{:configure :flush}}</code> if the hook should be called after multiple stages. At least one configured stage is required since the hook otherwise would never do anything.</p>
