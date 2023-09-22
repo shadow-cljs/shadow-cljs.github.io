@@ -247,7 +247,7 @@ They are configured per build under the `:build-hooks` key
   build-state)
 ```
 
-This example would call `(my.util/hook build-state 1 2 3)` after the build completed the `:flush` <<compilation-stages, stage>> (ie. written to disk). The example would print `[:hello-world (1 2 3)]` but please do something more useful in actual hooks.
+This example would call `(my.util/hook build-state 1 2 3)` after the build completed the `:flush` <<compile-stages, stage>> (ie. written to disk). The example would print `[:hello-world (1 2 3)]` but please do something more useful in actual hooks.
 
 The hook is a just a normal *Clojure* function with some additional metadata. The `{:shadow.build/stage :flush}` metadata informs the compiler to call this hook for `:flush` only. You may instead configure `{:shadow.build/stages #{:configure :flush}}` if the hook should be called after multiple stages. At least one configured stage is required since the hook otherwise would never do anything.
 
