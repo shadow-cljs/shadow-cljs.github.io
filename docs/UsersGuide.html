@@ -3802,6 +3802,18 @@ The <code>.js</code> files must be included in the correct order. The <a href="#
 <div class="paragraph">
 <p>There are a couple ways of loading code dynamically. <code>shadow.lazy</code> is the most convenient and easiest.</p>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+<code>shadow.lazy</code> is only intended for use with the <code>:browser</code> target. If you are targeting <code>:esm</code>, consider using <code>shadow.esm/dynamic-import</code>.
+</td>
+</tr>
+</table>
+</div>
 <div class="sect4">
 <h5 id="_using_shadow_lazy"><a class="anchor" href="#_using_shadow_lazy"></a><a class="link" href="#_using_shadow_lazy">Using shadow.lazy</a></h5>
 <div class="paragraph">
@@ -4774,7 +4786,19 @@ The additional target-specific options are:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>This would load an external ESM module dynamically at runtime without it ever being part of the build. You can of course also load your own <code>:modules</code> dynamically this way too.</p>
+<p>This would load an external ESM module dynamically at runtime without it ever being part of the build. You can of course also load your own <code>:modules</code> dynamically this way too, referencing them by url. It is not currently possible to load your modules by name with <code>dynamic-import</code>.</p>
+</div>
+<div class="paragraph">
+<p><code>dynamic-import</code> is only intended for use with the <code>:esm</code> target. The purpose of this helper is to work around an issue with the Closure compiler - we cannot directly call <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import"><code>import</code></a> from code processed by Closure. <code>dynamic-import</code> calls a function that wraps <code>import</code> in a way that Closure cannot interfere with. If you are using a different target such as <code>:browser</code>, you can make <code>shadow.esm/dynamic-import</code> work by adding to your build config:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:builds</span>
+ {<span class="symbol">:build-id</span>
+  {<span class="symbol">:modules</span>
+   {<span class="symbol">:module-id</span>
+    {<span class="symbol">:prepend</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">window.shadow_esm_import = function(x) { return import(x); };</span><span class="delimiter">&quot;</span></span>}}}}}</code></pre>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -7618,7 +7642,7 @@ that project and understand its setup, build, etc.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2022-08-05 09:27:21 CEST
+Last updated 2023-07-21 20:06:01 UTC
 </div>
 </div>
 </body>

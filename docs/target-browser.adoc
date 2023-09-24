@@ -151,6 +151,8 @@ The more dynamic your website gets, the more dynamic your requirements may get. 
 
 There are a couple ways of loading code dynamically. `shadow.lazy` is the most convenient and easiest.
 
+NOTE: `shadow.lazy` is only intended for use with the `:browser` target. If you are targeting `:esm`, consider using `shadow.esm/dynamic-import`.
+
 ==== Using shadow.lazy
 
 As https://clojureverse.org/t/shadow-lazy-convenience-wrapper-for-shadow-loader-cljs-loader/3841[announced here] shadow-cljs provides a convenience method for referring to potentially lazy loaded code.
