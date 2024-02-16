@@ -516,6 +516,15 @@ Additional optional Options to configure the connection handling are:
 `:proxy-max-connection-retries`:: int, defaults to 1.
 `:proxy-max-request-time`:: ms as int, defaults to 30000. 30sec request timeout.
 
+Note: By default, with `:proxy-url` a request for `/` will 503, even if a `:root` contains a file named `index.html`. This behavior can be overriden link:++https://github.com/thheller/shadow-undertow/blob/07402ed93ee7c644dbdc761633fb1e48a27b5222/src/main/shadow/undertow.clj#L115++[through configuration] in https://github.com/thheller/shadow-undertow[shadow-undertow]. A config to support this might include:
+
+```edn
+...
+ :dev-http {8000 {:root "public"
+                  :proxy-url "https://some.host"
+                  :use-index-files true}
+...
+```
 
 == JVM Configuration [[jvm-opts]]
 
