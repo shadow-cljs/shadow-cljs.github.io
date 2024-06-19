@@ -133,5 +133,3 @@ hello
 ```
 
 As `:node-script` this will only create the file specified in `:output-to`. The `:exports` map maps CLJS vars to the name they should be exported to.
-
-NOTE: Development mode has the <<NodeModes,same setup>> as for node scripts (extra dependencies).
