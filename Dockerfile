@@ -1,2 +1,2 @@
-FROM ruby:2-alpine
+FROM ruby:3-alpine
 RUN apk upgrade && apk add make

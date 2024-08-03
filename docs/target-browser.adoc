@@ -603,12 +603,12 @@ IMPORTANT: The requests must be forwarded to the main <<http, HTTP server>>, not
 
 == Using External JS Bundlers [[js-provider-external]]
 
-Sometimes npm packages you may wish to use may use features that `shadow-cljs` itself does not support. Some packages are even written with the explicit expectation to be processed by `webpack`. In these cases it might be simpler to just use `webpack` (or similar), instead of letting `shadow-cljs` try to bundle those packages and working arround the issues that may occur.
+Sometimes Node.js packages you may wish to use may use features that `shadow-cljs` itself does not support. Some packages are even written with the explicit expectation to be processed by `webpack`. In these cases it might be simpler to just use `webpack` (or similar), instead of letting `shadow-cljs` try to bundle those packages and working arround the issues that may occur.
 
-`shadow-cljs` supports an option to let it focus on compiling CLJS code, but let something else process the npm/JS requires. You can do so via `:js-provider :external`. I wrote more on this subject https://code.thheller.com/blog/shadow-cljs/2020/05/08/how-about-webpack-now.html#option-2-js-provider-external:[in this blogpost].
+`shadow-cljs` supports an option to let it focus on compiling CLJS code, but let something else process the Node.js/JS requires. You can do so via `:js-provider :external`. I wrote more on this subject https://code.thheller.com/blog/shadow-cljs/2020/05/08/how-about-webpack-now.html#option-2-js-provider-external:[in this blogpost].
 
 
-IMPORTANT: This will limit certain dynamic interaction. Adding new npm requires will require reloading the page, since they can no longer be hot-loaded in by shadow-cljs. Requiring npm packages at the REPL will also be limited to those already provided by the external JS file. Which often is not a big deal, but something to be aware of.
+IMPORTANT: This will limit certain dynamic interaction. Adding new Node.js requires will require reloading the page, since they can no longer be hot-loaded in by shadow-cljs. Requiring Node.js packages at the REPL will also be limited to those already provided by the external JS file. Which often is not a big deal, but something to be aware of.
 
 In your build config you add:
 
@@ -623,7 +623,7 @@ In your build config you add:
     :external-index "target/index.js"}}}}
 ```
 
-`shadow-cljs` will then just output all required `npm` package requires in a format that regular JS tools can understand. You'll then need to run `webpack` (or similar) manually, and include the output of that build separately from the `shadow-cljs` output.
+`shadow-cljs` will then just output all required Node.js package requires in a format that regular JS tools can understand. You'll then need to run `webpack` (or similar) manually, and include the output of that build separately from the `shadow-cljs` output.
 
 So, instead of just including one `script` tag in your HTML, you include two.
 
@@ -638,7 +638,7 @@ IMPORTANT: Note that `webpack` (or similar) sometimes output more than one file,
 
 === JS Tree Shaking
 
-Tools like `webpack` can potentially tree-shake npm dependencies to make their build output smaller. For this the `:external-index` file needs to generate ESM code, instead of the current default CommonJS, i.e. `require()`.
+Tools like `webpack` can potentially tree-shake Node.js dependencies to make their build output smaller. For this the `:external-index` file needs to generate ESM code, instead of the current default CommonJS, i.e. `require()`.
 
 ```clojure
 {:builds

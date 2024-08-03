@@ -55,9 +55,9 @@ IMPORTANT: You can and should verify that everything is clean by running `lein j
 
 ## Declaring JS dependencies [[publish-deps-cljs]]
 
-Please note that currently only `shadow-cljs` has a clean automatic interop story with `npm`. That may represent a problem for users of your libraries using other tools. You may want to consider providing a CLJSJS fallback and/or publishing extra documentation for `webpack` related workflows.
+Please note that currently only `shadow-cljs` has a clean automatic interop story with Node.js. That may represent a problem for users of your libraries using other tools. You may want to consider providing a CLJSJS fallback and/or publishing extra documentation for `webpack` related workflows.
 
-You can declare `npm` dependencies directly by including a `deps.cljs` with `:npm-deps` in your project (eg. `src/main/deps.cljs`).
+You can declare Node.js dependencies directly by including a `deps.cljs` with `:npm-deps` in your project (eg. `src/main/deps.cljs`).
 
 .Example src/main/deps.cljs
 ```clojure
