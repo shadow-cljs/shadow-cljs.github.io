@@ -194,10 +194,10 @@ IMPORTANT: This bypasses the "server mode". Meaning that everything you run will
 ```
 
 ```
-clj -A:shadow-cljs watch app
+clj -M:shadow-cljs watch app
 ```
 
-You may also specify additional aliases via the command line using `-A`, eg. `shadow-cljs -A:foo:bar ...`.
+You may also specify additional aliases via the command line using `-M`, eg. `shadow-cljs -M:foo:bar ...`.
 
 === Boot
 
