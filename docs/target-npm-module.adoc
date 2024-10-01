@@ -18,7 +18,7 @@ create-react-app, ...) with little configuration.
 
 With a JS file sitting in your project root, you may `require("./out/demo.foo")` to load the CLJS namespace and access it from JS. The JS requires must be the relative path from the JS file location to the CLJS output.
 
-If you plan to distribute code on NPM, then you may want to use the <<target-node-library, `:node-library` target>> instead since it allows for a finer level of control over exports and optimization.
+If you plan to distribute code on the <<npm, npm public registry>>, then you may want to use the <<target-node-library, `:node-library` target>> instead since it allows for a finer level of control over exports and optimization.
 
 == Working with Optimizations
 

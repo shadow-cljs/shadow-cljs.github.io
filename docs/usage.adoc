@@ -15,16 +15,30 @@ If <<Installation, installed>> globally, you can use the `shadow-cljs` command d
 $ shadow-cljs help
 ```
 
-If you prefer to only use the local `npm` install you can invoke it via `npx` or `yarn`.
+If you prefer to only use the local Node.js package install you can invoke it via `npx` (comes with Node.js), `bunx` (comes with Bun), `pnpx`, or `yarn`.
 
+.npm
 ```bash
-# npm
 $ npx shadow-cljs help
+```
 
-# yarn
+.Bun
+```bash
+$ bunx shadow-cljs help
+```
+
+.pnpm
+```bash
+$ pnpm shadow-cljs help
+```
+
+.Yarn
+```bash
 $ yarn shadow-cljs help
+```
 
-# manually
+.Manually
+```bash
 $ ./node_modules/.bin/shadow-cljs help
 ```
 

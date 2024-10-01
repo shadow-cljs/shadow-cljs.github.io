@@ -215,4 +215,4 @@ This is done by setting `:js-provider` in your build config.
    :modules {:demo {:exports {default demo.lib/hello}}}}}}
 ```
 
-For this build shadow-cljs will only compile and bundle CLJS code, but leave all other JS code to be provided by some other tool later. Note that if you have `(:require ["react"])` or any other `npm` dependency in your build the output from `shadow-cljs` MUST be processed by another tool first before it becomes loadable in the Browser. Only set this if some other tool is actually going to provide the required dependencies.
+For this build shadow-cljs will only compile and bundle CLJS code, but leave all other JS code to be provided by some other tool later. Note that if you have `(:require ["react"])` or any other Node.js package dependency in your build the output from `shadow-cljs` MUST be processed by another tool first before it becomes loadable in the Browser. Only set this if some other tool is actually going to provide the required dependencies.

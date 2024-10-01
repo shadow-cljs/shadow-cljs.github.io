@@ -96,26 +96,75 @@ Code examples may be similarly shortened.
 
 = Installation
 
-== Standalone via `npm`
+== Standalone via the Node.js package [[install_standalone]]
 
 You will need:
 
-- https://nodejs.org[node.js] (v6.0.0+, most recent version preferred)
-- https://www.npmjs.com[npm] (comes with `node` by default) or https://www.yarnpkg.com[yarn]
-- Any Java SDK (Version 11 or higher, LTS release recommended). https://adoptium.net/
+- https://nodejs.org[Node.js] or https://bun.sh[Bun]
+- https://www.npmjs.com[npm] (comes with Node.js), https://bun.sh[bun] (comes with Bun), https://pnpm.io/[pnpm], or https://www.yarnpkg.com[yarn]
+- Any Java SDK (Version 11 or higher, LTS release recommended). https://adoptium.net
 
-In your project directory you'll need a `package.json`. If you do not have one yet you can create one by running `npm init -y`. If you don't have a project directory yet consider creating it by running
+In your project directory you'll need a `package.json`. If you do not have one yet you can create one by running
+
+.npm
+```bash
+$ npm init -y
 ```
+
+.Bun
+```bash
+$ bun init -y
+```
+
+.pnpm
+```bash
+$ pnpm init
+```
+
+.Yarn
+```bash
+$ yarn init -y
+```
+
+If you don't have a project directory yet consider creating it by running
+
+.npm
+```bash
 $ npx create-cljs-project my-project
+```
+
+.Bun
+```bash
+$ bunx create-cljs-project my-project
+```
+
+.pnpm
+```bash
+$ pnpx create-cljs-project my-project
+```
+
+.Yarn
+```bash
+$ yarn create cljs-project my-project
 ```
 
 This will create all the necessary basic files and you can skip the following commands.
 
 If you have a `package.json` already and just want to add `shadow-cljs` run
 
-.NPM
+.npm
 ```bash
 $ npm install --save-dev shadow-cljs
+```
+
+.Bun
+```bash
+$ bun add --dev shadow-cljs
+```
+
+.pnpm
+```bash
+$ pnpm add --save-dev shadow-cljs
 ```
 
 .Yarn
@@ -123,11 +172,11 @@ $ npm install --save-dev shadow-cljs
 $ yarn add --dev shadow-cljs
 ```
 
-For convenience, you can run `npm install -g shadow-cljs` or `yarn global add shadow-cljs`. This will let you run the `shadow-cljs` command directly later. There should always be a shadow-cljs version installed in your project, the global install is optional.
+For convenience, you can run `npm install -g shadow-cljs`, `bun add -g shadow-cljs`, `pnpm add -g shadow-cljs`, or `yarn global add shadow-cljs`. This will let you run the `shadow-cljs` command directly later. There should always be a shadow-cljs version installed in your project, the global install is optional.
 
 == Library
 
-Although it is recommended to run the standalone version via `npm` you can also embed `shadow-cljs` into any other Clojure JVM tool (eg. `lein`, `boot`, ...).
+Although it is recommended to run the standalone version via the Node.js package you can also embed `shadow-cljs` into any other Clojure JVM tool (eg. `lein`, `boot`, ...).
 
 The artifact can be found at:
 
@@ -223,28 +272,58 @@ Notice that the source path is *only* specified once in the entire configuration
 
 === JavaScript [[npm-install]]
 
-`shadow-cljs` integrates fully with the https://www.npmjs.com/[`npm`] ecosystem to manage JavaScript dependencies.
+`shadow-cljs` integrates fully with the https://www.npmjs.com/[Node.js package] ecosystem to manage JavaScript dependencies.
 
-You can use `npm` or `yarn` to manage your dependencies, please refer to their respective documentation.
+You can use `npm`, `bun`, `pnpm` or `yarn` to manage your dependencies, please refer to their respective documentation.
 
 [horizontal]
-npm:: https://docs.npmjs.com/
-yarn:: https://yarnpkg.com/en/docs
+npm:: https://docs.npmjs.com
+Bun:: https://bun.sh/docs
+pnpm:: https://pnpm.io/motivation
+Yarn:: https://yarnpkg.com/en/docs
 
 Both manage your dependencies via a `package.json` file in your project directory.  Almost every package available via `npm` will explain how to install it. Those instructions now apply to `shadow-cljs` as well.
 
-.Installing a JavaScript package
+.npm
 ```bash
-# npm
 $ npm install the-thing
+```
 
-# yarn
+.Bun
+```bash
+$ bun add the-thing
+```
+
+.pnpm
+```bash
+$ pnpm add the-thing
+```
+
+.Yarn
+```bash
 $ yarn add the-thing
 ```
 
 Nothing more is required. Dependencies will be added to the `package.json` file and this will be used to manage them.
 
-TIP: If you don’t have a `package.json` yet run `npm init` from a command line.
+TIP: If you don’t have a `package.json` yet see <<install_standalone>>.
+
+`shadow-cljs` will try to use the same Node.js package manager to install Node.js packages specified in the `deps.cljs` files of dependencies in the classpath. It will try to determine which one to use by looking for the corresponding lock file for each package manager.
+
+You can override this guessing behavior with the `:node-modules` key in the `shadow-cljs.edn` file.
+
+```
+{:node-modules
+ {; Override the guessed Node.js package manager.
+  ;
+  ; Not needed if you specify :install-cmd.
+  :managed-by
+  :bun
+
+  ; Override the guessed install command for the Node.js package manager.
+  :install-cmd
+  ["bun" "add" "--exact"]}}
+```
 
 ==== Missing JS Dependency?
 
@@ -551,23 +630,22 @@ include::target-esm.adoc[]
 
 include::target-react-native.adoc[]
 
-= Targeting node.js [[target-node]]
+= Targeting Node.js [[target-node]]
 
 There is built-in support for generating code that is intended to be used as a stand-alone
 script, and also for code that is intended to be used as a library. See the
 section on <<config,common configuration>> for the base settings needed in
 a configuration file.
 
-== node.js Scripts [[target-node-script]]
+== Node.js Scripts [[target-node-script]]
 
 include::target-node-script.adoc[]
 
-== node.js Libraries [[target-node-library]]
+== Node.js Libraries [[target-node-library]]
 
 include::target-node-library.adoc[]
 
-
-== Creating `npm` packages
+== Creating Node.js packages
 
 // TODO: Thomas: I think it would be useful to show a package.json and a little bit of an example
 // on how you could set up to deploy this on NPM.
@@ -595,7 +673,7 @@ The default `:ns-regexp` is `"-test$"`, so your first test could look like:
 
 In the Clojure world it is common to keep test files in their own source paths so the above example assumes you have configured `:source-paths ["src/main" "src/test"]` in your `shadow-cljs.edn` config. Your usual app code goes into `src/main` and the tests go into `src/test`. This however is optional and it is totally fine to keep everything in `src` and just use `:source-paths ["src"]`.
 
-== Testing in node.js [[target-node-test]]
+== Testing in Node.js [[target-node-test]]
 
 include::target-node-test.adoc[]
 

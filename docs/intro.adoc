@@ -7,16 +7,16 @@
 `shadow-cljs` is composed of 2 parts:
 
 - The https://clojars.org/thheller/shadow-cljs[shadow-cljs] Clojure library which handles all the actual work.
-- The https://www.npmjs.com/package/shadow-cljs[shadow-cljs] `npm` package which provides a convenient interface for running most of the build functionality directly from command line.
+- The https://www.npmjs.com/package/shadow-cljs[shadow-cljs] Node.js package which provides a convenient interface for running most of the build functionality directly from command line.
 
 If desired you can easily integrate the `shadow-cljs` Clojure library into any other Clojure/JVM build tool (eg. https://leiningen.org/[leiningen] or the https://clojure.org/guides/deps_and_cli[Clojure CLI] tools).
 
-It is recommended to use the `npm` package as that provides a more optimized development experience tailored towards CLJS development.
+It is recommended to use the Node.js package as that provides a more optimized development experience tailored towards CLJS development.
 
 
 == Basic Workflow
 
-When working with `shadow-cljs` you will be defining one or more builds in the `shadow-cljs.edn` configuration file. Each build will have a `:target` property which represents a configuration preset optimized for the target environment (eg. the Browser, a `node.js` application or a Chrome Extension).
+When working with `shadow-cljs` you will be defining one or more builds in the `shadow-cljs.edn` configuration file. Each build will have a `:target` property which represents a configuration preset optimized for the target environment (eg. the Browser, a Node.js application or a Chrome Extension).
 
 Each build can either produce development or release output depending on the command used to trigger the compilation. The standard build commands are: `compile`, `watch` and `release`.
 
@@ -46,11 +46,11 @@ There are several important concepts that you should familiarize yourself with w
 
 In the Clojure(Script) everything is namespaced and each name is expected to resolve to a file. If you have a `(ns demo.app)` namespace the compiler expects to find a `demo/app.cljs` (or `.cljc`) on the classpath. The classpath will be searched in order until it is found. Suppose you configured the `:source-paths ["src/main" "src/test"]` the compiler will first look for a `src/main/demo/app.cljs` and then `src/test/demo/app.cljs`. When the file is not found on any source path the JVM will begin looking into the `.jar` files on the classpath. When it finds a `demo/app.cljs` at the root of any of the libraries that file it will be used.
 
-IMPORTANT: When a filename exists multiple times on the classpath then only the first one is used. Everything on the JVM and Clojure(Script) is namespaced to avoid such conflicts. Very similar to `npm` where each package must have a unique name.
+IMPORTANT: When a filename exists multiple times on the classpath then only the first one is used. Everything on the JVM and Clojure(Script) is namespaced to avoid such conflicts. Very similar to Node.js where each package must have a unique name.
 
 It is therefore recommended to be very disciplined about the names you choose and about properly namespacing everything. It may seem repetitive to always use `(ns your-company.components.foo)` over `(ns components.foo)` but it will save you from lot of headaches later on.
 
-This is unlike `npm` where the package name itself is never used inside the package itself and only relative paths are used.
+This is unlike Node.js where the package name itself is never used inside the package itself and only relative paths are used.
 
 
 === Server Mode

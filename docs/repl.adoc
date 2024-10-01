@@ -6,7 +6,7 @@ When you quickly want to test out some code the built-in REPLs should be enough.
 
 == ClojureScript REPL
 
-By default you can choose between a `node-repl` and a `browser-repl`. They both work similarly and the differentiating factor is that one runs in a managed `node.js` process while the others opens a Browser Window that will be used to eval the actual code.
+By default you can choose between a `node-repl` and a `browser-repl`. They both work similarly and the differentiating factor is that one runs in a managed Node.js process while the others opens a browser window that will be used to eval the actual code.
 
 === Node REPL [[node-repl]]
 
