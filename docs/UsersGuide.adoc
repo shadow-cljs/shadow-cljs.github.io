@@ -392,7 +392,6 @@ The above are the defaults so if you want to use those it is fine to just set `:
 You can create a Keystore using the java `keytool` command. Creating a trusted self-signed certificate is also possible but somewhat complicated.
 
 - https://gist.github.com/jchandra74/36d5f8d0e11960dd8f80260801109ab0[OpenSSL] instructions for Linux and Windows (via WSL)
-- https://certsimple.com/blog/localhost-ssl-fix[macOS] instructions
 
 The created `Certificates.p12` (macOS) or `localhost.pfx` (Linux, Windows) file can be turned into the required `keystore.jks` via the `keytool` utility.
 
