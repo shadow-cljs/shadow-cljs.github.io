@@ -6756,10 +6756,7 @@ The compiler looks for files relative to the project root first. It will also at
 <div class="sect3">
 <h4 id="_simplified_externs"><a class="anchor" href="#_simplified_externs"></a><a class="link" href="#_simplified_externs">14.2.3. Simplified Externs</a></h4>
 <div class="paragraph">
-<p>Writing Externs by hand can be challenging and <code>shadow-cljs</code> provides a way to write a more convenient way to write them. In combination with <code>shadow-cljs check &lt;your-build&gt;</code> you can quickly add the missing Externs.</p>
-</div>
-<div class="paragraph">
-<p>Start by creating a <code>externs/&lt;your-build&gt;.txt</code>, so build <code>:app</code> would be <code>externs/app.txt</code>. In that file each line should be one word specifying a JS property that should not be renamed. Global variables should be prefixed by <code>global:</code></p>
+<p>Writing Externs by hand can be challenging and <code>shadow-cljs</code> provides a way to write a more convenient way to write them. Start by creating a <code>externs/&lt;your-build&gt;.txt</code>, so build <code>:app</code> would be <code>externs/app.txt</code>. In that file each line should be one word specifying a JS property that should not be renamed. Global variables should be prefixed by <code>global:</code></p>
 </div>
 <div class="listingblock">
 <div class="title">Example externs/app.txt</div>

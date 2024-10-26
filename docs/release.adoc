@@ -160,9 +160,7 @@ TIP: The compiler looks for files relative to the project root first. It will al
 
 === Simplified Externs
 
-Writing Externs by hand can be challenging and `shadow-cljs` provides a way to write a more convenient way to write them. In combination with `shadow-cljs check <your-build>` you can quickly add the missing Externs.
-
-Start by creating a `externs/<your-build>.txt`, so build `:app` would be `externs/app.txt`. In that file each line should be one word specifying a JS property that should not be renamed. Global variables should be prefixed by `global:`
+Writing Externs by hand can be challenging and `shadow-cljs` provides a way to write a more convenient way to write them. Start by creating a `externs/<your-build>.txt`, so build `:app` would be `externs/app.txt`. In that file each line should be one word specifying a JS property that should not be renamed. Global variables should be prefixed by `global:`
 
 .Example externs/app.txt
 ```
