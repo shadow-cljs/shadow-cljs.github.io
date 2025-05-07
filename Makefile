@@ -11,4 +11,7 @@ docs/UsersGuide.html: docs/*.adoc
 docker-build:
 	docker run -it -v $$(pwd)/docs:/docs asciidoctor/docker-asciidoctor asciidoctor -o /docs/UsersGuide.html -b html5 -r asciidoctor-diagram /docs/UsersGuide.adoc
 
-.PHONY: docker-build
+podman-build:
+	podman run -it -v $$(pwd)/docs:/docs asciidoctor/docker-asciidoctor asciidoctor -o /docs/UsersGuide.html -b html5 -r asciidoctor-diagram /docs/UsersGuide.adoc
+
+.PHONY: docker-build podman-build
