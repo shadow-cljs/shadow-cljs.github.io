@@ -102,7 +102,7 @@ You will need:
 
 - https://nodejs.org[node.js] (v6.0.0+, most recent version preferred)
 - https://www.npmjs.com[npm] (comes with `node` by default) or https://www.yarnpkg.com[yarn]
-- Any Java SDK (Version 11 or higher, LTS release recommended). https://adoptium.net/
+- Any Java SDK (Version 21 or higher, LTS release recommended). https://adoptium.net/
 
 In your project directory you'll need a `package.json`. If you do not have one yet you can create one by running `npm init -y`. If you don't have a project directory yet consider creating it by running
 ```
