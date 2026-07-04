@@ -442,7 +442,7 @@ If you prefer to set your own port instead you can do this via the `:http` confi
 
 These servers are started automatically when `shadow-cljs` is running in server mode. They are not specific to any build and can be used to serve files for multiple builds as long as a unique `:output-dir` is used for each.
 
-IMPORTANT:: These are just generic web servers that server static files. They are not required for any live-reload or REPL logic. Any webserver will do, these are just provided for convenience.
+IMPORTANT:: These are just generic web servers that serve static files. They are not required for any live-reload or REPL logic. Any webserver will do, these are just provided for convenience.
 
 .Basic example serving the `public` directory via `http://localhost:8000`
 ```
