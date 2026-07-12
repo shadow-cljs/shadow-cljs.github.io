@@ -86,7 +86,7 @@ Or, when watching several builds:
          (cider-shadow-watched-builds . ("<first-build>" "<other-build>")))))
 ```
 
-Read about Emacs and shadow-cljs, using the `.dir-locals.el` file at the https://docs.cider.mx/cider/1.1/cljs/shadow-cljs.html[Cider docs]
+Read about Emacs and shadow-cljs, using the `.dir-locals.el` file at the https://docs.cider.mx/cider/cljs/shadow-cljs.html[Cider docs]
 
 === Using deps.edn with custom repl intialization.
 
