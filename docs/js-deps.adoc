@@ -15,7 +15,7 @@ var react = require("react");
   (:require ["react" :as react]))
 ```
 
-Whatever "string" parameter is used when calling require we transfer to the `:require` as-is. The `:as` alias is up to you. Once we have that we can use the code like any other CLJS namespace!
+Whatever "string" parameter is used when calling `require()` we transfer to the `:require` as-is. The `:as` alias is up to you. Once we have that we can use the code like any other CLJS namespace!
 
 ```
 (react/createElement "div" nil "hello world")
