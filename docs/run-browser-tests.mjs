@@ -70,7 +70,7 @@ const MIME_TYPES = {
   ".wasm": "application/wasm",
 };
 
-// minimal static file server, the generated index.html loads /js/test.js so the dir is served at /
+// minimal static file server for the generated index.html and its JS modules
 function serveDir(dir) {
   const root = path.resolve(dir);
   if (!fs.existsSync(path.join(root, "index.html"))) {
