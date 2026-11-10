@@ -1,6 +1,6 @@
 This target is meant for gathering up namespaces that contain tests (based on a filename pattern match),
-and triggering a test runner. It contains a built-in runner that will automatically scan for `cljs.test`
-tests and run them.
+and running them in the browser. It contains a built-in runner that will automatically scan for `cljs.test`
+tests, run them and display the results.
 
 The relevant configuration options are:
 
@@ -25,28 +25,189 @@ In general you will need a config that looks like this:
    :test-dir  "out/test"}}}
 ```
 
+Run `shadow-cljs watch test` and open http://localhost:8021. All tests run when the page loads.
+
+=== The Test Runner
+
+The built-in runner shows the results grouped by namespace. Namespaces containing failures are expanded automatically.
+
+Selecting tests::
+The filter input matches test names (`some.ns/some-test`) as a substring, use commas to match several (eg. `user,auth/login`).
+Press `/` to focus it, `Enter` to run the matching tests and `Esc` to clear it. Checkboxes exclude namespaces or single tests from running,
+each row also has a button to run just that namespace or test. "Run failed" runs only the tests that failed.
+The selection is remembered in the browser via `localStorage`.
+
+Failures::
+Failed `(is (= expected actual))` assertions show the actual value with all differences to the expected value marked.
+Values that match are shown as is, so the location of a difference is easy to find in larger data.
++
+```
+expected: (= {:name "foo", :roles #{:admin :user}} (get-user))
+  actual: {:name (mismatch (expected "foo") (actual "bar")),
+           :roles #{:user (missing :admin) (unexpected :guest)},
+           :created-at (unexpected "2026-11-10")}
+```
++
+Failures of https://github.com/nubank/matcher-combinators[matcher-combinators] `match?` and `thrown-match?` assertions are shown the same way.
+No extra configuration is needed for that.
+
+Output::
+Output printed while a test runs (eg. `println`) is captured and shown with the test.
+
+Live Reload::
+During `watch` only the tests affected by a change run again after a hot-reload. A test is affected when its namespace,
+or any namespace it depends on (directly or transitively), was recompiled. So changing the code under test also runs its tests again.
+Use the "Auto-run on reload" checkbox to turn this off. A reload waits for the namespace currently running tests to complete.
+
+URL Parameters::
+`?test=some.ns,some.ns/some-test` limits the page to these namespaces and tests. `?filter=text` sets the filter.
+
+Release builds work the same way: run `shadow-cljs release test` and open the page, just without hot-reload.
+
+==== Async Tests
+
+`cljs.test` has no timeouts for async tests, so a test that never calls `done` would stop the entire test run.
+The runner reports an error for any async test that hasn't called `done` after 30 seconds and continues with the next test.
+Exceptions thrown in async callbacks (eg. in a `setTimeout`) are also reported for the test that is currently running.
+
+The timeout can be configured in ms, `0` disables it.
+
+```
+{:target :browser-test
+ :test-dir "out/test"
+ :closure-defines {shadow.test.runner/ASYNC-TIMEOUT 60000}}
+```
+
+=== Headless and Automated Use [[browser-test-headless]]
+
+For CI or AI agents, the runner page provides the results in several machine-readable ways.
+
+Console::
+Every failure is logged via `console.error`, followed by the summary line `cljs.test` also uses.
++
+```
+FAIL in demo.foo-test/map-diff (demo/foo_test.cljs:42)
+expected: (= {:id 1, :name "foo"} {:id 1, :name "bar"})
+  actual: {:id 1, :name (mismatch (expected "foo") (actual "bar"))}
+
+Ran 26 tests containing 66 assertions.
+28 failures, 8 errors.
+```
+
+Page Status::
+The `data-test-status` attribute of the `<html>` element is `running`, `passed`, `failed` or `idle` (nothing ran).
+Waiting for `html[data-test-status=passed], html[data-test-status=failed]` works without running any JavaScript.
+`document.title` also shows the status. In the page itself every test has a `data-test-id` and `data-status` attribute.
+
+JavaScript API::
+The runner provides a `window.shadowTest` object, described below.
+
+The `window.shadowTest` object has these functions:
+
+[horizontal]
+`shadowTest.done()`:: Promise resolving to the JSON report once no tests are running.
+`shadowTest.report()`:: The JSON report of the current state.
+`shadowTest.text()`:: Plain text report, same format as the console output.
+`shadowTest.status()`:: `"running"`, `"passed"`, `"failed"` or `"idle"`.
+`shadowTest.run(filter)`:: Runs the tests matching filter (comma separated, all tests if omitted). Returns the same Promise as `done()`.
+`shadowTest.list()`:: All test ids.
+
+The JSON report looks like this (shortened):
+
+```json
+{"status": "failed",
+ "summary": {"tests": 26, "passed": 5, "failed": 14, "errors": 7,
+             "notRun": 0, "outdated": 0, "assertions": 66},
+ "run": {"id": 1, "status": "done", "reason": "load", "completed": 26, "durationMs": 4460,
+         "testIds": ["demo.foo-test/foo", "demo.foo-test/map-diff", ...]},
+ "namespaceErrors": [],
+ "tests": [
+   {"id": "demo.foo-test/map-diff", "ns": "demo.foo-test", "name": "map-diff",
+    "file": "demo/foo_test.cljs", "line": 41,
+    "status": "fail", "durationMs": 1,
+    "assertions": {"pass": 0, "fail": 1, "error": 0},
+    "out": null,
+    "failures": [
+      {"type": "fail",
+       "message": null,
+       "testing": [],
+       "expected": "(= {:id 1, :name \"foo\"} {:id 1, :name \"bar\"})",
+       "actual": "{:id 1, :name (mismatch (expected \"foo\") (actual \"bar\"))}",
+       "text": "FAIL in demo.foo-test/map-diff (demo/foo_test.cljs:42)\n..."}]},
+   ...]}
+```
+
+The `status` of a test is `pass`, `fail`, `error` or `not-run`. During `watch` it may also be `outdated`, meaning the code
+changed since the test ran but it didn't run again (eg. because it was excluded). While a run is active, tests are `queued` or `running`.
+Failures of type `error` have `error`, `data` and `cause` instead of `actual`. `namespaceErrors` contains errors
+that happened outside of any test, eg. in fixtures.
+
+==== Running Headless
+
+shadow-cljs doesn't include a browser. The following script uses https://playwright.dev[Playwright] to run the tests in a headless browser.
+It prints the results and exits with `0` if all tests passed, `1` if any failed and `2` if the tests could not run
+(eg. the build is missing, the page failed to load, the tests timed out or nothing matched `--test`).
+
+```bash
+npm install --save-dev playwright
+npx playwright install chromium
+
+npx shadow-cljs compile test   # or: npx shadow-cljs release test
+node run-browser-tests.mjs out/test
+node run-browser-tests.mjs out/test --test=my.app.core-test
+node run-browser-tests.mjs http://localhost:8021 --json
+```
+
+Given a directory it serves the `:test-dir` itself, so no `:dev-http` server is needed. Given a URL it uses the already running server,
+eg. the `:dev-http` of a running `watch`. `--console` also prints the console output of the page. Builds made with `compile` try to
+connect to the shadow-cljs server for hot-reload, which only logs an error if no server is running. The tests run regardless,
+but `release` builds are a better fit for CI.
+
+.run-browser-tests.mjs
+[source,javascript]
+----
+include::run-browser-tests.mjs[]
+----
+
+==== Using the REPL
+
+With `watch` running and the test page open, a CLJS REPL connected to the test build can access the results too.
+
+```clojure
+(js/shadowTest.status)                       ;; "passed", "failed", "running" or "idle"
+(shadow.test.runner/text-report)             ;; same text as the console output
+(shadow.test.runner/run-tests! '[my.app.core-test/some-test my.app.other-test/foo])
+```
+
+`run-tests!` only starts the run, query the results once the status is no longer `"running"`.
+The page runs affected tests on its own after every change, so usually there is no need to run anything.
+Reading the status directly after saving a file may still return the result from before the reload though.
+The run id changes with every run, `(.. (js/shadowTest.report) -run -id)`, so compare it to the one before the change.
+
+Note that every open test page is a separate runtime. If the page is open in several browsers, make sure the REPL talks to the intended one.
+
+=== Custom Runner
+
 If you choose to supply a custom `:runner-ns`, it might look like this:
 
 ```
 (ns tests.client-test-main
   {:dev/always true}
   (:require [shadow.test :as st]
-            [shadow.test.env :as env]
-            [cljs-test-display.core :as ctd]
-            [shadow.dom :as dom]))
+            [shadow.test.env :as env]))
 
 (defn start []
   (-> (env/get-test-data)
       (env/reset-test-data!))
 
-  (st/run-all-tests (ctd/init! "test-root")))
+  ;; prints the results to the browser console using the default cljs.test reporter
+  (st/run-all-tests))
 
 (defn stop [done]
   ; tests can be async. You must call done so that the runner knows you actually finished
   (done))
 
 (defn ^:export init []
-  (dom/append [:div#test-root])
   (start))
 ```
 
@@ -56,13 +217,16 @@ It just has `init`, `start`, `stop` methods. `init` will be called once on start
 
 TIP: `:runner-ns` is optional, just leave it out to use the default.
 
+NOTE: The built-in runner previously used `cljs-test-display`, which is no longer included with shadow-cljs.
+If your custom runner uses it, add `com.bhauman/cljs-test-display` to your dependencies.
+
 === Generated output in `:test-dir`
 
 The output includes two primary artifacts in your `test-dir` folder:
 
 * `index.html` - If and only if there was not already an `index.html` file present. By default the generated
 file loads the tests and runs `init` in the `:runner-ns`. You may edit or add a custom version that will
-not be overwritten.
+not be overwritten. An `index.html` generated by older shadow-cljs versions keeps working.
 * `js/test.js` - The Javascript tests. The tests will always have this name. The entries for the module are
 auto-generated.
 
