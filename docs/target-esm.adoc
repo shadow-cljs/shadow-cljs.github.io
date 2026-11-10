@@ -1,10 +1,44 @@
-The `:target :esm` emits files that can be used in any ESM environment.
+The `:target :esm` emits files that can be used in any ESM environment. It is the recommended target for code running in the Browser, and works just as well for Node.js, Web Workers, Deno or as input for other JavaScript tools.
 
-ESM, short for ECMAscript Modules, or just https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules[JavaScript Modules], is the modernized standard for JavaScript files. Most modern platforms support this out of the box, and more and more of the JS ecosystem is moving this way. Each Module generated this way can specify "exports" which other files importing this can reference.
+ESM, short for ECMAScript Modules, or just https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules[JavaScript Modules], is the modernized standard for JavaScript files. All modern browsers and platforms support it out of the box, and the rest of the JS ecosystem has been moving this way for years. Each module generated this way can specify "exports" which other files importing it can reference.
 
-ESM much like the <<target-browser, :target :browser>> is driven by the `:modules` config option. Each module can declare its `:exports` for others to access.
+During development it supports live code reloading, a REPL, CSS reloading and the HUD. The `release` output is minified by the Closure Compiler with `:advanced` optimizations.
 
-As with other modes the <<config, main configuration options>> apply and can be set.
+NOTE: The older <<target-browser, `:target :browser`>> remains supported and works fine for existing projects, but `:esm` covers the same use cases using standard JavaScript modules. Prefer `:esm` for new projects.
+
+A basic browser configuration looks like this:
+
+.shadow-cljs.edn
+```clojure
+{:deps true
+ :dev-http {8000 "public"}
+ :builds
+ {:app
+  {:target :esm
+   :output-dir "public/js"
+   :modules {:main {:init-fn my.app/init}}}}}
+```
+
+.src/main/my/app.cljs
+```clojure
+(ns my.app)
+
+(defn init []
+  (js/console.log "Hello from ClojureScript"))
+```
+
+.public/index.html
+```html
+<!doctype html>
+<html>
+  <head><meta charset="utf-8"><title>My app</title></head>
+  <body><script type="module" src="/js/main.js"></script></body>
+</html>
+```
+
+Run `npx shadow-cljs watch app` and open http://localhost:8000. The browser console should show `Hello from ClojureScript`.
+
+As with other targets the <<config, main configuration options>> apply and can be set.
 The additional target-specific options are:
 
 [horizontal]
@@ -12,10 +46,18 @@ The additional target-specific options are:
 `:runtime`:: (optional , default `:browser`) Controls which development extensions for REPL/hot-reload are injected. Use `:node` for Node.js REPL and hot reload support, or `:custom` for a custom runtime client. `:devtools {:enabled false}` disables development client injection.
 `:modules`:: required, a map of keyword to module configuration
 
-
 The examples below assume `:paths ["src/main"]` in `deps.edn` and an active shadow-cljs dependency. For Node.js, set `:runtime :node` and ensure Node treats the generated `.js` files as ES modules, for example with a `package.json` containing `"type": "module"` in the output directory.
 
-== Module Configuration
+== Output Settings
+
+All files are written to the configured `:output-dir`. Each module ends up as a `<module-id>.js` file in that directory. Unlike `:target :browser` no `:asset-path` is needed, since generated files reference each other using relative `import` paths. You only need to serve the `:output-dir` with some kind of web server and load the module via `<script type="module">` or `import`.
+
+WARNING: Each build requires its own `:output-dir`, you may not put multiple builds into the same directory.
+This directory should also be exclusively owned by the build. There should be no other files in there.
+While `shadow-cljs` won't delete anything it is safer to leave it alone. During development compilation
+creates many more files than just the module files: source maps, original sources, and generated sources in an additional `cljs-runtime` directory. This directory is not required for `release` builds.
+
+== Module Configuration [[esm-modules]]
 
 Each module has its own set of options that control how the module is constructed. Specifying multiple modules will mean that the code is split between them.
 
@@ -24,6 +66,13 @@ Each module has its own set of options that control how the module is constructe
 `:entries`:: optional, a vector of namespace symbols to load in this module
 `:exports`:: optional, a map of export names (symbols or keywords) to fully qualified symbols
 `:depends-on`:: a set of other module IDs this module depends on. With multiple modules, each non-root module must depend on the shared root, directly or transitively.
+`:preloads`:: optional, a vector of namespaces to load first in this module during development. See <<devtools, Preloads>>.
+`:prepend`:: String content that will be prepended to the js output. Useful for comments, copyright notice, etc.
+`:append`:: String content that will be appended to the js output. Useful for comments, copyright notice, etc.
+`:prepend-js`:: A string to prepend to the module output containing valid javascript that will be run through Closure optimizer.
+`:append-js`:: A string to append to the module output containing valid javascript that will be run through Closure optimizer.
+
+`shadow-cljs` follows the dependency graph from the namespaces referenced by `:init-fn`, `:entries` and `:exports` to find everything needed in the output. Namespaces that are not required will not be included.
 
 === Module Exports
 
@@ -109,7 +158,7 @@ Sometimes you may not require any `:exports` and instead just want the code to r
 And the HTML
 
 ```html
-<script type="module" src="js/demo.js"></script>
+<script type="module" src="/js/demo.js"></script>
 ```
 
 It can also be combined with `:exports` to run a function and still provide `:exports`
@@ -136,8 +185,11 @@ Keeping this HTML will essentially just log twice on page load.
 </script>
 ```
 
-== Module Splitting
+== Code Splitting [[esm-code-splitting]]
 
+Declaring more than one module splits the code between them, so that each page or feature only loads what it actually needs.
+
+TIP: Don't worry too much about `:modules` in the beginning. Start with one and split them later.
 
 ```clojure
 {:deps true
@@ -178,7 +230,41 @@ You may now load each `:module` independently in the HTML.
 </script>
 ```
 
-The browser will automatically load the `/js/base.js` as well, but not the `/js/other.js` as the code above doesn't need it. You can use `:modules` to split code for separate sections of your website for example.
+The browser will automatically load the `/js/base.js` as well, but not the `/js/other.js` as the code above doesn't need it. Unlike with `:target :browser` you do not need to include the `<script>` tags for dependencies yourself or worry about their order, since each module imports the modules it depends on.
+
+You can use `:modules` to split code for separate sections of your website. Say you have a traditional website with actual different pages.
+
+- `www.acme.com` - serving the homepage
+- `www.acme.com/login` - serving the login form
+- `www.acme.com/protected` - protected section that is only available once the user is logged in
+
+One possible configuration for this would be to have one common module that is shared between all the pages. Then one for each page.
+
+.Example config with multiple `:modules`
+```clojure
+{...
+ :builds
+ {:app
+  {:target :esm
+   :output-dir "public/js"
+   :modules
+   {:shared
+    {:entries []}
+    :home
+    {:init-fn my.app.home/init
+     :depends-on #{:shared}}
+    :login
+    {:init-fn my.app.login/init
+     :depends-on #{:shared}}
+    :protected
+    {:init-fn my.app.protected/init
+     :depends-on #{:shared}}}}}}
+```
+
+.HTML for the `/login` page
+```html
+<script type="module" src="/js/login.js"></script>
+```
 
 == Dynamic Module Import
 
@@ -197,6 +283,277 @@ Modules can also be loaded dynamically at runtime via the provided `shadow.esm/d
 
 This loads an ESM module at runtime without a static import. The URL must be loadable by the runtime. It can refer to an external module or one of your generated `:modules`.
 
+== Lazy Loading [[esm-lazy-loading]]
+
+NOTE: This feature is still considered experimental.
+
+Using `dynamic-import` directly requires knowing which module a given piece of code ended up in. Instead you can tag a var with `^:lazy-loadable` and load it by name, letting the compiler figure out which module needs to be loaded.
+
+.Code to be loaded lazily
+```clojure
+(ns demo.thing)
+
+(defn ^:lazy-loadable x [e]
+  (js/console.log "hello world" e))
+```
+
+.Loading it at runtime
+```clojure
+(ns demo.app
+  (:require
+    [shadow.esm :as esm]
+    [shadow.cljs.modern :refer (js-await)]))
+
+(defn on-event [e]
+  (js-await [get-x (esm/load-by-name 'demo.thing/x)]
+    (let [x (get-x)]
+      (x e))))
+```
+
+.Build config with a separate module for `demo.thing`
+```clojure
+{...
+ :builds
+ {:app
+  {:target :esm
+   :output-dir "public/js"
+   :modules
+   {:main
+    {:init-fn demo.app/init}
+    :thing
+    {:entries [demo.thing]
+     :depends-on #{:main}}}}}}
+```
+
+Let's assume that the `on-event` function above is called when something in your app happens, for example when the user clicked a button. `esm/load-by-name` will `import()` the module the var was compiled into (`thing.js` here) and returns a promise. Note that `demo.app` does not `:require` `demo.thing`, otherwise it would end up in the `:main` module and there would be nothing to load lazily.
+
+The promise resolves to a zero-arity function returning the current value of the var, not the value itself. This is so that hot-reload keeps working and you never hold on to an outdated reference. Call it whenever you need the value instead of storing the result.
+
+`esm/get-loaded` returns that same function if the var has already been loaded, or `nil` otherwise. This is useful when you want to use something synchronously if available, and only go async when it is not.
+
+```clojure
+(if-some [get-x (esm/get-loaded 'demo.thing/x)]
+  ((get-x) e)
+  (on-event e))
+```
+
+If you prefer not to use the fully qualified name you can supply a custom name instead, e.g. `(defn ^{:lazy-loadable "thing"} x [e] ...)` and `(esm/load-by-name "thing")`.
+
+IMPORTANT: Vars tagged with `^:lazy-loadable` are never removed by dead code elimination, even if they are never actually loaded.
+
+== Web Workers [[esm-web-workers]]
+
+Browsers support loading ES modules natively in https://developer.mozilla.org/en-US/docs/Web/API/Worker/Worker[Web Workers] via `{type: "module"}`, so no extra configuration is required. A worker is just another module, usually with its own `:init-fn` and a dedicated CLJS namespace.
+
+.Example config with a worker module
+```clojure
+{...
+ :builds
+ {:app
+  {:target :esm
+   :output-dir "public/js"
+   :modules
+   {:shared
+    {:entries []}
+    :main
+    {:init-fn my.app/init
+     :depends-on #{:shared}}
+    :worker
+    {:init-fn my.app.worker/init
+     :depends-on #{:shared}}}}}}
+```
+
+The empty `:entries []` in the `:shared` module will make it collect all the code shared between the `:main` and `:worker` modules. The code in the `my.app.worker` namespace will only ever be loaded by the worker.
+
+.Sample echo worker
+```clojure
+(ns my.app.worker)
+
+(defn init []
+  (js/self.addEventListener "message"
+    (fn [^js e]
+      (js/postMessage (.. e -data)))))
+```
+
+.Sample using the worker
+```clojure
+(ns my.app)
+
+(defn init []
+  (let [worker (js/Worker. "/js/worker.js" #js {:type "module"})]
+    (.. worker (addEventListener "message" (fn [e] (js/console.log e))))
+    (.. worker (postMessage "hello world"))))
+```
+
+The worker imports `shared.js` itself, the same way the page loading `main.js` does.
+
+== Cacheable Output [[esm-cacheable-output]]
+
+In a web setting it is desirable to cache `.js` files for a very long time to avoid extra requests. For this the URL needs to change for every released version, so users never end up with outdated files.
+
+The recommended way to do this is a dedicated output directory per version. Leave the regular `:output-dir` in your build config for development and override it for `release` builds via <<config-merge, --config-merge>>.
+
+```bash
+$ npx shadow-cljs release app --config-merge '{:output-dir "public/js/v2"}'
+```
+
+This writes all modules to `public/js/v2`, which you then reference in your HTML.
+
+```html
+<script type="module" src="/js/v2/main.js"></script>
+```
+
+Since the generated modules import each other using relative paths everything in the directory stays consistent, and the files of a release never change once written. Previous versions can be kept around, so users still running an older version of your page can continue to load its files. The version can be anything, for example a manually maintained number or the `git` commit at the time of the build. Just make sure to bump it for every release you ship.
+
+```bash
+$ npx shadow-cljs release app --config-merge "{:output-dir \"public/js/$(git rev-parse --short HEAD)\"}"
+```
+
+How the version gets into the HTML depends on how you generate it. A server-side template, a script in your deployment process or a <<build-hooks, build hook>> are all fine options.
+
+== Development Support [[esm-devtools]]
+
+The `:devtools` section of a build configures the HUD, CSS reloading and runtime connections. With the default `:runtime :browser` the `:esm` target uses the same browser development client as `:target :browser`, so everything in this section applies to both. Configure optional development HTTP servers separately with the top-level <<dev-http, :dev-http>> setting.
+
+=== Heads-Up Display (HUD) [[hud]]
+
+Browser builds use a HUD to display a loading indicator when a build is started. It will also display warnings and errors if there are any.
+
+You can disable it completely by setting `:hud false` in the `:devtools` section.
+
+You may also toggle certain features by specifying which features you care about via setting `:hud #{:errors :warnings}`. This will show errors/warnings but no progress indicator. Available options are `:errors`, `:warnings`, `:progress`. Only options included will be enabled, all other will be disabled.
+
+==== Opening Files [[open-file-command]]
+
+Warnings include a link to source location which can be clicked to open the file in your editor. For this a little bit of config is required.
+
+You can either configure this in your `shadow-cljs.edn` config for the project or globally in your home directory under `~/.shadow-cljs/config.edn`.
+
+.`:open-file-command` configuration
+```clojure
+{:open-file-command
+ ["idea" :pwd "--line" :line :file]}
+```
+
+The `:open-file-command` expects a vector representing a very simple DSL. Strings are kept as they are and keyword are replaced by their respective values. A nested vector can be used in case you need to combine multiple params, using `clojure.core/format` style pattern.
+
+The above example would execute
+```bash
+$ idea /path/to/project-root --line 3 /path/to/project-root/src/main/demo/foo.cljs
+```
+
+.`emacsclient` example
+```
+{:open-file-command
+ ["emacsclient" "-n" ["+%s:%s" :line :column] :file]}
+```
+
+```bash
+$ emacsclient -n +3:1 /path/to/project-root/src/main/demo/foo.cljs
+```
+
+The available replacement variables are:
+
+[Horizontal]
+`:pwd`::
+Process Working Directory (aka project root)
+
+`:file`::
+Absolute File Path
+
+`:line`::
+Line Number of Warning/Error
+
+`:column`::
+Column Number
+
+`:wsl-file`::
+Translated WSL file path. Useful when running `shadow-cljs` via WSL Bash. Translates a `/mnt/c/Users/someone/code/project/src/main/demo/foo.cljs` path into `C:\Users\...`
+
+`:wsl-pwd`::
+Translated `:pwd`
+
+
+
+=== CSS Reloading
+
+The Browser devtools can also reload CSS for you. This is enabled by default and in most cases requires no additional
+configuration when you are using the built-in <<dev-http, development HTTP servers>>.
+
+Any stylesheet included in a page will be reloaded if modified on the filesystem. Prefer using absolute paths but relative paths should work as well.
+
+.Example HTML snippet
+```html
+<link rel="stylesheet" href="/css/main.css"/>
+```
+
+.Example Hiccup since we aren't savages
+```
+[:link {:rel "stylesheet" :href "/css/main.css"}]
+```
+
+.Using the built-in dev HTTP server
+```
+:dev-http {8000 "public"}
+```
+
+This will cause the browser to reload `/css/main.css` when `public/css/main.css` is changed.
+
+`shadow-cljs` currently provides no support for directly compiling CSS but the usual tools will work and should
+be run separately. Just make sure the output is generated into the correct places.
+
+When you are not using the built-in HTTP Server you can specify `:watch-dir` instead which should be a path to the
+document root used to serve your content.
+
+.Example :watch-dir config
+```clojure
+{...
+ :builds
+ {:app {...
+        :devtools {:watch-dir "public"}}}}
+```
+
+When your HTTP Server is serving the files from a virtual directory and the filesystem paths don't exactly match the path used in the HTML you may adjust the path by setting `:watch-path` which will be used as a prefix.
+
+.Example `public/css/main.css` being served under `/foo/css/main.css`
+```clojure
+{...
+ :builds
+ {:app
+  {...
+   :devtools {:watch-dir "public"
+              :watch-path "/foo"}}}}
+```
+
+=== Proxy Support [[proxy-support]]
+
+By default the devtools client will attempt to connect to the `shadow-cljs` process via the configured <<http, HTTP server>> (usually `localhost`). If you are using a reverse proxy to serve your HTML that might not be possible. You can set `:devtools-url` to configure which URL to use.
+
+```
+{...
+ :builds
+ {:app {...
+        :devtools {:before-load  my.app/stop
+                   :after-load   my.app/start
+                   :devtools-url "https://some.host/shadow-cljs"
+                   ...}}}}
+```
+
+`shadow-cljs` will then use the `:devtools-url` as the base when making requests. It is not the final URL so you must ensure that all requests starting with the path you configured (eg. `/shadow-cljs/*`) are forwarded to the host `shadow-cljs` is running on.
+
+
+.Incoming Request to Proxy
+```text
+wss://some.host/shadow-cljs/api/remote-relay?server-token=...
+```
+.must forward to
+```
+ws://localhost:9630/api/remote-relay?server-token=...
+```
+
+The client will make WebSocket request as well as normal XHR requests to load files. Ensure that your proxy properly upgrades WebSockets.
+
+IMPORTANT: Forward these requests to the main <<http, HTTP server>>, usually port 9630. Keep the request path after the configured proxy prefix and preserve query parameters.
 
 == Third Party Tool Integration
 

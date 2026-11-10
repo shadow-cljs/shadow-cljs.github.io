@@ -163,7 +163,7 @@ The available JS providers include:
 
 [Horizontal]
 `:require`:: Maps directly to the JS `require("thing")` function call. It is the default for all `node.js` targets since it can resolve `require` natively at runtime. The included JS is not processed in any way.
-`:shadow`:: Resolves the JS via `node_modules` and includes a minified version of each referenced file in the build. It is the default for the `:browser` target. `node_modules` sources do not go through `:advanced` compilation.
+`:shadow`:: Resolves the JS via `node_modules` and includes a minified version of each referenced file in the build. It is the default for the `:esm` and `:browser` targets. `node_modules` sources do not go through `:advanced` compilation.
 `:closure`:: Resolves similarly to `:shadow` but attempts to process all included files via the Closure Compiler CommonJS/ES6 rewrite facilities. They will also be processed via `:advanced` compilation.
 `:import`:: Emits ES imports for dependencies to be resolved by the runtime or another bundler. Used with the <<target-esm, :esm target>>.
 `:external`:: Only collects JS requires and emits an index file (configured via `:external-index "foo/bar.js"`) that is meant to be processed by any other JS build tool and will actually provide the JS dependencies. The emitted index file contains a bit of glue code so that the CLJS output can access the JS dependencies. The output of the external index file should be loaded before the CLJS output.
@@ -174,7 +174,7 @@ Ideally we want to use `:closure` as our primary JS Provider since that will run
 
 `:shadow` is sort of a stopgap solution that only processes code via `:simple` and achieves much more reliable support while still getting reasonably optimized code. The output is comparable (or often better) to what other tools like `webpack` generate.
 
-Until support in Closure gets more reliable `:shadow` is the recommend JS Provider for `:browser` builds.
+Until support in Closure gets more reliable `:shadow` is the recommend JS Provider for browser builds.
 ****
 
 
@@ -200,7 +200,7 @@ It is largely dependent on the packages you use whether this will work or not. Y
 {...
  :builds
  {:app
-  {:target :browser
+  {:target :esm
    ...
    :js-options {:entry-keys ["module" "browser" "main"]} ;; try "module" first
    }}}
@@ -218,7 +218,7 @@ For bundled browser dependencies, `:export-conditions` in `:js-options` controls
 {:deps true
  :builds
  {:app
-  {:target :browser
+  {:target :esm
    :modules {:main {:init-fn my.app/init}}
    :js-options {:export-conditions ["browser" "import" "default"]}}}}
 ```
@@ -240,7 +240,7 @@ Here is a sample `shadow-cljs.edn` config for such a build:
 {...
  :builds
  {:app
-  {:target :browser
+  {:target :esm
    ...
    :js-options
    {:resolve {"react" {:target :global
@@ -261,7 +261,7 @@ Sometimes you want more control over which `npm` package is actually used depend
 {...
  :builds
  {:app
-  {:target :browser
+  {:target :esm
    ...
    :js-options
    {:resolve {"react" {:target :npm
@@ -274,7 +274,7 @@ You can also use a file to override the dependency, the path is relative to the 
 {...
  :builds
  {:app
-  {:target :browser
+  {:target :esm
    ...
    :js-options
    {:resolve {"react" {:target :file

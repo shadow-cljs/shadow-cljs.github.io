@@ -4,8 +4,8 @@
 ```
 {:deps true
  :builds
- {:app   {:target     :browser
-          ... browser-specific options ...}
+ {:app   {:target     :esm
+          ... esm-specific options ...}
   :tests {:target :browser-test
           :test-dir "out/test"}}}
 ```
@@ -14,15 +14,15 @@ Each build describes artifacts that the compiler will build. The build target is
 
 == Build Target
 
-Each build in `shadow-cljs` must define a `:target` which defines where you intend your code to be executed. There are default built-ins for the <<target-browser,browser>> and <<target-node,`node.js`>>. They all share the basic concept of having `:dev` and `:release` modes. `:dev` mode provides all the usual development goodies like fast compilation, live code reloading and a REPL. `:release` mode will produce optimized output intended for production.
+Each build in `shadow-cljs` must define a `:target` which defines where you intend your code to be executed. There are default built-ins for the <<target-esm,browser>> and <<target-node,`node.js`>>. They all share the basic concept of having `:dev` and `:release` modes. `:dev` mode provides all the usual development goodies like fast compilation, live code reloading and a REPL. `:release` mode will produce optimized output intended for production.
 
 Targets are covered in separate chapters.
 
 Here are some of them:
 
 [Horizontal]
-<<target-browser, `:browser`>>:: Output code suitable for running in a web browser.
-<<target-esm, `:esm`>>:: Output ES modules with explicit exports for browsers, Node.js or other JavaScript tools.
+<<target-esm, `:esm`>>:: Output ES modules for browsers, Node.js or other JavaScript tools. The recommended target for code running in a web browser.
+<<target-browser, `:browser`>>:: Output classic scripts for running in a web browser. Still supported, but prefer `:esm` for new projects.
 <<target-browser-test, `:browser-test`>>:: Scan for tests to determine required files, and output tests suitable for running in the browser.
 <<target-karma, `:karma`>>:: Scan for tests to determine required files, and output karma-runner compatible tests. See <<target-karma, the Karma compatibility section>>.
 <<target-node-library, `:node-library`>>:: Output code suitable for use as a node library.
@@ -83,9 +83,8 @@ For example to only include the preloads within a main module during development
                           com.fulcrologic.fulcro.inspect.dom-picker-preload]
                          :depends-on #{:shared}}
                   :shared {:entries []}
-                  :web-worker {...
-                    :depends-on #{:shared}
-                    :web-worker true}}}}}
+                  :worker {...
+                           :depends-on #{:shared}}}}}}
 ```
 
 `:preloads` are only applied to development builds and will not be applied to release builds.
@@ -301,7 +300,7 @@ In addition you can control how much caching is done more broadly via the `:buil
 {...
  :builds
  {:app
-  {:target :browser
+  {:target :esm
    ...
    :build-options
    {:cache-level :off}}}}
@@ -348,7 +347,7 @@ This defines the `your.app/VERBOSE` variable as `false` by default. This will ca
 {...
  :builds
  {:app
-  {:target :browser
+  {:target :esm
    ...
    :modules {:app {:entries [your.app]}}
    ;; to enable in development only
@@ -377,7 +376,7 @@ These are all grouped under the `:compiler-options` key in your build config.
 {:deps true
  :builds
  {:app
-  {:target :browser
+  {:target :esm
    ...
    :compiler-options {:fn-invoke-direct true}}}}
 ```
@@ -506,7 +505,7 @@ CAUTION: This feature only works in `shadow-cljs`. It was officially https://dev
 
 `shadow-cljs` lets you configure additional reader features in `.cljc` files. By default you can only use reader conditionals to generate separate code for `:clj`, `:cljs` or `:cljr`. In many CLJS builds however it is also desirable to select which code is generated based on your `:target`.
 
-Example: Some `npm` packages only work when targeting the `:browser`, but you may have a `ns` that you also want to use in a `:node-script` build. This might happen frequently when trying to use Server-Side Rendering (SSR) with your React App. `codemirror` is one such package.
+Example: Some `npm` packages only work when targeting the browser, but you may have a `ns` that you also want to use in a `:node-script` build. This might happen frequently when trying to use Server-Side Rendering (SSR) with your React App. `codemirror` is one such package.
 
 ```clojure
 (ns my.awesome.component
@@ -522,7 +521,7 @@ Example: Some `npm` packages only work when targeting the `:browser`, but you ma
 ...
 ```
 
-This namespace will compile fine for both builds (`:node-script` and `:browser`) but when trying to run the `:node-script` it will fail since the `codemirror` package tries to access the DOM. Since `react-dom/server` does not use refs the `init-cm` function will never be called anyways.
+This namespace will compile fine for both builds (`:node-script` and `:esm`) but when trying to run the `:node-script` it will fail since the `codemirror` package tries to access the DOM. Since `react-dom/server` does not use refs the `init-cm` function will never be called anyways.
 
 While you can use <<closure-defines, :closure-defines>> to conditionally compile away the `init-cm` fn you can not use it to get rid of the extra `:require`. Reader conditionals let you do this easily.
 
@@ -552,7 +551,7 @@ While you can use <<closure-defines, :closure-defines>> to conditionally compile
  :builds
  ;; app build configured normally, no adjustments required
  {:app
-  {:target :browser
+  {:target :esm
    ...}
   ;; for the server we add the :node reader feature
   ;; it will then be used instead of the default :cljs
@@ -589,7 +588,7 @@ You can pass additional config data via the `--config-merge {:some "data"}` comm
 {...
  :builds
  {:app
-  {:target :browser
+  {:target :esm
    :output-dir "public/js"
    ...}}}
 ```
@@ -617,7 +616,7 @@ It is possible to use environment variables to set configuration values in `shad
 {...
  :builds
  {:app
-  {:target :browser
+  {:target :esm
    :output-dir "public/js"
    :closure-defines {your.app/URL #shadow/env "APP_URL"}
    ...}}}
@@ -653,17 +652,17 @@ Configuration merge order is as follows `:build-defaults` -> `:target-defaults` 
    {your.app/VERBOSE true}}
 
  :target-defaults
- {:browser
+ {:esm
    {:js-options
      {:resolve {"react" {:target :global
                          :global "React"}}}}}
 
  :builds
  {:app
-  {:target :browser
+  {:target :esm
    ...}}}
 ```
 
-In this example the `:app` target will inherit both `:build-defaults` and the `:target-defaults` for `:browser`.
+In this example the `:app` target will inherit both `:build-defaults` and the `:target-defaults` for `:esm`.
 
 IMPORTANT: Configs later in the merge order can override, but not remove previous configuration items. Once a default is set, the only way to remove it is by overriding it.

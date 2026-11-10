@@ -148,9 +148,8 @@ Choose a published https://clojars.org/thheller/shadow-cljs[shadow-cljs version]
 {:deps true
  :dev-http {8000 "public"}
  :builds
- {:app {:target :browser
+ {:app {:target :esm
         :output-dir "public/js"
-        :asset-path "/js"
         :modules {:main {:init-fn my.app/init}}}}}
 ```
 
@@ -167,11 +166,11 @@ Choose a published https://clojars.org/thheller/shadow-cljs[shadow-cljs version]
 <!doctype html>
 <html>
   <head><meta charset="utf-8"><title>My app</title></head>
-  <body><script src="/js/main.js"></script></body>
+  <body><script type="module" src="/js/main.js"></script></body>
 </html>
 ```
 
-Run `npx shadow-cljs watch app` and open http://localhost:8000. This example has the following files:
+The build uses <<target-esm, `:target :esm`>>, the recommended target for code running in the Browser. Run `npx shadow-cljs watch app` and open http://localhost:8000. This example has the following files:
 
 ```text
 .
@@ -579,13 +578,13 @@ Restart a running server after changing JVM options. Available arguments depend 
 
 include::build-config.adoc[]
 
-= Targeting the Browser [[target-browser]]
-
-include::target-browser.adoc[]
-
-= Targeting JavaScript Modules [[target-esm]]
+= Targeting the Browser and JavaScript Modules [[target-esm]]
 
 include::target-esm.adoc[]
+
+= Targeting the Browser with Classic Scripts [[target-browser]]
+
+include::target-browser.adoc[]
 
 = Targeting React Native [[target-react-native]]
 

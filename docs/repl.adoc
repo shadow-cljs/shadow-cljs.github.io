@@ -37,7 +37,7 @@ IMPORTANT: If you close the Browser window the REPL will stop working.
 If you want to build a specific thing you should configure a build using one of the provided build-targets. Most of them automatically inject the necessary code for a ClojureScript REPL. It should not require any additional configuration. For the build CLJS REPL to work you need 2 things
 
 . a running `watch` for your build
-. connect the JS runtime of the `:target`. Meaning if you are using the `:browser` target you need to open a Browser that has the generated JS loaded. For node.js builds that means running the `node` process.
+. connect the JS runtime of the `:target`. Meaning if you are building for the Browser (eg. `:target :esm`) you need to open a Browser that has the generated JS loaded. For node.js builds that means running the `node` process.
 
 Once you have both you can connect to the CLJS REPL via the command line or from the Clojure REPL.
 

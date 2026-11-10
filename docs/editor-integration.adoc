@@ -132,7 +132,7 @@ The file must define the `user/reset` fn since Proto REPL will call that when co
 
 7) Eval `(shadow.cljs.devtools.api/nrepl-select :your-build)`. The REPL connection is now in CLJS mode, meaning that everything you eval will be eval'd in JS. You can eval `:repl/quit` to get back to Clojure Mode. If you get `[:no-worker :browser]` you need to start the `watch` first.
 
-8) Before you can eval CLJS you need to connect your client (eg. your Browser when building a `:browser` App).
+8) Before you can eval CLJS you need to connect your client (eg. your Browser when building a browser app).
 
 9) Eval some JS, eg. `(js/alert "foo")`. If you get `There is no connected JS runtime` the client is not connected properly. Otherwise the Browser should show an alert.
 

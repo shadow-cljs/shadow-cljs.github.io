@@ -37,7 +37,7 @@ The compiled JS code however must also be loaded by a JS runtime (eg. Browser or
 
 Once connected the REPL is ready to use. Note that reloading the JS runtime (eg. manual browser page reload) will wipe out all REPL state of the runtime but some of the compiler side state will remain until the `watch` is also restarted.
 
-It is possible for more than one JS runtime to connect to the `watch` process. `shadow-cljs` by default picks the first JS runtime that connected as the `eval` target. If you open a given `:browser` build in multiple Browsers only the first one will be used to `eval` code. Or you could be opening a `:react-native` app in iOS and Android next to each other during development. Only one runtime can eval and if that disconnects the next one takes over based on the time it connected.
+It is possible for more than one JS runtime to connect to the `watch` process. `shadow-cljs` by default picks the first JS runtime that connected as the `eval` target. If you open a given browser build in multiple Browsers only the first one will be used to `eval` code. Or you could be opening a `:react-native` app in iOS and Android next to each other during development. Only one runtime can eval and if that disconnects the next one takes over based on the time it connected.
 
 
 ### Missing JS runtime [[missing-js-runtime]]
@@ -48,9 +48,9 @@ This error message just means that no JS runtime (eg. Browser) has connected to 
 
 Regular `shadow-cljs` builds do not manage any JS runtime of their own so you are responsible for running them.
 
-#### :target :browser [[repl-trouble-browser]]
+#### :target :esm, :browser [[repl-trouble-browser]]
 
-For <<target-browser, `:target :browser`>> builds the `watch` process will have compiled the given code to a configured `:output-dir` (defaults to `public/js`). The generated `.js` must be loaded in a browser. Once loaded the Browser Console should show a `WebSocket connected` message. If you are using any kind of custom HTTP servers or have over-eager firewalls blocking the connections you might need to set some additional configuration (eg. via <<proxy-support, :devtools-url>>). The goal is to be able to connect to the <<http, primary HTTP server>>.
+For <<target-esm, `:target :esm`>> (with the default `:runtime :browser`) and <<target-browser, `:target :browser`>> builds the `watch` process will have compiled the given code to the configured `:output-dir`. The generated `.js` must be loaded in a browser. Once loaded the Browser Console should show a `WebSocket connected` message. If you are using any kind of custom HTTP servers or have over-eager firewalls blocking the connections you might need to set some additional configuration (eg. via <<proxy-support, :devtools-url>>). The goal is to be able to connect to the <<http, primary HTTP server>>.
 
 
 #### :target :node-script, :node-library [[repl-trouble-node]]

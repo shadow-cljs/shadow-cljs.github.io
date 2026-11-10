@@ -1,4 +1,6 @@
-The `:browser` target produces output intended to run in a Browser environment. During development it supports live code reloading, REPL, CSS reloading. The `release` output will be minified by the Closure Compiler with `:advanced` optimizations.
+The `:browser` target produces classic script output intended to run in a Browser environment. During development it supports live code reloading, REPL, CSS reloading. The `release` output will be minified by the Closure Compiler with `:advanced` optimizations.
+
+TIP: For new projects use <<target-esm, `:target :esm`>> instead. It covers the same use cases, but emits standard JavaScript modules that work in the Browser as well as in other ESM environments and JS tools. `:target :browser` remains supported and there is no need to migrate existing projects that are working fine.
 
 A basic browser configuration looks like this:
 
@@ -352,6 +354,8 @@ In a web setting it is desirable to cache `.js` files for a very long time to av
 practice the generate a unique name for the `.js` file for every released version. This changes the URL used to
 access it and thereby is safe to cache forever.
 
+TIP: The recommended approach is a dedicated output directory per version, e.g. `--config-merge '{:output-dir "public/js/v2" :asset-path "/js/v2"}'`, as described in <<esm-cacheable-output, Cacheable Output>> for `:target :esm`. The `:release-version` and `:module-hash-names` options below are still supported, but not recommended.
+
 === Release Versions [[release-version]]
 
 Creating unique filenames for each release can be done via the `:release-version` config setting. Generally you'll pass this in from the command line via <<config-merge, --config-merge>>.
@@ -458,147 +462,7 @@ be relative to the configured `:output-dir`.
 
 == Development Support
 
-The `:devtools` section of a `:browser` build configures the HUD, CSS reloading and runtime connections. Configure optional development HTTP servers separately with the top-level <<dev-http, :dev-http>> setting.
-
-=== Heads-Up Display (HUD) [[hud]]
-
-The `:browser` target now uses a HUD to display a loading indicator when a build is started. It will also display warnings and errors if there are any.
-
-You can disable it completely by setting `:hud false` in the `:devtools` section.
-
-You may also toggle certain features by specifying which features you care about via setting `:hud #{:errors :warnings}`. This will show errors/warnings but no progress indicator. Available options are `:errors`, `:warnings`, `:progress`. Only options included will be enabled, all other will be disabled.
-
-==== Opening Files [[open-file-command]]
-
-Warnings include a link to source location which can be clicked to open the file in your editor. For this a little bit of config is required.
-
-You can either configure this in your `shadow-cljs.edn` config for the project or globally in your home directory under `~/.shadow-cljs/config.edn`.
-
-.`:open-file-command` configuration
-```clojure
-{:open-file-command
- ["idea" :pwd "--line" :line :file]}
-```
-
-The `:open-file-command` expects a vector representing a very simple DSL. Strings are kept as they are and keyword are replaced by their respective values. A nested vector can be used in case you need to combine multiple params, using `clojure.core/format` style pattern.
-
-The above example would execute
-```bash
-$ idea /path/to/project-root --line 3 /path/to/project-root/src/main/demo/foo.cljs
-```
-
-.`emacsclient` example
-```
-{:open-file-command
- ["emacsclient" "-n" ["+%s:%s" :line :column] :file]}
-```
-
-```bash
-$ emacsclient -n +3:1 /path/to/project-root/src/main/demo/foo.cljs
-```
-
-The available replacement variables are:
-
-[Horizontal]
-`:pwd`::
-Process Working Directory (aka project root)
-
-`:file`::
-Absolute File Path
-
-`:line`::
-Line Number of Warning/Error
-
-`:column`::
-Column Number
-
-`:wsl-file`::
-Translated WSL file path. Useful when running `shadow-cljs` via WSL Bash. Translates a `/mnt/c/Users/someone/code/project/src/main/demo/foo.cljs` path into `C:\Users\...`
-
-`:wsl-pwd`::
-Translated `:pwd`
-
-
-
-=== CSS Reloading
-
-The Browser devtools can also reload CSS for you. This is enabled by default and in most cases requires no additional
-configuration when you are using the built-in <<dev-http, development HTTP servers>>.
-
-Any stylesheet included in a page will be reloaded if modified on the filesystem. Prefer using absolute paths but relative paths should work as well.
-
-.Example HTML snippet
-```html
-<link rel="stylesheet" href="/css/main.css"/>
-```
-
-.Example Hiccup since we aren't savages
-```
-[:link {:rel "stylesheet" :href "/css/main.css"}]
-```
-
-.Using the built-in dev HTTP server
-```
-:dev-http {8000 "public"}
-```
-
-This will cause the browser to reload `/css/main.css` when `public/css/main.css` is changed.
-
-`shadow-cljs` currently provides no support for directly compiling CSS but the usual tools will work and should
-be run separately. Just make sure the output is generated into the correct places.
-
-When you are not using the built-in HTTP Server you can specify `:watch-dir` instead which should be a path to the
-document root used to serve your content.
-
-.Example :watch-dir config
-```clojure
-{...
- :builds
- {:app {...
-        :devtools {:watch-dir "public"}}}}
-```
-
-When your HTTP Server is serving the files from a virtual directory and the filesystem paths don't exactly match the path used in the HTML you may adjust the path by setting `:watch-path` which will be used as a prefix.
-
-.Example `public/css/main.css` being served under `/foo/css/main.css`
-```clojure
-{...
- :builds
- {:app
-  {...
-   :devtools {:watch-dir "public"
-              :watch-path "/foo"}}}}
-```
-
-=== Proxy Support [[proxy-support]]
-
-By default the devtools client will attempt to connect to the `shadow-cljs` process via the configured <<http, HTTP server>> (usually `localhost`). If you are using a reverse proxy to serve your HTML that might not be possible. You can set `:devtools-url` to configure which URL to use.
-
-```
-{...
- :builds
- {:app {...
-        :devtools {:before-load  my.app/stop
-                   :after-load   my.app/start
-                   :devtools-url "https://some.host/shadow-cljs"
-                   ...}}}}
-```
-
-`shadow-cljs` will then use the `:devtools-url` as the base when making requests. It is not the final URL so you must ensure that all requests starting with the path you configured (eg. `/shadow-cljs/*`) are forwarded to the host `shadow-cljs` is running on.
-
-
-.Incoming Request to Proxy
-```text
-wss://some.host/shadow-cljs/api/remote-relay?server-token=...
-```
-.must forward to
-```
-ws://localhost:9630/api/remote-relay?server-token=...
-```
-
-The client will make WebSocket request as well as normal XHR requests to load files. Ensure that your proxy properly upgrades WebSockets.
-
-IMPORTANT: Forward these requests to the main <<http, HTTP server>>, usually port 9630. Keep the request path after the configured proxy prefix and preserve query parameters.
+The `:browser` target uses the same development client as <<target-esm, `:target :esm`>>. The HUD, CSS reloading and `:devtools-url` proxy support are all configured the same way, see <<esm-devtools, Development Support>> in the `:esm` chapter.
 
 == Using External JS Bundlers [[js-provider-external]]
 
