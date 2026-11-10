@@ -79,7 +79,7 @@ If you see this you need to open your App in the Browser or start the `node` pro
 
 == Clojure REPL
 
-A Clojure REPL is also provided in addition to the provided ClojureScript REPLs. This is can be used to control the `shadow-cljs` process and run all other build commands through it. You can start with a Clojure REPL and then upgrade it to a CLJS REPL at any point (and switch back).
+A Clojure REPL is also provided in addition to the provided ClojureScript REPLs. This can be used to control the `shadow-cljs` process and run all other build commands through it. You can start with a Clojure REPL and then upgrade it to a CLJS REPL at any point (and switch back).
 
 .Running from the CLI
 ```bash

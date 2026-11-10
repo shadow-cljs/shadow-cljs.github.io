@@ -104,7 +104,7 @@ import defaultExport, * as name from "module-name";
 
 .Example Module Import without use (including a Module for side-effects only)
 ```js
-import from "module-name";
+import "module-name";
 ```
 ```clojure
 (:require ["module-name"])
@@ -126,7 +126,7 @@ import AutoSizer from 'react-virtualized/dist/commonjs/AutoSizer'
 import List from 'react-virtualized/dist/commonjs/List'
 ```
 
-With our improved support we we can easily translate this to:
+This translates to:
 
 ```
 (ns my-ns
@@ -159,12 +159,13 @@ Since printing arbitrary JS objects is not always useful (as seen above) you can
 
 `shadow-cljs` supports several different ways to include `npm` packages into your build. They are configurable via the `:js-options :js-provider` setting. Each `:target` usually sets the one appropriate for your build most often you won't need to touch this setting.
 
-Currently there are 3 supported JS Providers:
+The available JS providers include:
 
 [Horizontal]
 `:require`:: Maps directly to the JS `require("thing")` function call. It is the default for all `node.js` targets since it can resolve `require` natively at runtime. The included JS is not processed in any way.
 `:shadow`:: Resolves the JS via `node_modules` and includes a minified version of each referenced file in the build. It is the default for the `:browser` target. `node_modules` sources do not go through `:advanced` compilation.
 `:closure`:: Resolves similarly to `:shadow` but attempts to process all included files via the Closure Compiler CommonJS/ES6 rewrite facilities. They will also be processed via `:advanced` compilation.
+`:import`:: Emits ES imports for dependencies to be resolved by the runtime or another bundler. Used with the <<target-esm, :esm target>>.
 `:external`:: Only collects JS requires and emits an index file (configured via `:external-index "foo/bar.js"`) that is meant to be processed by any other JS build tool and will actually provide the JS dependencies. The emitted index file contains a bit of glue code so that the CLJS output can access the JS dependencies. The output of the external index file should be loaded before the CLJS output.
 
 .`:shadow` vs `:closure`
@@ -192,7 +193,7 @@ Until support in Closure gets more reliable `:shadow` is the recommend JS Provid
 
 Nowadays many `npm` packages ship multiple build variants. `shadow-cljs` will by default pick the variant linked under the `main` or `browser` key in `package.json`. This most commonly refers to CommonJS code. Some modern packages also provide a `module` entry which usually refers to ECMAScript code (meaning "modern" JS). Interop between CommonJS and ESM can be tricky so `shadow-cljs` defaults to using CommonJS but it can be beneficial to use ESM.
 
-It is largely dependent on the packages you use whether this will work or not. You can configure `shadow-cljs`  to prefer the `module` entry via the `:entry-keys` JS option. It takes a vector of string keys found in `package.json` which will be tried in order. The default is `"["browser" "main" "module"]`.
+It is largely dependent on the packages you use whether this will work or not. You can configure `shadow-cljs`  to prefer the `module` entry via the `:entry-keys` JS option. It takes a vector of string keys found in `package.json` which will be tried in order. For browser builds the default is `["browser" "main" "module"]`.
 
 .Example config preferring "module" over "browser" and "main".
 ```clojure
@@ -206,6 +207,24 @@ It is largely dependent on the packages you use whether this will work or not. Y
 ```
 
 Make sure to test thoroughly and compare the <<build-report, build report>> output to check size differences when switching this. Results may vary greatly in positive or negative ways.
+
+==== Package exports
+
+When a package declares an `exports` field in `package.json`, that field takes precedence over `:entry-keys` for requests from outside the package. Changing `:entry-keys` alone will not select another variant of such a package.
+
+For bundled browser dependencies, `:export-conditions` in `:js-options` controls which conditional export is chosen. The default order is `["browser" "require" "default" "module" "import"]`. To prefer ESM variants, for example:
+
+```clojure
+{:deps true
+ :builds
+ {:app
+  {:target :browser
+   :modules {:main {:init-fn my.app/init}}
+   :js-options {:export-conditions ["browser" "import" "default"]}}}}
+```
+
+Package exports can restrict which subpaths are public. An error such as `package ... had exports, but could not resolve ...` may mean that the requested subpath is not exported. Prefer the package's documented entry points. `:exports-bypass true` permits legacy path resolution when no export matches; `:ignore-exports true` ignores the exports field entirely. Use these overrides only when you understand the package layout. With `:js-provider :require` or `:import`, the runtime or external bundler resolves package internals instead.
+
 
 === Resolving Packages [[js-resolve]]
 
@@ -246,7 +265,7 @@ Sometimes you want more control over which `npm` package is actually used depend
    ...
    :js-options
    {:resolve {"react" {:target :npm
-                       :require "preact-compat"}}}
+                       :require "preact-compat"}}}}}}
 ```
 
 You can also use a file to override the dependency, the path is relative to the project root.
@@ -259,12 +278,12 @@ You can also use a file to override the dependency, the path is relative to the 
    ...
    :js-options
    {:resolve {"react" {:target :file
-                       :file   "src/main/override-react.js"}}}
+                       :file   "src/main/override-react.js"}}}}}}
 ```
 
 ==== Limitations [[js-resolve-limitations]]
 
-The `:shadow-js` and `:closure` have full control over `:resolve` and everything mentioned above works without any downsides. The `:js-provider :require` however is more limited. Only the initial require can be influenced since the standard `require` is in control after that. This means it is not possible to influence what a package might `require` internally. It is therefore not recommended to be used with targets that use `require` directly (eg. `:node-script`).
+The `:shadow` and `:closure` providers have full control over `:resolve` and everything mentioned above works without any downsides. The `:js-provider :require` however is more limited. Only the initial require can be influenced since the standard `require` is in control after that. This means it is not possible to influence what a package might `require` internally. It is therefore not recommended to be used with targets that use `require` directly (eg. `:node-script`).
 
 .Redirecting "react" to "preact"
 ```
@@ -275,7 +294,7 @@ The `:shadow-js` and `:closure` have full control over `:resolve` and everything
    ...
    :js-options
    {:resolve {"react" {:target :npm
-                       :require "preact-compat"}}}
+                       :require "preact-compat"}}}}}}
 ```
 .Example use of react-table
 ```
@@ -338,11 +357,11 @@ We already covered how `npm` packages are accessed by their name but on the clas
 
 TIP: For string requires the extension `.js` will be added automatically but you can specify the extension if you prefer. Note that currently only `.js` is supported though.
 
-Absolute requires like `/some-library/components/foo` mean that the compiler will look for a `some-library/components/foo.js` on the classpath; unlike `node` which would attempt to load the file from the local filesystem. The same classpath rules apply so the file may either be in your `:source-paths` or in some third-party `.jar` library you are using.
+Absolute requires like `/some-library/components/foo` mean that the compiler will look for a `some-library/components/foo.js` on the classpath; unlike `node` which would attempt to load the file from the local filesystem. The same classpath rules apply: the file may be in a source directory configured by `deps.edn` or in a third-party `.jar` library.
 
 Relative requires are resolved by first looking at the current namespace and then resolving a relative path from that name. In the above example we are in `demo/app.cljs` to the `./bar` require resolves to `demo/bar.js`, so it is identical to `(:require ["/demo/bar"])`.
 
-IMPORTANT: The files must not be physically located in the same directory. The lookup for the file appears on the classpath instead. This is unlike node which expects relative requires to always resolve to physical files.
+IMPORTANT: The files do not need to be physically located in the same directory. The lookup for the file appears on the classpath instead. This is unlike node which expects relative requires to always resolve to physical files.
 
 .Example File Structure with Separate Paths
 ```text
@@ -362,9 +381,9 @@ IMPORTANT: The files must not be physically located in the same directory. The l
 
 IMPORTANT: It is expected that the classpath only contains JavaScript that can be consumed without any pre-processing by the Compiler. `npm` has a very similar convention.
 
-The Closure Compiler is used for processing all JavaScript found on the classpath using its `ECMASCRIPT_NEXT` language setting. What exactly this setting means is not well documented but it mostly represents the next generation JavaScript code which might not even be supported by most browsers yet. ES6 is very well supported as well as most ES8 features. Similarly to standard CLJS this will be compiled down to ES5 with polyfills when required.
+The Closure Compiler processes JavaScript found on the classpath. Supported syntax depends on the bundled compiler version. Use the <<_output_language_options, output language options>> to choose the generated JavaScript feature set; there is no general guarantee of ES5 output.
 
-Since the Closure Compiler is getting constant updates newer features will be available over time. Just don't expect to use the latest cutting edge preview features to be available immediately. Somewhat recent additions like `async/await` already work quite well.
+Syntax requiring preprocessing, such as TypeScript or JSX, must be transformed before the files are placed on the classpath.
 
 The JS should be written using ES Module Syntax using `import` and `export`. JS files can include other JS files and reference CLJS code directly. They may also access `npm` packages directly with one caveat.
 
@@ -379,7 +398,7 @@ import React from "react";
 import cljs from "goog:cljs.core";
 
 export function inc(num) {
-  return cljs.inc(1);
+  return cljs.inc(num);
 }
 ```
 
@@ -389,9 +408,9 @@ IMPORTANT: Due to strict checking of the Closure Compiler it is not possible to 
 
 Since there are many popular JavaScript dialects (JSX, CoffeeScript, etc) that are not directly parsable by the Closure Compiler we need to pre-process them before putting them onto the classpath. https://babeljs.io/[babel] is commonly used in the JavaScript world so we are going to use `babel` to process `.jsx` files as an example here.
 
-.Example shadow-cljs.edn Config
+.Example deps.edn paths (alongside your :deps and :aliases)
 ```
-{:source-paths
+{:paths
  ["src/main"
   "src/gen"]
  ...}
@@ -412,7 +431,7 @@ Since there are many popular JavaScript dialects (JSX, CoffeeScript, etc) that a
             └── bar.jsx
 ```
 
-IMPORTANT: Notice how `src/js` is not added to `:source-paths` which means it will not be on the classpath.
+IMPORTANT: Notice how `src/js` is not added to `:paths` which means it will not be on the classpath.
 
 .src/js/demo/bar.jsx
 ```jsx

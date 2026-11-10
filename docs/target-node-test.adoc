@@ -34,4 +34,14 @@ $ node out/node-tests.js
 $ shadow-cljs compile test && node out/node-tests.js
 ```
 
+The default runner also supports listing tests and selecting namespaces or individual test vars. These options are passed to the generated Node.js script:
+
+```bash
+$ node out/node-tests.js --list
+$ node out/node-tests.js --test=demo.app-test
+$ node out/node-tests.js --test=demo.app-test/some-test,demo.other-test
+```
+
+Selections are exact names, not regular expressions. They only select tests already included by the build's `:ns-regexp` and active classpath.
+
 The `node` process exit code will be set to `0` when successful and `1` on any failures. (The `node` process exit code will not be returned when using `:autorun`.)

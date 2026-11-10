@@ -10,19 +10,19 @@ The code is just ClojureScript, and an entry point is easy to define:
 
 === Build Options
 
-You will need the same basic <<config,main configuration>> as in other targets (like
-`:source-paths`), but you'll need some node-specific build target options:
+You will need the same basic <<config,main configuration>> as in other targets (including
+source paths in `deps.edn`), but you'll need some node-specific build target options:
 
 [horizontal]
 `:main`:: (required). The namespace-qualified symbol of your script's entry point function.
 `:output-to`:: (required). The path and filename for the generated script.
 `:output-dir`:: (optional). The path for supporting files in development mode. Defaults to a cache directory.
 
-// TODO: Thomas mentioned that node can be picky and sometimes output-dir is useful...an example would be nice.
+The output uses CommonJS. If the surrounding `package.json` sets `"type": "module"`, use a `.cjs` filename for `:output-to`, or use the <<target-esm, :esm target>> when you need ES module output.
 
 .Sample node script build
 ```
-{:source-paths [...]
+{:deps true
  ...
  :builds
  {:script
@@ -81,11 +81,13 @@ Here is an example http server in node:
   "Hot code reload hook to shut down resources so hot code reload can work"
   [done]
   (js/console.warn "stop called")
-  (when-some [srv @server-ref]
+  (if-some [srv @server-ref]
     (.close srv
       (fn [err]
+        (vreset! server-ref nil)
         (js/console.log "stop completed" err)
-        (done)))))
+        (done)))
+    (done)))
 
 (js/console.log "__filename" js/__filename)
 ```

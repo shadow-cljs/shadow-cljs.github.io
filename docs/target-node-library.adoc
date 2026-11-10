@@ -9,6 +9,8 @@ The target-specific options are:
 `:output-to`:: (required). The path and filename for the generated library.
 `:output-dir`:: (optional). The path for supporting files in development mode. Defaults to a cache directory.
 
+The output uses CommonJS. In a package with `"type": "module"`, choose a `.cjs` output filename. Use the <<target-esm, :esm target>> for ES module output.
+
 The hot code reload story is similar to <<NodeHotCodeReload, the script target>>, but may not work as well
 since it cannot as easily control all of the code that is loaded.
 
@@ -56,18 +58,17 @@ It is effectively generating `module.exports = demo.ns.f;`
 {...
  :builds {:lib {:exports {:g       demo.ns/f
                           :h       other.ns/thing
-                          :ns/ok?  another.ns/ok?}
+                          :ok?     another.ns/ok?}
                 ...}}}
 ```
 
-The keyword is used as the name of the entry in the exported object. *No munging is done* to this keyword name
-(but namespaces are dropped). So, the above example maps cljs `f` to `g`, etc.:
+Export keys must be unqualified keywords. Their names are munged to JavaScript identifiers (except `:default`, which is kept as `default`). For example, `:ok?` becomes `ok_QMARK_`. The example maps the CLJS var `f` to the JS property `g`:
 
 ```bash
 $ node
 > var lib = require('./lib.js');
 lib.g(); // call demo-ns/f
-lib["ok?"](); // call another-ns/ok?
+lib.ok_QMARK_(); // call another.ns/ok?
 ```
 
 You can achieve the exact same thing by using `:exports-var` pointing to a `def`
@@ -84,6 +85,9 @@ In addition you may specify `:exports-fn` as a fully qualified symbol. This shou
 ```clojure
 (ns demo.ns
   (:require [demo.other :as other]))
+
+(defn hello []
+  "hello")
 
 (defn generate-exports []
   #js {:hello hello

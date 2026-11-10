@@ -3,8 +3,7 @@ The `:browser` target produces output intended to run in a Browser environment. 
 A basic browser configuration looks like this:
 
 ```
-{:dependencies [...]
- :source-paths [...]
+{:deps true
 
  :builds
  {:app {:target :browser
@@ -119,7 +118,7 @@ One possible configuration for this would be to have one common module that is s
    :depends-on #{:shared}}
   :protected
   {:entries [my.app.protected]
-   :depends-on #{:shared}}
+   :depends-on #{:shared}}}}
 ```
 
 TIP: You can leave the `:entries` of the `:shared` module empty to let the compiler figure out which namespaces are shared between the other modules.
@@ -191,7 +190,7 @@ If you load `xy` the result will be a vector with two things. If you load `xym` 
 
 ==== Using shadow-cljs's built-in Loader Support
 
-IMPORTANT: This is the low level version, which the above is built upoin. Use it if you want to build your own abstraction for async loading. The above is much more convenient to use.
+IMPORTANT: This is the low level version, which the above is built upon. Use it if you want to build your own abstraction for async loading. The above is much more convenient to use.
 
 The compiler supports generating the required data for using the `shadow.loader` utility namespace. It exposes a simple interface to let you load modules on-demand at runtime.
 
@@ -244,7 +243,7 @@ Then the following expressions can be used for loading code:
 (loader/with-module "extra" fn-to-call-on-load)
 ```
 
-You can check if a module is loaded using `(loaded? "module-name")`.
+You can check if a module is loaded using `(loader/loaded? "module-name")`.
 
 You can read more about a more practical example in this blog post about https://code.thheller.com/blog/shadow-cljs/2019/03/03/code-splitting-clojurescript.html[ Code-Splitting ClojureScript]. This is only a basic overview.
 
@@ -269,11 +268,12 @@ When using multiple `:modules` (a.k.a <<CodeSplitting, code splitting>>) this is
 ```clojure
 {...
  :builds
- {:target :browser
-  ...
-  :compiler-options
-  {:output-wrapper true
-   :rename-prefix-namespace "MY_APP"}}}
+ {:app
+  {:target :browser
+   ...
+   :compiler-options
+   {:output-wrapper true
+    :rename-prefix-namespace "MY_APP"}}}}
 ```
 
 This will only create the `MY_APP` global variable. Since every "global" variable will now be prefixed by `MY_APP.` (e.g. `MY_APP.a` instead of just `a`) the code size can go up substantially. It is important to keep this short. Browser compression (e.g. `gzip`) helps reduce the overhead of the extra code but depending on the amount of global variables in your build this can still produce a noticeable increase.
@@ -407,7 +407,7 @@ Instead of generating `main.js` it will now generate `main.<hash>.js` in the `:o
 
 Since the filename can change with every release it gets a little bit more complicated to include them
 in your HTML. If you want to accomplish this with a program external to shadow-cljs, you can find programmatic information about filenames in the <<BrowserManifest, Output Manifest>>.
-If you want to accomplish this as part of the build, have a look at <<Build Configuration, Build Hooks>>, and at https://github.com/thheller/shadow-cljs/blob/9a36743674e7bac457c43761c2ef0cce0423862a/src/main/shadow/html.clj#L28-L60[this hook specifically] for inspiration.
+If you want to accomplish this as part of the build, have a look at <<build-hooks, Build Hooks>>, and at https://github.com/thheller/shadow-cljs/blob/9a36743674e7bac457c43761c2ef0cce0423862a/src/main/shadow/html.clj#L28-L60[this hook specifically] for inspiration.
 
 == Output Manifest [[BrowserManifest]]
 
@@ -458,8 +458,7 @@ be relative to the configured `:output-dir`.
 
 == Development Support
 
-The `:devtools` section of the configuration for `:browser` supports a few additional
-options for configuring an optional dev-time HTTP server for a build and CSS reloading.
+The `:devtools` section of a `:browser` build configures the HUD, CSS reloading and runtime connections. Configure optional development HTTP servers separately with the top-level <<dev-http, :dev-http>> setting.
 
 === Heads-Up Display (HUD) [[hud]]
 
@@ -554,9 +553,9 @@ document root used to serve your content.
 .Example :watch-dir config
 ```clojure
 {...
-    {:builds
-      {:app {...
-             :devtools {:watch-dir "public"}}}}
+ :builds
+ {:app {...
+        :devtools {:watch-dir "public"}}}}
 ```
 
 When your HTTP Server is serving the files from a virtual directory and the filesystem paths don't exactly match the path used in the HTML you may adjust the path by setting `:watch-path` which will be used as a prefix.
@@ -564,11 +563,11 @@ When your HTTP Server is serving the files from a virtual directory and the file
 .Example `public/css/main.css` being served under `/foo/css/main.css`
 ```clojure
 {...
- {:builds
-  {:app
-   {...
-    :devtools {:watch-dir "public"
-               :watch-path "/foo"}}}}
+ :builds
+ {:app
+  {...
+   :devtools {:watch-dir "public"
+              :watch-path "/foo"}}}}
 ```
 
 === Proxy Support [[proxy-support]]
@@ -590,16 +589,16 @@ By default the devtools client will attempt to connect to the `shadow-cljs` proc
 
 .Incoming Request to Proxy
 ```text
-https://some.host/shadow-cljs/ws/foo/bar?asdf
+wss://some.host/shadow-cljs/api/remote-relay?server-token=...
 ```
 .must forward to
 ```
-http://localhost:9630/foo/bar?asdf
+ws://localhost:9630/api/remote-relay?server-token=...
 ```
 
 The client will make WebSocket request as well as normal XHR requests to load files. Ensure that your proxy properly upgrades WebSockets.
 
-IMPORTANT: The requests must be forwarded to the main <<http, HTTP server>>, not the one configured in the build itself.
+IMPORTANT: Forward these requests to the main <<http, HTTP server>>, usually port 9630. Keep the request path after the configured proxy prefix and preserve query parameters.
 
 == Using External JS Bundlers [[js-provider-external]]
 

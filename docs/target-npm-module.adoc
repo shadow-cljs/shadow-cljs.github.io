@@ -3,7 +3,7 @@ create-react-app, ...) with little configuration.
 
 [horizontal]
 `:output-dir`:: (required) The path for the output files are written to
-`:entries`:: (required) A vector of namespace symbols that should be compiled
+`:entries`:: (optional) A vector of namespace symbols that should be compiled. Without `:entries` or `:ns-regexp`, all project namespaces are included.
 `:ns-regexp`:: (optional) A regular expression matching namespaces against project files. This only scans files, and will not scan jars.
 
 .Example `shadow-cljs.edn` config
@@ -40,7 +40,7 @@ This is a standard annotation that is understood by ClojureScript and prevents G
 renaming an artifact. JS code will still be able to access them after optimizations. Without the `^:export` hint the closure-compiler will likely have removed or renamed them.
 
 ```
-var ns = require("shadow-cljs/demo.foo");
+var ns = require("./out/demo.foo");
 
 ns.foo;
 ns.bar();

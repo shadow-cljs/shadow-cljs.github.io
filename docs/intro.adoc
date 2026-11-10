@@ -11,7 +11,7 @@
 
 If desired you can easily integrate the `shadow-cljs` Clojure library into any other Clojure/JVM build tool (eg. https://leiningen.org/[leiningen] or the https://clojure.org/guides/deps_and_cli[Clojure CLI] tools).
 
-It is recommended to use the `npm` package as that provides a more optimized development experience tailored towards CLJS development.
+Use the `npm` package as the command-line launcher and `deps.edn` as the dependency manager. This combines the launcher's server reuse with the Clojure CLI's dependency and classpath management. Keep build configuration in `shadow-cljs.edn`; set `:deps true` there to enable the <<deps-edn, recommended integration>>.
 
 
 == Basic Workflow
@@ -41,10 +41,10 @@ There are several important concepts that you should familiarize yourself with w
 
 `shadow-cljs` uses the Java Virtual Machine (JVM) and its "classpath" when working with files. This is a virtual filesystem composed of many classpath entries. Each entry is either
 
-- A local filesystem directory, managed by `:source-paths` entry in the configuration.
-- Or a `.jar` file, representing Clojure(Script) or JVM libraries. These are compressed archives containing many files (basically just a `.zip` file). These are added by your `:dependencies`.
+- A local filesystem directory, configured with `:paths` or an alias's `:extra-paths` in `deps.edn`.
+- Or a `.jar` file, representing Clojure(Script) or JVM libraries. These are compressed archives containing many files (basically just a `.zip` file). These are added by your dependencies in `deps.edn`.
 
-In the Clojure(Script) everything is namespaced and each name is expected to resolve to a file. If you have a `(ns demo.app)` namespace the compiler expects to find a `demo/app.cljs` (or `.cljc`) on the classpath. The classpath will be searched in order until it is found. Suppose you configured the `:source-paths ["src/main" "src/test"]` the compiler will first look for a `src/main/demo/app.cljs` and then `src/test/demo/app.cljs`. When the file is not found on any source path the JVM will begin looking into the `.jar` files on the classpath. When it finds a `demo/app.cljs` at the root of any of the libraries that file it will be used.
+In Clojure(Script), everything is namespaced and each name is expected to resolve to a file. If you have a `(ns demo.app)` namespace the compiler expects to find a `demo/app.cljs` (or `.cljc`) on the classpath. The classpath will be searched in order until it is found. Suppose you configured `:paths ["src/main" "src/test"]` in `deps.edn`; the compiler will first look for a `src/main/demo/app.cljs` and then `src/test/demo/app.cljs`. When the file is not found on any source path the JVM will begin looking into the `.jar` files on the classpath. When it finds a `demo/app.cljs` at the root of a library, that file is used.
 
 IMPORTANT: When a filename exists multiple times on the classpath then only the first one is used. Everything on the JVM and Clojure(Script) is namespaced to avoid such conflicts. Very similar to `npm` where each package must have a unique name.
 
@@ -59,7 +59,7 @@ This is unlike `npm` where the package name itself is never used inside the pack
 
 When using the `shadow-cljs` CLI all commands will re-use a running server instance JVM instead of starting a new JVM. This is substantially faster since start-up time can be quite slow.
 
-Once the server is running however you only have to restart it whenever your `:dependencies` change and everything else can be done via the REPL.
+Restart the server when dependencies, source paths, active aliases or JVM options change. Most code changes can be handled by `watch` and the REPL without restarting the server.
 
 === REPL
 

@@ -1,18 +1,17 @@
-The `:target :react-native` produces code that is meant to integrate into the default `react-native` tooling (eg. `metro`). Tools like `expo` which wrap those tools should automatically work and require no additional setup.
+The `:target :react-native` produces code that is meant to integrate into the default `react-native` tooling (eg. `metro`). When using Expo or another wrapper, configure its entry file to load the generated output and register the app's root component.
 
-You will need the same basic <<config,main configuration>> as in other targets (like
-`:source-paths`), the build specific config is very minimal and requires at least 2 options (besides `:target` itself)
+You will need the same basic <<config,main configuration>> as in other targets (including
+source paths in `deps.edn`), the build specific config is very minimal and requires at least 2 options (besides `:target` itself)
 
 [horizontal]
 `:init-fn`:: (required). The namespace-qualified symbol of your apps init function. This function will be called once on startup and should probably render something.
 `:output-dir`:: (required). The directory used to write output files.
 
-// TODO: Thomas mentioned that node can be picky and sometimes output-dir is useful...an example would be nice.
+Keep `:output-dir` separate from hand-written application sources because its files are generated.
 
 .Sample :react-native config
 ```
-{:source-paths [...]
- :dependencies [...]
+{:deps true
  ...
  :builds
  {:app
@@ -25,32 +24,28 @@ When compiled this results in a `app/index.js` file intended to be used as an en
 
 == React Native
 
-There are two ways to use `react-native`, "plain" `react-native`, which allows you to use native code and libraries and the one "wrapped" in https://expo.io/[expo] (described below). All the steps described above are sufficient to start using shadow-cljs with the plain `react-native`. See this example repo:
+A plain React Native project loads the generated `app/index.js` from its JavaScript entry file. The CLJS init function must register the root component using React Native's `AppRegistry`. The following repository illustrates the integration, but its dependency versions and tooling setup may be historical:
 
 - https://github.com/thheller/reagent-react-native
 
 == Expo
 
-https://expo.io/[expo] makes working with `react-native` quite easy. There are two provided example setups.
+https://expo.dev/[Expo] can load the generated output as a custom entry point. For a project without Expo Router, set `main` in `package.json` to the output file:
+
+```json
+{
+  "main": "./app/index.js"
+}
+```
+
+The CLJS init function must register the root component. See https://docs.expo.dev/versions/latest/sdk/expo/#registerrootcomponentappkey[Expo's registerRootComponent documentation]. Expo Router projects have their own entry-point conventions; the setup above assumes the CLJS init function owns application startup.
+
+These older repositories illustrate shadow-cljs integration, but their `expo init` commands and `app.json` `entryPoint` configuration should not be copied into a current project:
 
 - https://github.com/thheller/fulcro-expo
 - https://github.com/thheller/reagent-expo
 
-Both examples were generated using `expo init ...` and the only adjusted change in the config was adding the proper `entryPoint` to the generated `app.json`.
-
-```
-{
-  "expo": {
-    "name": "hello-world",
-    "slug": "reagent-expo",
-    ...
-    "entryPoint":"./app/index.js",
-    ...
-  }
-}
-```
-
-`expo` requires that a React Component is registered on startup which can be done manually or by using the `shadow.expo/render-root` function which takes care of creating the Component and instead directly expects a React Element instance to start rendering.
+`shadow.expo/render-root` registers a React component and accepts a React element to render. This helper requires the `expo` and `create-react-class` npm packages in addition to the React Native project's dependencies.
 
 .From the Reagent https://github.com/thheller/reagent-expo/blob/2c73ed0513a8f5050b250c0c7e53b9ae7543cee9/src/main/test/app.cljs#L34-L40[example]
 ```

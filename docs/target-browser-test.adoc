@@ -37,6 +37,11 @@ Press `/` to focus it, `Enter` to run the matching tests and `Esc` to clear it. 
 each row also has a button to run just that namespace or test. "Run failed" runs only the tests that failed.
 The selection is remembered in the browser via `localStorage`.
 
+Browser Tab::
+The favicon keeps a laboratory flask silhouette so test tabs are easy to recognize. Its liquid and status badge are blue
+while tests run, green when they pass, red when tests fail or error, and gray when idle. The badge shows a clock, check,
+cross or dash respectively. The page title shows progress while running and the number of failed tests when done.
+
 Failures::
 Failed `(is (= expected actual))` assertions show the actual value with all differences to the expected value marked.
 Values that match are shown as is, so the location of a difference is easy to find in larger data.

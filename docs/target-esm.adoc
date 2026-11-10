@@ -8,10 +8,12 @@ As with other modes the <<config, main configuration options>> apply and can be 
 The additional target-specific options are:
 
 [horizontal]
-`:output-dir`:: (optional, default `"public/js"`). The path where all `:modules` are written to.
-`:runtime`:: (optional , default `:browser`) Controls which development extensions for REPL/hot-reload are injected. Currently only supports `:browser`. Set to any other value to disable.
+`:output-dir`:: (required). The path where all `:modules` are written to.
+`:runtime`:: (optional , default `:browser`) Controls which development extensions for REPL/hot-reload are injected. Use `:node` for Node.js REPL and hot reload support, or `:custom` for a custom runtime client. `:devtools {:enabled false}` disables development client injection.
 `:modules`:: required, a map of keyword to module configuration
 
+
+The examples below assume `:paths ["src/main"]` in `deps.edn` and an active shadow-cljs dependency. For Node.js, set `:runtime :node` and ensure Node treats the generated `.js` files as ES modules, for example with a `package.json` containing `"type": "module"` in the output directory.
 
 == Module Configuration
 
@@ -20,8 +22,8 @@ Each module has its own set of options that control how the module is constructe
 [horizontal]
 `:init-fn`:: optional, a `defn` to run when the module loads.
 `:entries`:: optional, a vector of namespace symbols to load in this module
-`:exports`:: required, a map of symbol to fully qualified symbols
-`:depends-on`:: required when using multiple `:modules`. specifing a set of other modules this module depends on.
+`:exports`:: optional, a map of export names (symbols or keywords) to fully qualified symbols
+`:depends-on`:: a set of other module IDs this module depends on. With multiple modules, each non-root module must depend on the shared root, directly or transitively.
 
 === Module Exports
 
@@ -29,7 +31,7 @@ Controlling what code is actually exported is done via `:exports`.
 
 .Example Build Config
 ```clojure
-{:source-paths ["src/main"]
+{:deps true
  :dev-http {8000 "public"}
  :builds
  {:app
@@ -45,7 +47,7 @@ This will generate the `public/js/demo.js` file. The name is decided by taking t
 (ns demo.lib)
 
 (defn hello []
-  (js/console.og "hello world"))
+  (js/console.log "hello world"))
 
 (defn not-exported []
   (js/console.log "foo"))
@@ -69,7 +71,7 @@ Note that only `hello` is accessible here since it was declared in the `:exports
 ES Module have this one "special" `default` export, which you'll often see used in JS examples. This can be expressed by defining the `default` exports like any other.
 
 ```clojure
-{:source-paths ["src/main"]
+{:deps true
  :dev-http {8000 "public"}
  :builds
  {:app
@@ -95,7 +97,7 @@ Many platforms or systems apply special meaning to this `default` export, but it
 Sometimes you may not require any `:exports` and instead just want the code to run automatically when the module is loaded. This can be done via `:init-fn`.
 
 ```clojure
-{:source-paths ["src/main"]
+{:deps true
  :dev-http {8000 "public"}
  :builds
  {:app
@@ -110,10 +112,10 @@ And the HTML
 <script type="module" src="js/demo.js"></script>
 ```
 
-In can also be combined with `:exports` to run a function and still provide `:exports`
+It can also be combined with `:exports` to run a function and still provide `:exports`
 
 ```clojure
-{:source-paths ["src/main"]
+{:deps true
  :dev-http {8000 "public"}
  :builds
  {:app
@@ -129,7 +131,7 @@ Keeping this HTML will essentially just log twice on page load.
 
 ```html
 <script type="module">
-  import hello from "/js/demo.js";
+  import { hello } from "/js/demo.js";
   hello();
 </script>
 ```
@@ -138,7 +140,7 @@ Keeping this HTML will essentially just log twice on page load.
 
 
 ```clojure
-{:source-paths ["src/main"]
+{:deps true
  :dev-http {8000 "public"}
  :builds
  {:app
@@ -171,7 +173,7 @@ You may now load each `:module` independently in the HTML.
 
 ```html
 <script type="module">
-  import hello from "/js/hello.js";
+  import { hello } from "/js/hello.js";
   hello();
 </script>
 ```
@@ -189,23 +191,23 @@ Modules can also be loaded dynamically at runtime via the provided `shadow.esm/d
     [shadow.cljs.modern :refer (js-await)]))
 
 (defn foo []
-  (js-await [mod (dynamic-import "https://cdn.pika.dev/preact@^10.0.0")]
+  (js-await [mod (dynamic-import "/js/other.js")]
     (js/console.log "loaded module" mod)))
 ```
 
-This would load an external ESM module dynamically at runtime without it ever being part of the build. You can of course also load your own `:modules` dynamically this way too.
+This loads an ESM module at runtime without a static import. The URL must be loadable by the runtime. It can refer to an external module or one of your generated `:modules`.
 
 
 == Third Party Tool Integration
 
-In the default `:runtime :browser` setup all dependencies are bundled and provided by `shadow-cljs`. This is done so the output is directly loadable in the Browser. When importing the `:target :esm` output into another build tool environment (eg. webpack) that may lead to duplicated dependencies.
+With the default `:js-provider :shadow`, JavaScript dependencies are bundled and provided by `shadow-cljs`. This is done so the output is directly loadable in the Browser. When importing the `:target :esm` output into another build tool environment (eg. webpack) that may lead to duplicated dependencies.
 
 Instead, you can configure shadow-cljs to not bundle any JS dependencies and instead leave that to the other tool.
 
-This is done by setting `:js-provider` in your build config.
+Set `:js-provider :import` under `:js-options` in your build config.
 
 ```clojure
-{:source-paths ["src/main"]
+{:deps true
  :dev-http {8000 "public"}
  :builds
  {:app
@@ -215,4 +217,4 @@ This is done by setting `:js-provider` in your build config.
    :modules {:demo {:exports {default demo.lib/hello}}}}}}
 ```
 
-For this build shadow-cljs will only compile and bundle CLJS code, but leave all other JS code to be provided by some other tool later. Note that if you have `(:require ["react"])` or any other `npm` dependency in your build the output from `shadow-cljs` MUST be processed by another tool first before it becomes loadable in the Browser. Only set this if some other tool is actually going to provide the required dependencies.
+With `:js-provider :import`, npm dependencies remain as ES imports in the generated output. Another bundler, a browser import map, or an ESM runtime must resolve those imports. For example, a browser cannot resolve the bare `"react"` specifier without an import map or a bundler. `:runtime` selects development support; it does not itself choose how dependencies are bundled.

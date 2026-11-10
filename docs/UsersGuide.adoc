@@ -1,7 +1,6 @@
 = Shadow CLJS User's Guide
 :author: Thomas Heller and Tony Kay
-:revdate: Jan 10, 2018
-:revnumber: 1.0
+:revdate: November 10, 2026
 :lang: en
 :encoding: UTF-8
 :doctype: book
@@ -29,15 +28,6 @@ ifdef::env-github[]
 toc::[]
 endif::[]
 
-// TODO: Missing content
-// - HUD
-// - Undocumented global options
-//    - http
-//    - ssl
-//    - cache-root
-//    - open-file-command
-//    - others???
-
 include::intro.adoc[]
 
 == About this Book
@@ -62,22 +52,22 @@ from its output.
 ```bash
 # A comment. This command lists files:
 $ ls -l
+deps.edn
 shadow-cljs.edn
-project.clj
 ...
 ```
 
 Many of the examples are of the configuration file for the compiler. This file contains an EDN map. Where we have already discussed required options we will often elide them for clarity. In this case we'll usually include an ellipsis to indicate "content that is required but isn't in our current focus":
 
-.Example 1. Specify dependencies
+.Example 1. Enable deps.edn integration
 ```
-{:dependencies [[lib "1.0"]]}
+{:deps true}
 ```
 
-.Example 2. Add source paths
+.Example 2. Add a development HTTP server
 ```
 {...
- :source-paths ["src"]
+ :dev-http {8000 "public"}
  ...}
 ```
 
@@ -91,25 +81,23 @@ interest:
                      :output-dir "resources/public/js"}}}
 ```
 
-Code examples may be similarly shortened.
+Code examples may be similarly shortened. Replace `"VERSION"` in dependency examples with a concrete published version; it is a placeholder, not a version selector.
 
 
 = Installation
 
-== Standalone via `npm`
+== Command-line Launcher via `npm` [[Installation]]
 
 You will need:
 
-- https://nodejs.org[node.js] (v6.0.0+, most recent version preferred)
+- https://nodejs.org[Node.js] (a currently supported LTS release is recommended)
 - https://www.npmjs.com[npm] (comes with `node` by default) or https://www.yarnpkg.com[yarn]
-- Any Java SDK (Version 21 or higher, LTS release recommended). https://adoptium.net/
+- A https://adoptium.net/[Java SDK] (version 21 or higher, LTS release recommended)
+- The https://clojure.org/guides/install_clojure[Clojure CLI] for the recommended `deps.edn` dependency management
 
-In your project directory you'll need a `package.json`. If you do not have one yet you can create one by running `npm init -y`. If you don't have a project directory yet consider creating it by running
-```
-$ npx create-cljs-project my-project
-```
+Use `deps.edn` to manage Clojure(Script) dependencies and source paths, and `shadow-cljs.edn` to configure builds. The `npm` package supplies the command-line launcher and works with this setup. See <<config, Configuration>> for the two files to create.
 
-This will create all the necessary basic files and you can skip the following commands.
+In your project directory you will also need a `package.json`. If you do not have one yet, create it with `npm init -y`.
 
 If you have a `package.json` already and just want to add `shadow-cljs` run
 
@@ -127,7 +115,7 @@ For convenience, you can run `npm install -g shadow-cljs` or `yarn global add sh
 
 == Library
 
-Although it is recommended to run the standalone version via `npm` you can also embed `shadow-cljs` into any other Clojure JVM tool (eg. `lein`, `boot`, ...).
+The recommended setup combines the `npm` launcher with `deps.edn`. You can also embed the `shadow-cljs` library in another Clojure JVM process or use <<Leiningen, Leiningen>> for an existing project.
 
 The artifact can be found at:
 
@@ -140,86 +128,132 @@ include::repl.adoc[]
 
 = Configuration [[config]]
 
-`shadow-cljs` is configured by a `shadow-cljs.edn` file in your project root directory. You can
-create a default one by running `shadow-cljs init`. It should contain a map with some global
-configuration and a `:builds` entry for all your builds.
+`shadow-cljs` uses two configuration files in the project root:
 
-```
-{:source-paths [...]
- :dependencies [...]
- :builds {...}}
-```
+- `deps.edn` manages Clojure(Script) dependencies and source paths. This is the preferred approach for new and existing projects.
+- `shadow-cljs.edn` configures builds, development servers and REPL options. Set `:deps true` to use the classpath from `deps.edn`.
 
-An example config could look like this:
+JavaScript dependencies and the CLI launcher are managed separately in `package.json`.
 
+.Example deps.edn
 ```clojure
-{:dependencies
- [[reagent "0.8.0-alpha2"]]
+{:paths ["src"]
+ :deps {thheller/shadow-cljs {:mvn/version "VERSION"}}}
+```
 
- :source-paths
- ["src"]
+Choose a published https://clojars.org/thheller/shadow-cljs[shadow-cljs version] for `"VERSION"`.
 
+.Example shadow-cljs.edn
+```clojure
+{:deps true
+ :dev-http {8000 "public"}
  :builds
  {:app {:target :browser
         :output-dir "public/js"
         :asset-path "/js"
-        :modules {:main {:entries [my.app]}}}}}
+        :modules {:main {:init-fn my.app/init}}}}}
 ```
 
-The file structure for this example should look like this:
+.Source file src/my/app.cljs
+```clojure
+(ns my.app)
+
+(defn init []
+  (js/console.log "Hello from ClojureScript"))
+```
+
+.Page public/index.html
+```html
+<!doctype html>
+<html>
+  <head><meta charset="utf-8"><title>My app</title></head>
+  <body><script src="/js/main.js"></script></body>
+</html>
+```
+
+Run `npx shadow-cljs watch app` and open http://localhost:8000. This example has the following files:
+
 ```text
 .
+├── deps.edn
 ├── package.json
 ├── shadow-cljs.edn
+├── public
+│   └── index.html
 └── src
     └── my
         └── app.cljs
 ```
 
+NOTE: `shadow-cljs init` currently generates a configuration using the built-in dependency resolver. To use the recommended setup, create `deps.edn`, move source paths and dependencies there, and replace the generated top-level `:source-paths` and `:dependencies` with `:deps true`.
+
 == Source Paths [[source-paths]]
 
-`:source-paths` configures your JVM classpath. The compiler will use this config to find Clojure(Script) source files (eg. `.cljs`).
+With the recommended setup, `:paths` in `deps.edn` configures the project's source directories on the JVM classpath. The compiler uses that classpath to find Clojure(Script) source files (e.g. `.cljs` and `.cljc`) and other resources.
 
-It is fine to put everything into one source path but you can use multiple if you want to "group" source files in certain ways. It is useful if you want to keep your tests separate for example.
+It is fine to put everything in `src`. You can also group application, development and test sources into separate directories. Aliases let you add paths only when needed.
 
-.Using multiple source paths
-```
-{:source-paths ["src/main" "src/test"]
- ...}
-```
-
-.File Structure
-```text
-.
-├── package.json
-├── shadow-cljs.edn
-└── src
-    └── main
-        └── my
-            └── app.cljs
-    └── test
-        └── my
-            └── app_test.cljs
+.Example deps.edn with a test alias
+```clojure
+{:paths ["src/main"]
+ :deps {thheller/shadow-cljs {:mvn/version "VERSION"}}
+ :aliases {:test {:extra-paths ["src/test"]}}}
 ```
 
-It is not recommended to separate source files by extension (eg. `src/clj`, `src/cljs`, `src/cljc`). For some reason this is widely used in CLJS project templates but it just makes things harder to use.
+.Activate the alias in shadow-cljs.edn
+```clojure
+{:deps {:aliases [:test]}
+ :builds {...}}
+```
+
+Declare source paths once for the project, rather than separately for each build. Namespace dependency graphs determine which files are included in each build. Restart the shadow-cljs server after changing the classpath or active aliases.
+
+It is not necessary to separate source files by extension (e.g. `src/clj`, `src/cljs`, `src/cljc`). Grouping them by purpose often makes shared `.cljc` code easier to work with.
 
 == Dependencies
 
-=== Clojure(Script)
+=== Clojure(Script) [[clojure-dependencies]]
 
-Your dependencies are managed via the `:dependencies` key at the root of the `shadow-cljs.edn` config file. They are declared in the same notation that other Clojure tools like `lein` or `boot` use.
+*Use `deps.edn` to manage Clojure(Script) dependencies.* Declare libraries in its `:deps` map using fully qualified library names and dependency coordinates. The Clojure CLI supports Maven, Git and local dependencies. See <<deps-edn, deps.edn integration>> for aliases and launcher options.
 
-Each dependency is written as a vector using `[library-name "version-string"]` nested in one outer vector.
-
-.Example :dependencies
+.Example deps.edn dependency
 ```clojure
-{:source-paths ["src"]
- :dependencies [[reagent "0.9.1"]]
- :builds ...}
+{:paths ["src"]
+ :deps {thheller/shadow-cljs {:mvn/version "VERSION"}
+        my/library {:mvn/version "1.0.0"}}}
 ```
 
-Notice that the source path is *only* specified once in the entire configuration. The system will use namespace dependency graphs to determine what code is needed in the final output of any given build.
+`my/library` is an example library name; replace it with the library and version you need. Keep `thheller/shadow-cljs` in the active dependencies, either at the top level or in an enabled alias. The JVM version of shadow-cljs comes from `deps.edn`, even when commands are launched through the `npm` package.
+
+IMPORTANT: With `:deps true` or `:deps {:aliases [...]}`, top-level `:source-paths` and `:dependencies` in `shadow-cljs.edn` are ignored. Move them to `:paths` and `:deps` in `deps.edn`; merely creating a `deps.edn` file does not enable the integration.
+
+Let shadow-cljs supply its matching ClojureScript and Closure Compiler dependencies. Explicitly selecting different compiler versions may cause <<failed-to-load, startup or compilation errors>>.
+
+==== Migrating from shadow-cljs.edn
+
+. Install the https://clojure.org/guides/install_clojure[Clojure CLI].
+. Move top-level `:source-paths` to `:paths` in `deps.edn`.
+. Convert dependencies such as `[my/library "1.0.0"]` to `my/library {:mvn/version "1.0.0"}` in the `:deps` map, preserving any exclusions or other dependency options using the https://clojure.org/reference/deps_edn[deps.edn syntax].
+. Add `thheller/shadow-cljs {:mvn/version "VERSION"}` to the active dependencies.
+. Remove top-level `:source-paths` and `:dependencies` from `shadow-cljs.edn`, and add `:deps true` or `:deps {:aliases [:cljs]}` if using a dedicated alias.
+. Restart the shadow-cljs server so it uses the new classpath.
+
+Build definitions stay in `shadow-cljs.edn`. JavaScript dependencies stay in `package.json`.
+
+==== Built-in Dependency Resolver (Fallback) [[standalone-dependencies]]
+
+The built-in resolver is still available for projects that cannot use the Clojure CLI. Prefer `deps.edn`; do not choose this fallback for new projects. Existing projects can continue using these options while migrating.
+
+In fallback mode, omit `:deps` and `:lein`, and configure source paths and Maven dependencies directly in `shadow-cljs.edn`. Dependencies use a vector of `[library-name "version"]` entries.
+
+.Fallback shadow-cljs.edn
+```clojure
+{:source-paths ["src"]
+ :dependencies [[my/library "1.0.0"]]
+ :builds {...}}
+```
+
+The built-in resolver supplies shadow-cljs itself. Unlike the `deps.edn` setup, you do not add the `thheller/shadow-cljs` artifact manually in this mode.
 
 === JavaScript [[npm-install]]
 
@@ -248,7 +282,7 @@ TIP: If you don’t have a `package.json` yet run `npm init` from a command line
 
 ==== Missing JS Dependency?
 
-You might run into errors related to missing JS dependencies. Most ClojureScript libraries do not yet declare the `npm` packages they use since they still expect to use <<cljsjs, CLJSJS>>. We want to use `npm` directly which means you must manually install the `npm` packages until libraries properly declare the `:npm-deps` themselves.
+You might run into errors related to missing JS dependencies. Install the `npm` packages required by the ClojureScript libraries you use. Some libraries declare these via `:npm-deps` in `deps.cljs`; others document them in their installation instructions. Older libraries may refer to <<cljsjs, CLJSJS>> packages instead.
 
 ```text
 The required JS dependency "react" is not available, it was required by ...
@@ -256,22 +290,22 @@ The required JS dependency "react" is not available, it was required by ...
 
 This means that you should `npm install react`.
 
-TIP: In the case of `react` you probably need these 3 packages: `npm install react react-dom create-react-class`.
+For a React browser application, install `react` and `react-dom` at versions supported by your ClojureScript UI library. Install `create-react-class` only if that library or your code requires it.
 
 
 == User Configuration [[user-config]]
 
-Most configuration will be done in the projects themselves via `shadow-cljs.edn` but some config may be user-dependent. Tools like https://docs.cider.mx[CIDER] may require the additional `cider-nrepl` dependency which would be useless for a different team member using Cursive when adding that dependency via `shadow-cljs.edn`.
+Keep project dependencies and source paths in `deps.edn`, and build configuration in `shadow-cljs.edn`. Some settings may be user-specific, such as editor middleware or the command used to open source files.
 
-A restricted set of config options can be added to `~/.shadow-cljs/config.edn` which will then apply to all projects built on this users machine.
+User configuration is read from the first existing file in this order: `$XDG_CONFIG_HOME/shadow-cljs/config.edn`, `$LOCALAPPDATA/shadow-cljs/config.edn`, then `~/.shadow-cljs/config.edn`. It applies to all projects on that machine. The examples below use the home-directory fallback.
 
-Adding dependencies is allowed via the usual `:dependencies` key. Note that dependencies added here will apply to ALL projects. Keep them to a minimum and only put tool related dependencies here. Everything that is relevant to a build should remain in `shadow-cljs.edn` as otherwise things may not compile for other users. These dependencies will automatically be added when using `deps.edn` or `lein` as well.
+Adding dependencies is allowed via the usual `:dependencies` key. Note that dependencies added here will apply to ALL projects. Keep them to a minimum and only put tool related dependencies here. Everything required to build a project belongs in its `deps.edn` so it is available to other users. These dependencies will automatically be added when using `deps.edn` or `lein` as well.
 
 .Example ~/.shadow-cljs/config.edn
 ```
 {:dependencies
- [[cider/cider-nrepl "0.21.1"]]}
-;; this version may be out of date, check whichever is available
+ [[cider/cider-nrepl "VERSION"]]}
+;; choose a version compatible with your editor
 ```
 
 When using `deps.edn` to resolve dependencies you may sometimes want to activate additional aliases. This can be done via `:deps-aliases`.
@@ -283,11 +317,11 @@ When using `deps.edn` to resolve dependencies you may sometimes want to activate
 ;; ~/.shadow-cljs/config.edn
 {:deps-aliases [:cider]}
 ```
-This will make the `shadow-cljs` command use the `[:cider :cljs]` aliases in projects using `deps.edn`. This might be useful if you have an additional `:cider` alias in your `~/.clojure/deps.edn`.
+This will make the `shadow-cljs` command use the `[:cljs :cider]` aliases in projects using `deps.edn`. This might be useful if you have an additional `:cider` alias in your `~/.clojure/deps.edn`.
 
 By default the `shadow-cljs` server-mode will launch an embedded nREPL server which you might not need. You can disable this by setting `:nrepl false` in user config.
 
-The only other currently accepted value in the user config is the <<open-file-command, :open-file-command>>. No other options are currently have any effect.
+Other useful user settings include <<open-file-command, :open-file-command>> and `:local-ip` for runtime connections. User configuration is merged with project configuration, so avoid putting project-specific build or server settings here.
 
 == Server Options
 
@@ -295,7 +329,7 @@ This section is for other options that configure the `shadow-cljs` server instan
 
 === nREPL [[nREPL]]
 
-The `shadow-cljs` <<server-mode, server>> provides a https://nrepl.org[nREPL] server via TCP. If you look at the startup message you'll see the port of nREPL, and the port will also be stored in `target/shadow-cljs/nrepl.port`:
+The `shadow-cljs` <<server-mode, server>> provides a https://nrepl.org[nREPL] server via TCP. If you look at the startup message you'll see the port of nREPL, and the port will also be stored in `.shadow-cljs/nrepl.port` (under the configured `:cache-root`):
 
 ```bash
 $ shadow-cljs watch app
@@ -318,7 +352,7 @@ You can configure the port and additional middleware with `shadow-cljs.edn`:
 
 The default global config file in `~/.nrepl/nrepl.edn` or the local `.nrepl.edn` will also be loaded on startup and can be used to configure `:middleware`.
 
-If the popular middleware https://github.com/clojure-emacs/cider-nrepl[cider-nrepl] is found on the classpath (e.g. it's included in `:dependencies`), it will be used automatically. No additional configuration required. This can be disabled by setting `:nrepl {:cider false}`.
+If the popular middleware https://github.com/clojure-emacs/cider-nrepl[cider-nrepl] is found on the classpath (e.g. it is an active dependency in `deps.edn`), it will be used automatically. No additional configuration required. This can be disabled by setting `:nrepl {:cider false}`.
 
 You may configure the namespace you start in when connecting by setting `:init-ns` in the `:nrepl` options. It defaults to `shadow.user`.
 
@@ -328,11 +362,13 @@ You may configure the namespace you start in when connecting by setting `:init-n
  ...}
 ```
 
+For editors that discover a server through `.nrepl-port` in the project root, enable `:nrepl {:write-port-file true}`. This additional port file is disabled by default to avoid conflicts with other nREPL servers.
+
 The nREPL server can be disabled by setting `:nrepl false`.
 
 ==== nREPL Usage
 
-When connecting to the nREPL server the connection always starts out as a Clojure REPL. Switching to a CLJS REPL works similarly to the <<cljs-repl, non-nREPL version>>. First the `watch` for the given build needs to be started and then we need to select this build to switch the current nREPL session to that build. After selecting the build everything will be eval'd in ClojureScript instead of Clojure.
+When connecting to the nREPL server the connection always starts out as a Clojure REPL. Switching to a CLJS REPL works similarly to the <<build-repl, non-nREPL version>>. First the `watch` for the given build needs to be started and then we need to select this build to switch the current nREPL session to that build. After selecting the build everything will be eval'd in ClojureScript instead of Clojure.
 
 
 ```repl
@@ -442,7 +478,7 @@ If you prefer to set your own port instead you can do this via the `:http` confi
 
 These servers are started automatically when `shadow-cljs` is running in server mode. They are not specific to any build and can be used to serve files for multiple builds as long as a unique `:output-dir` is used for each.
 
-IMPORTANT:: These are just generic web servers that serve static files. They are not required for any live-reload or REPL logic. Any webserver will do, these are just provided for convenience.
+IMPORTANT: These are just generic web servers that serve static files. They are not required for any live-reload or REPL logic. Any webserver will do, these are just provided for convenience.
 
 .Basic example serving the `public` directory via `http://localhost:8000`
 ```
@@ -518,21 +554,26 @@ Additional optional Options to configure the connection handling are:
 
 == JVM Configuration [[jvm-opts]]
 
-When `shadow-cljs.edn` is used in charge of starting the JVM you can configure additional command line arguments to be passed directly to the JVM. For example you may want to decrease or increase the amount of RAM used by shadow-cljs.
+With `deps.edn`, put JVM options in an alias and enable it in `shadow-cljs.edn`.
 
-This is done by configuring `:jvm-opts` at the root of `shadow-cljs.edn` expecting a vector of strings.
-
-.Example limited RAM use to 1GB
+.Example deps.edn alias limiting RAM use to 1GB
 ```clojure
-{:source-paths [...]
- :dependencies [...]
- :jvm-opts ["-Xmx1G"]
- :builds ...}
+{:paths ["src"]
+ :deps {thheller/shadow-cljs {:mvn/version "VERSION"}}
+ :aliases {:cljs {:jvm-opts ["-Xmx1G"]}}}
 ```
 
-The arguments that can be passed to the JVM vary depending on the version but you can find an example list https://docs.oracle.com/javase/8/docs/technotes/tools/windows/java.html[here]. Please note that assigning too little or too much RAM can degrade performance. The defaults are usually good enough.
+.Enable the alias in shadow-cljs.edn
+```clojure
+{:deps {:aliases [:cljs]}
+ :builds {...}}
+```
 
-IMPORTANT: When using `deps.edn` or `project.clj` the `:jvm-opts` need to be configured there.
+The `npm` launcher also forwards top-level `:jvm-opts` from `shadow-cljs.edn` when launching through the Clojure CLI, but keeping them in `deps.edn` lets other Clojure CLI invocations use the same options. When using Leiningen, configure JVM options in `project.clj`.
+
+For the <<standalone-dependencies, built-in resolver fallback>>, configure `:jvm-opts ["-Xmx1G"]` at the root of `shadow-cljs.edn`.
+
+Restart a running server after changing JVM options. Available arguments depend on the Java version; the defaults are usually sufficient.
 
 = Build Configuration
 
@@ -568,8 +609,9 @@ include::target-node-library.adoc[]
 
 == Creating `npm` packages
 
-// TODO: Thomas: I think it would be useful to show a package.json and a little bit of an example
-// on how you could set up to deploy this on NPM.
+Use <<target-node-library, :node-library>> for CommonJS exports or <<target-esm, :esm>> for ES module exports. Build with `release` and include the generated output in the package. JavaScript dependencies left as `require()` or `import` calls must also be declared in the package's `package.json`.
+
+The package entry points must match the generated files and their module format. See the https://docs.npmjs.com/creating-and-publishing-scoped-public-packages[npm publishing guide] for package metadata, inspecting package contents and publishing.
 
 = Embedding in the JS Ecosystem -- The `:npm-module` Target [[target-npm-module]]
 
@@ -592,7 +634,7 @@ The default `:ns-regexp` is `"-test$"`, so your first test could look like:
   (is (= 1 2)))
 ```
 
-In the Clojure world it is common to keep test files in their own source paths so the above example assumes you have configured `:source-paths ["src/main" "src/test"]` in your `shadow-cljs.edn` config. Your usual app code goes into `src/main` and the tests go into `src/test`. This however is optional and it is totally fine to keep everything in `src` and just use `:source-paths ["src"]`.
+To use this layout, put `"src/main"` in `:paths` in `deps.edn`, add `"src/test"` via a test alias, and activate that alias in `shadow-cljs.edn` as shown under <<source-paths, Source Paths>>. Your app code goes into `src/main` and tests into `src/test`. You can also keep everything in `src` with `:paths ["src"]`. Test discovery only scans namespaces on the active classpath.
 
 == Testing in node.js [[target-node-test]]
 

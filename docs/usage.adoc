@@ -87,9 +87,67 @@ Once any server is running every other command will use that and run much faster
 
 == Build Tool Integration
 
-`shadow-cljs` can integrate with other Clojure tools since the primary distribution is just a `.jar` file available via https://clojars.org/thheller/shadow-cljs[Clojars]. By default your `:dependencies` are managed via `shadow-cljs.edn` but you can use other builds tools to manage your dependencies as well.
+Use <<deps-edn, deps.edn>> to manage Clojure(Script) dependencies and source paths. Keep using the `npm` launcher for commands such as `npx shadow-cljs watch app`; it launches the JVM through the Clojure CLI and reuses a running shadow-cljs server.
 
-CAUTION: It is strongly recommended to use the standalone `shadow-cljs` version. The command does a lot of things to optimize the user experience (e.g. faster startup) which are not done by other tools. You'll also save yourself a lot of headaches dealing with dependency conflicts and other related errors.
+`shadow-cljs.edn` remains the build configuration file in this setup. Its built-in dependency resolver is a <<standalone-dependencies, fallback>>, not the recommended dependency manager. Existing Leiningen projects can also use the integration below.
+
+=== tools.deps / deps.edn (Recommended) [[deps-edn]] [[tools-deps]]
+
+Install the https://clojure.org/guides/install_clojure[Clojure CLI], then enable it with `:deps true` in `shadow-cljs.edn`. The launcher uses the `clojure` executable, which must be available on your PATH.
+
+Add the `thheller/shadow-cljs` artifact to `deps.edn`. Replace `"VERSION"` below with your chosen published https://clojars.org/thheller/shadow-cljs[version].
+
+.Simple shadow-cljs.edn
+```clojure
+{:deps true
+ :builds {...}}
+```
+
+.Simple deps.edn
+```clojure
+{:paths ["src"]
+ :deps {thheller/shadow-cljs {:mvn/version "VERSION"}}}
+```
+
+To keep build tooling or additional source paths in an alias, activate it through `:deps {:aliases [...]}`.
+
+.shadow-cljs.edn with a :cljs alias
+```clojure
+{:deps {:aliases [:cljs]}
+ :builds {...}}
+```
+
+.Matching deps.edn
+```clojure
+{:paths ["src/main"]
+ :aliases
+ {:cljs
+  {:extra-paths ["src/test"]
+   :extra-deps {thheller/shadow-cljs {:mvn/version "VERSION"}}}}}
+```
+
+Run `npx shadow-cljs watch app` as usual. Top-level `:source-paths` and `:dependencies` in `shadow-cljs.edn` are ignored in this mode; configure paths and dependencies in `deps.edn`. Restart the server after changing them or the active aliases.
+
+You can add aliases for a CLI invocation with `npx shadow-cljs -M:foo:bar watch app`. Aliases affect JVM startup; they do not change the classpath of an already running server. See also <<user-config, user-specific aliases>> and <<jvm-opts, JVM options>>.
+
+==== Option: Running via clojure directly
+
+You can run the JVM entry point directly with the Clojure CLI. For example:
+
+.deps.edn
+```clojure
+{:paths ["src"]
+ :aliases
+ {:shadow-cljs
+  {:extra-deps {thheller/shadow-cljs {:mvn/version "VERSION"}}
+   :main-opts ["-m" "shadow.cljs.devtools.cli"]}}}
+```
+
+```bash
+$ clojure -M:shadow-cljs watch app
+```
+
+This starts a new JVM for each invocation rather than using the `npm` launcher's connection to an existing server. The compilation results are the same. Prefer the `npm` launcher for repeated commands during development.
 
 === Leiningen [[Leiningen]]
 
@@ -99,7 +157,7 @@ If you'd like to use https://leiningen.org/[Leiningen] to manage your dependenci
 {:lein true
  ; :source-paths and :dependencies are now ignored in this file
  ; configure them via project.clj
- :builds { ... }
+ :builds {...}}
 ```
 
 .Using a dedicated `lein` profile
@@ -115,12 +173,12 @@ If you'd like to use https://leiningen.org/[Leiningen] to manage your dependenci
   {:cljs
    {:source-paths ["src/cljs"]
     :dependencies [[thheller/shadow-cljs "..."]
-                   [reagent "0.8.1"]]}})
+                   [my/library "1.0.0"]]}})
 ```
 
 When using `project.clj` to manage your `:dependencies` you must manually include the https://clojars.org/thheller/shadow-cljs[thheller/shadow-cljs] artifact in your `:dependencies` (directly or in a profile).
 
-IMPORTANT: When you are running into weird Java Stackstraces when starting `shadow-cljs` or trying compile builds you may have a dependency conflict. It is very important that `shadow-cljs` is used with proper matching `org.clojure/clojurescript` and `closure-compiler` versions. You can check via `lein deps :tree` and the required versions are listed on https://clojars.org/thheller/shadow-cljs[clojars] (on the right side).
+IMPORTANT: If startup or compilation fails with a Java stack trace, you may have a dependency conflict. It is very important that `shadow-cljs` is used with proper matching `org.clojure/clojurescript` and `closure-compiler` versions. You can check via `lein deps :tree` and the required versions are listed on https://clojars.org/thheller/shadow-cljs[clojars] (on the right side).
 
 ==== Running Tasks Directly From Leiningen
 
@@ -139,71 +197,9 @@ $ lein run -m shadow.cljs.devtools.cli compile build-id
 $ lein run -m shadow.cljs.devtools.cli release build-id
 ```
 
-=== tools.deps / deps.edn [[deps-edn]]
+=== Boot (Legacy Integration)
 
-The new https://clojure.org/guides/deps_and_cli[deps.edn] can also be used to manage your `:dependencies` and `:source-paths` instead of using the built-in methods or `lein`. All `shadow-cljs` commands will then be launched via the new `clojure` utility instead.
-
-IMPORTANT: `tools.deps` is still changing quite frequently. Make sure you are using the latest version.
-
-To use this set the `:deps true` property in your config. It is also possible to configure which `deps.edn` aliases should be used.
-
-You must add the `thheller/shadow-cljs` artifact to your `deps.edn` manually.
-
-.Simple `shadow-cljs.edn` example
-```clojure
-{:deps true
- :builds ...}
-```
-
-.Simple `deps.edn` example
-```clojure
-{:paths [...]
- :deps {thheller/shadow-cljs {:mvn/version <latest>}}}
-```
-
-.Example `shadow-cljs.edn` with :cljs alias
-```clojure
-{:deps {:aliases [:cljs]}
- :builds ...}
-```
-
-.Example `deps.edn`
-```clojure
-{:paths [...]
- :deps {...}
- :aliases
- {:cljs
-  {:extra-deps {thheller/shadow-cljs {:mvn/version <latest>}}}}
-```
-
-With this you are all set, and can run `shadow-cljs` as normal.
-
-==== Option: Running via clj directly
-
-Optionally, if you want to skip running the `shadow-cljs` command line tool directly, you may as well just run directly via `clj`.
-
-IMPORTANT: This bypasses the "server mode". Meaning that everything you run will run a new JVM instance and potentially be much slower. You'll lose out on some features https://code.thheller.com/blog/shadow-cljs/2017/11/18/the-many-ways-to-use-shadow-cljs.html[outlined here]. Other than that the compilation results will be identical.
-
-```
-{:paths [...]
- :deps {...}
- :aliases
- {:shadow-cljs
-  {:extra-deps {thheller/shadow-cljs {:mvn/version <latest>}}
-   :main-opts ["-m" "shadow.cljs.devtools.cli"]}}}
-```
-
-```
-clj -M:shadow-cljs watch app
-```
-
-You may also specify additional aliases via the command line using `-M`, eg. `shadow-cljs -M:foo:bar ...`.
-
-=== Boot
-
-The authors have little Boot experience, so this chapter is in need of contributions. We understand
-that Boot allows you to build your tool chain out of functions. Since `shadow-cljs` is a normal
-JVM library, you can call functions within it to invoke tasks.
+For new projects, use the <<deps-edn, deps.edn integration>>. Existing Boot projects may embed shadow-cljs as a JVM library and invoke its API functions. This integration has not been validated with current shadow-cljs releases.
 
 Some boot tasks are available here:
 https://github.com/jgdavey/boot-shadow-cljs

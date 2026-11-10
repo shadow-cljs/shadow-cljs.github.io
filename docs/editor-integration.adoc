@@ -1,27 +1,10 @@
 == Cursive
 
-Cursive does not currently support resolving dependencies via `shadow-cljs.edn`. You can run `shadow-cljs pom` to generate a `pom.xml` and import that using the IntelliJ.
+For the recommended `deps.edn` setup, open `deps.edn` or its containing directory as a Cursive project. Select the same aliases in Cursive's Deps tool window that you enable through `:deps {:aliases [...]}` in `shadow-cljs.edn`, then refresh the project. See https://cursive-ide.com/userguide/deps.html[Working with Deps].
 
-```
-$ shadow-cljs pom
-```
+If you use the <<standalone-dependencies, built-in resolver fallback>>, run `shadow-cljs pom` to generate a `pom.xml` and import that as a Maven project in IntelliJ. This requires the Maven plugin. Regenerate the POM after changing dependencies.
 
-Then in Cursive *File -> New -> Project from Existing Sources* then select the generated `pom.xml` in the project directory.
-
-IMPORTANT: You need to have the "Build Tools" -> "Maven" Plugin enabled for this. It might not be enabled by default.
-
-Alternatively you can create a dummy `project.clj` or use the full <<Leiningen, Leiningen integration>>.
-
-```
-(defproject your/project "0.0.0"
-  :dependencies
-  [[thheller/shadow-cljs "X.Y.Z"]]
-
-  :source-paths
-  ["src"])
-```
-
-You can run `npx shadow-cljs server` inside the Terminal provided by IntelliJ and use `Clojure REPL -> Remote` Run Configuration to connect to the provided <<nREPL, nREPL server>>. Just select the "Use port from nREPL file" option in Cursive Clojure REPL -> Remote or configure a fixed nREPL port if you prefer.
+Run `npx shadow-cljs server` in the IntelliJ terminal and create a `Clojure REPL -> Remote` run configuration. Use the <<nREPL, nREPL port>> printed at startup and stored in `.shadow-cljs/nrepl.port`, or configure a fixed port. To use automatic discovery through the standard `.nrepl-port` file, enable `:nrepl {:write-port-file true}` in `shadow-cljs.edn`.
 
 Note that the Cursive REPL when first connected always starts out as a CLJ REPL. You can switch it to CLJS by calling `(shadow/repl :your-build-id)`. This will automatically switch the Cursive option as well. You can type `:cljs/quit` to drop back down to the CLJ REPL.
 
@@ -29,7 +12,7 @@ NOTE: You cannot switch from CLJ->CLJS via the Cursive select box. Make sure you
 
 == Emacs / CIDER [[cider]]
 
-This section is written for CIDER version 0.20.0 and above. Ensure your Emacs environment has this version of the `cider` package or later. Refer to the link:https://docs.cider.mx[CIDER documentation] for full installation details.
+CIDER supports shadow-cljs through jack-in or a connection to an existing nREPL server. Use https://docs.cider.mx/cider/cljs/shadow-cljs.html[the CIDER shadow-cljs documentation] for the options supported by your installed CIDER version. When connecting to an existing server, add a compatible `cider/cider-nrepl` version to an active `deps.edn` alias or your <<user-config, user configuration>>.
 
 === Launch the ClojureScript REPL
 
@@ -86,13 +69,11 @@ Or, when watching several builds:
          (cider-shadow-watched-builds . ("<first-build>" "<other-build>")))))
 ```
 
-Read about Emacs and shadow-cljs, using the `.dir-locals.el` file at the https://docs.cider.mx/cider/1.1/cljs/shadow-cljs.html[Cider docs]
+Read about Emacs and shadow-cljs, using the `.dir-locals.el` file at the https://docs.cider.mx/cider/cljs/shadow-cljs.html[Cider docs]
 
-=== Using deps.edn with custom repl intialization.
+=== Using deps.edn with Custom REPL Initialization
 
-In case you want to manage your dependencies via https://clojure.org/guides/deps_and_cli[deps.edn], you can use
-custom cljs-repl init form. Create a `:dev` alias with an extra source path of "dev" and add the following
-namespace
+For a custom Clojure CLI jack-in sequence, include shadow-cljs in the active `deps.edn` dependencies, create a `:dev` alias with `:extra-paths ["dev"]`, and put the following namespace in `dev/user.clj`:
 ```clj
 (ns user
   (:require [shadow.cljs.devtools.api :as shadow]
@@ -110,7 +91,7 @@ namespace
 
 Supposing your build-id is `:app`, add the following to your `.dir-locals.el`
 ```elisp
-((nil . ((cider-clojure-cli-global-options . "-A:dev")
+((nil . ((cider-clojure-cli-aliases        . ":dev")
          (cider-preferred-build-tool       . clojure-cli)
          (cider-default-cljs-repl          . custom)
          (cider-custom-cljs-repl-init-form . "(do (user/cljs-repl))")
@@ -121,13 +102,15 @@ Supposing your build-id is `:app`, add the following to your `.dir-locals.el`
 
 `cider-jack-in-cljs` should then work out of the box.
 
-== Proto REPL (Atom)
+== Proto REPL (Atom, Historical)
+
+NOTE: https://github.com/atom/atom[Atom was retired in December 2022]. These instructions are retained for existing installations and have not been validated with current shadow-cljs releases.
 
 Proto REPL is mostly intended for Clojure development so most features do not work for ClojureScript. It is however possible to use it for simple evals.
 
 You need to setup a couple of things to get it working.
 
-1)  Create a `user.clj` in on of your `:source-paths`.
+1) Create a `user.clj` in a source directory on the active classpath.
 
 ```clojure
  (ns user)
@@ -137,7 +120,7 @@ You need to setup a couple of things to get it working.
 
 The file must define the `user/reset` fn since Proto REPL will call that when connecting. If `user/reset` is not found it will call `tools.namespace` which destroys the running `shadow-cljs` server. We don't want that. You could do something here but we don't need to do anything for CLJS.
 
-2) add `[proto-repl "0.3.1"]` to your `:dependencies` in <<user-config, ~/.shadow-cljs/config.edn>> or `shadow-cljs.edn`.
+2) Add `proto-repl/proto-repl {:mvn/version "0.3.1"}` to an active `deps.edn` alias, or `[proto-repl "0.3.1"]` to the user-level `:dependencies` in <<user-config, ~/.shadow-cljs/config.edn>>. This is the historical version used by these instructions.
 
 3) Configure a fixed <<nREPL, nREPL port>>
 
@@ -153,7 +136,9 @@ The file must define the `user/reset` fn since Proto REPL will call that when co
 
 9) Eval some JS, eg. `(js/alert "foo")`. If you get `There is no connected JS runtime` the client is not connected properly. Otherwise the Browser should show an alert.
 
-== Chlorine (Atom)
+== Chlorine (Atom, Historical)
+
+NOTE: https://github.com/atom/atom[Atom was retired in December 2022]. These instructions are retained for existing installations and have not been validated with current shadow-cljs releases.
 
 Chlorine connects Atom to a Socket REPL, but also tries to refresh namespace. So first, open up Chlorine package config and check if configuration `Should we use clojure.tools.namespace to refresh` is set to `simple`, otherwise it'll destroy the running `shadow-cljs` server.
 
@@ -178,7 +163,7 @@ You need VS Code and the https://marketplace.visualstudio.com/items?itemName=bet
 
 === Start the REPL
 
-The easiest way to start the REPL is to use Calva's *Jack-in* command and then select the `shadow-cljs` *Project Type*. This will start the shadow-cljs watcher and inject the necessary *cider-nrepl* dependencies.
+The easiest way to start the REPL is to use Calva's *Jack-in* command and then select the `shadow-cljs` *Project Type*. This works with `:deps true` as well: the launcher uses the Clojure CLI and the aliases selected in `shadow-cljs.edn`. Calva supplies the editor middleware for jack-in. See https://calva.io/connect/[Calva connection instructions].
 
 If you want to start the REPL yourself you can:
 
@@ -190,7 +175,7 @@ If you want to start the REPL yourself you can:
 
 Once shadow is done with its initial compile, start the app (in the browser, or node, or whatever, depending on your app).
 
-Calva will prompt you for witch build to attach the REPL connection to. Calva has a command (and a statusbar button) for switching witch build is attached.
+Calva will prompt you for which build to attach the REPL connection to. Calva has a command (and a statusbar button) for switching which build is attached.
 
 Hack away!
 
@@ -206,22 +191,26 @@ This guide uses as an example the app created in the official https://github.com
 
 Install https://www.vim.org/scripts/script.php?script_id=4978[Fireplace.vim] using your favorite method of installing plug-ins in Vim/Neovim.
 
-As an https://nrepl.org/[nREPL] client, https://www.vim.org/scripts/script.php?script_id=4978[Fireplace.vim] depends on https://docs.cider.mx/cider-nrepl/[CIDER-nREPL] (which is nREPL middleware that provides common, editor-agnostic REPL operations) therefore you need to include this dependency in <<user-config, ~/.shadow-cljs/config.edn>> or `shadow-cljs.edn` (as shown in the next sub-section.) Shadow-CLJS will inject the required CIDER-nREPL middleware once it sees this dependency.
+As an https://nrepl.org/[nREPL] client, https://www.vim.org/scripts/script.php?script_id=4978[Fireplace.vim] depends on https://docs.cider.mx/cider-nrepl/[CIDER-nREPL] (which is nREPL middleware that provides common, editor-agnostic REPL operations) so include it in an active `deps.edn` alias (as shown below), or in your <<user-config, user configuration>>. Shadow-CLJS will inject the required CIDER-nREPL middleware once it sees this dependency.
 
 === Preparing the app
 
-Create the example app by following the official https://github.com/thheller/shadow-cljs#quick-start[Shadow-CLJS Quick Start] guide and modify its `shadow-cljs.edn` as follows:
+For an app with sources under `src/main`, use the following `deps.edn` setup. Replace `"VERSION"` with the appropriate published version of each library. If you followed a project template using the fallback resolver, first apply the <<clojure-dependencies, dependency migration steps>>.
+
+.deps.edn
+```clojure
+{:paths ["src/main"]
+ :deps {thheller/shadow-cljs {:mvn/version "VERSION"}}
+ :aliases
+ {:dev {:extra-paths ["src/dev" "src/test"]
+        :extra-deps {cider/cider-nrepl {:mvn/version "VERSION"}}}}}
+```
+
+.shadow-cljs.edn
 
 ```clojure
 ;; shadow-cljs configuration
-{:source-paths
- ["src/dev"
-  "src/main"
-  "src/test"]
-
- ;; ADD - CIDER-nREPL middleware required by Fireplace.vim
- :dependencies
- [[cider/cider-nrepl "0.22.4"]]
+{:deps {:aliases [:dev]}
 
  ;; ADD - a port (e.g., 3333) for the REPL server to which Fireplace.vim connects
  :nrepl

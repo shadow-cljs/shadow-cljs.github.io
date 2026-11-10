@@ -2,13 +2,12 @@
 
 .A configuration file with a build map.
 ```
-{:dependencies [[some-library "1.2.1"] ...]
- :source-paths ["src"]
+{:deps true
  :builds
  {:app   {:target     :browser
           ... browser-specific options ...}
-  :tests {:target :karma
-          ... karma-specific options ...}}}
+  :tests {:target :browser-test
+          :test-dir "out/test"}}}
 ```
 
 Each build describes artifacts that the compiler will build. The build target is an extensible feature of `shadow-cljs`, and the compiler comes with quite a few of them already.
@@ -23,14 +22,14 @@ Here are some of them:
 
 [Horizontal]
 <<target-browser, `:browser`>>:: Output code suitable for running in a web browser.
-<<target-bootstrap, `:bootstrap`>>:: Output code suitable for running in bootstrapped cljs environment.
+<<target-esm, `:esm`>>:: Output ES modules with explicit exports for browsers, Node.js or other JavaScript tools.
 <<target-browser-test, `:browser-test`>>:: Scan for tests to determine required files, and output tests suitable for running in the browser.
-<<target-karma, `:karma`>>:: Scan for tests to determine required files, and output karma-runner compatible tests. See http://karma-runner.github.io/2.0/index.html[Karma].
+<<target-karma, `:karma`>>:: Scan for tests to determine required files, and output karma-runner compatible tests. See <<target-karma, the Karma compatibility section>>.
 <<target-node-library, `:node-library`>>:: Output code suitable for use as a node library.
 <<target-node-script, `:node-script`>>:: Output code suitable for use as a node script.
 <<target-npm-module, `:npm-module`>>:: Output code suitable for use as an NPM module.
 
-Each target is covered in more detail in its own chapter since the remaining build options vary on
+The targets listed above are covered in more detail in their own chapters since the remaining build options vary on
 the target you select.
 
 
@@ -56,8 +55,7 @@ When running `watch` code for the REPL is injected automatically and usually doe
 
 === Preloads
 
-As a developer most of your time is spent in development mode. You're probably familiar with tools like `figwheel`,
-`boot-reload`, and `devtools`. It's almost certain that you want one or more of these in your builds.
+Preloads let you include development tools and instrumentation in a build. shadow-cljs already provides hot reload and REPL support; those features do not require an additional reload library.
 
 Preloads are used to force certain namespaces into the front of your generated Javascript. This is
 generally used to inject tools and instrumentation before the application actually loads and runs. The
@@ -94,7 +92,7 @@ For example to only include the preloads within a main module during development
 
 NOTE: Since version 2.0.130 shadow-cljs automatically adds `cljs-devtools` to the preloads in
 `watch` and `compile` if they are on the classpath. All you need to do is make sure `binaryage/devtools` is in your
-`dependencies` list. (Note, *not* binaryage/**cljs-**devtools.) If you don't want to have `cljs-devtools` in
+`deps.edn` dependencies. (Note, *not* binaryage/**cljs-**devtools.) If you don't want to have `cljs-devtools` in
 specific targets, you can suppress this by adding `:console-support false` to the `:devtools` section of
 those targets.
 
@@ -161,14 +159,14 @@ There are also async variants of these in case you need to do some async work th
   (js/setTimeout
     (fn []
       (js/console.log "stop complete")
-      (done)))
+      (done))))
 
 (defn ^:dev/after-load-async start [done]
   (js/console.log "start")
   (js/setTimeout
     (fn []
       (js/console.log "start complete")
-      (done)))
+      (done))))
 ```
 
 IMPORTANT: The functions will receive one callback function that must be called when their work is completed. If the callback function is not called the reload process will not proceed.
@@ -202,7 +200,7 @@ files that have been recompiled.  This function *must* be synchronous in nature.
 `:before-load-async`:: A symbol (with namespace) of a function `(fn [done])` to run just before refreshing. This function can do async processing, but *must* call `(done)` to indicate it is complete.
 `:after-load`:: A symbol (with namespace) of a function to run after hot code reload is complete.
 `:after-load-async`:: A symbol (with namespace) of a function `(fn [done])` to run after hot code reload is complete. This function can do async processing, but *must* call `(done)` to indicate it is complete.
-`:autoload`:: A boolean controlling whether code should be hot loaded. Implicitly set to `true` if either of the callbacks is set. Always enabled for the `:browser` target by default, set to `false` to disable.
+`:autoload`:: A boolean controlling whether code should be hot loaded. Defaults to `true` when development support is enabled; set to `false` to disable automatic reloads.
 `:ignore-warnings`:: A boolean controlling whether code with warnings should be reloaded. Defaults to `false`.
 
 .A sample of lifecycle hooks.
@@ -217,7 +215,7 @@ files that have been recompiled.  This function *must* be synchronous in nature.
 
 IMPORTANT: Hooks cannot be declared in the `cljs.user` namespace. Hooks are only used if the namespace containing them is actually included in the build. If you use an extra namespace make sure to include it via `:preloads`.
 
-TIP: If neither `:after-load` nor `:before-load` are set the compiler will only attempt to hot reload the code in the `:browser` target. If you still want hot reloading but don't need any of the callbacks you can set `:autoload true` instead.
+TIP: Reload hooks are optional. Configure them when your app needs to stop or restart resources around a reload; use `:autoload false` when you want to control reloading yourself.
 
 
 == Build Hooks [[build-hooks]]
@@ -226,14 +224,14 @@ It is sometimes desirable to execute some custom code at a specific stage in the
 
 They are configured per build under the `:build-hooks` key
 
-.Exampe :build-hooks
+.Example :build-hooks
 ```clojure
 {...
  :builds
  {:app {:target ...
         :build-hooks
         [(my.util/hook 1 2 3)]
-        ...}}}}
+        ...}}}
 ```
 
 .Example hook code
@@ -313,19 +311,18 @@ The cache files are stored in a dedicated directory for each build so the cache 
 
 .Cache location for `cljs/core.cljs`
 ```
-target/shadow-cljs/builds/app/dev/ana/cljs/core.cljs.cache.transit.json
+.shadow-cljs/builds/app/dev/ana/cljs/core.cljs.cache.transit.json
 ```
 
-The `:cache-root` setting defaults to `target/shadow-cljs` and controls where ALL cache files will be written. It can only be configured globally, not per build.
+The `:cache-root` setting defaults to `.shadow-cljs` and controls where ALL cache files will be written. It can only be configured globally, not per build.
 
 ```
-{:source-paths [...]
- :dependencies [...]
- :cache-root ".shadow-cljs"
+{:deps true
+ :cache-root "target/shadow-cljs"
  :builds ...}
 
 ;; cache then goes to
-;; .shadow-cljs/builds/app/dev/ana/cljs/core.cljs.cache.transit.json
+;; target/shadow-cljs/builds/app/dev/ana/cljs/core.cljs.cache.transit.json
 ```
 
 The `:cache-root` is always resolved relative to the project directory. You can also specify absolute paths (eg. `/tmp/shadow-cljs`).
@@ -360,7 +357,7 @@ This defines the `your.app/VERBOSE` variable as `false` by default. This will ca
    :closure-defines {your.app/VERBOSE true}
    ;; you may also enable it for release as well
    :release {:closure-defines {your.app/VERBOSE true}}
-   }}
+   }}}
 ```
 
 TIP: It is generally safer to use the "disabled" variant as the default since it makes things less likely to be included in a `release` build when they shouldn't be. Forgetting to set a `:closure-defines` variable should almost always result in less code being used not more.
@@ -377,7 +374,7 @@ The CLJS compiler supports several options to influence how some code is generat
 These are all grouped under the `:compiler-options` key in your build config.
 
 ```clojure
-{:dependencies [...]
+{:deps true
  :builds
  {:app
   {:target :browser
@@ -425,7 +422,7 @@ Options that don't have any effect at all include
 - `:watch-fn`
 - `:process-shim`
 
-=== Warnings as Errors [[warnigs-as-errors]]
+=== Warnings as Errors [[warnings-as-errors]] [[warnigs-as-errors]]
 
 It is sometimes desireable to fail a build with warnings rather than continuing with the build (eg. in CI envs). You can use the `:warnings-as-errors` compiler options to customize how that is handled.
 
@@ -444,7 +441,7 @@ It is sometimes desireable to fail a build with warnings rather than continuing 
  :builds
  {:app
   {...
-   :compiler-options {:warnings-as-errors #{:undeclared-var}}}}
+   :compiler-options {:warnings-as-errors #{:undeclared-var}}}}}
 ```
 
 A set of possible warning-type keywords can be found https://github.com/clojure/clojurescript/blob/5ad96a8b3ae2e3616a19715ba9ba2471a36933a2/src/main/clojure/cljs/analyzer.cljc#L124-L163[here].
@@ -456,7 +453,7 @@ A set of possible warning-type keywords can be found https://github.com/clojure/
  {:app
   {...
    :compiler-options {:warnings-as-errors {:ignore #{some.ns some.library.*}
-                                           :warnings-types #{:undeclared-var}}}
+                                           :warning-types #{:undeclared-var}}}}}}
 ```
 
 `:ignore` takes a set of symbols refering to namespaces. Either direct matches or `.*` wildcards are allowed. `:warning-types` has the same functionality as above, not specifying it means all warnings will throw except the ignored namespaces.
@@ -464,11 +461,9 @@ A set of possible warning-type keywords can be found https://github.com/clojure/
 
 == Output Language Options
 
-By default the generated JS output will be compatible with ES6 and all "newer" features will be transpiled to compatible code using polyfills. This is currently the safest default and supports most browsers in active use (including IE10+).
+The default compiler setting is `:output-feature-set :es-unsupported`, which preserves JavaScript features supported by the bundled Closure Compiler rather than targeting a fixed older ECMAScript version. Targets may override this: for example, `:react-native` defaults to `:es5` for development and `:es2020` for release.
 
-You can select other output options if you only care about more modern environments and want to keep the original code without replacements (eg. `node`, Chrome Extensions, ...)
-
-IMPORTANT: Note that this mostly affects imported JS code from <<npm, npm>> or `.js` files from the <<classpath-js, classpath>>. CLJS will currently only generate ES5 output and is not affected by setting higher options.
+Choose an explicit feature set when your deployment environment requires older syntax. This affects processing of imported JavaScript as well as compiler-generated output. It does not guarantee that all browser or Node.js APIs used by your dependencies are available; test in the environments you support.
 
 You can configure this via the `:output-feature-set` in `:compiler-options`. The older `:language-out` option should not be used as `:output-feature-set` replaced it.
 
@@ -479,13 +474,17 @@ Supported options are:
 - `:es5`
 - `:es6` - `class`, `const`, `let`, ...
 - `:es7` - exponent `**` operator
-- `:es8` - `async/await`, `generators`, shared memory and atomics
-- `:es2018` - async iteration, `Promise.finally`, several `RegExp` features, spread syntax in object literals
+- `:es8` or `:es2017` - includes `async/await`
+- `:es9` or `:es2018` - async iteration, `Promise.finally`, several `RegExp` features, spread syntax in object literals
 - `:es2019`
-- `:es2020` - `AsyncIterator`, `BigInt`, `??` operator, dynamic imports
-- `:es-next` - all the features the Closure Compiler currently supports
+- `:es2020` - features such as `BigInt` and the `??` operator
+- `:es2021`
+- `:es-next` - the features in Closure Compiler's `ES_NEXT` feature set
+- `:es-next-in` or `:es-unstable` - Closure Compiler's unstable feature set
+- `:es-unsupported` - Closure Compiler's broadest feature set (the default)
 - `:browser-2020` - `:es2019` minus several RegExp features
 - `:browser-2021` - `:es2020` minus RegExp Unicode properties
+- `:browser-2022`, `:browser-2023`, `:browser-2024`, `:browser-2025` - additional browser-oriented feature sets
 
 .Example
 ```
