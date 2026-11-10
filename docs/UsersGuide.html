@@ -735,7 +735,10 @@ table.CodeRay td.code{padding:0 0 0 .75em}
 <li><a href="#target-node-test">12.1. Testing in node.js</a></li>
 <li><a href="#target-browser-test">12.2. Testing in the Browser</a>
 <ul class="sectlevel3">
-<li><a href="#_generated_output_in_test_dir">12.2.1. Generated output in <code>:test-dir</code></a></li>
+<li><a href="#_the_test_runner">12.2.1. The Test Runner</a></li>
+<li><a href="#browser-test-headless">12.2.2. Headless and Automated Use</a></li>
+<li><a href="#_custom_runner">12.2.3. Custom Runner</a></li>
+<li><a href="#_generated_output_in_test_dir">12.2.4. Generated output in <code>:test-dir</code></a></li>
 </ul>
 </li>
 <li><a href="#target-karma">12.3. Targeting Tests to Karma for Continuous Integration</a>
@@ -5511,8 +5514,8 @@ $ shadow-cljs compile test &amp;&amp; node out/node-tests.js</code></pre>
 <h3 id="target-browser-test"><a class="anchor" href="#target-browser-test"></a><a class="link" href="#target-browser-test">12.2. Testing in the Browser</a></h3>
 <div class="paragraph">
 <p>This target is meant for gathering up namespaces that contain tests (based on a filename pattern match),
-and triggering a test runner. It contains a built-in runner that will automatically scan for <code>cljs.test</code>
-tests and run them.</p>
+and running them in the browser. It contains a built-in runner that will automatically scan for <code>cljs.test</code>
+tests, run them and display the results.</p>
 </div>
 <div class="paragraph">
 <p>The relevant configuration options are:</p>
@@ -5571,6 +5574,440 @@ In general you will need a config that looks like this:</p>
 </div>
 </div>
 <div class="paragraph">
+<p>Run <code>shadow-cljs watch test</code> and open <a href="http://localhost:8021" class="bare">http://localhost:8021</a>. All tests run when the page loads.</p>
+</div>
+<div class="sect3">
+<h4 id="_the_test_runner"><a class="anchor" href="#_the_test_runner"></a><a class="link" href="#_the_test_runner">12.2.1. The Test Runner</a></h4>
+<div class="paragraph">
+<p>The built-in runner shows the results grouped by namespace. Namespaces containing failures are expanded automatically.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Selecting tests</dt>
+<dd>
+<p>The filter input matches test names (<code>some.ns/some-test</code>) as a substring, use commas to match several (eg. <code>user,auth/login</code>).
+Press <code>/</code> to focus it, <code>Enter</code> to run the matching tests and <code>Esc</code> to clear it. Checkboxes exclude namespaces or single tests from running,
+each row also has a button to run just that namespace or test. "Run failed" runs only the tests that failed.
+The selection is remembered in the browser via <code>localStorage</code>.</p>
+</dd>
+<dt class="hdlist1">Failures</dt>
+<dd>
+<p>Failed <code>(is (= expected actual))</code> assertions show the actual value with all differences to the expected value marked.
+Values that match are shown as is, so the location of a difference is easy to find in larger data.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">expected<span class="error">:</span> (<span class="keyword">=</span> {<span class="symbol">:name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">foo</span><span class="delimiter">&quot;</span></span>, <span class="symbol">:roles</span> #{<span class="symbol">:admin</span> <span class="symbol">:user</span>}} (get-user))
+  actual<span class="error">:</span> {<span class="symbol">:name</span> (mismatch (expected <span class="string"><span class="delimiter">&quot;</span><span class="content">foo</span><span class="delimiter">&quot;</span></span>) (actual <span class="string"><span class="delimiter">&quot;</span><span class="content">bar</span><span class="delimiter">&quot;</span></span>)),
+           <span class="symbol">:roles</span> #{<span class="symbol">:user</span> (missing <span class="symbol">:admin</span>) (unexpected <span class="symbol">:guest</span>)},
+           <span class="symbol">:created-at</span> (unexpected <span class="string"><span class="delimiter">&quot;</span><span class="content">2026-11-10</span><span class="delimiter">&quot;</span></span>)}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Failures of <a href="https://github.com/nubank/matcher-combinators">matcher-combinators</a> <code>match?</code> and <code>thrown-match?</code> assertions are shown the same way.
+No extra configuration is needed for that.</p>
+</div>
+</dd>
+<dt class="hdlist1">Output</dt>
+<dd>
+<p>Output printed while a test runs (eg. <code>println</code>) is captured and shown with the test.</p>
+</dd>
+<dt class="hdlist1">Live Reload</dt>
+<dd>
+<p>During <code>watch</code> only the tests affected by a change run again after a hot-reload. A test is affected when its namespace,
+or any namespace it depends on (directly or transitively), was recompiled. So changing the code under test also runs its tests again.
+Use the "Auto-run on reload" checkbox to turn this off. A reload waits for the namespace currently running tests to complete.</p>
+</dd>
+<dt class="hdlist1">URL Parameters</dt>
+<dd>
+<p><code>?test=some.ns,some.ns/some-test</code> limits the page to these namespaces and tests. <code>?filter=text</code> sets the filter.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>Release builds work the same way: run <code>shadow-cljs release test</code> and open the page, just without hot-reload.</p>
+</div>
+<div class="sect4">
+<h5 id="_async_tests"><a class="anchor" href="#_async_tests"></a><a class="link" href="#_async_tests">Async Tests</a></h5>
+<div class="paragraph">
+<p><code>cljs.test</code> has no timeouts for async tests, so a test that never calls <code>done</code> would stop the entire test run.
+The runner reports an error for any async test that hasn&#8217;t called <code>done</code> after 30 seconds and continues with the next test.
+Exceptions thrown in async callbacks (eg. in a <code>setTimeout</code>) are also reported for the test that is currently running.</p>
+</div>
+<div class="paragraph">
+<p>The timeout can be configured in ms, <code>0</code> disables it.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:target</span> <span class="symbol">:browser-test</span>
+ <span class="symbol">:test-dir</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">out/test</span><span class="delimiter">&quot;</span></span>
+ <span class="symbol">:closure-defines</span> {shadow.test.runner/ASYNC-TIMEOUT <span class="integer">60000</span>}}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="browser-test-headless"><a class="anchor" href="#browser-test-headless"></a><a class="link" href="#browser-test-headless">12.2.2. Headless and Automated Use</a></h4>
+<div class="paragraph">
+<p>For CI or AI agents, the runner page provides the results in several machine-readable ways.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Console</dt>
+<dd>
+<p>Every failure is logged via <code>console.error</code>, followed by the summary line <code>cljs.test</code> also uses.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">FAIL in demo.foo-test/map-diff (demo/foo_test.cljs<span class="error">:</span><span class="integer">42</span>)
+expected<span class="error">:</span> (<span class="keyword">=</span> {<span class="symbol">:id</span> <span class="integer">1</span>, <span class="symbol">:name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">foo</span><span class="delimiter">&quot;</span></span>} {<span class="symbol">:id</span> <span class="integer">1</span>, <span class="symbol">:name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">bar</span><span class="delimiter">&quot;</span></span>})
+  actual<span class="error">:</span> {<span class="symbol">:id</span> <span class="integer">1</span>, <span class="symbol">:name</span> (mismatch (expected <span class="string"><span class="delimiter">&quot;</span><span class="content">foo</span><span class="delimiter">&quot;</span></span>) (actual <span class="string"><span class="delimiter">&quot;</span><span class="content">bar</span><span class="delimiter">&quot;</span></span>))}
+
+Ran <span class="integer">26</span> tests containing <span class="integer">66</span> assertions.
+<span class="integer">28</span> failures, <span class="integer">8</span> errors.</code></pre>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">Page Status</dt>
+<dd>
+<p>The <code>data-test-status</code> attribute of the <code>&lt;html&gt;</code> element is <code>running</code>, <code>passed</code>, <code>failed</code> or <code>idle</code> (nothing ran).
+Waiting for <code>html[data-test-status=passed], html[data-test-status=failed]</code> works without running any JavaScript.
+<code>document.title</code> also shows the status. In the page itself every test has a <code>data-test-id</code> and <code>data-status</code> attribute.</p>
+</dd>
+<dt class="hdlist1">JavaScript API</dt>
+<dd>
+<p>The runner provides a <code>window.shadowTest</code> object, described below.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>The <code>window.shadowTest</code> object has these functions:</p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+<code>shadowTest.done()</code>
+</td>
+<td class="hdlist2">
+<p>Promise resolving to the JSON report once no tests are running.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>shadowTest.report()</code>
+</td>
+<td class="hdlist2">
+<p>The JSON report of the current state.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>shadowTest.text()</code>
+</td>
+<td class="hdlist2">
+<p>Plain text report, same format as the console output.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>shadowTest.status()</code>
+</td>
+<td class="hdlist2">
+<p><code>"running"</code>, <code>"passed"</code>, <code>"failed"</code> or <code>"idle"</code>.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>shadowTest.run(filter)</code>
+</td>
+<td class="hdlist2">
+<p>Runs the tests matching filter (comma separated, all tests if omitted). Returns the same Promise as <code>done()</code>.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>shadowTest.list()</code>
+</td>
+<td class="hdlist2">
+<p>All test ids.</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The JSON report looks like this (shortened):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{<span class="key"><span class="delimiter">&quot;</span><span class="content">status</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">failed</span><span class="delimiter">&quot;</span></span>,
+ <span class="key"><span class="delimiter">&quot;</span><span class="content">summary</span><span class="delimiter">&quot;</span></span>: {<span class="key"><span class="delimiter">&quot;</span><span class="content">tests</span><span class="delimiter">&quot;</span></span>: <span class="integer">26</span>, <span class="key"><span class="delimiter">&quot;</span><span class="content">passed</span><span class="delimiter">&quot;</span></span>: <span class="integer">5</span>, <span class="key"><span class="delimiter">&quot;</span><span class="content">failed</span><span class="delimiter">&quot;</span></span>: <span class="integer">14</span>, <span class="key"><span class="delimiter">&quot;</span><span class="content">errors</span><span class="delimiter">&quot;</span></span>: <span class="integer">7</span>,
+             <span class="key"><span class="delimiter">&quot;</span><span class="content">notRun</span><span class="delimiter">&quot;</span></span>: <span class="integer">0</span>, <span class="key"><span class="delimiter">&quot;</span><span class="content">outdated</span><span class="delimiter">&quot;</span></span>: <span class="integer">0</span>, <span class="key"><span class="delimiter">&quot;</span><span class="content">assertions</span><span class="delimiter">&quot;</span></span>: <span class="integer">66</span>},
+ <span class="key"><span class="delimiter">&quot;</span><span class="content">run</span><span class="delimiter">&quot;</span></span>: {<span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>: <span class="integer">1</span>, <span class="key"><span class="delimiter">&quot;</span><span class="content">status</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">done</span><span class="delimiter">&quot;</span></span>, <span class="key"><span class="delimiter">&quot;</span><span class="content">reason</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">load</span><span class="delimiter">&quot;</span></span>, <span class="key"><span class="delimiter">&quot;</span><span class="content">completed</span><span class="delimiter">&quot;</span></span>: <span class="integer">26</span>, <span class="key"><span class="delimiter">&quot;</span><span class="content">durationMs</span><span class="delimiter">&quot;</span></span>: <span class="integer">4460</span>,
+         <span class="key"><span class="delimiter">&quot;</span><span class="content">testIds</span><span class="delimiter">&quot;</span></span>: [<span class="string"><span class="delimiter">&quot;</span><span class="content">demo.foo-test/foo</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">demo.foo-test/map-diff</span><span class="delimiter">&quot;</span></span>, <span class="error">.</span><span class="error">.</span><span class="error">.</span>]},
+ <span class="key"><span class="delimiter">&quot;</span><span class="content">namespaceErrors</span><span class="delimiter">&quot;</span></span>: [],
+ <span class="key"><span class="delimiter">&quot;</span><span class="content">tests</span><span class="delimiter">&quot;</span></span>: [
+   {<span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">demo.foo-test/map-diff</span><span class="delimiter">&quot;</span></span>, <span class="key"><span class="delimiter">&quot;</span><span class="content">ns</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">demo.foo-test</span><span class="delimiter">&quot;</span></span>, <span class="key"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">map-diff</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">file</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">demo/foo_test.cljs</span><span class="delimiter">&quot;</span></span>, <span class="key"><span class="delimiter">&quot;</span><span class="content">line</span><span class="delimiter">&quot;</span></span>: <span class="integer">41</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">status</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">fail</span><span class="delimiter">&quot;</span></span>, <span class="key"><span class="delimiter">&quot;</span><span class="content">durationMs</span><span class="delimiter">&quot;</span></span>: <span class="integer">1</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">assertions</span><span class="delimiter">&quot;</span></span>: {<span class="key"><span class="delimiter">&quot;</span><span class="content">pass</span><span class="delimiter">&quot;</span></span>: <span class="integer">0</span>, <span class="key"><span class="delimiter">&quot;</span><span class="content">fail</span><span class="delimiter">&quot;</span></span>: <span class="integer">1</span>, <span class="key"><span class="delimiter">&quot;</span><span class="content">error</span><span class="delimiter">&quot;</span></span>: <span class="integer">0</span>},
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">out</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">failures</span><span class="delimiter">&quot;</span></span>: [
+      {<span class="key"><span class="delimiter">&quot;</span><span class="content">type</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">fail</span><span class="delimiter">&quot;</span></span>,
+       <span class="key"><span class="delimiter">&quot;</span><span class="content">message</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+       <span class="key"><span class="delimiter">&quot;</span><span class="content">testing</span><span class="delimiter">&quot;</span></span>: [],
+       <span class="key"><span class="delimiter">&quot;</span><span class="content">expected</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">(= {:id 1, :name </span><span class="char">\&quot;</span><span class="content">foo</span><span class="char">\&quot;</span><span class="content">} {:id 1, :name </span><span class="char">\&quot;</span><span class="content">bar</span><span class="char">\&quot;</span><span class="content">})</span><span class="delimiter">&quot;</span></span>,
+       <span class="key"><span class="delimiter">&quot;</span><span class="content">actual</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">{:id 1, :name (mismatch (expected </span><span class="char">\&quot;</span><span class="content">foo</span><span class="char">\&quot;</span><span class="content">) (actual </span><span class="char">\&quot;</span><span class="content">bar</span><span class="char">\&quot;</span><span class="content">))}</span><span class="delimiter">&quot;</span></span>,
+       <span class="key"><span class="delimiter">&quot;</span><span class="content">text</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">FAIL in demo.foo-test/map-diff (demo/foo_test.cljs:42)</span><span class="char">\n</span><span class="content">...</span><span class="delimiter">&quot;</span></span>}]},
+   <span class="error">.</span><span class="error">.</span><span class="error">.</span>]}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>status</code> of a test is <code>pass</code>, <code>fail</code>, <code>error</code> or <code>not-run</code>. During <code>watch</code> it may also be <code>outdated</code>, meaning the code
+changed since the test ran but it didn&#8217;t run again (eg. because it was excluded). While a run is active, tests are <code>queued</code> or <code>running</code>.
+Failures of type <code>error</code> have <code>error</code>, <code>data</code> and <code>cause</code> instead of <code>actual</code>. <code>namespaceErrors</code> contains errors
+that happened outside of any test, eg. in fixtures.</p>
+</div>
+<div class="sect4">
+<h5 id="_running_headless"><a class="anchor" href="#_running_headless"></a><a class="link" href="#_running_headless">Running Headless</a></h5>
+<div class="paragraph">
+<p>shadow-cljs doesn&#8217;t include a browser. The following script uses <a href="https://playwright.dev">Playwright</a> to run the tests in a headless browser.
+It prints the results and exits with <code>0</code> if all tests passed, <code>1</code> if any failed and <code>2</code> if the tests could not run
+(eg. the build is missing, the page failed to load, the tests timed out or nothing matched <code>--test</code>).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">npm install --save-dev playwright
+npx playwright install chromium
+
+npx shadow-cljs compile test   # or: npx shadow-cljs release test
+node run-browser-tests.mjs out/test
+node run-browser-tests.mjs out/test --test=my.app.core-test
+node run-browser-tests.mjs http://localhost:8021 --json</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Given a directory it serves the <code>:test-dir</code> itself, so no <code>:dev-http</code> server is needed. Given a URL it uses the already running server,
+eg. the <code>:dev-http</code> of a running <code>watch</code>. <code>--console</code> also prints the console output of the page. Builds made with <code>compile</code> try to
+connect to the shadow-cljs server for hot-reload, which only logs an error if no server is running. The tests run regardless,
+but <code>release</code> builds are a better fit for CI.</p>
+</div>
+<div class="listingblock">
+<div class="title">run-browser-tests.mjs</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript"><span class="error">#</span>!<span class="regexp"><span class="delimiter">/</span><span class="content">usr</span><span class="delimiter">/</span></span>bin/env node
+<span class="comment">// Runs the tests of a shadow-cljs :browser-test build in a headless browser.</span>
+<span class="comment">// Prints the results and exits with 0 if all tests passed, 1 if any failed, 2 if the tests could not run.</span>
+<span class="comment">//</span>
+<span class="comment">// Requires playwright: npm install --save-dev playwright &amp;&amp; npx playwright install chromium</span>
+<span class="comment">//</span>
+<span class="comment">// Usage:</span>
+<span class="comment">//   node run-browser-tests.mjs &lt;test-dir-or-url&gt; [options]</span>
+<span class="comment">//</span>
+<span class="comment">//   &lt;test-dir-or-url&gt;  the :test-dir of a compiled or released build, served by this script,</span>
+<span class="comment">//                      or the URL of an already served test page, eg. http://localhost:8021</span>
+<span class="comment">//</span>
+<span class="comment">// Options:</span>
+<span class="comment">//   --test=a.ns,a.ns/some-test  only run these namespaces and tests</span>
+<span class="comment">//   --filter=text               only run tests whose ns/name contains text, comma separated alternatives</span>
+<span class="comment">//   --json                      print the JSON report instead of the text report</span>
+<span class="comment">//   --console                   also print the console output of the page</span>
+<span class="comment">//   --browser=chromium          chromium, firefox or webkit</span>
+<span class="comment">//   --timeout=120000            give up after this many ms</span>
+
+<span class="reserved">import</span> http from <span class="string"><span class="delimiter">&quot;</span><span class="content">node:http</span><span class="delimiter">&quot;</span></span>;
+<span class="reserved">import</span> fs from <span class="string"><span class="delimiter">&quot;</span><span class="content">node:fs</span><span class="delimiter">&quot;</span></span>;
+<span class="reserved">import</span> path from <span class="string"><span class="delimiter">&quot;</span><span class="content">node:path</span><span class="delimiter">&quot;</span></span>;
+
+const USAGE = <span class="string"><span class="delimiter">&quot;</span><span class="content">Usage: node run-browser-tests.mjs &lt;test-dir-or-url&gt; [--test=...] [--filter=...] [--json] [--console] [--browser=chromium] [--timeout=ms]</span><span class="delimiter">&quot;</span></span>;
+
+<span class="keyword">function</span> <span class="function">parseArgs</span>(argv) {
+  const opts = { <span class="key">target</span>: <span class="predefined-constant">null</span>, <span class="key">test</span>: <span class="predefined-constant">null</span>, <span class="key">filter</span>: <span class="predefined-constant">null</span>, <span class="key">json</span>: <span class="predefined-constant">false</span>, <span class="key">console</span>: <span class="predefined-constant">false</span>, <span class="key">browser</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">chromium</span><span class="delimiter">&quot;</span></span>, <span class="key">timeout</span>: <span class="integer">120000</span> };
+  <span class="keyword">for</span> (const arg of argv) {
+    <span class="keyword">if</span> (arg === <span class="string"><span class="delimiter">&quot;</span><span class="content">--json</span><span class="delimiter">&quot;</span></span>) opts.json = <span class="predefined-constant">true</span>;
+    <span class="keyword">else</span> <span class="keyword">if</span> (arg === <span class="string"><span class="delimiter">&quot;</span><span class="content">--console</span><span class="delimiter">&quot;</span></span>) opts.console = <span class="predefined-constant">true</span>;
+    <span class="keyword">else</span> <span class="keyword">if</span> (arg.startsWith(<span class="string"><span class="delimiter">&quot;</span><span class="content">--test=</span><span class="delimiter">&quot;</span></span>)) opts.test = arg.slice(<span class="integer">7</span>);
+    <span class="keyword">else</span> <span class="keyword">if</span> (arg.startsWith(<span class="string"><span class="delimiter">&quot;</span><span class="content">--filter=</span><span class="delimiter">&quot;</span></span>)) opts.filter = arg.slice(<span class="integer">9</span>);
+    <span class="keyword">else</span> <span class="keyword">if</span> (arg.startsWith(<span class="string"><span class="delimiter">&quot;</span><span class="content">--browser=</span><span class="delimiter">&quot;</span></span>)) opts.browser = arg.slice(<span class="integer">10</span>);
+    <span class="keyword">else</span> <span class="keyword">if</span> (arg.startsWith(<span class="string"><span class="delimiter">&quot;</span><span class="content">--timeout=</span><span class="delimiter">&quot;</span></span>)) opts.timeout = parseInt(arg.slice(<span class="integer">10</span>), <span class="integer">10</span>);
+    <span class="keyword">else</span> <span class="keyword">if</span> (arg.startsWith(<span class="string"><span class="delimiter">&quot;</span><span class="content">--</span><span class="delimiter">&quot;</span></span>)) fail(<span class="error">`</span>Unknown option: <span class="predefined">$</span>{arg}<span class="error">\</span><span class="predefined">n$</span>{USAGE}<span class="error">`</span>);
+    <span class="keyword">else</span> opts.target = arg;
+  }
+  <span class="keyword">if</span> (!opts.target) fail(USAGE);
+  <span class="keyword">return</span> opts;
+}
+
+<span class="comment">// problems running the tests, as opposed to failing tests</span>
+<span class="reserved">class</span> RunnerError <span class="reserved">extends</span> Error {}
+
+<span class="keyword">function</span> <span class="function">fail</span>(msg) {
+  <span class="keyword">throw</span> <span class="keyword">new</span> RunnerError(msg);
+}
+
+async <span class="keyword">function</span> <span class="function">loadPlaywright</span>() {
+  <span class="keyword">for</span> (const name of [<span class="string"><span class="delimiter">&quot;</span><span class="content">playwright</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">playwright-core</span><span class="delimiter">&quot;</span></span>]) {
+    <span class="keyword">try</span> {
+      <span class="keyword">return</span> await <span class="reserved">import</span>(name);
+    } <span class="keyword">catch</span> (e) {
+      <span class="comment">// try the next one</span>
+    }
+  }
+  fail(<span class="string"><span class="delimiter">&quot;</span><span class="content">playwright not found. Install it via: npm install --save-dev playwright &amp;&amp; npx playwright install chromium</span><span class="delimiter">&quot;</span></span>);
+}
+
+const MIME_TYPES = {
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">.html</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">text/html; charset=utf-8</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">.js</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">text/javascript; charset=utf-8</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">.mjs</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">text/javascript; charset=utf-8</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">.css</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">text/css; charset=utf-8</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">.json</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">application/json</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">.map</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">application/json</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">.svg</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">image/svg+xml</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">.png</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">image/png</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">.wasm</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">application/wasm</span><span class="delimiter">&quot;</span></span>,
+};
+
+<span class="comment">// minimal static file server, the generated index.html loads /js/test.js so the dir is served at /</span>
+<span class="keyword">function</span> <span class="function">serveDir</span>(dir) {
+  const root = path.resolve(dir);
+  <span class="keyword">if</span> (!fs.existsSync(path.join(root, <span class="string"><span class="delimiter">&quot;</span><span class="content">index.html</span><span class="delimiter">&quot;</span></span>))) {
+    fail(<span class="error">`</span><span class="predefined">$</span>{root}/index.html not found. Compile the :browser-test build first, eg. npx shadow-cljs compile test<span class="error">`</span>);
+  }
+
+  const server = http.createServer((req, res) =&gt; {
+    const urlPath = decodeURIComponent(<span class="keyword">new</span> URL(req.url, <span class="string"><span class="delimiter">&quot;</span><span class="content">http://localhost</span><span class="delimiter">&quot;</span></span>).pathname);
+    const file = path.join(root, urlPath.endsWith(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>) ? urlPath + <span class="string"><span class="delimiter">&quot;</span><span class="content">index.html</span><span class="delimiter">&quot;</span></span> : urlPath);
+    <span class="keyword">if</span> (!file.startsWith(root + path.sep)) {
+      res.writeHead(<span class="integer">403</span>).end();
+      <span class="keyword">return</span>;
+    }
+    fs.readFile(file, (err, data) =&gt; {
+      <span class="keyword">if</span> (err) {
+        res.writeHead(<span class="integer">404</span>).end();
+      } <span class="keyword">else</span> {
+        res.writeHead(<span class="integer">200</span>, { <span class="key"><span class="delimiter">&quot;</span><span class="content">content-type</span><span class="delimiter">&quot;</span></span>: MIME_TYPES[path.extname(file)] || <span class="string"><span class="delimiter">&quot;</span><span class="content">application/octet-stream</span><span class="delimiter">&quot;</span></span> });
+        res.end(data);
+      }
+    });
+  });
+
+  <span class="keyword">return</span> <span class="keyword">new</span> Promise((resolve) =&gt; {
+    server.listen(<span class="integer">0</span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">127.0.0.1</span><span class="delimiter">&quot;</span></span>, () =&gt; {
+      resolve({ server, <span class="key">url</span>: <span class="error">`</span>http:<span class="comment">//127.0.0.1:${server.address().port}/` });</span>
+    });
+  });
+}
+
+async <span class="keyword">function</span> <span class="function">main</span>() {
+  const opts = parseArgs(process.argv.slice(<span class="integer">2</span>));
+  const pw = await loadPlaywright();
+  const browserType = pw[opts.browser];
+  <span class="keyword">if</span> (!browserType) fail(<span class="error">`</span>Unknown browser: <span class="predefined">$</span>{opts.browser}<span class="error">`</span>);
+
+  let server = <span class="predefined-constant">null</span>;
+  let url = opts.target;
+  <span class="keyword">if</span> (!<span class="regexp"><span class="delimiter">/</span><span class="content">^https?:</span><span class="content">\/</span><span class="content">\/</span><span class="delimiter">/</span></span>.test(url)) {
+    ({ server, url } = await serveDir(url));
+  }
+
+  const pageUrl = <span class="keyword">new</span> URL(url);
+  <span class="keyword">if</span> (opts.test) pageUrl.searchParams.set(<span class="string"><span class="delimiter">&quot;</span><span class="content">test</span><span class="delimiter">&quot;</span></span>, opts.test);
+  <span class="keyword">if</span> (opts.filter) pageUrl.searchParams.set(<span class="string"><span class="delimiter">&quot;</span><span class="content">filter</span><span class="delimiter">&quot;</span></span>, opts.filter);
+
+  const browser = await browserType.launch();
+  const pageErrors = [];
+  let exitCode = <span class="integer">2</span>;
+
+  <span class="keyword">try</span> {
+    const page = await browser.newPage();
+    page.on(<span class="string"><span class="delimiter">&quot;</span><span class="content">pageerror</span><span class="delimiter">&quot;</span></span>, (err) =&gt; {
+      pageErrors.push(err);
+      <span class="keyword">if</span> (opts.console) console.error(<span class="error">`</span>[pageerror] <span class="predefined">$</span>{err.stack || err.message}<span class="error">`</span>);
+    });
+    <span class="keyword">if</span> (opts.console) {
+      page.on(<span class="string"><span class="delimiter">&quot;</span><span class="content">console</span><span class="delimiter">&quot;</span></span>, (msg) =&gt; console.error(<span class="error">`</span>[console.<span class="predefined">$</span>{msg.type()}] <span class="predefined">$</span>{msg.text()}<span class="error">`</span>));
+    }
+
+    const deadline = Date.now() + opts.timeout;
+    const remaining = () =&gt; Math.max(<span class="integer">1</span>, deadline - Date.now());
+
+    await page.<span class="reserved">goto</span>(pageUrl.toString(), { <span class="key">timeout</span>: remaining() });
+
+    <span class="keyword">try</span> {
+      await page.waitForFunction(() =&gt; window.shadowTest, <span class="predefined-constant">null</span>, { <span class="key">timeout</span>: Math.min(remaining(), <span class="integer">30000</span>) });
+    } <span class="keyword">catch</span> (e) {
+      const errors = pageErrors.map((err) =&gt; <span class="error">`</span>  <span class="predefined">$</span>{err.message}<span class="error">`</span>).join(<span class="string"><span class="delimiter">&quot;</span><span class="char">\n</span><span class="delimiter">&quot;</span></span>);
+      fail(<span class="error">`</span>The page at <span class="predefined">$</span>{pageUrl} did not load the shadow-cljs test runner (window.shadowTest).<span class="error">`</span> +
+           (errors ? <span class="error">`</span><span class="error">\</span>nPage errors:<span class="error">\</span><span class="predefined">n$</span>{errors}<span class="error">`</span> : <span class="string"><span class="delimiter">&quot;</span><span class="delimiter">&quot;</span></span>));
+    }
+
+    const done = page.evaluate(() =&gt; shadowTest.done());
+    <span class="comment">// rejects when the browser is closed after a timeout, nothing left to do then</span>
+    done.<span class="keyword">catch</span>(() =&gt; {});
+
+    const report = await Promise.race([
+      done,
+      <span class="keyword">new</span> Promise((resolve) =&gt; setTimeout(() =&gt; resolve(<span class="predefined-constant">null</span>), remaining())),
+    ]);
+
+    <span class="keyword">if</span> (!report) {
+      fail(<span class="error">`</span>Tests did not complete within <span class="predefined">$</span>{opts.timeout}ms.<span class="error">`</span>);
+    }
+
+    <span class="keyword">if</span> (opts.json) {
+      console.log(JSON.stringify(report, <span class="predefined-constant">null</span>, <span class="integer">2</span>));
+    } <span class="keyword">else</span> {
+      console.log(await page.evaluate(() =&gt; shadowTest.text()));
+    }
+
+    <span class="keyword">if</span> (report.status === <span class="string"><span class="delimiter">&quot;</span><span class="content">passed</span><span class="delimiter">&quot;</span></span>) {
+      exitCode = <span class="integer">0</span>;
+    } <span class="keyword">else</span> <span class="keyword">if</span> (report.status === <span class="string"><span class="delimiter">&quot;</span><span class="content">failed</span><span class="delimiter">&quot;</span></span>) {
+      exitCode = <span class="integer">1</span>;
+    } <span class="keyword">else</span> {
+      <span class="comment">// &quot;idle&quot;, nothing ran. eg. --test or --filter didn't match anything</span>
+      <span class="keyword">if</span> (!opts.json) console.error(<span class="string"><span class="delimiter">&quot;</span><span class="content">No tests ran.</span><span class="delimiter">&quot;</span></span>);
+      exitCode = <span class="integer">2</span>;
+    }
+  } <span class="keyword">finally</span> {
+    await browser.close();
+    <span class="keyword">if</span> (server) server.close();
+  }
+
+  process.exit(exitCode);
+}
+
+main().<span class="keyword">catch</span>((e) =&gt; {
+  console.error(e <span class="keyword">instanceof</span> RunnerError ? e.message : (e.stack || String(e)));
+  process.exit(<span class="integer">2</span>);
+});</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_using_the_repl"><a class="anchor" href="#_using_the_repl"></a><a class="link" href="#_using_the_repl">Using the REPL</a></h5>
+<div class="paragraph">
+<p>With <code>watch</code> running and the test page open, a CLJS REPL connected to the test build can access the results too.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(js/shadowTest.status)                       <span class="comment">;; &quot;passed&quot;, &quot;failed&quot;, &quot;running&quot; or &quot;idle&quot;</span>
+(shadow.test.runner/text-report)             <span class="comment">;; same text as the console output</span>
+(shadow.test.runner/run-tests! '[my.app.core-test/some-test my.app.other-test/foo])</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>run-tests!</code> only starts the run, query the results once the status is no longer <code>"running"</code>.
+The page runs affected tests on its own after every change, so usually there is no need to run anything.
+Reading the status directly after saving a file may still return the result from before the reload though.
+The run id changes with every run, <code>(.. (js/shadowTest.report) -run -id)</code>, so compare it to the one before the change.</p>
+</div>
+<div class="paragraph">
+<p>Note that every open test page is a separate runtime. If the page is open in several browsers, make sure the REPL talks to the intended one.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_custom_runner"><a class="anchor" href="#_custom_runner"></a><a class="link" href="#_custom_runner">12.2.3. Custom Runner</a></h4>
+<div class="paragraph">
 <p>If you choose to supply a custom <code>:runner-ns</code>, it might look like this:</p>
 </div>
 <div class="listingblock">
@@ -5578,22 +6015,20 @@ In general you will need a config that looks like this:</p>
 <pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">tests.client-test-main</span>
   {<span class="symbol">:dev/always</span> <span class="predefined-constant">true</span>}
   (<span class="symbol">:require</span> [shadow.test <span class="symbol">:as</span> st]
-            [shadow.test.env <span class="symbol">:as</span> env]
-            [cljs-test-display.core <span class="symbol">:as</span> ctd]
-            [shadow.dom <span class="symbol">:as</span> dom]))
+            [shadow.test.env <span class="symbol">:as</span> env]))
 
 (<span class="keyword">defn</span> <span class="function">start</span> []
   (<span class="keyword">-&gt;</span> (env/get-test-data)
       (env/reset-test-data!))
 
-  (st/run-all-tests (ctd/init! <span class="string"><span class="delimiter">&quot;</span><span class="content">test-root</span><span class="delimiter">&quot;</span></span>)))
+  <span class="comment">;; prints the results to the browser console using the default cljs.test reporter</span>
+  (st/run-all-tests))
 
 (<span class="keyword">defn</span> <span class="function">stop</span> [done]
   <span class="comment">; tests can be async. You must call done so that the runner knows you actually finished</span>
   (done))
 
 (<span class="keyword">defn</span> ^<span class="symbol">:export</span> init []
-  (dom/append [<span class="symbol">:div#test-root</span>])
   (start))</code></pre>
 </div>
 </div>
@@ -5615,8 +6050,22 @@ In general you will need a config that looks like this:</p>
 </tr>
 </table>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The built-in runner previously used <code>cljs-test-display</code>, which is no longer included with shadow-cljs.
+If your custom runner uses it, add <code>com.bhauman/cljs-test-display</code> to your dependencies.
+</td>
+</tr>
+</table>
+</div>
+</div>
 <div class="sect3">
-<h4 id="_generated_output_in_test_dir"><a class="anchor" href="#_generated_output_in_test_dir"></a><a class="link" href="#_generated_output_in_test_dir">12.2.1. Generated output in <code>:test-dir</code></a></h4>
+<h4 id="_generated_output_in_test_dir"><a class="anchor" href="#_generated_output_in_test_dir"></a><a class="link" href="#_generated_output_in_test_dir">12.2.4. Generated output in <code>:test-dir</code></a></h4>
 <div class="paragraph">
 <p>The output includes two primary artifacts in your <code>test-dir</code> folder:</p>
 </div>
@@ -5625,7 +6074,7 @@ In general you will need a config that looks like this:</p>
 <li>
 <p><code>index.html</code> - If and only if there was not already an <code>index.html</code> file present. By default the generated
 file loads the tests and runs <code>init</code> in the <code>:runner-ns</code>. You may edit or add a custom version that will
-not be overwritten.</p>
+not be overwritten. An <code>index.html</code> generated by older shadow-cljs versions keeps working.</p>
 </li>
 <li>
 <p><code>js/test.js</code> - The Javascript tests. The tests will always have this name. The entries for the module are
